@@ -8,7 +8,7 @@ import { SexyBoarder } from '@/components/sexy-boarder';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { PriceCardVariant, productMetadataSchema } from '../models/product-metadata';
+import { productMetadataSchema } from '../models/product-metadata';
 import { BillingInterval, Price, ProductWithPrices } from '../types';
 
 export function PricingCard({
@@ -46,9 +46,7 @@ export function PricingCard({
   const isBillingIntervalYearly = billingInterval === 'year';
   const metadata = productMetadataSchema.parse(product.metadata);
   const buttonVariantMap = {
-    basic: 'default',
     pro: 'sexy',
-    enterprise: 'orange',
   } as const;
 
   function handleBillingIntervalChange(billingInterval: BillingInterval) {
@@ -56,7 +54,7 @@ export function PricingCard({
   }
 
   return (
-    <WithSexyBorder variant={metadata.priceCardVariant} className='w-full flex-1'>
+    <WithSexyBorder className='w-full flex-1'>
       <div className='flex w-full flex-col rounded-md border border-zinc-800 bg-black p-4 lg:p-8'>
         <div className='p-4'>
           <div className='mb-1 text-center font-alt text-xl font-bold'>{product.name}</div>
@@ -75,12 +73,12 @@ export function PricingCard({
         {!Boolean(price) && product.prices.length > 1 && <PricingSwitch onChange={handleBillingIntervalChange} />}
 
         <div className='m-auto flex w-fit flex-1 flex-col gap-2 px-8 py-4'>
-          {metadata.generatedImages === 'enterprise' && <CheckItem text={`Unlimited banner images`} />}
-          {metadata.generatedImages !== 'enterprise' && (
-            <CheckItem text={`Generate ${metadata.generatedImages} banner images`} />
+          {metadata.researches === 'unlimited' ? (
+            <CheckItem text={`Unlimited research`} />
+          ) : (
+            <CheckItem text={`Up to ${metadata.researches} researches`} />
           )}
-          {<CheckItem text={`${metadata.imageEditor} image editing features`} />}
-          {<CheckItem text={`${metadata.supportLevel} support`} />}
+          <CheckItem text={`${metadata.supportLevel} support`} />
         </div>
 
         {createCheckoutAction && (
@@ -115,20 +113,12 @@ function CheckItem({ text }: { text: string }) {
   );
 }
 
-export function WithSexyBorder({
-  variant,
-  className,
-  children,
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant: PriceCardVariant }) {
-  if (variant === 'pro') {
-    return (
-      <SexyBoarder className={className} offset={100}>
-        {children}
-      </SexyBoarder>
-    );
-  } else {
-    return <div className={className}>{children}</div>;
-  }
+export function WithSexyBorder({ className, children }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <SexyBoarder className={className} offset={100}>
+      {children}
+    </SexyBoarder>
+  );
 }
 
 function PricingSwitch({ onChange }: { onChange: (value: BillingInterval) => void }) {

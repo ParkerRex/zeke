@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoLogoGithub, IoLogoGoogle } from 'react-icons/io5';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
-import { ActionResponse } from '@/types/action-response';
+import type { ActionResponse } from '@/types/action-response';
 
 const titleMap = {
   login: 'Login to ZEKE',
@@ -74,6 +74,7 @@ export function AuthUI({
           className='flex items-center justify-center gap-2 rounded-md bg-cyan-500 py-4 font-medium text-black transition-all hover:bg-cyan-400 disabled:bg-neutral-700'
           onClick={() => handleOAuthClick('google')}
           disabled={pending}
+          type='button'
         >
           <IoLogoGoogle size={20} />
           Continue with Google
@@ -82,6 +83,7 @@ export function AuthUI({
           className='flex items-center justify-center gap-2 rounded-md bg-fuchsia-500 py-4 font-medium text-black transition-all hover:bg-fuchsia-400 disabled:bg-neutral-700'
           onClick={() => handleOAuthClick('github')}
           disabled={pending}
+          type='button'
         >
           <IoLogoGithub size={20} />
           Continue with GitHub
@@ -92,6 +94,7 @@ export function AuthUI({
             <button
               className='text-neutral6 flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 py-4 font-medium transition-all hover:bg-zinc-800 disabled:bg-neutral-700 disabled:text-black'
               disabled={pending}
+              type='button'
             >
               Continue with Email
             </button>

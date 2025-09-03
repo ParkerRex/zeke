@@ -129,14 +129,14 @@ You did it! You should be able to look in your Stripe dashboard and see your pro
 
 Your products and prices are managed via the `stripe-fixtures.json` file. You can delete your test data in Stripe on the [Developers page](https://dashboard.stripe.com/test/developers), make the changes you'd like, and then run the fixture command from above. When changes are made in Stripe the webhook hits the api route at `src/app/api/webhooks`. The handler will synchronize the data sent from Stripe to your Supabase database.
 
-The `metadata` field in your fixture is where we can store info about the product that can be used in your app. For example, say you have a basic product, and one of the features of the product includes a max number of team invites. You can add a field to the metadata like `team_invites`. Then update the Zod schema in `src/features/pricing/models/product-metadata.ts`
+The `metadata` field in your fixture is where we can store info about the product that can be used in your app. For example, say you want to add a max number of team invites. You can add a field to the metadata like `team_invites`. Then update the Zod schema in `src/features/pricing/models/product-metadata.ts`
 
 Then you can make use of it like this:
 
 ```ts
 const products = await getProducts();
 const productMetadata = productMetadataSchema.parse(products[0].metadata); // Now it's typesafe 🙌!
-productMetadata.teamInvites; // The value you set in the fixture
+productMetadata.researches; // The value you set in the fixture
 ```
 
 ### Managing your database schema

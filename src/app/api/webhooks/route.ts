@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 
 import { upsertUserSubscription } from '@/features/account/controllers/upsert-user-subscription';
+import { softDeleteProduct } from '@/features/pricing/controllers/soft-delete-product';
 import { upsertPrice } from '@/features/pricing/controllers/upsert-price';
 import { upsertProduct } from '@/features/pricing/controllers/upsert-product';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
@@ -11,6 +12,7 @@ const relevantEvents = new Set([
   'product.updated',
   'price.created',
   'price.updated',
+  'product.deleted',
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
@@ -37,6 +39,12 @@ export async function POST(req: Request) {
         case 'product.updated':
           await upsertProduct(event.data.object as Stripe.Product);
           break;
+        case 'product.deleted': {
+          // Stripe sends a DeletedProduct object with { id, deleted: true }
+          const deleted = event.data.object as { id: string };
+          await softDeleteProduct(deleted.id);
+          break;
+        }
         case 'price.created':
         case 'price.updated':
           await upsertPrice(event.data.object as Stripe.Price);
