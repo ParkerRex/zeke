@@ -89,7 +89,7 @@ Now we're going to run the initial [Supabase Migration](https://supabase.com/doc
 
 1. Run `bunx supabase login`
 1. Run `bunx supabase init`
-1. Open your `package.json` and update both `UPDATE_THIS_WITH_YOUR_SUPABASE_PROJECT_ID` strings with your supabase project id
+1. Add `SUPABASE_PROJECT_ID` to your `.env.local` (see `.env.local.example`)
 1. Run `bun run supabase:link`
 1. Run `bun run migration:up`
 

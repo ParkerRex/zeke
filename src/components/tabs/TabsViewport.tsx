@@ -1,10 +1,12 @@
 "use client";
 import { useEffect } from "react";
-import { useTabs } from "@/lib/tabsStore";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { usePathname,useRouter } from "next/navigation";
 import { X } from "lucide-react";
+
+import { Tabs, TabsContent,TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTabs } from "@/lib/tabsStore";
+
 import StoryTab from "./StoryTab";
-import { useRouter, usePathname } from "next/navigation";
 
 export default function TabsViewport() {
   const { tabs, activeId, setActive, closeTab } = useTabs();

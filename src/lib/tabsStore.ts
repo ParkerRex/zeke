@@ -1,6 +1,7 @@
 "use client";
 import { create } from "zustand";
-import type { EmbedKind, Overlays } from "@/types/story";
+
+import type { EmbedKind, Overlays } from "@/features/stories";
 
 export type Tab = {
   id: string; // clusterId or "share:abc123"
@@ -58,4 +59,3 @@ export const useTabs = create<TabsState>((set, get) => ({
     get().openTab(tab);
   },
 }));
-

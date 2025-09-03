@@ -1,6 +1,6 @@
 "use client";
-import { Tab } from "@/lib/tabsStore";
 import { Button } from "@/components/ui/button";
+import { Tab } from "@/lib/tabsStore";
 
 export default function OverlayPanel({ tab }: { tab: Tab }) {
   const share = async () => {

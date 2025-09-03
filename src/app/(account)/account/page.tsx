@@ -31,7 +31,7 @@ export default async function AccountPage() {
   }
 
   return (
-    <section className='rounded-lg bg-black px-4 py-16'>
+    <section className='rounded-lg bg-white px-4 py-16'>
       <h1 className='mb-8 text-center'>Account</h1>
 
       <div className='flex flex-col gap-4'>
@@ -69,12 +69,12 @@ function Card({
   footer?: ReactNode;
 }>) {
   return (
-    <div className='m-auto w-full max-w-3xl rounded-md bg-zinc-900'>
+    <div className='m-auto w-full max-w-3xl rounded-md bg-gray-100'>
       <div className='p-4'>
         <h2 className='mb-1 text-xl font-semibold'>{title}</h2>
         <div className='py-4'>{children}</div>
       </div>
-      <div className='flex justify-end rounded-b-md border-t border-zinc-800 p-4'>{footer}</div>
+      <div className='flex justify-end rounded-b-md border-t border-gray-200 p-4'>{footer}</div>
     </div>
   );
 }

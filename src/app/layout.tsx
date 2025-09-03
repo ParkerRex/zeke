@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Montserrat, Montserrat_Alternates } from 'next/font/google';
 import Link from 'next/link';
 import { IoLogoFacebook, IoLogoInstagram, IoLogoTwitter } from 'react-icons/io5';
@@ -65,7 +65,10 @@ export const metadata: Metadata = {
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
-  themeColor: '#000000',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#FFFFFF',
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
@@ -97,45 +100,45 @@ async function AppBar() {
 
 function Footer() {
   return (
-    <footer className='mt-8 flex flex-col gap-8 text-neutral-400 lg:mt-32'>
+    <footer className='mt-8 flex flex-col gap-8 text-gray-600 lg:mt-32'>
       <div className='flex flex-col justify-between gap-8 lg:flex-row'>
         <div>
           <Logo />
         </div>
         <div className='grid grid-cols-2 gap-8 sm:grid-cols-4 lg:grid-cols-4 lg:gap-16'>
           <div className='flex flex-col gap-2 lg:gap-6'>
-            <div className='font-semibold text-neutral-100'>Product</div>
+            <div className='font-semibold text-black'>Product</div>
             <nav className='flex flex-col gap-2 lg:gap-6'>
-              <Link href='/pricing'>Pricing</Link>
+              <Link href='/pricing' className='hover:underline transition-all duration-150 cursor-pointer'>Pricing</Link>
             </nav>
           </div>
           <div className='flex flex-col gap-2 lg:gap-6'>
-            <div className='font-semibold text-neutral-100'>Company</div>
+            <div className='font-semibold text-black'>Company</div>
             <nav className='flex flex-col gap-2 lg:gap-6'>
-              <Link href='/about-us'>About Us</Link>
-              <Link href='/privacy'>Privacy</Link>
+              <Link href='/about-us' className='hover:underline transition-all duration-150 cursor-pointer'>About Us</Link>
+              <Link href='/privacy' className='hover:underline transition-all duration-150 cursor-pointer'>Privacy</Link>
             </nav>
           </div>
           <div className='flex flex-col gap-2 lg:gap-6'>
-            <div className='font-semibold text-neutral-100'>Support</div>
+            <div className='font-semibold text-black'>Support</div>
             <nav className='flex flex-col gap-2 lg:gap-6'>
-              <Link href='/support'>Get Support</Link>
+              <Link href='/support' className='hover:underline transition-all duration-150 cursor-pointer'>Get Support</Link>
             </nav>
           </div>
           <div className='flex flex-col gap-2 lg:gap-6'>
-            <div className='font-semibold text-neutral-100'>Follow us</div>
+            <div className='font-semibold text-black'>Follow us</div>
             <nav className='flex flex-col gap-2 lg:gap-6'>
-              <Link href='#'>
+              <Link href='#' className='hover:underline transition-all duration-150 cursor-pointer'>
                 <span className='flex items-center gap-2'>
                   <IoLogoTwitter size={22} /> <span>Twitter</span>
                 </span>
               </Link>
-              <Link href='#'>
+              <Link href='#' className='hover:underline transition-all duration-150 cursor-pointer'>
                 <span className='flex items-center gap-2'>
                   <IoLogoFacebook size={22} /> <span>Facebook</span>
                 </span>
               </Link>
-              <Link href='#'>
+              <Link href='#' className='hover:underline transition-all duration-150 cursor-pointer'>
                 <span className='flex items-center gap-2'>
                   <IoLogoInstagram size={22} /> <span>Instagram</span>
                 </span>
@@ -144,8 +147,8 @@ function Footer() {
           </div>
         </div>
       </div>
-      <div className='border-t border-zinc-800 py-6 text-center'>
-        <span className='text-neutral4 text-xs'>Copyright {new Date().getFullYear()} © ZEKE </span>
+      <div className='border-t border-gray-200 py-6 text-center'>
+        <span className='text-gray-500 text-xs'>Copyright {new Date().getFullYear()} © ZEKE </span>
       </div>
     </footer>
   );

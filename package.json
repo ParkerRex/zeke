@@ -11,8 +11,8 @@
     "email:dev": "email dev --dir ./src/features/emails --port 3001",
     "email:export": "email export",
     "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks --project-name=default",
-    "generate-types": "supabase gen types typescript --project-id hblelrtwdpukaymtpchv --schema public > src/libs/supabase/types.ts",
-    "supabase:link": "env-cmd -f ./.env.local supabase link --project-ref hblelrtwdpukaymtpchv",
+    "generate-types": "env-cmd -f ./.env.local supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/libs/supabase/types.ts",
+    "supabase:link": "env-cmd -f ./.env.local supabase link --project-ref $SUPABASE_PROJECT_ID",
     "migration:new": "supabase migration new",
     "migration:up": "supabase migration up --linked --debug && npm run generate-types",
     "migration:squash": "supabase migration squash --linked"
@@ -64,6 +64,9 @@
     "prettier-plugin-tailwindcss": "^0.3.0",
     "supabase": "^2.39.2",
     "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "overrides": {
     "@types/react": "19.0.4",

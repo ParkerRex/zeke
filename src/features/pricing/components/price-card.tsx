@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { IoCheckmark } from 'react-icons/io5';
 
-import { SexyBoarder } from '@/components/sexy-boarder';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -46,7 +45,7 @@ export function PricingCard({
   const isBillingIntervalYearly = billingInterval === 'year';
   const metadata = productMetadataSchema.parse(product.metadata);
   const buttonVariantMap = {
-    pro: 'sexy',
+    pro: 'default',
   } as const;
 
   function handleBillingIntervalChange(billingInterval: BillingInterval) {
@@ -54,25 +53,30 @@ export function PricingCard({
   }
 
   return (
-    <WithSexyBorder className='w-full flex-1'>
-      <div className='flex w-full flex-col rounded-md border border-zinc-800 bg-black p-4 lg:p-8'>
-        <div className='p-4'>
-          <div className='mb-1 text-center font-alt text-xl font-bold'>{product.name}</div>
-          <div className='flex justify-center gap-0.5 text-zinc-400'>
-            <span className='font-semibold'>
+    <WithSexyBorder className='w-full'>
+      <div className='flex h-full w-full flex-col rounded-2xl border border-gray-200 bg-white p-6 lg:p-8 shadow-sm'>
+        <div className='text-center'>
+          <div className='mb-2 font-alt text-2xl font-bold text-gray-900'>{product.name}</div>
+          {!Boolean(price) && product.prices.length > 1 && (
+            <div className='mb-3'>
+              <PricingSwitch onChange={handleBillingIntervalChange} />
+            </div>
+          )}
+          <div className='mb-6 flex items-end justify-center gap-2 text-gray-900'>
+            <span className='text-5xl font-extrabold tracking-tight'>
               {yearPrice && isBillingIntervalYearly
                 ? '$' + yearPrice / 100
                 : monthPrice
                 ? '$' + monthPrice / 100
                 : 'Custom'}
             </span>
-            <span>{yearPrice && isBillingIntervalYearly ? '/year' : monthPrice ? '/month' : null}</span>
+            <span className='pb-2 text-sm text-gray-500'>
+              {yearPrice && isBillingIntervalYearly ? '/year' : monthPrice ? '/month' : null}
+            </span>
           </div>
         </div>
 
-        {!Boolean(price) && product.prices.length > 1 && <PricingSwitch onChange={handleBillingIntervalChange} />}
-
-        <div className='m-auto flex w-fit flex-1 flex-col gap-2 px-8 py-4'>
+        <div className='mx-auto w-full max-w-xs flex-1 space-y-3 py-2'>
           {metadata.researches === 'unlimited' ? (
             <CheckItem text={`Unlimited research`} />
           ) : (
@@ -82,7 +86,7 @@ export function PricingCard({
         </div>
 
         {createCheckoutAction && (
-          <div className='py-4'>
+          <div className='mt-6'>
             {currentPrice && (
               <Button
                 variant={buttonVariantMap[metadata.priceCardVariant]}
@@ -106,18 +110,18 @@ export function PricingCard({
 
 function CheckItem({ text }: { text: string }) {
   return (
-    <div className='flex items-center gap-2'>
-      <IoCheckmark className='my-auto flex-shrink-0 text-slate-500' />
-      <p className='text-sm font-medium text-white first-letter:capitalize'>{text}</p>
+    <div className='flex items-center gap-3'>
+      <IoCheckmark className='my-auto flex-shrink-0 text-emerald-600 text-lg' />
+      <p className='text-sm font-medium text-gray-700 first-letter:capitalize'>{text}</p>
     </div>
   );
 }
 
-export function WithSexyBorder({ className, children }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function WithSexyBorder({ className, children }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <SexyBoarder className={className} offset={100}>
+    <div className={className}>
       {children}
-    </SexyBoarder>
+    </div>
   );
 }
 

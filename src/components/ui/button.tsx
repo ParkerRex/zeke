@@ -4,26 +4,25 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/cn';
 import { Slot } from '@radix-ui/react-slot';
 
-import { SexyBoarder } from '../sexy-boarder';
+import { FramedContainer } from '../sexy-boarder';
 
 const buttonVariants = cva(
-  'w-fit inline-flex items-center justify-center whitespace-nowrap text-sm rounded-md font-alt font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
+  'w-fit inline-flex items-center justify-center whitespace-nowrap text-sm rounded-md font-alt font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer',
   {
     variants: {
       variant: {
-        default: 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-        orange: 'bg-orange-500 hover:bg-orange-400',
-        sexy: 'transition-all bg-black hover:bg-opacity-0',
+        default: 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-red-400',
+        outline: 'border border-gray-300 bg-white text-black hover:bg-gray-50 focus:ring-gray-200',
+        secondary: 'bg-gray-100 text-black hover:bg-gray-200 focus:ring-gray-200',
+        ghost: 'hover:bg-gray-100 hover:text-black focus:ring-gray-200',
+        link: 'text-black underline-offset-4 hover:underline focus:ring-gray-200',
+        minimal: 'border border-gray-200 bg-white text-black hover:border-gray-400 focus:ring-gray-200',
       },
       size: {
         default: 'h-10 px-4',
         sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
+        lg: 'h-12 rounded-md px-8',
         icon: 'h-9 w-9',
       },
     },
@@ -61,8 +60,8 @@ export function WithSexyBorder({
   className?: string;
   children: React.ReactNode;
 }) {
-  if (variant === 'sexy') {
-    return <SexyBoarder className={className}>{children}</SexyBoarder>;
+  if (variant === 'minimal') {
+    return <FramedContainer className={className}>{children}</FramedContainer>;
   } else {
     return <>{children}</>;
   }

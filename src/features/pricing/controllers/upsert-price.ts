@@ -8,7 +8,8 @@ type Price = Database['public']['Tables']['prices']['Row'];
 export async function upsertPrice(price: Stripe.Price) {
   const priceData: Price = {
     id: price.id,
-    product_id: typeof price.product === 'string' ? price.product : '',
+    // Set to null when product is not a string ID to avoid FK violations
+    product_id: typeof price.product === 'string' ? price.product : null,
     active: price.active,
     currency: price.currency,
     description: price.nickname ?? null,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getShareSnapshot, getStoryById } from '@/server/stories';
+import { getShareSnapshot, getStoryById } from '@/features/stories';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

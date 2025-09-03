@@ -1,7 +1,6 @@
-import { Cluster } from "@/types/story";
+import type { Cluster } from "@/features/stories";
 
-// Minimal in-memory dataset for scaffolding
-const sampleClusters: Cluster[] = [
+export const sampleClusters: Cluster[] = [
   {
     id: "clu_123",
     title: "Mistral releases 8x7B",
@@ -34,17 +33,4 @@ const sampleClusters: Cluster[] = [
     },
   },
 ];
-
-export function listStories(): Cluster[] {
-  return sampleClusters;
-}
-
-export function getStoryById(id: string): Cluster | undefined {
-  return sampleClusters.find((c) => c.id === id);
-}
-
-export function getShareSnapshot(id: string): Cluster | undefined {
-  // For prototype, reuse the same dataset
-  return getStoryById(id) ?? sampleClusters[0];
-}
 

@@ -7,6 +7,9 @@ import { upsertProduct } from '@/features/pricing/controllers/upsert-product';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
 import { getEnvVar } from '@/utils/get-env-var';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const relevantEvents = new Set([
   'product.created',
   'product.updated',
@@ -26,7 +29,9 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    if (!sig || !webhookSecret) return;
+    if (!sig) {
+      return Response.json('Missing stripe-signature header', { status: 400 });
+    }
     event = stripeAdmin.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (error) {
     return Response.json(`Webhook Error: ${(error as any).message}`, { status: 400 });

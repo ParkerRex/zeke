@@ -1,4 +1,5 @@
-import { listStories } from "@/server/stories";
+import { listStories } from "@/features/stories";
+
 import StoryRow from "./StoryRow";
 
 export default async function FeedList() {
@@ -12,4 +13,3 @@ export default async function FeedList() {
     </div>
   );
 }
-

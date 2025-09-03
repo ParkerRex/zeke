@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getStoryById } from '@/server/stories';
+import { getStoryById } from '@/features/stories';
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const cluster = getStoryById(params.id);

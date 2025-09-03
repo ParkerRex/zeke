@@ -11,29 +11,31 @@ export async function PricingSection({ isPricingPage }: { isPricingPage?: boolea
   const HeadingLevel = isPricingPage ? 'h1' : 'h2';
 
   return (
-    <section className='relative rounded-lg bg-black py-8'>
-      <div className='relative z-10 m-auto flex max-w-[1200px] flex-col items-center gap-8 px-4 pt-8 lg:pt-[140px]'>
-        <HeadingLevel className='max-w-4xl bg-gradient-to-br from-white to-neutral-200 bg-clip-text text-center text-4xl font-bold text-transparent lg:text-6xl'>
+    <section className='relative overflow-hidden rounded-lg bg-white'>
+      {/* Top art reserves height so heading never overlaps */}
+      <div className='relative h-[180px] sm:h-[220px] lg:h-[300px]'>
+        <Image
+          src='/section-bg.png'
+          alt=''
+          fill
+          priority={isPricingPage}
+          quality={100}
+          className='rounded-t-lg object-cover'
+        />
+      </div>
+      <div className='relative z-10 m-auto flex max-w-[1200px] flex-col items-center gap-8 px-4 py-8'>
+        <HeadingLevel className='max-w-4xl bg-gradient-to-br from-black to-gray-800 bg-clip-text text-center text-4xl font-bold text-transparent lg:text-6xl'>
           Predictable pricing for every use case.
         </HeadingLevel>
         <p className='text-center text-xl'>
           Find a plan that fits you. Upgrade at any time to enable additional features.
         </p>
-        <div className='flex w-full flex-col items-center justify-center gap-2 lg:flex-row lg:gap-8'>
+        <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {products.map((product) => {
             return <PricingCard key={product.id} product={product} createCheckoutAction={createCheckoutAction} />;
           })}
         </div>
       </div>
-      <Image
-        src='/section-bg.png'
-        width={1440}
-        height={462}
-        alt=''
-        className='absolute left-0 top-0 rounded-t-lg'
-        priority={isPricingPage}
-        quality={100}
-      />
     </section>
   );
 }
