@@ -34,6 +34,14 @@ Bootstrap your SaaS with a modern tech stack built to move quick. Follow the gui
 
 ## Getting started
 
+### Supabase CLI
+
+- This project uses the npm package `supabase` (local devDependency) so commands are reproducible via `bun run` or `npm run`.
+- Scripts call the local binary in `node_modules/.bin` (no global/brew dependency).
+- If you previously installed the Homebrew CLI, uninstall to avoid PATH conflicts:
+  - `brew uninstall supabase` (and optionally `brew untap supabase/tap`).
+  - Verify with `which supabase` → should point into `node_modules/.bin` when running scripts.
+
 ### 1. Setup Supabase
 
 1. Go to [supabase.com](https://supabase.com) and create a project
