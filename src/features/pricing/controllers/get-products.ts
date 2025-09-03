@@ -1,6 +1,8 @@
 import { createSupabaseServerClient } from '@/libs/supabase/supabase-server-client';
 
-export async function getProducts() {
+import { ProductWithPrices } from '../types';
+
+export async function getProducts(): Promise<ProductWithPrices[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -15,5 +17,5 @@ export async function getProducts() {
     console.error(error.message);
   }
 
-  return data ?? [];
+  return (data as ProductWithPrices[]) ?? [];
 }

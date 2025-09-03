@@ -1,6 +1,7 @@
+import { SubscriptionWithProduct } from '@/features/pricing/types';
 import { createSupabaseServerClient } from '@/libs/supabase/supabase-server-client';
 
-export async function getSubscription() {
+export async function getSubscription(): Promise<SubscriptionWithProduct | null> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -13,5 +14,5 @@ export async function getSubscription() {
     console.error(error);
   }
 
-  return data;
+  return data as SubscriptionWithProduct | null;
 }
