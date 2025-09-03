@@ -113,19 +113,19 @@ alter table public.watchlist enable row level security;
 alter table public.share enable row level security;
 alter table public.digest_subscription enable row level security;
 
-create policy if not exists "own bookmarks" on public.bookmark
+create policy "own bookmarks" on public.bookmark
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-create policy if not exists "own highlights" on public.highlight
+create policy "own highlights" on public.highlight
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-create policy if not exists "own watchlists" on public.watchlist
+create policy "own watchlists" on public.watchlist
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Allow public read of share snapshots; only owner can insert/delete
-create policy if not exists "read shares" on public.share for select using (true);
-create policy if not exists "own shares write" on public.share for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "read shares" on public.share for select using (true);
+create policy "own shares write" on public.share for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-create policy if not exists "own digest sub" on public.digest_subscription
+create policy "own digest sub" on public.digest_subscription
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 

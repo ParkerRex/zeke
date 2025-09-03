@@ -1,21 +1,10 @@
-'use client';
-import { useEffect } from 'react';
+import ShareClient from './share-client';
 
-import { useTabs } from '@/lib/tabsStore';
-export default function ShareRoute({ params }: { params: { shareId: string } }) {
-  const { restoreFromUrl, setActive } = useTabs();
-  const id = params.shareId;
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      await restoreFromUrl(id, true);
-      if (mounted) setActive(`share:${id}`);
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [id, restoreFromUrl, setActive]);
-
-  return null;
+export default async function ShareRoute({
+  params,
+}: {
+  params: Promise<{ shareId: string }>;
+}) {
+  const { shareId } = await params;
+  return <ShareClient id={shareId} />;
 }
