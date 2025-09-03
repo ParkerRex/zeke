@@ -1,23 +1,10 @@
-"use client";
-import { useEffect } from "react";
+import StoryClient from './story-client';
 
-import { useTabs } from "@/lib/tabsStore";
-
-export default function StoryRoute({ params }: { params: { clusterId: string } }) {
-  const { restoreFromUrl, setActive } = useTabs();
-  const id = params.clusterId;
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      await restoreFromUrl(id, false);
-      if (mounted) setActive(id);
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [id, restoreFromUrl, setActive]);
-
-  return null;
+export default async function StoryRoute({
+  params,
+}: {
+  params: Promise<{ clusterId: string }>;
+}) {
+  const { clusterId } = await params;
+  return <StoryClient id={clusterId} />;
 }
-
