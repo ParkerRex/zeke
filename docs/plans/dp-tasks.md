@@ -6,7 +6,7 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 
 Priority
 
-- [ ] Deploy worker to Cloud Run (Session Pooler URL, `BOSS_MIGRATE=false`) and verify heartbeat in logs.
+- [x] Deploy worker to Cloud Run (Session Pooler URL, `BOSS_MIGRATE=false`) and verify heartbeat in logs.
 - [ ] Implement `ingest:pull` (RSS first) + schedule via pg-boss cron (every 5 min); upsert `raw_items` and enqueue `ingest:fetch-content`.
 - [ ] Implement Extraction v1 (Readability + canonicalize + `content_hash`) writing `contents`/`stories`.
 - [ ] Add `/api/stories` and `/api/stories/:id` serving reader text.
