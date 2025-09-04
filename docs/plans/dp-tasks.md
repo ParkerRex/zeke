@@ -2,6 +2,29 @@
 
 This checklist captures tasks discussed in the diagram planning thread and ties them to the pipeline spec. Grouped for execution clarity.
 
+## Suggested Next Steps (now)
+
+Stack Bootstrap (priority)
+
+- [x] pg-boss setup: create `pgboss` schema, grant `worker` role (CONNECT, CREATE), verify SSL.
+- [x] Worker scaffold + local run: pg-boss + queues created, `/healthz`, scheduled `system:heartbeat` OK.
+- [ ] Deploy worker to Cloud Run (Session Pooler URL) and verify heartbeat in logs.
+- [ ] Observability baseline: structured logs, job heartbeat/latency metrics; confirm retries and DLQ work.
+
+Database Bootstrap
+
+- [ ] Enable pgvector in Supabase and add `ivfflat` index for `story_embeddings.embedding`.
+- [ ] Phase 0 SQL migrations: `sources`, `raw_items`, `contents`, `stories`, `clusters` (1:N), `story_overlays`, `story_embeddings vector(1536)`, `highlights`; unique indexes and constraints.
+
+Core Workflows v1
+
+- [ ] Ingestion v1: RSS, HN, arXiv connectors with cursors; upsert `raw_items` (idempotent) and enqueue `fetch-content`.
+- [ ] Extraction v1: Readability HTML → `contents.text`, canonicalize URLs, compute `content_hash`, upsert `contents`/`stories` with link-by-hash.
+- [ ] APIs v1: `/api/stories` (list with representative + overlays lite placeholder) and `/api/stories/:id` (story + `contents.text`).
+- [ ] Highlights MVP: create `/api/highlights` (POST/GET) with spans anchored to `contents.text`.
+- [ ] RLS policies: authenticated reads for stories/overlays; per-user RLS on highlights; service-role writes for worker.
+- [ ] Local dev: seed 10–20 fixtures and enable “analysis stub” overlays for UI work.
+
 ## Documentation & Diagrams
 
 - [x] Create `docs/plans/dp-diagrams.md` with Mermaid diagrams
@@ -15,22 +38,22 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 
 ## Architecture & Boundaries
 
-- [ ] Validate trust boundaries: RLS in app routes, service role only in worker
+- [ ] Validate trust boundaries: authenticated reads via RLS; service role only in worker (no anon)
 - [ ] Document secret handling and least-privilege keys per environment
-- [ ] Confirm deployment topology (Vercel Edge, Worker host, Supabase)
-- [ ] Define environment variables per role (anon, service role, storage)
-- [ ] Write RLS policies for read paths and limit public access
+- [ ] Confirm deployment topology (Next.js, Cloud Run Worker, Supabase)
+- [ ] Define environment variables per role (edge auth keys, service role, storage)
+- [ ] Write RLS policies for read paths (auth required) and per-user tables (highlights)
 
 ## Data Model
 
-- [ ] Finalize tables: `sources`, `raw_items`, `contents`, `stories`, `story_overlays`, `story_embeddings`, `clusters`
+- [ ] Finalize tables: `sources`, `raw_items`, `contents`, `stories`, `clusters`, `story_overlays`, `story_embeddings`, `highlights`
 - [ ] Add `content_hash`-based dedupe and indexes
-- [ ] Define `cluster_key` computation and uniqueness constraints
+- [ ] Define `cluster_key` computation and 1:N cluster→stories cardinality
 - [ ] Store `citations` structure and `model_version` in overlays
 - [ ] Create SQL migrations (tables, indexes, constraints, comments)
 - [ ] Add unique (source_id, external_id) on `raw_items`
-- [ ] Add `sources.last_cursor jsonb` and `last_checked` timestamp
-- [ ] Add pgvector extension and index on `story_embeddings`
+- [ ] Add `sources.last_cursor jsonb`, `last_checked`, `domain`, `authority_score`
+- [ ] Add pgvector extension and index on `story_embeddings (vector(1536))`
 - [ ] Buckets: create Storage buckets (raw-html, pdfs, audio, transcripts, images)
 
 ## Ingestion
@@ -50,16 +73,17 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 - [ ] Compute and persist `content_hash` on normalized text
 - [ ] Upsert `contents` and `stories`; link existing by `content_hash`
 - [ ] Canonicalize URLs (strip UTM, resolve redirects) before hashing
-- [ ] PDF path: fetch and extract text; store pdf; section spans (optional)
-- [ ] Language detection; mark unsupported for now or label in UI
+- [ ] PDF path: fetch and extract text; store pdf; fall back to managed OCR if extraction is poor
+- [ ] Language detection; mark unsupported for now
 - [ ] Storage naming by `content_hash`; retention policy for large audio
+- [ ] Annotation-ready: define highlight span format anchored to `contents.text`
 
 ## Clustering
 
 - [ ] Compute `cluster_key` and check near-duplicates
 - [ ] SimHash/Hamming and/or cosine similarity thresholds (e.g., ≤6, ≥0.85)
-- [ ] Maintain `clusters` membership and representatives
-- [ ] Choose representative selection strategy (freshness, quality)
+- [ ] Maintain `clusters` table; persist `representative_story_id`
+- [ ] Choose representative selection strategy (freshness, authority)
 - [ ] Expose manual split/merge tooling (admin)
 - [ ] Aggregate cluster signals (counts, recency velocity) for hype/confidence
 
@@ -81,33 +105,33 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 
 ## Scheduling & Orchestration
 
-- [ ] Choose queue (pg-boss or jobs table) and implement claim/retry semantics
-- [ ] Supabase Scheduled Functions or Vercel Cron for enqueuing
-- [ ] Worker for long tasks (transcription, PDF parsing, LLM analysis)
+- [ ] Choose queue (pg-boss) and implement claim/retry semantics
+- [ ] Configure pg-boss cron for recurring jobs (ingest pulls)
+- [ ] Cloud Run worker for long tasks (transcription, PDF parsing, LLM analysis)
 - [ ] Ensure idempotency via upserts and advisory locks
 - [ ] Implement retries, backoff, and dead-letter handling
 - [ ] Concurrency controls per job type (e.g., transcription workers)
 - [ ] Backfill support with cursors and throttles
 
+### DB setup for pg-boss
+
+- [ ] Create `pgboss` schema and grant privileges to a dedicated `worker` DB user
+- [ ] Verify SSL connection string (`?sslmode=require`) and `ssl.rejectUnauthorized=false` in Node client
+
 ## Serving
 
 - [ ] `/api/stories` list with filters and clusters + overlays lite
 - [ ] `/api/stories/:id` detail with overlays, citations, safe embed URL
-- [ ] `/api/share` snapshot with immutable `share_id`
 - [ ] Cursor-based pagination and stable ordering
 - [ ] Safe embed enforcement (https, referrerPolicy, sandbox)
 - [ ] Internal reader for articles/transcripts; sanitize HTML rendering
 - [ ] Clustered listing UX (representative + alternates)
 - [ ] Per-medium rendering: article/pdf (reader + link), youtube/podcast (transcript-first + player), reddit/HN (internal text + thread link)
-- [ ] `/api/share` snapshot: denormalize payload for immutability
+- [ ] `/api/highlights` create/list for annotations
 
 ## Cost Controls
 
-- [ ] Rate-limit per source; track LLM tokens and batch embeddings
-- [ ] Gated transcription for long media; delete large audio post-transcript
-- [ ] Re-analyze only on `content_hash` change or model upgrade
-- [ ] Track per-stage cost metrics; add kill switches
-- [ ] Prefer available transcripts; fall back to Whisper selectively
+- [ ] Defer detailed cost controls; basic guardrails only (re-analyze on content change)
 
 ## Observability & Quality
 
@@ -139,7 +163,7 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 - [ ] Domain whitelist vs. open web startup strategy; define initial allowlist
 - [ ] Storage choice for raw artifacts: Supabase Storage vs S3 (encryption, lifecycle)
 - [ ] Inline reader vs. iframe embed defaults per media type
-- [ ] Queue selection (pg-boss vs custom jobs table) and hosting for worker
+- [ ] Queue selection (pg-boss vs custom jobs table) and Cloud Run config
 - [ ] Cluster thresholds and similarity methods; revisit after initial data
 - [ ] Domain reliability model approach and data sources
 - [ ] Language policy: skip, label, or translate non-English content
@@ -147,7 +171,7 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 
 ## Delivery Phases
 
-- [ ] Phase 0: tables, RSS/HN/arXiv ingest, extraction, dedupe, basic serving
-- [ ] Phase 1: overlays generation, embeddings, UI wiring
-- [ ] Phase 2: clustering, citations, YT/Podcast transcripts
+- [ ] Phase 0: tables, RSS/HN/arXiv ingest, extraction, dedupe, reader serving
+- [ ] Phase 1: overlays generation, embeddings, highlights API
+- [ ] Phase 2: clustering, citations, YT/Podcast transcripts, PDF improvements
 - [ ] Phase 3: queue/worker hardening, monitoring, editorial loop, domain reliability

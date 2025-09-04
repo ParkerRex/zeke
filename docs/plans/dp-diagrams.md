@@ -8,16 +8,18 @@ Shows the main components and external dependencies and how they communicate.
 
 ```mermaid
 graph LR
-  U[Browser App] --> R[Next.js Routes/Edge]
+  U[Browser App] --> R[Next.js Routes]
   R --> DB[(Supabase Postgres + pgvector)]
   R --> ST[(Supabase Storage)]
-  R -. cron/enqueue .-> W[Background Worker]
+  DB -. pg-boss (cron/enqueue) .-> W[Cloud Run Worker (Node/TS)]
   R -. source fetch .-> Ext[External Sources: RSS, HN, Reddit, YouTube, arXiv]
+  U -. Reader/Annotator .- R
   W --> DB
   W --> ST
   W -.-> LLM[LLM API]
   W -.-> EMB[Embeddings API]
   W -.-> YTDLP[yt-dlp/Whisper]
+  W -. pdf OCR .-> OCR[[PDF Extraction Service (optional)]]
 ```
 
 ## Deployment Topology
@@ -30,19 +32,20 @@ graph TB
     UI[User]
   end
   subgraph Vercel/Next.js
-    Edge[Route Handlers + Cron]
+    Web[Route Handlers]
   end
-  subgraph Worker Host
-    Work[Queue Worker]
+  subgraph GCP Cloud Run
+    Work[Queue Worker (Node/TS)]
   end
   subgraph Supabase
-    PG[(Postgres)]
+    PG[(Postgres + pgvector)]
     STO[(Storage)]
+    BOSS[(pg-boss schema)]
   end
-  UI-->Edge
-  Edge-->PG
-  Edge-->STO
-  Edge-. enqueue jobs .->Work
+  UI-->Web
+  Web-->PG
+  Web-->STO
+  BOSS-. schedules/enqueues .->Work
   Work-->PG
   Work-->STO
 ```
@@ -53,13 +56,13 @@ Highlights public vs private components and where RLS/service-role apply.
 
 ```mermaid
 graph LR
-  subgraph Public RLS
-    Edge[Next.js Routes]
+  subgraph Authenticated RLS (no anon)
+    Web[Next.js Routes]
   end
   subgraph Private Service Role
-    Work[Background Worker]
+    Work[Cloud Run Worker]
   end
-  Edge-->PG[(Postgres + RLS)]
+  Web-->PG[(Postgres + RLS)]
   Work-->PG
   Work-->STO[(Storage)]
 ```
@@ -94,16 +97,25 @@ Walks through a single ingest run from cron to queued content fetch.
 
 ```mermaid
 sequenceDiagram
-  participant Cron
-  participant Edge as Edge Function/Route
+  participant Boss as pg-boss (cron)
+  participant Work as Worker
   participant API as Source API
   participant DB as Supabase
-  participant Q as Queue
-  Cron->>Edge: ingest:pull(source,cursor)
-  Edge->>API: fetch new items
-  API-->>Edge: items
-  Edge->>DB: upsert raw_items
-  Edge->>Q: enqueue fetch-content
+  Boss-->>Work: enqueue ingest:pull(source,cursor)
+  Work->>API: fetch new items
+  API-->>Work: items
+  Work->>DB: upsert raw_items
+  Work-->>Boss: enqueue fetch-content
+```
+
+## Scheduling (pg‑boss)
+
+```mermaid
+graph LR
+  B[pg-boss cron] --> E[enqueue jobs]
+  E --> W[Cloud Run Worker]
+  W -->|claim/ack| B
+  W --> D[(Supabase)]
 ```
 
 ## Content Fetch & Normalization
@@ -150,9 +162,10 @@ erDiagram
   sources ||--o{ raw_items : has
   raw_items ||--|| contents : yields
   contents ||--|| stories : feeds
+  clusters ||--o{ stories : groups
   stories ||--o{ story_overlays : has
   stories ||--o{ story_embeddings : has
-  stories }o--o{ clusters : member_of
+  stories ||--o{ highlights : has
 ```
 
 ## Clustering Decision Flow
@@ -186,6 +199,25 @@ flowchart LR
   WH --> TXT[VTT + Plain Text]
   TXT --> STO[(Storage transcripts)]
   STO --> DB[(contents.transcript_url, text)]
+```
+
+## Reader & Annotation Flow
+
+End-to-end flow for reading and highlighting across mediums (articles, PDFs, transcripts).
+
+```mermaid
+sequenceDiagram
+  participant UI as Reader/Annotator UI
+  participant API as Next.js /api/stories
+  participant DB as Supabase
+  UI->>API: GET /api/stories/:id
+  API->>DB: SELECT story, contents, overlays
+  DB-->>API: rows (text + metadata)
+  API-->>UI: story + contents.text (+ transcript/pdf text)
+  UI->>API: POST /api/highlights {story_id, content_id, span}
+  API->>DB: INSERT highlights (offsets anchored to content_hash)
+  DB-->>API: id
+  API-->>UI: {id}
 ```
 
 ## Job State Machine
