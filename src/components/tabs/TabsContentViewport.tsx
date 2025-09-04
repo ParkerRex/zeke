@@ -12,5 +12,14 @@ export default function TabsContentViewport() {
     if (pathname === "/stories") return <StoriesGridClient variant="full" />;
     return <div className="p-6 text-muted-foreground">Open a story to begin.</div>;
   }
-  return <StoryTab tab={active} />;
+  return (
+    <div
+      role="tabpanel"
+      id={`tabpanel-${active.id}`}
+      aria-labelledby={`tab-${active.id}`}
+      className="h-full"
+    >
+      <StoryTab tab={active} />
+    </div>
+  );
 }

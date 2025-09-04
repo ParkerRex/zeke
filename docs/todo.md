@@ -25,8 +25,9 @@ big news:
 - [ ] optimistic updates
 - [ ] feature based file org
 - [ ] in mem persistence
+- [ ] store for the tabs
 
-### Story cards:
+# Story cards:
 
 for hackernews:
 

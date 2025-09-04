@@ -1,9 +1,11 @@
 
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Pin } from 'lucide-react';
 
 import { useTabs } from '@/lib/tabsStore';
+import { toast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import { StoryKindIcon } from '@/components/stories/StoryKindIcon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -15,11 +17,21 @@ import {
 } from '@/components/ui/context-menu';
 
 export default function TabsStrip() {
-  const { tabs, activeId, setActive, closeTab, promoteTab, pinTab, closeOthers, closeToRight } = useTabs();
+  const { tabs, activeId, setActive, closeTab, promoteTab, pinTab, closeOthers, closeToRight, batch } = useTabs();
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
   const ytThumb = (url: string) => {
     try {
-      const m = url.match(/\/embed\/([a-zA-Z0-9_-]+)/);
-      const id = m?.[1];
+      // Support /embed/ID, watch?v=ID, youtu.be/ID
+      let id: string | undefined;
+      const embed = url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+      if (embed) id = embed[1];
+      if (!id) {
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) id = u.pathname.split('/').filter(Boolean)[0];
+        if (!id && u.searchParams.get('v')) id = String(u.searchParams.get('v'));
+      }
       return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined;
     } catch {
       return undefined;
@@ -30,7 +42,9 @@ export default function TabsStrip() {
       const u = new URL(url);
       return u.hostname.replace(/^www\./, '');
     } catch {
-      return url;
+      // Fallback for non-absolute URLs
+      const m = String(url).replace(/^https?:\/\//, '').split('/')[0] || '';
+      return m.replace(/^www\./, '');
     }
   };
 
@@ -50,6 +64,9 @@ export default function TabsStrip() {
       const meta = e.metaKey || e.ctrlKey;
       if (!meta) return;
       if (isEditable(e.target)) return;
+      // Do not hijack shortcuts when an iframe (viewer) has focus
+      const active = document.activeElement?.tagName.toLowerCase();
+      if (active === 'iframe') return;
       // Close active tab
       if (e.key.toLowerCase() === 'w') {
         if (activeId) {
@@ -72,14 +89,36 @@ export default function TabsStrip() {
     return () => window.removeEventListener('keydown', onKey);
   }, [activeId, tabs, setActive, closeTab]);
 
+  // Show/hide edge fades only when overflowed and based on scroll position
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const update = () => {
+      const ov = el.scrollWidth > el.clientWidth + 2;
+      if (!ov) {
+        setShowLeft(false);
+        setShowRight(false);
+        return;
+      }
+      setShowLeft(el.scrollLeft > 2);
+      setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
   return (
-    <TooltipProvider delayDuration={500}>
       <div className='flex min-w-0 items-center gap-2 overflow-hidden'>
         <div className='relative ml-0 flex min-w-0 flex-1 overflow-hidden'>
           {/* Scroll fade gradients */}
-          <div className='pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent' />
-          <div className='pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent' />
-          <div className='no-scrollbar -mx-1 flex max-w-full flex-1 items-center overflow-x-auto px-1 select-none'>
+          <div className={`pointer-events-none absolute left-0 top-0 h-full w-4 bg-gradient-to-r from-white to-transparent transition-opacity ${showLeft ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`pointer-events-none absolute right-0 top-0 h-full w-4 bg-gradient-to-l from-white to-transparent transition-opacity ${showRight ? 'opacity-100' : 'opacity-0'}`} />
+          <div ref={scrollerRef} role='tablist' aria-label='Open stories' className='no-scrollbar -mx-1 flex max-w-full flex-1 items-center overflow-x-auto px-1 select-none'>
           {tabs.map((t, idx) => (
             <div key={t.id} className='flex items-center'>
               <ContextMenu>
@@ -87,21 +126,23 @@ export default function TabsStrip() {
                   <TooltipTrigger asChild>
                     <ContextMenuTrigger asChild>
                       <div
+                        id={`tab-${t.id}`}
                         title={t.title}
                         role='tab'
                         aria-selected={activeId === t.id}
+                        aria-controls={`tabpanel-${t.id}`}
                         tabIndex={0}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') setActive(t.id);
+                          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(t.id); }
                         }}
-                        className={`mr-1 flex flex-1 basis-[200px] min-w-[104px] max-w-[260px] items-center gap-2 rounded-[10px] border px-2.5 py-1 text-sm transition-all select-none ${
+                        className={`group mr-1 flex flex-1 basis-[200px] min-w-[104px] max-w-[260px] items-center gap-2 rounded-[10px] border px-2.5 py-1 text-sm transition-all select-none ${
                           activeId === t.id
                             ? 'border-gray-200 bg-white text-gray-900 shadow-sm'
                             : 'border-transparent bg-gray-100 text-gray-700 hover:border-gray-300 hover:bg-white hover:shadow-sm'
                         } ${t.preview ? 'italic' : ''}`}
-                    onClick={() => {
+                        onClick={() => {
+                      // Single click only activates; keep preview until double-click
                       setActive(t.id);
-                      if (t.preview) promoteTab(t.id); // single-click promotes
                     }}
                     onDoubleClick={(e) => {
                       e.preventDefault();
@@ -114,7 +155,7 @@ export default function TabsStrip() {
                     <button
                       type='button'
                       aria-label={`Close ${t.title}`}
-                      className='ml-1 inline-flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100'
+                      className={`ml-1 inline-flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 transition-opacity ${activeId === t.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         closeTab(t.id);
@@ -153,11 +194,61 @@ export default function TabsStrip() {
                   </TooltipContent>
                 </Tooltip>
 
-                <ContextMenuContent className='min-w-[180px]'>
-                    {/* TODO(perf): consider batch updates if we ever support closing hundreds of tabs */}
-                    <ContextMenuItem onSelect={() => closeTab(t.id)}>Close</ContextMenuItem>
-                    <ContextMenuItem onSelect={() => closeToRight(t.id)}>Close to the right</ContextMenuItem>
-                    <ContextMenuItem onSelect={() => closeOthers(t.id)}>Close others</ContextMenuItem>
+                <ContextMenuContent className='min-w-[220px]'>
+                    {/* Counts for inline clarity (no extra confirmation) */}
+                    {(() => {
+                      const current = tabs;
+                      const idx = current.findIndex((x) => x.id === t.id);
+                      const toRight = idx === -1 ? 0 : current.slice(idx + 1).filter((x) => !x.pinned).length;
+                      const others = current.filter((x) => x.id !== t.id && !x.pinned).length;
+                      const doCloseRight = () => {
+                        if (t.pinned || toRight === 0) return;
+                        // Soft guard when the action would close many tabs
+                        const MANY_THRESHOLD = 5;
+                        if (toRight >= MANY_THRESHOLD) {
+                          const ok = window.confirm(`Close ${toRight} tab${toRight>1?'s':''} to the right?`);
+                          if (!ok) return;
+                        }
+                        const toRestore = current.slice(idx + 1).filter((x) => !x.pinned);
+                        closeToRight(t.id);
+                        if (toRestore.length) {
+                          toast({
+                            title: `Closed ${toRestore.length} tab${toRestore.length>1?'s':''}`,
+                            action: (
+                              <ToastAction altText='Undo' onClick={() => batch((cur) => [...cur, ...toRestore])}>
+                                Undo
+                              </ToastAction>
+                            ),
+                          });
+                        }
+                      };
+                      const doCloseOthers = () => {
+                        if (others === 0) return;
+                        const toRestore = current.filter((x) => x.id !== t.id && !x.pinned);
+                        closeOthers(t.id);
+                        if (toRestore.length) {
+                          toast({
+                            title: `Closed ${toRestore.length} tab${toRestore.length>1?'s':''}`,
+                            action: (
+                              <ToastAction altText='Undo' onClick={() => batch((cur) => [...cur, ...toRestore])}>
+                                Undo
+                              </ToastAction>
+                            ),
+                          });
+                        }
+                      };
+                      return (
+                        <>
+                          <ContextMenuItem onSelect={() => closeTab(t.id)}>Close</ContextMenuItem>
+                          <ContextMenuItem onSelect={doCloseRight} disabled={t.pinned || toRight === 0}>
+                            Close to the right{toRight ? ` (${toRight})` : ''}
+                          </ContextMenuItem>
+                          <ContextMenuItem onSelect={doCloseOthers} disabled={others === 0}>
+                            Close others{others ? ` (${others})` : ''}
+                          </ContextMenuItem>
+                        </>
+                      );
+                    })()}
                     <ContextMenuSeparator />
                     <ContextMenuItem onSelect={() => pinTab(t.id, !t.pinned)}>{t.pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>
                   </ContextMenuContent>
@@ -167,6 +258,5 @@ export default function TabsStrip() {
           </div>
         </div>
       </div>
-    </TooltipProvider>
   );
 }

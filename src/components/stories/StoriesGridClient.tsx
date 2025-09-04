@@ -27,10 +27,14 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    (async () => {
-      const r = await fetch('/api/stories').then((x) => x.json());
-      setItems(r.clusters ?? []);
-    })();
+    const ac = new AbortController();
+    fetch('/api/stories', { signal: ac.signal })
+      .then((x) => x.json())
+      .then((r) => setItems(r.clusters ?? []))
+      .catch((e) => {
+        if (e.name !== 'AbortError') console.error(e);
+      });
+    return () => ac.abort();
   }, []);
 
   // Sync from URL params (used when landed via link)

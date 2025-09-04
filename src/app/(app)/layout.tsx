@@ -7,6 +7,7 @@ import TabsStrip from '@/components/tabs/TabsStrip';
 import { useTabs } from '@/lib/tabsStore';
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import TabsContentViewport from '@/components/tabs/TabsContentViewport';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import TodayFeedClient from '@/components/feed/TodayFeedClient';
 import HomeSnapshot from '@/components/home/HomeSnapshot';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -29,6 +30,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const showSidebarPanel = !isHome && pathname !== '/stories' && usesViewer;
 
   return (
+    <TooltipProvider delayDuration={400}>
     <div className='grid h-screen grid-cols-[64px_1fr] grid-rows-[auto_1fr]'>
       {/* Rail spans both rows */}
       <aside className='row-span-2 border-r bg-white'>
@@ -60,7 +62,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {/* Back button (IDE-style) */}
         {usesViewer && (
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                // Fallback to /stories if there is no in-app history entry
+                if (window.history.length > 1) router.back();
+                else router.push('/stories');
+              }
+            }}
             className='hidden items-center gap-2 rounded-md border border-transparent px-2 py-1 text-sm text-gray-700 transition-colors hover:border-gray-200 hover:bg-white sm:inline-flex'
             aria-label='Back'
           >
@@ -97,5 +105,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </main>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
