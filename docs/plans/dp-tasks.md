@@ -4,17 +4,23 @@ This checklist captures tasks discussed in the diagram planning thread and ties 
 
 ## Suggested Next Steps (now)
 
-Stack Bootstrap (priority)
+Priority
+
+- [ ] Deploy worker to Cloud Run (Session Pooler URL, `BOSS_MIGRATE=false`) and verify heartbeat in logs.
+- [ ] Implement `ingest:pull` (RSS first) + schedule via pg-boss cron (every 5 min); upsert `raw_items` and enqueue `ingest:fetch-content`.
+- [ ] Implement Extraction v1 (Readability + canonicalize + `content_hash`) writing `contents`/`stories`.
+- [ ] Add `/api/stories` and `/api/stories/:id` serving reader text.
+
+Stack Bootstrap (done locally)
 
 - [x] pg-boss setup: create `pgboss` schema, grant `worker` role (CONNECT, CREATE), verify SSL.
 - [x] Worker scaffold + local run: pg-boss + queues created, `/healthz`, scheduled `system:heartbeat` OK.
-- [ ] Deploy worker to Cloud Run (Session Pooler URL) and verify heartbeat in logs.
 - [ ] Observability baseline: structured logs, job heartbeat/latency metrics; confirm retries and DLQ work.
 
 Database Bootstrap
 
-- [ ] Enable pgvector in Supabase and add `ivfflat` index for `story_embeddings.embedding`.
-- [ ] Phase 0 SQL migrations: `sources`, `raw_items`, `contents`, `stories`, `clusters` (1:N), `story_overlays`, `story_embeddings vector(1536)`, `highlights`; unique indexes and constraints.
+- [x] Enable pgvector in Supabase and add `ivfflat` index for `story_embeddings.embedding`.
+- [x] Phase 0 SQL migrations: `sources`, `raw_items`, `contents`, `stories`, `clusters` (1:N), `story_overlays`, `story_embeddings vector(1536)`, `highlights`; unique indexes and constraints.
 
 Core Workflows v1
 
