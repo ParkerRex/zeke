@@ -1,11 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import type { Cluster } from "@/features/stories";
 import { useTabs } from "@/lib/tabsStore";
+import { StoryKindIcon } from "@/components/stories/StoryKindIcon";
 
 export default function StoryRow({ cluster }: { cluster: Cluster }) {
   const { openTab } = useTabs();
-  const openInTab = () => {
+  const openPreview = () =>
     openTab({
       id: cluster.id,
       title: cluster.title,
@@ -13,23 +13,38 @@ export default function StoryRow({ cluster }: { cluster: Cluster }) {
       embedUrl: cluster.embedUrl,
       clusterId: cluster.id,
       overlays: cluster.overlays,
+      preview: true,
     });
-  };
+  const openPermanent = () =>
+    openTab({
+      id: cluster.id,
+      title: cluster.title,
+      embedKind: cluster.embedKind,
+      embedUrl: cluster.embedUrl,
+      clusterId: cluster.id,
+      overlays: cluster.overlays,
+      preview: false,
+    });
 
   return (
-    <div className="flex items-center justify-between rounded border border-gray-200 p-4 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm transition-all duration-150 cursor-pointer">
+    <button
+      onClick={openPreview}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        openPermanent();
+      }}
+      className="group flex w-full items-start gap-3 px-3 py-2 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+    >
+      <div className="mt-0.5 flex-shrink-0 text-gray-700">
+        <StoryKindIcon kind={cluster.embedKind} className="h-5 w-5" />
+      </div>
       <div className="min-w-0 flex-1">
-        <div className="font-medium truncate max-w-[60vw] text-gray-900">{cluster.title}</div>
-        <div className="text-xs text-gray-500 truncate max-w-[60vw] mt-1">{cluster.primaryUrl}</div>
+        <div className="truncate text-sm font-medium text-gray-900">{cluster.title}</div>
+        <div className="truncate text-[11px] text-gray-500">{cluster.primaryUrl}</div>
       </div>
-      <div className="flex items-center gap-3 flex-shrink-0">
-        <span aria-label="chili" className="hidden md:inline text-sm">
-          {Array.from({ length: cluster.overlays.chili }).map((_, i) => "🌶")}
-        </span>
-        <Button size="sm" variant="outline" onClick={openInTab}>
-          Open
-        </Button>
-      </div>
-    </div>
+      <span aria-label="chili" className="flex-shrink-0 text-xs">
+        {Array.from({ length: cluster.overlays.chili }).map(() => "🌶")}
+      </span>
+    </button>
   );
 }

@@ -11,7 +11,16 @@ export type Overlays = {
   sources: SourceRef[];
 };
 
-export type EmbedKind = "youtube" | "article" | "reddit" | "hn";
+export type EmbedKind =
+  | "youtube"
+  | "article" // blogs/news
+  | "reddit"
+  | "hn"
+  | "podcast"
+  | "arxiv"
+  | "twitter"
+  | "industry"
+  | "company";
 
 export type Cluster = {
   id: string;
@@ -21,4 +30,3 @@ export type Cluster = {
   embedUrl: string;
   overlays: Overlays;
 };
-

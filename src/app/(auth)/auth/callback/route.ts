@@ -34,7 +34,8 @@ export async function GET(request: NextRequest) {
     if (!userSubscription) {
       return NextResponse.redirect(`${siteUrl}/pricing`);
     } else {
-      return NextResponse.redirect(`${siteUrl}`);
+      // On successful auth for subscribed users, drop them into the workspace
+      return NextResponse.redirect(`${siteUrl}/today`);
     }
   }
 
