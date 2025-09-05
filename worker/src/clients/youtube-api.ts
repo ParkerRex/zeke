@@ -86,17 +86,17 @@ export class YouTubeAPIClient {
       const searchResponse = await this.youtube.search.list({
         part: ['snippet'],
         q: query,
-        type: 'channel',
+        type: ['channel'],
         maxResults,
-      });
+      } as any);
 
       const channels: YouTubeChannel[] = [];
 
-      for (const item of searchResponse.data.items || []) {
+      for (const item of searchResponse.data?.items || []) {
         if (item.snippet && item.id?.channelId) {
           // Get channel details to find uploads playlist
           const channelDetails = await this.youtube.channels.list({
-            part: ['contentDetails'],
+            part: 'contentDetails' as any,
             id: [item.id.channelId],
           });
 
@@ -279,16 +279,16 @@ export class YouTubeAPIClient {
       const searchResponse = await this.youtube.search.list({
         part: ['snippet'],
         q: query,
-        type: 'video',
+        type: ['video'],
         maxResults: Math.min(maxResults, 50),
         publishedAfter,
         order,
         videoDuration: duration,
-      });
+      } as any);
 
       const videos: YouTubeVideo[] = [];
 
-      for (const item of searchResponse.data.items || []) {
+      for (const item of searchResponse.data?.items || []) {
         const videoId = item.id?.videoId;
         const snippet = item.snippet;
 

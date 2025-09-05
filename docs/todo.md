@@ -28,6 +28,7 @@ big news:
 - [ ] store for the tabs
 - [ ] nuked the stripe fixtures
 - [ ] installed npm over pnpm on worker
+- [ ] pgboss schema gets nuked on reset, move from supabase/sql to supabase/migrations
 
 # Story cards:
 

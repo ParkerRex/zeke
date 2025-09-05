@@ -33,7 +33,7 @@ export async function runYouTubeFetchAndExtract(jobData, boss) {
                 video_id: videoId,
                 audio_path: audioResult.audioPath,
                 duration: audioResult.metadata.duration,
-                file_size_mb: Math.round((audioResult.metadata.filesize || 0) / (1024 * 1024) * 100) / 100,
+                file_size_mb: Math.round(((audioResult.metadata.filesize || 0) / (1024 * 1024)) * 100) / 100,
             });
             // Step 2: Transcribe audio using Whisper
             const transcriptionResult = await transcribeAudio(audioResult.audioPath, videoId, {
@@ -70,16 +70,17 @@ export async function runYouTubeFetchAndExtract(jobData, boss) {
             });
             // Step 4: Create or link story
             const existingStoryId = await findStoryIdByContentHash(content_hash);
-            const storyId = existingStoryId ?? (await insertStory({
-                content_id,
-                title: audioResult.metadata.title || row.title || null,
-                canonical_url: videoUrl,
-                primary_url: videoUrl,
-                kind: 'youtube',
-                published_at: audioResult.metadata.uploadDate ?
-                    new Date(audioResult.metadata.uploadDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')).toISOString() :
-                    null,
-            }));
+            const storyId = existingStoryId ??
+                (await insertStory({
+                    content_id,
+                    title: audioResult.metadata.title || row.title || null,
+                    canonical_url: videoUrl,
+                    primary_url: videoUrl,
+                    kind: 'youtube',
+                    published_at: audioResult.metadata.uploadDate
+                        ? new Date(audioResult.metadata.uploadDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')).toISOString()
+                        : null,
+                }));
             // Step 5: Enqueue AI analysis
             await boss.send('analyze:llm', { storyId });
             // Step 6: Cleanup temporary files
@@ -104,7 +105,7 @@ export async function runYouTubeFetchAndExtract(jobData, boss) {
                 raw_item_id: row.id,
                 video_id: videoId,
                 url: row.url,
-                err: String(err)
+                err: String(err),
             }, 'error');
             // Cleanup on error
             try {
@@ -250,16 +251,17 @@ export async function runYouTubeQueuedExtract(jobData, boss) {
                 content_hash,
             });
             const existingStoryId = await findStoryIdByContentHash(content_hash);
-            const storyId = existingStoryId ?? (await insertStory({
-                content_id,
-                title: audioResult.metadata.title || row.title || null,
-                canonical_url: videoUrl,
-                primary_url: videoUrl,
-                kind: 'youtube',
-                published_at: audioResult.metadata.uploadDate ?
-                    new Date(audioResult.metadata.uploadDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')).toISOString() :
-                    null,
-            }));
+            const storyId = existingStoryId ??
+                (await insertStory({
+                    content_id,
+                    title: audioResult.metadata.title || row.title || null,
+                    canonical_url: videoUrl,
+                    primary_url: videoUrl,
+                    kind: 'youtube',
+                    published_at: audioResult.metadata.uploadDate
+                        ? new Date(audioResult.metadata.uploadDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')).toISOString()
+                        : null,
+                }));
             await boss.send('analyze:llm', { storyId });
             log('youtube_queued_extract_success', {
                 comp: 'extract',
@@ -275,7 +277,7 @@ export async function runYouTubeQueuedExtract(jobData, boss) {
                 comp: 'extract',
                 raw_item_id: row.id,
                 video_id: videoId,
-                err: String(err)
+                err: String(err),
             }, 'error');
             await cleanupVideoTempFiles(videoId);
         }

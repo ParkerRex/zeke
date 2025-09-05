@@ -1,4 +1,4 @@
-create role worker login password 'YOUR_SECURE_PASSWORD';
+create role worker login password '36fcf077ca100d32194e58a762265e4cd4ece41b3e5ffb30343d526048c0741';
 grant connect on database postgres to worker;
 grant create on database postgres to worker; -- needed for CREATE SCHEMA IF NOT EXISTS
 grant usage on schema public to worker;

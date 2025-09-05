@@ -31,7 +31,7 @@ export class YouTubeFetcher {
             // Fetch videos from uploads playlist
             const videos = await this.apiClient.getChannelUploads(uploadsPlaylistId, maxResults, publishedAfter);
             // Get detailed video information
-            const videoIds = videos.map(video => video.videoId);
+            const videoIds = videos.map((video) => video.videoId);
             const detailedVideos = await this.apiClient.getVideoDetails(videoIds);
             // Track quota usage
             const actualCost = 1 + Math.ceil(videoIds.length / 50);
