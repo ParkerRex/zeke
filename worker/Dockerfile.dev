@@ -1,0 +1,21 @@
+# Fast development Dockerfile - skips heavy Python deps
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy package files and install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN npm i -g pnpm && pnpm i
+
+# Copy source and build
+COPY tsconfig.json ./
+COPY src ./src
+RUN npx tsc -p tsconfig.json
+
+ENV NODE_ENV=development
+CMD ["node", "dist/worker.js"]

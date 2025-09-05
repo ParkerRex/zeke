@@ -1,7 +1,7 @@
-"use client";
-import { create } from "zustand";
+'use client';
+import { create } from 'zustand';
 
-import type { EmbedKind, Overlays } from "@/features/stories";
+import type { EmbedKind, Overlays } from '@/features/stories';
 
 const STORAGE_PANEL_MAP = 'tabs:panelOpenById';
 const STORAGE_PANEL_GLOBAL = 'tabs:sidePanelOpen';
@@ -16,7 +16,9 @@ function loadPanelMap(): Record<string, boolean> {
 }
 
 function savePanelMap(map: Record<string, boolean>) {
-  try { localStorage.setItem(STORAGE_PANEL_MAP, JSON.stringify(map)); } catch {}
+  try {
+    localStorage.setItem(STORAGE_PANEL_MAP, JSON.stringify(map));
+  } catch {}
 }
 
 function loadPanelGlobal(): boolean | undefined {
@@ -29,7 +31,9 @@ function loadPanelGlobal(): boolean | undefined {
 }
 
 function savePanelGlobal(v: boolean) {
-  try { localStorage.setItem(STORAGE_PANEL_GLOBAL, String(v)); } catch {}
+  try {
+    localStorage.setItem(STORAGE_PANEL_GLOBAL, String(v));
+  } catch {}
 }
 
 export type Tab = {
@@ -54,7 +58,7 @@ type TabsState = {
   openTab: (tab: Tab) => void;
   closeTab: (id: string) => void;
   setActive: (id: string) => void;
-  updateOverlay: (id: string, partial: Partial<Tab["overlays"]>) => void;
+  updateOverlay: (id: string, partial: Partial<Tab['overlays']>) => void;
   updateContext: (id: string, partial: Record<string, any>) => void;
   restoreFromUrl: (clusterIdOrShareId: string, isShare?: boolean) => Promise<void>;
   promoteTab: (id: string) => void; // convert preview -> permanent
@@ -80,7 +84,24 @@ export const useTabs = create<TabsState>((set, get) => ({
   tabs: [],
   activeId: undefined,
   sidePanelOpen: loadPanelGlobal() ?? true,
-  panelOpenById: loadPanelMap(),
+  panelOpenById: ((): Record<string, boolean> => {
+    const map = loadPanelMap();
+    // Migrate legacy non-story IDs to prefixed equivalents
+    const migrations: Record<string, string> = {
+      company: 'tab:company',
+      industries: 'tab:industries',
+    };
+    let changed = false;
+    for (const [oldKey, newKey] of Object.entries(migrations)) {
+      if (oldKey in map && !(newKey in map)) {
+        map[newKey] = map[oldKey];
+        delete map[oldKey];
+        changed = true;
+      }
+    }
+    if (changed) savePanelMap(map);
+    return map;
+  })(),
   setSidePanelOpen: (v) =>
     set((s) => {
       const id = s.activeId;
@@ -112,10 +133,9 @@ export const useTabs = create<TabsState>((set, get) => ({
   setActive: (id) =>
     set((s) => ({
       activeId: id,
-      sidePanelOpen: s.panelOpenById[id] ?? (loadPanelGlobal() ?? true),
+      sidePanelOpen: s.panelOpenById[id] ?? loadPanelGlobal() ?? true,
     })),
-  promoteTab: (id) =>
-    set((s) => ({ tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, preview: false } : t))) })),
+  promoteTab: (id) => set((s) => ({ tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, preview: false } : t))) })),
   pinTab: (id, pinned = true) =>
     set((s) => ({ tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, pinned } : t))) })),
   updateOverlay: (id, partial) =>
@@ -149,8 +169,7 @@ export const useTabs = create<TabsState>((set, get) => ({
       console.error(e);
     }
   },
-  closeOthers: (id) =>
-    set((s) => ({ tabs: sortTabs(s.tabs.filter((t) => t.id === id || t.pinned)), activeId: id })),
+  closeOthers: (id) => set((s) => ({ tabs: sortTabs(s.tabs.filter((t) => t.id === id || t.pinned)), activeId: id })),
   closeToRight: (id) =>
     set((s) => {
       // Use current visual order (s.tabs) to decide which are to the right

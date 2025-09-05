@@ -1,38 +1,51 @@
 # syntax=docker/dockerfile:1
-FROM node:20-slim
+
+# Build stage
+FROM node:20-slim AS builder
+WORKDIR /app
+
+# Copy package files and install ALL dependencies (including dev)
+COPY package.json pnpm-lock.yaml ./
+RUN npm i -g pnpm && pnpm i
+
+# Copy source and build
+COPY tsconfig.json ./
+COPY src ./src
+RUN npx tsc -p tsconfig.json
+
+# Production stage
+FROM node:20-slim AS production
 WORKDIR /app
 
 # Install system dependencies for YouTube processing
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     ffmpeg \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install yt-dlp and Whisper
-RUN pip3 install --no-cache-dir \
-    yt-dlp==2024.1.7 \
-    openai-whisper==20231117 \
+# Create and activate virtual environment for Python packages
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python packages with caching
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir yt-dlp openai-whisper
+
+# Install PyTorch CPU version separately with correct index
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir \
     torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Install dependencies (include dev deps to build TypeScript)
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN if [ -f package-lock.json ]; then npm ci; \
-    elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i; \
-    elif [ -f yarn.lock ]; then yarn install; \
-    else npm i; fi
+# Copy package files and install ONLY production dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,target=/root/.local/share/pnpm \
+    npm i -g pnpm && pnpm i --prod
 
-COPY tsconfig.json ./
-COPY src ./src
-
-# Build TypeScript
-RUN npx tsc -p tsconfig.json
-
-# Optionally prune dev dependencies to slim image
-RUN if [ -f package-lock.json ]; then npm prune --omit=dev; \
-    elif [ -f pnpm-lock.yaml ]; then pnpm prune --prod; \
-    elif [ -f yarn.lock ]; then yarn workspaces focus --production || true; fi
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
 
 ENV NODE_ENV=production
 CMD ["node", "dist/worker.js"]

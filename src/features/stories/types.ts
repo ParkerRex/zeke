@@ -12,15 +12,22 @@ export type Overlays = {
 };
 
 export type EmbedKind =
-  | "youtube"
-  | "article" // blogs/news
-  | "reddit"
-  | "hn"
-  | "podcast"
-  | "arxiv"
-  | "twitter"
-  | "industry"
-  | "company";
+  | 'youtube'
+  | 'article' // blogs/news
+  | 'reddit'
+  | 'hn'
+  | 'podcast'
+  | 'arxiv'
+  | 'twitter'
+  | 'industry'
+  | 'company';
+
+export type YouTubeMetadata = {
+  transcriptUrl?: string;
+  transcriptVtt?: string;
+  durationSeconds?: number;
+  viewCount?: number;
+};
 
 export type Cluster = {
   id: string;
@@ -29,4 +36,5 @@ export type Cluster = {
   embedKind: EmbedKind;
   embedUrl: string;
   overlays: Overlays;
+  youtubeMetadata?: YouTubeMetadata;
 };

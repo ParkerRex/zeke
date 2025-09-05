@@ -19,6 +19,45 @@ RSS Feeds (2 sources) → raw_items (47) → contents (16) → stories (17) → 
                                                                           ↑ Real OpenAI Analysis ↑
 ```
 
+## 🚀 Quick Start (Development)
+
+### One-Command Setup
+
+```bash
+pnpm run dev
+```
+
+This will:
+
+1. ✅ Start local Supabase database
+2. ✅ Apply all migrations (including PgBoss setup)
+3. ✅ Test worker connectivity
+4. ✅ Start Next.js app (port 3000)
+5. ✅ Start background worker
+
+### Individual Commands
+
+```bash
+pnpm run dev:setup    # Setup database only
+pnpm run dev:full     # Start Next.js + Worker (after setup)
+pnpm run dev:next     # Start Next.js only
+pnpm run dev:worker   # Start worker only
+pnpm run stop         # Stop everything
+```
+
+### Testing
+
+```bash
+pnpm run test         # Test database + worker connectivity
+pnpm run test:worker  # Test worker connection + job queue
+```
+
+### Services
+
+- **Next.js App**: http://localhost:3000
+- **Supabase Studio**: http://127.0.0.1:54323
+- **Supabase API**: http://127.0.0.1:54321
+
 ## Current Status
 
 ### ✅ What's Working

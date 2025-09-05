@@ -23,8 +23,8 @@ Maintainability / Perf
 
 High‑Risk / Logic
 
-- [ ] Prefix non‑story tab ids to avoid collisions (e.g., `tab:company`, `tab:industries`). `src/components/company/CompanyPanel.tsx`, `src/components/industry/IndustryPanel.tsx`
-- [ ] Scope global keybinds (Cmd/Ctrl+W, 1..9) to the tabstrip region to avoid hijacking browser shortcuts when focus is inside viewer iframes. `src/components/tabs/TabsStrip.tsx`
+- [x] Prefix non‑story tab ids to avoid collisions (e.g., `tab:company`, `tab:industries`). `src/components/company/CompanyPanel.tsx`, `src/components/industry/IndustryPanel.tsx`, `src/lib/tabsStore.ts`
+- [x] Scope global keybinds (Cmd/Ctrl+W, 1..9) to the tabstrip region to avoid hijacking browser shortcuts when focus is inside viewer iframes. `src/components/tabs/TabsStrip.tsx`
 
 Performance
 
@@ -39,7 +39,7 @@ Accessibility
 Routing / SSR / SEO
 
 - [ ] Give `/stories` a minimal SSR shell/metadata for SEO/sharing (while viewer still drives content). `src/app/(app)/stories/page.tsx`
-- [ ] Back button: also guard with same‑origin `document.referrer` before calling `router.back()`. `src/app/(app)/layout.tsx`
+- [x] Back button: also guard with same‑origin `document.referrer` before calling `router.back()`. `src/app/(app)/layout.tsx`
 
 UX Consistency
 
@@ -54,7 +54,7 @@ State Management
 API / Reliability
 
 - [ ] Add loading/error UI + retry for stories fetchers; cancel on unmount. `TodayFeedClient`, `StoriesGridClient`
-- [ ] Try/catch for `restoreFromUrl` and toast on failure. `src/lib/tabsStore.ts`
+- [x] Try/catch for `restoreFromUrl` and toast on failure. `src/lib/tabsStore.ts`
 
 Code Hygiene
 

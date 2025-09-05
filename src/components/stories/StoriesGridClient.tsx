@@ -1,7 +1,15 @@
-"use client";
+'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { IoDocumentText, IoLogoReddit, IoLogoYoutube, IoMic, IoNewspaper, IoCodeSlash, IoSearch } from 'react-icons/io5';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  IoDocumentText,
+  IoLogoReddit,
+  IoLogoYoutube,
+  IoMic,
+  IoNewspaper,
+  IoCodeSlash,
+  IoSearch,
+} from 'react-icons/io5';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +29,7 @@ const mediums: { key: EmbedKind | 'all'; label: string; Icon: any }[] = [
 
 export default function StoriesGridClient({ variant = 'full' }: { variant?: 'full' | 'embedded' }) {
   const { openTab } = useTabs();
+  const router = useRouter();
   const [q, setQ] = useState('');
   const [kind, setKind] = useState<EmbedKind | 'all'>('all');
   const [items, setItems] = useState<Cluster[]>([]);
@@ -56,9 +65,27 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
   }, [items, q, kind]);
 
   const openPreview = (c: Cluster) =>
-    openTab({ id: c.id, title: c.title, embedKind: c.embedKind, embedUrl: c.embedUrl, clusterId: c.id, overlays: c.overlays, preview: true });
-  const openPermanent = (c: Cluster) =>
-    openTab({ id: c.id, title: c.title, embedKind: c.embedKind, embedUrl: c.embedUrl, clusterId: c.id, overlays: c.overlays, preview: false });
+    openTab({
+      id: c.id,
+      title: c.title,
+      embedKind: c.embedKind,
+      embedUrl: c.embedUrl,
+      clusterId: c.id,
+      overlays: c.overlays,
+      preview: true,
+    });
+  const openPermanent = (c: Cluster) => {
+    openTab({
+      id: c.id,
+      title: c.title,
+      embedKind: c.embedKind,
+      embedUrl: c.embedUrl,
+      clusterId: c.id,
+      overlays: c.overlays,
+      preview: false,
+    });
+    router.push(`/stories/${encodeURIComponent(c.id)}`);
+  };
 
   return (
     <div className='relative h-full overflow-auto'>
@@ -112,7 +139,10 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
             <button
               key={c.id}
               onClick={() => openPreview(c)}
-              onDoubleClick={(e) => { e.preventDefault(); openPermanent(c); }}
+              onDoubleClick={(e) => {
+                e.preventDefault();
+                openPermanent(c);
+              }}
               className='group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm'
             >
               <div className='mb-2 flex items-center gap-2 text-sm font-medium'>

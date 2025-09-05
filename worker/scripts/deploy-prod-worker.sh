@@ -20,7 +20,11 @@ fi
   "${BOSS_SCHEMA:=pgboss}" \
   "${BOSS_CRON_TZ:=UTC}" \
   "${BOSS_MIGRATE:=false}" \
-  "${OPENAI_API_KEY:=}"
+  "${OPENAI_API_KEY:=}" \
+  "${YOUTUBE_API_KEY:=}" \
+  "${YOUTUBE_QUOTA_LIMIT:=10000}" \
+  "${YOUTUBE_QUOTA_RESET_HOUR:=0}" \
+  "${YOUTUBE_RATE_LIMIT_BUFFER:=500}"
 
 # Prefer DATABASE_URL_POOLER if provided
 if [[ -n "$DATABASE_URL_POOLER" ]]; then
@@ -44,11 +48,22 @@ if [[ -n "$OPENAI_API_KEY" ]]; then
   ENV_VARS="$ENV_VARS,OPENAI_API_KEY=$OPENAI_API_KEY"
 fi
 
+# Add YouTube API configuration if provided
+if [[ -n "$YOUTUBE_API_KEY" ]]; then
+  ENV_VARS="$ENV_VARS,YOUTUBE_API_KEY=$YOUTUBE_API_KEY"
+  ENV_VARS="$ENV_VARS,YOUTUBE_QUOTA_LIMIT=$YOUTUBE_QUOTA_LIMIT"
+  ENV_VARS="$ENV_VARS,YOUTUBE_QUOTA_RESET_HOUR=$YOUTUBE_QUOTA_RESET_HOUR"
+  ENV_VARS="$ENV_VARS,YOUTUBE_RATE_LIMIT_BUFFER=$YOUTUBE_RATE_LIMIT_BUFFER"
+fi
+
+echo "[info] Deploying $SERVICE to $REGION..."
 gcloud run deploy "$SERVICE" \
   --source "$ROOT_DIR" \
   --project "$PROJECT_ID" \
   --region "$REGION" \
   --min-instances=1 \
-  --cpu=1 --memory=1Gi \
+  --cpu=2 --memory=4Gi \
+  --timeout=1800 \
+  --concurrency=1 \
   --set-env-vars "$ENV_VARS" \
   --no-allow-unauthenticated

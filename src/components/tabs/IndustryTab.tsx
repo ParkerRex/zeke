@@ -30,7 +30,7 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
   return (
     <div className='h-full overflow-auto'>
       <div className='border-b bg-background/50 p-3 text-sm font-medium'>
-        Industries {industry ? `› ${industry}` : ''} {sub ? `› ${sub}` : ''}
+        Sector {industry ? `› ${industry}` : ''} {sub ? `› ${sub}` : ''}
       </div>
       <div className='space-y-2 p-4'>
         {filtered.length ? (

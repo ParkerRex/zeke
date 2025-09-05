@@ -722,19 +722,47 @@ async function uploadAudio(videoId: string, audioPath: string): Promise<string> 
   return `youtube-audio/${fileName}`;
 }
 
-async function uploadTranscript(videoId: string, vttContent: string): Promise<string> {
-  const fileName = `${videoId}.vtt`;
+async function uploadTranscript(
+  videoId: string,
+  vttContent: string,
+  plainText: string
+): Promise<{
+  vttUrl: string;
+  txtUrl: string;
+}> {
+  const vttFileName = `${videoId}.vtt`;
+  const txtFileName = `${videoId}.txt`;
 
-  const { data, error } = await supabaseAdmin.storage.from('youtube-transcripts').upload(fileName, vttContent, {
-    contentType: 'text/vtt',
-    upsert: true,
-  });
+  // Upload VTT file with timestamps
+  const { data: vttData, error: vttError } = await supabaseAdmin.storage
+    .from('youtube-transcripts')
+    .upload(vttFileName, vttContent, {
+      contentType: 'text/vtt',
+      upsert: true,
+      cacheControl: '86400', // Cache for 24 hours
+    });
 
-  if (error) {
-    throw new Error(`Failed to upload transcript: ${error.message}`);
+  if (vttError) {
+    throw new Error(`Failed to upload VTT transcript: ${vttError.message}`);
   }
 
-  return `youtube-transcripts/${fileName}`;
+  // Upload plain text file for search and AI analysis
+  const { data: txtData, error: txtError } = await supabaseAdmin.storage
+    .from('youtube-transcripts')
+    .upload(txtFileName, plainText, {
+      contentType: 'text/plain',
+      upsert: true,
+      cacheControl: '86400', // Cache for 24 hours
+    });
+
+  if (txtError) {
+    throw new Error(`Failed to upload plain text transcript: ${txtError.message}`);
+  }
+
+  return {
+    vttUrl: `youtube-transcripts/${vttFileName}`,
+    txtUrl: `youtube-transcripts/${txtFileName}`,
+  };
 }
 
 async function cleanupTempFiles(filePaths: string[]): Promise<void> {
@@ -748,24 +776,390 @@ async function cleanupTempFiles(filePaths: string[]): Promise<void> {
 
 ## Database Schema Extensions
 
-### Storage Buckets Setup
+### ✅ IMPLEMENTED: Database-First Transcript Storage (Production Ready)
+
+**IMPLEMENTED STRATEGY**: Store VTT content directly in database for optimal performance and cost efficiency.
 
 ```sql
--- Create Supabase Storage buckets for YouTube content
-INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types) VALUES
-('youtube-audio', 'youtube-audio', false, 524288000, ARRAY['audio/mp4', 'audio/m4a']), -- 500MB limit
-('youtube-transcripts', 'youtube-transcripts', false, 10485760, ARRAY['text/vtt', 'text/plain']); -- 10MB limit
+-- ✅ COMPLETED: Added transcript storage to contents table (2025-09-05)
+ALTER TABLE public.contents ADD COLUMN IF NOT EXISTS transcript_vtt text;
+CREATE INDEX IF NOT EXISTS idx_contents_transcript_vtt ON public.contents(id) WHERE transcript_vtt IS NOT NULL;
+COMMENT ON COLUMN public.contents.transcript_vtt IS 'WebVTT format transcript content for YouTube videos with timestamps';
+```
 
--- Set up RLS policies for buckets
-CREATE POLICY "Service role can manage youtube-audio" ON storage.objects
-FOR ALL USING (bucket_id = 'youtube-audio' AND auth.role() = 'service_role');
+**Database Schema Benefits**:
 
+- **Zero Storage Costs**: No file storage fees for transcript content
+- **Atomic Operations**: Transcript and content stored together in single transaction
+- **Fast Access**: Direct database queries, no file system overhead
+- **Simplified Architecture**: No separate storage bucket management needed
+- **Backup Included**: Transcripts included in database backups automatically
+
+**Transcript URL Pattern**:
+
+- Format: `youtube://{videoId}` (stored in `contents.transcript_url`)
+- Example: `youtube://dQw4w9WgXcQ`
+- Purpose: Frontend identification of YouTube content type
+
+**Implementation Details**:
+
+- **VTT Content**: Stored in `contents.transcript_vtt` field with full WebVTT format
+- **Plain Text**: Stored in `contents.text` field for search and AI analysis
+- **Metadata**: Video duration, view count stored in dedicated fields
+- **Processing**: Audio files processed temporarily, deleted after transcription
+
+## ✅ COMPLETED: Database-First Implementation (2025-09-05)
+
+### ✅ Step 1: Database Schema Updates (COMPLETE)
+
+**Implemented Database Changes:**
+
+```sql
+-- ✅ EXECUTED: Added transcript storage to contents table
+ALTER TABLE public.contents ADD COLUMN IF NOT EXISTS transcript_vtt text;
+CREATE INDEX IF NOT EXISTS idx_contents_transcript_vtt ON public.contents(id) WHERE transcript_vtt IS NOT NULL;
+COMMENT ON COLUMN public.contents.transcript_vtt IS 'WebVTT format transcript content for YouTube videos with timestamps';
+```
+
+### Step 2: Configure RLS Policies (10 minutes)
+
+```sql
+-- Execute in Supabase SQL Editor
+-- Service role can manage youtube-transcripts
 CREATE POLICY "Service role can manage youtube-transcripts" ON storage.objects
 FOR ALL USING (bucket_id = 'youtube-transcripts' AND auth.role() = 'service_role');
 
--- Allow authenticated users to read transcripts (for frontend)
+-- Authenticated users can read transcripts (for frontend internal reader)
 CREATE POLICY "Authenticated users can read transcripts" ON storage.objects
 FOR SELECT USING (bucket_id = 'youtube-transcripts' AND auth.role() = 'authenticated');
+```
+
+### Step 3: Create Storage Upload Module (25 minutes)
+
+Create `worker/src/storage/youtube-uploads.ts`:
+
+```typescript
+import { supabaseAdmin } from '../supabase.js';
+import { log } from '../log.js';
+
+export interface TranscriptUploadResult {
+  vttUrl: string;
+  txtUrl: string;
+  success: boolean;
+  error?: string;
+}
+
+export async function uploadYouTubeTranscript(
+  videoId: string,
+  vttContent: string,
+  plainText: string
+): Promise<TranscriptUploadResult> {
+  try {
+    const vttFileName = `${videoId}.vtt`;
+    const txtFileName = `${videoId}.txt`;
+
+    log('youtube_transcript_upload_start', {
+      videoId,
+      vttSize: vttContent.length,
+      txtSize: plainText.length,
+    });
+
+    // Upload VTT file with timestamps
+    const { data: vttData, error: vttError } = await supabaseAdmin.storage
+      .from('youtube-transcripts')
+      .upload(vttFileName, vttContent, {
+        contentType: 'text/vtt',
+        upsert: true,
+        cacheControl: '86400', // Cache for 24 hours
+      });
+
+    if (vttError) {
+      throw new Error(`VTT upload failed: ${vttError.message}`);
+    }
+
+    // Upload plain text file for search and AI analysis
+    const { data: txtData, error: txtError } = await supabaseAdmin.storage
+      .from('youtube-transcripts')
+      .upload(txtFileName, plainText, {
+        contentType: 'text/plain',
+        upsert: true,
+        cacheControl: '86400', // Cache for 24 hours
+      });
+
+    if (txtError) {
+      throw new Error(`Plain text upload failed: ${txtError.message}`);
+    }
+
+    const result = {
+      vttUrl: `youtube-transcripts/${vttFileName}`,
+      txtUrl: `youtube-transcripts/${txtFileName}`,
+      success: true,
+    };
+
+    log('youtube_transcript_upload_success', {
+      videoId,
+      vttUrl: result.vttUrl,
+      txtUrl: result.txtUrl,
+    });
+
+    return result;
+  } catch (error) {
+    const errorMessage = String(error);
+    log(
+      'youtube_transcript_upload_error',
+      {
+        videoId,
+        error: errorMessage,
+      },
+      'error'
+    );
+
+    return {
+      vttUrl: '',
+      txtUrl: '',
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+```
+
+### Step 4: Update Extraction Pipeline (15 minutes)
+
+Modify `worker/src/extract/youtube.ts` to integrate storage upload:
+
+```typescript
+// Add import at top of file
+import { uploadYouTubeTranscript } from '../storage/youtube-uploads.js';
+
+// Update the extraction pipeline (around line 300-330)
+// Replace the content creation section with:
+
+const transcriptText = transcriptionResult.text.trim();
+if (!transcriptText) {
+  throw new Error('No text extracted from transcription');
+}
+
+// Upload transcripts to storage
+const uploadResult = await uploadYouTubeTranscript(
+  videoId,
+  transcriptionResult.vtt || '', // VTT content with timestamps
+  transcriptText // Plain text for search
+);
+
+if (!uploadResult.success) {
+  throw new Error(`Transcript upload failed: ${uploadResult.error}`);
+}
+
+const enhancedText = formatYouTubeContent(transcriptText, audioResult.metadata, transcriptionResult);
+const content_hash = hashText(enhancedText);
+
+const content_id = await insertContents({
+  raw_item_id: row.id,
+  text: enhancedText,
+  html_url: videoUrl,
+  transcript_url: uploadResult.vttUrl, // Store VTT URL for frontend
+  lang: transcriptionResult.language,
+  content_hash,
+});
+```
+
+## Frontend Integration Specifications
+
+### Stories Feed Integration
+
+**Requirement**: YouTube content appears in main stories feed alongside articles
+
+**Implementation Details**:
+
+- Update `src/features/stories/controllers/stories.ts` to fetch YouTube content
+- Filter stories by `contents.transcript_url LIKE 'youtube://%'` for YouTube identification
+- Display video metadata in story cards (title, channel, duration, view count)
+- Add YouTube branding and thumbnail display
+- Maintain chronological ordering with article stories
+
+**Database Query Pattern**:
+
+```sql
+-- Fetch YouTube stories with transcript data
+SELECT
+  s.id, s.title, s.canonical_url, s.created_at,
+  c.transcript_url, c.transcript_vtt, c.duration_seconds, c.view_count
+FROM stories s
+JOIN contents c ON c.id = s.content_id
+WHERE c.transcript_url LIKE 'youtube://%'
+ORDER BY s.created_at DESC;
+```
+
+### Story Detail View Layout
+
+**Layout Requirements**:
+
+- **Left Side (60% width)**: YouTube video iframe embed with responsive sizing
+- **Right Sidebar (40% width)**: "Why It Matters" section above existing content
+- **Main Content Area**: Internal transcript reader with full VTT content
+- **Mobile**: Stack vertically (video → transcript → sidebar)
+
+**YouTube Iframe Integration**:
+
+```typescript
+// Extract video ID from transcript_url pattern
+const videoId = transcriptUrl.replace('youtube://', '');
+const embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+
+// Enable YouTube Player API for timestamp synchronization
+<iframe
+  src={embedUrl}
+  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+  allowFullScreen
+  className='aspect-video w-full'
+/>;
+```
+
+### Internal Transcript Reader
+
+**Core Features**:
+
+1. **VTT Parsing**: Parse `contents.transcript_vtt` field to extract timestamps and text
+2. **Clickable Timestamps**: Click timestamp to seek video to specific time
+3. **Auto-Scroll**: Highlight current segment based on video playback
+4. **Search**: Find text within transcript with highlighting
+5. **Responsive Design**: Mobile-friendly transcript display
+
+**VTT Parsing Implementation**:
+
+```typescript
+interface TranscriptSegment {
+  id: number;
+  startTime: number; // seconds
+  endTime: number; // seconds
+  text: string;
+  startTimeFormatted: string; // "MM:SS"
+  endTimeFormatted: string;
+}
+
+function parseVTT(vttContent: string): TranscriptSegment[] {
+  // Parse WebVTT format from contents.transcript_vtt
+  // Extract timestamps and text segments
+  // Return structured data for UI rendering
+}
+```
+
+**Video Synchronization**:
+
+```typescript
+// YouTube Player API integration
+function seekToTimestamp(seconds: number) {
+  if (youtubePlayer) {
+    youtubePlayer.seekTo(seconds, true);
+  }
+}
+
+// Auto-highlight current segment
+function updateCurrentSegment(currentTime: number) {
+  const activeSegment = segments.find((s) => currentTime >= s.startTime && currentTime <= s.endTime);
+  setActiveSegmentId(activeSegment?.id);
+}
+```
+
+## AI Analysis Enhancement Specifications
+
+### "Why It Matters" Analysis for YouTube Content
+
+**Objective**: Extract key insights specifically valuable to AI researchers and software engineers
+
+**Analysis Prompt Template**:
+
+```
+Analyze this YouTube video transcript and extract 3-5 key insights that matter most to AI researchers and software engineers. Focus on:
+
+1. **Research Significance**: How does this advance current AI/ML research?
+2. **Practical Applications**: What real-world problems does this solve?
+3. **Technical Innovation**: What new techniques or approaches are introduced?
+4. **Industry Impact**: How might this influence AI development practices?
+5. **Implementation Relevance**: What can engineers apply immediately?
+
+Format as bullet points with specific, actionable insights. Avoid generic summaries.
+
+Transcript: {transcript_text}
+Video Metadata: Title: {title}, Channel: {channel}, Duration: {duration}
+```
+
+**Output Format**:
+
+```json
+{
+  "why_it_matters": [
+    "• Introduces novel attention mechanism that reduces transformer memory usage by 40% while maintaining accuracy",
+    "• Demonstrates practical implementation for production ML systems handling 1M+ requests/day",
+    "• Provides open-source framework that can be integrated into existing PyTorch workflows",
+    "• Addresses critical scalability challenges in large language model deployment",
+    "• Shows measurable improvements in inference speed for real-time applications"
+  ]
+}
+```
+
+### "Technical Stack/Tools" Analysis
+
+**Objective**: Identify and timestamp all technologies, frameworks, and tools mentioned
+
+**Analysis Prompt Template**:
+
+```
+Extract all technical tools, frameworks, programming languages, cloud platforms, and methodologies mentioned in this YouTube video transcript. For each item:
+
+1. Provide the exact name/term used
+2. Include precise timestamp where mentioned (format: [MM:SS])
+3. Add brief context about how it's used
+4. Categorize by type (ML Framework, Cloud Platform, Programming Language, etc.)
+
+Be comprehensive - include libraries, APIs, services, algorithms, and development tools.
+
+Transcript with timestamps: {transcript_with_timestamps}
+```
+
+**Output Format**:
+
+```json
+{
+  "technical_stack": {
+    "ml_frameworks": [
+      "PyTorch - [03:45] Used for model training and inference pipeline",
+      "Transformers - [07:22] Hugging Face library for pre-trained models"
+    ],
+    "cloud_platforms": [
+      "AWS SageMaker - [12:30] Model deployment and scaling infrastructure",
+      "Google Cloud TPU - [15:18] Hardware acceleration for training"
+    ],
+    "programming_languages": [
+      "Python - [02:15] Primary development language for ML pipeline",
+      "CUDA - [09:33] GPU programming for custom kernels"
+    ],
+    "development_tools": [
+      "Docker - [18:45] Containerization for model serving",
+      "Kubernetes - [20:12] Orchestration for distributed training"
+    ]
+  }
+}
+```
+
+### Enhanced Content Analysis (Future)
+
+**Additional Analysis Types**:
+
+1. **Key Concepts**: Extract main technical concepts and definitions with timestamps
+2. **Research Papers**: Identify and link mentioned academic papers
+3. **Code Examples**: Capture specific implementation details and architectural patterns
+4. **Future Implications**: Analyze potential impact on industry and research directions
+
+**Database Schema Extensions**:
+
+```sql
+-- Additional fields for enhanced analysis
+ALTER TABLE story_overlays ADD COLUMN IF NOT EXISTS technical_stack jsonb;
+ALTER TABLE story_overlays ADD COLUMN IF NOT EXISTS key_concepts jsonb;
+ALTER TABLE story_overlays ADD COLUMN IF NOT EXISTS research_papers jsonb;
+ALTER TABLE story_overlays ADD COLUMN IF NOT EXISTS implementation_details jsonb;
 ```
 
 ### Database Schema Updates

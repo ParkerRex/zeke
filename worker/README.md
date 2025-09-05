@@ -1,194 +1,148 @@
-# ZEKE Worker (pg-boss + Node/TS)
+# Zeke Worker
 
-TypeScript worker that processes pg-boss jobs from Supabase Postgres. Run locally with a Direct connection; deploy on Cloud Run using the Session Pooler.
+Background job processor for Zeke using pg-boss. Handles YouTube video transcription, content processing, and other async tasks.
 
-## Current Status (2025-09-05)
+## 🚀 Quick Start
 
-**✅ WORKING**: Complete data pipeline with real OpenAI integration!
+### Prerequisites
+- Node.js 20+
+- pnpm
+- Local Supabase instance (for development)
+- Docker (for containerized development)
 
-- **47 raw items** ingested from 2 RSS sources (Hacker News + Ars Technica)
-- **16 contents** extracted with clean text using Mozilla Readability
-- **17 stories** created with content deduplication via content_hash
-- **9 overlays** generated with GPT-4o-mini analysis ("why it matters" summaries)
-- **9 embeddings** created with text-embedding-3-small (1536-dimensional vectors)
+### Local Development Setup
 
-## How It Works
+1. **Start local Supabase** (from project root):
+   ```bash
+   pnpm run supabase:start
+   ```
 
-```mermaid
-sequenceDiagram
-  participant Boss as pg-boss (cron)
-  participant Worker as Cloud Run Worker
-  participant Src as External Sources (RSS)
-  participant DB as Supabase Postgres
+2. **Run migrations** (from project root):
+   ```bash
+   pnpm run migration:up:local
+   ```
 
-  Boss-->>Worker: schedule ingest:pull (*/5)
-  Worker->>Src: fetch RSS/Atom feeds
-  Src-->>Worker: items (guid, link, title)
-  Worker->>DB: upsert public.raw_items (idempotent)
-  Worker-->>Boss: send ingest:fetch-content {rawItemIds}
-  Boss-->>Worker: work ingest:fetch-content
-  Worker->>Src: fetch article HTML (15s timeout)
-  Worker->>Worker: Readability extract → text
-  Worker->>Worker: hash(text) → content_hash
-  Worker->>DB: insert contents; insert or link story by content_hash
-  Worker-->>Boss: send analyze:llm {storyId}
-  Boss-->>Worker: work analyze:llm
-  Worker->>OpenAI: GPT-4o-mini analysis + text-embedding-3-small
-  OpenAI-->>Worker: summaries, scores, embeddings
-  Worker->>DB: insert story_overlays + story_embeddings
-  Worker->>HTTP: /healthz for Cloud Run
+3. **Test database connection**:
+   ```bash
+   cd worker
+   pnpm run test:connection
+   ```
+
+4. **Start worker in development mode**:
+   ```bash
+   pnpm run dev          # Direct Node.js with hot reload
+   pnpm run dev:docker   # Containerized development
+   ```
+
+## 🧪 Testing
+
+### Connection Tests
+```bash
+pnpm run test:connection     # Test database and PgBoss setup
+pnpm run test:transcription  # Test job queue functionality
 ```
 
-Operational notes:
+### Manual Testing
+```bash
+# Test YouTube API
+node test-youtube-api.js
 
-- Uses Session Pooler in prod (`?sslmode=require`) and Direct in local dev.
-- Node `pg` Pool has an `error` handler to survive pooler resets.
-- Network calls use 15s abort guards to avoid hung jobs.
-- Real OpenAI integration with GPT-4o-mini and text-embedding-3-small models.
-- Graceful fallbacks to stub analysis if OpenAI API fails.
-- Minimal structured logs: `boss_started`, `heartbeat`, `ingest_pull_*`, `fetch_content_*`, `analyze_llm_*`.
-
-## Prereqs
-
-- Supabase Postgres (Direct URL for local dev; Session Pooler URL for Cloud Run)
-- Node 20+
-- pg-boss schema/privileges (SQL below)
-
-## Connection guidance
-
-- Local (Direct, IPv6): `postgresql://worker:PASSWORD@db.<project>.supabase.co:5432/postgres?sslmode=no-verify`
-- Cloud Run (Session Pooler, IPv4): `postgresql://worker.<project>:PASSWORD@<region>.pooler.supabase.com:5432/postgres?sslmode=no-verify`
-  - Do not use the Transaction Pooler (breaks pg-boss LISTEN/NOTIFY).
-
-## Local dev
-
-1. `cp .env.example .env` and set `DATABASE_URL` (Direct) and optional `BOSS_MIGRATE=true` (default).
-2. Install deps: `pnpm install`
-3. Run dev: `pnpm dev`
-
-On first start, pg-boss will create its schema/tables, create queues, schedule `system:heartbeat` every 5 minutes, and expose `/healthz`.
-
-After first successful start, you can harden:
-
-- Set `BOSS_MIGRATE=false` to skip future schema checks/creates.
-- Optionally revoke DB-level CREATE from the worker role.
-
-## Deploy to Cloud Run
-
-Fill in worker/.env (see .env.example), then run:
-
-```
-pnpm run deploy
+# Test full pipeline
+node test-youtube-pipeline.js
 ```
 
-This script reads worker/.env and deploys with the configured env vars. For production, you can also run:
+## 📦 Deployment
 
-```
+### Production Deployment
+```bash
 pnpm run deploy:prod
 ```
 
-For local docker-based runs, use:
+### Environment Configuration
 
-```
-pnpm run deploy:local
-```
-
-Environment variables (summary):
-
-- `DATABASE_URL_POOLER`: Session Pooler URL (prod deploy).
-- `DATABASE_URL`: Direct URL (local/dev and Docker local).
-- `BOSS_SCHEMA`: pg-boss schema name (default `pgboss`).
-- `BOSS_MIGRATE`: `true` to allow pg-boss to create/verify its schema (local first run), `false` in prod.
-- `OPENAI_API_KEY`: OpenAI API key for real GPT-4o-mini analysis and embeddings.
-
-## Logs CLI
-
-Use the built-in script to stream Cloud Run logs without opening the console:
-
-```
-# Stream INFO+ level (default lookback FRESHNESS=15m). Uses streaming if available,
-# otherwise polls every 5s with `gcloud logging read`.
-pnpm run logs
-
-# Only warnings and errors
-pnpm run logs:errors
-
-# Custom lookback and filter (advanced filter syntax)
-FRESHNESS=30m pnpm run logs "jsonPayload.msg=fetch_content_start OR textPayload:extract_error"
-```
-
-## pg-boss DB setup (SQL)
-
-Run in Supabase SQL Editor (adjust role/password):
-
-```
-create role worker login password 'REDACTED_STRONG_PASSWORD';
-grant connect on database postgres to worker;
-grant create on database postgres to worker; -- needed for first-time CREATE SCHEMA
-grant usage on schema public to worker;
-
--- Create pgboss schema as admin; grant worker privileges to create inside it
-create schema if not exists pgboss;
-grant usage, create on schema pgboss to worker;
-
--- Allow worker to read/write app tables (adjust as needed)
-grant select, insert, update, delete on all tables in schema public to worker;
-grant usage on all sequences in schema public to worker;
-alter default privileges in schema public grant select, insert, update, delete on tables to worker;
-alter default privileges in schema public grant usage on sequences to worker;
-
--- Extensions used by the app (first-time setup)
-create extension if not exists pgcrypto;
-create extension if not exists vector;
-```
-
-After pg-boss is installed, you may set `BOSS_MIGRATE=false` and optionally:
-
-```
-revoke create on database postgres from worker;
-```
-
-## Manual test endpoints (repeatable)
-
-The worker exposes simple debug endpoints for on-demand tests:
-
-- `POST /debug/schedule-rss` → creates the `ingest:pull` queue and schedules it every 5 minutes (idempotent).
-- `POST /debug/ingest-now` → immediately runs the RSS ingest once without waiting for cron.
-
-Examples:
-
-```
-curl -X POST "$WORKER_URL/debug/schedule-rss"
-curl -X POST "$WORKER_URL/debug/ingest-now"
-```
-
-Then verify in DB:
-
-```sql
--- Check pipeline progress
-SELECT
-  (SELECT COUNT(*) FROM raw_items) as raw_items,
-  (SELECT COUNT(*) FROM contents) as contents,
-  (SELECT COUNT(*) FROM stories) as stories,
-  (SELECT COUNT(*) FROM story_overlays) as overlays,
-  (SELECT COUNT(*) FROM story_embeddings) as embeddings;
-
--- View recent items
-select id, url, title, discovered_at from public.raw_items order by discovered_at desc limit 10;
-
--- Check AI analysis results
-select story_id, chili, confidence, model_version, created_at
-from story_overlays order by created_at desc limit 5;
-```
-
-## Testing AI Analysis
-
-Test the OpenAI integration manually:
-
+#### Local Development (`.env.local`)
 ```bash
-# Test LLM analysis on existing stories without overlays
-pnpm run test:analysis
-
-# Or use the built-in test script
-npx tsx src/test-analysis.ts
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+BOSS_SCHEMA="pgboss"
+BOSS_MIGRATE="false"
+OPENAI_API_KEY="your-openai-key"
+YOUTUBE_API_KEY="your-youtube-key"
 ```
+
+#### Production (`.env`)
+```bash
+DATABASE_URL_POOLER="postgresql://worker.xxx:xxx@aws-1-us-central1.pooler.supabase.com:5432/postgres?sslmode=no-verify"
+BOSS_SCHEMA="pgboss"
+BOSS_MIGRATE="false"
+OPENAI_API_KEY="your-openai-key"
+YOUTUBE_API_KEY="your-youtube-key"
+```
+
+## 🏗️ Architecture
+
+### Job Types
+- `transcribe-video`: YouTube video transcription
+- `process-content`: Content analysis and processing
+- `cleanup-temp-files`: Temporary file cleanup
+
+### Database Schema
+- Uses `pgboss` schema for job management
+- Worker role with appropriate permissions
+- Automatic job partitioning and cleanup
+
+### Docker Images
+- **Development**: Fast build without Python dependencies
+- **Production**: Full build with PyTorch, Whisper, yt-dlp
+
+## 🔧 Scripts Reference
+
+| Script | Description |
+|--------|-------------|
+| `pnpm run dev` | Start with hot reload |
+| `pnpm run dev:docker` | Start in Docker container |
+| `pnpm run build` | Build TypeScript |
+| `pnpm run start` | Start production server |
+| `pnpm run test:connection` | Test database connectivity |
+| `pnpm run test:transcription` | Test job queue |
+| `pnpm run deploy:prod` | Deploy to GCP Cloud Run |
+| `pnpm run logs` | View production logs |
+| `pnpm run logs:errors` | View error logs only |
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **SSL Connection Errors**
+   - Local: Use `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+   - Production: Ensure `sslmode=no-verify` in connection string
+
+2. **PgBoss Schema Missing**
+   ```bash
+   pnpm run migration:up:local  # Apply migrations
+   ```
+
+3. **Worker Role Missing**
+   - Migration automatically creates worker role for local development
+   - Production requires manual role setup
+
+4. **Build Timeouts**
+   - Use development Dockerfile for faster iteration
+   - Production builds take 8-10 minutes due to Python dependencies
+
+### Performance Optimization
+
+- **Local Development**: 23 seconds build time
+- **Production**: 8-10 minutes with optimizations
+- **Regional Matching**: Ensure worker and database in same region
+
+## 📊 Monitoring
+
+### Health Checks
+- Worker exposes health endpoint on `/health`
+- PgBoss connection status monitoring
+- Job processing metrics
+
+### Logging
+- Structured JSON logging
+- Error tracking with context
+- Performance metrics collection

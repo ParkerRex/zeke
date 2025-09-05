@@ -3,20 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
     "clean": "rm -rf .next node_modules",
-    "email:build": "email build",
+    "dev": "bash scripts/dev-start.sh && pnpm run dev:full",
+    "dev:setup": "bash scripts/dev-start.sh",
+    "dev:full": "concurrently --names \"NEXT,WORKER\" --prefix-colors \"green,yellow\" \"pnpm run dev:next\" \"pnpm run dev:worker\"",
+    "dev:next": "next dev --turbopack --port 3000",
+    "dev:worker": "cd worker && pnpm run dev",
+    "lint": "next lint",
+    "start": "next start",
+    "stop": "bash scripts/dev-stop.sh",
+    "test": "pnpm run test:db && pnpm run test:worker",
+    "test:db": "pnpm supabase start && pnpm supabase migration up --local",
+    "test:worker": "cd worker && pnpm run test:connection && pnpm run test:transcription",
+    "db:reset": "pnpm supabase db reset --local",
+    "db:migrate": "pnpm supabase migration up --local && pnpm run types:generate",
+    "types:generate": "pnpm supabase gen types typescript --local --schema public > src/libs/supabase/types.ts",
+    "types:generate:remote": "env-cmd -f ./.env.local pnpm supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/libs/supabase/types.ts",
+    "migration:new": "pnpm supabase migration new",
+    "migration:up": "pnpm supabase migration up --linked --debug && pnpm run types:generate:remote",
+    "migration:squash": "pnpm supabase migration squash --linked",
+    "worker:deploy": "cd worker && pnpm run deploy:prod",
     "email:dev": "email dev --dir ./src/features/emails --port 3001",
-    "email:export": "email export",
-    "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks --project-name=default",
-    "generate-types": "env-cmd -f ./.env.local supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/libs/supabase/types.ts",
-    "supabase:link": "env-cmd -f ./.env.local supabase link --project-ref $SUPABASE_PROJECT_ID",
-    "migration:new": "supabase migration new",
-    "migration:up": "supabase migration up --linked --debug && pnpm run generate-types",
-    "migration:squash": "supabase migration squash --linked"
+    "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks --project-name=default"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -84,9 +93,11 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.2",
     "@types/react": "19.0.4",
     "@types/react-dom": "19.0.2",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
     "env-cmd": "^10.1.0",
     "eslint": "^9.34.0",
     "eslint-config-next": "^15.5.2",
@@ -94,11 +105,13 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-tailwindcss": "^3.18.2",
+    "husky": "^9.1.7",
     "postcss": "^8.5.6",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "supabase": "^2.39.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "ultracite": "5.3.3"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -5,6 +5,7 @@ import { extractAudio } from './youtube-audio.js';
 import { transcribeAudio } from '../transcribe/whisper.js';
 import { transcriptionQueue } from '../transcribe/queue.js';
 import { cleanupVideoTempFiles } from '../utils/temp-files.js';
+import { prepareYouTubeTranscript, generateVTTContent } from '../storage/youtube-uploads.js';
 /**
  * Extract YouTube content: audio → transcription → text content
  */
@@ -241,12 +242,21 @@ export async function runYouTubeQueuedExtract(jobData, boss) {
             if (!transcriptText) {
                 throw new Error('No text extracted from transcription');
             }
+            // Generate VTT content from transcription segments
+            const vttContent = generateVTTContent(transcriptionResult);
+            // Prepare transcript data for storage
+            const transcriptData = await prepareYouTubeTranscript(videoId, vttContent, transcriptText);
+            if (!transcriptData.success) {
+                throw new Error(`Transcript preparation failed: ${transcriptData.error}`);
+            }
             const enhancedText = formatYouTubeContent(transcriptText, audioResult.metadata, transcriptionResult);
             const content_hash = hashText(enhancedText);
             const content_id = await insertContents({
                 raw_item_id: row.id,
                 text: enhancedText,
                 html_url: videoUrl,
+                transcript_url: transcriptData.transcriptUrl, // Store transcript URL pattern
+                transcript_vtt: transcriptData.vttContent, // Store VTT content directly
                 lang: transcriptionResult.language,
                 content_hash,
             });
@@ -270,6 +280,9 @@ export async function runYouTubeQueuedExtract(jobData, boss) {
                 story_id: storyId,
                 video_id: videoId,
                 transcription_job_id: transcriptionJobId,
+                transcript_url: transcriptData.transcriptUrl,
+                transcript_vtt_length: transcriptData.vttContent.length,
+                transcript_text_length: transcriptText.length,
             });
         }
         catch (err) {

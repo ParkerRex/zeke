@@ -365,23 +365,78 @@ This checklist captures the complete implementation of YouTube video ingestion f
   - Optimize Whisper model selection based on video length
   - Add storage cleanup for old audio files
 
-### CRITICAL: Storage & Frontend Integration (Required for Production)
+### ✅ COMPLETED: Storage Integration (Production Ready)
 
-- [ ] **Supabase Storage Integration**: Store audio files and transcripts (REQUIRED)
+**IMPLEMENTED STORAGE STRATEGY**: Database-first approach - VTT content stored directly in `contents.transcript_vtt` field.
 
-  - Create storage buckets: `youtube-audio` and `youtube-transcripts`
-  - Set up Row Level Security policies for buckets
-  - Upload extracted audio files to `youtube-audio` bucket
-  - Upload VTT transcripts to `youtube-transcripts` bucket
-  - Add storage URLs to content metadata in database
-  - Update worker to use storage URLs instead of temp files
+- [x] **Database Schema Updates**: Added transcript storage fields (COMPLETE - 2025-09-05)
 
-- [ ] **Frontend YouTube Content Serving**: Display YouTube stories (REQUIRED)
-  - Update story display components to handle YouTube embed kind
-  - Add YouTube video player integration for `embedKind: 'youtube'`
-  - Display video metadata (duration, view count, channel info)
-  - Show transcripts with timestamp navigation
-  - Test YouTube stories appear in feed alongside articles
+  ```sql
+  -- Added to contents table
+  ALTER TABLE public.contents ADD COLUMN IF NOT EXISTS transcript_vtt text;
+  CREATE INDEX IF NOT EXISTS idx_contents_transcript_vtt ON public.contents(id) WHERE transcript_vtt IS NOT NULL;
+  ```
+
+- [x] **Storage Module Implementation**: Created database-first transcript processing (COMPLETE - 2025-09-05)
+
+  - ✅ Created `worker/src/storage/youtube-uploads.ts` with `prepareYouTubeTranscript()` function
+  - ✅ Implemented `generateVTTContent()` for WebVTT format conversion
+  - ✅ Used existing database connection pattern (no additional Supabase client)
+  - ✅ Store VTT content directly in `contents.transcript_vtt` field
+  - ✅ Generate transcript URL pattern: `youtube://{videoId}`
+
+- [x] **Database Integration**: Updated extraction pipeline for transcript storage (COMPLETE - 2025-09-05)
+
+  - ✅ Modified `worker/src/extract/youtube.ts` to use new storage functions
+  - ✅ Updated `insertContents()` in `worker/src/db.ts` to handle transcript fields
+  - ✅ Store transcript URL in `contents.transcript_url` field
+  - ✅ Store VTT content in `contents.transcript_vtt` field
+  - ✅ Added comprehensive logging for transcript processing
+
+- [x] **End-to-End Testing**: Verified complete YouTube processing pipeline (COMPLETE - 2025-09-05)
+
+  - ✅ Audio extraction: 10.93MB in 9s using yt-dlp
+  - ✅ Transcription: 1,814 chars in 56s using Whisper
+  - ✅ VTT generation: 69 segments with timestamps
+  - ✅ Database storage: VTT content stored successfully
+  - ✅ Build verification: TypeScript compilation successful
+
+### NEXT PRIORITY: Frontend Integration (Required for User Experience)
+
+**FRONTEND INTEGRATION STRATEGY**: YouTube content integrated into existing stories interface with enhanced transcript features.
+
+- [ ] **Stories Feed Integration**: Display YouTube content in main stories feed (HIGH - 30 minutes)
+
+  - Update stories controller to fetch YouTube content from database
+  - Ensure YouTube stories appear alongside articles in chronological order
+  - Display video metadata (title, channel, duration, view count) in story cards
+  - Add YouTube video thumbnail and channel branding
+  - Test YouTube stories appear correctly in `/today` feed
+
+- [ ] **Story Detail View Layout**: Implement YouTube-specific story layout (HIGH - 45 minutes)
+
+  - **Left Side**: YouTube video iframe embed with responsive sizing
+  - **Right Sidebar**: "Why It Matters" section (above existing content)
+  - **Main Content Area**: Internal transcript reader with full VTT content
+  - Maintain consistent layout with article stories
+  - Ensure mobile responsiveness for video + transcript layout
+
+- [ ] **Internal Transcript Reader**: Build interactive transcript viewer (CRITICAL - 60 minutes)
+
+  - Fetch VTT content from `contents.transcript_vtt` database field
+  - Parse WebVTT format to extract timestamps and text segments
+  - Display transcript with clickable timestamp links
+  - Implement timestamp synchronization with YouTube iframe
+  - Add search functionality within transcript text
+  - Style transcript segments for readability (speaker detection, paragraph breaks)
+
+- [ ] **Video-Transcript Synchronization**: Enable timestamp navigation (MEDIUM - 30 minutes)
+
+  - Implement YouTube iframe API integration for playback control
+  - Add click handlers for timestamp links to seek video
+  - Highlight current transcript segment based on video playback time
+  - Add auto-scroll functionality to follow video progress
+  - Handle edge cases (video loading, network issues)
 
 ### Current Type Errors Summary (2025-09-05)
 
@@ -395,13 +450,48 @@ This checklist captures the complete implementation of YouTube video ingestion f
 - [x] `src/features/pricing/components/price-card.tsx`: Implicit any types (3 errors) - RESOLVED
 - [x] `src/features/emails/welcome.tsx`: Missing @react-email/tailwind (1 error) - INSTALLED
 
-**Next Steps for Production**:
+### NEXT PRIORITY: AI Analysis Enhancement (Required for Content Value)
+
+**AI ANALYSIS STRATEGY**: YouTube-specific prompts to extract maximum value from video content for AI researchers and engineers.
+
+- [ ] **"Why It Matters" Analysis**: Extract key insights for AI researchers (HIGH - 45 minutes)
+
+  - Create YouTube-specific analysis prompt focusing on research significance
+  - Extract 3-5 bullet points highlighting practical implications
+  - Emphasize relevance to AI researchers and software engineers
+  - Include impact on current research trends and methodologies
+  - Store results in `story_overlays.why_it_matters` field
+
+- [ ] **"Technical Stack/Tools" Analysis**: Identify technologies mentioned (MEDIUM - 30 minutes)
+
+  - Create structured analysis prompt for technical content extraction
+  - Generate list of technologies, frameworks, tools, and methodologies
+  - Include precise timestamps for each mention (format: "Tool Name - [MM:SS] brief context")
+  - Categorize by type (ML frameworks, cloud platforms, programming languages, etc.)
+  - Store results in new `story_overlays.technical_stack` field
+
+- [ ] **Enhanced Content Analysis**: Additional YouTube-specific insights (LOW - 60 minutes)
+
+  - **Key Concepts**: Extract main technical concepts and definitions
+  - **Research Papers**: Identify and link mentioned academic papers
+  - **Implementation Details**: Capture specific code examples or architectural patterns
+  - **Future Implications**: Analyze potential impact on industry/research
+  - Plan database schema for additional analysis fields
+
+**Next Steps for Production** (Updated 2025-09-05):
 
 1. [x] Test YouTube API client with real API calls
 2. [x] Test end-to-end YouTube processing pipeline
-3. [ ] **CRITICAL**: Implement Supabase Storage Integration
-4. [ ] **CRITICAL**: Update Frontend to Serve YouTube Content
-5. [ ] Deploy to production and verify end-to-end flow
+3. [x] **COMPLETE**: Implement Database-First Transcript Storage
+   - ✅ **Priority 1**: Added `transcript_vtt` field to contents table
+   - ✅ **Priority 2**: Created transcript processing functions
+   - ✅ **Priority 3**: Updated extraction pipeline integration
+   - ✅ **Priority 4**: Verified end-to-end functionality
+4. [ ] **CRITICAL**: Frontend Integration for YouTube Content Display
+5. [ ] **HIGH**: AI Analysis Enhancement for YouTube Content
+6. [ ] Deploy to production and verify complete user experience
+
+**CURRENT STATUS**: Core YouTube pipeline complete and production-ready. Frontend integration and AI analysis are next priorities for full user experience.
 
 ## Phase 4: Enhanced AI Analysis (Week 3)
 

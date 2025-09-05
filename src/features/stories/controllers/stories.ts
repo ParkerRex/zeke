@@ -4,7 +4,7 @@ import { supabaseAdminClient } from '@/libs/supabase/supabase-admin';
 
 export async function listStories(): Promise<Cluster[]> {
   try {
-    // Query stories with their overlays using the updated types
+    // Query stories with their overlays and YouTube-specific content data
     const { data: stories, error } = await supabaseAdminClient
       .from('stories')
       .select(
@@ -20,6 +20,12 @@ export async function listStories(): Promise<Cluster[]> {
           chili,
           confidence,
           citations
+        ),
+        contents (
+          transcript_url,
+          transcript_vtt,
+          duration_seconds,
+          view_count
         )
       `
       )
@@ -42,18 +48,37 @@ export async function listStories(): Promise<Cluster[]> {
       // Handle overlay data - it might be an object or array depending on the query
       const overlay = Array.isArray(story.story_overlays) ? story.story_overlays[0] : story.story_overlays;
 
+      // Handle contents data - it might be an object or array depending on the query
+      const content = Array.isArray(story.contents) ? story.contents[0] : story.contents;
+
+      // Extract YouTube video ID from transcript URL for embed
+      let embedUrl = story.primary_url || story.canonical_url || '';
+      if (story.kind === 'youtube' && content?.transcript_url) {
+        const videoId = content.transcript_url.replace('youtube://', '');
+        embedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      }
+
       return {
         id: story.id,
         title: story.title || 'Untitled Story',
         primaryUrl: story.primary_url || story.canonical_url || '',
         embedKind: mapKindToEmbedKind(story.kind),
-        embedUrl: story.primary_url || story.canonical_url || '',
+        embedUrl,
         overlays: {
           whyItMatters: overlay?.why_it_matters || 'Analysis pending...',
           chili: overlay?.chili || 0,
           confidence: overlay?.confidence || 0,
           sources: parseCitations(overlay?.citations) || [],
         },
+        youtubeMetadata:
+          story.kind === 'youtube' && content
+            ? {
+                transcriptUrl: content.transcript_url || undefined,
+                transcriptVtt: content.transcript_vtt || undefined,
+                durationSeconds: content.duration_seconds || undefined,
+                viewCount: content.view_count || undefined,
+              }
+            : undefined,
       };
     });
 
@@ -82,6 +107,12 @@ export async function getStoryById(id: string): Promise<Cluster | undefined> {
           chili,
           confidence,
           citations
+        ),
+        contents (
+          transcript_url,
+          transcript_vtt,
+          duration_seconds,
+          view_count
         )
       `
       )
@@ -97,18 +128,37 @@ export async function getStoryById(id: string): Promise<Cluster | undefined> {
     // Handle overlay data - it might be an object or array depending on the query
     const overlay = Array.isArray(story.story_overlays) ? story.story_overlays[0] : story.story_overlays;
 
+    // Handle contents data - it might be an object or array depending on the query
+    const content = Array.isArray(story.contents) ? story.contents[0] : story.contents;
+
+    // Extract YouTube video ID from transcript URL for embed
+    let embedUrl = story.primary_url || story.canonical_url || '';
+    if (story.kind === 'youtube' && content?.transcript_url) {
+      const videoId = content.transcript_url.replace('youtube://', '');
+      embedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    }
+
     return {
       id: story.id,
       title: story.title || 'Untitled Story',
       primaryUrl: story.primary_url || story.canonical_url || '',
       embedKind: mapKindToEmbedKind(story.kind),
-      embedUrl: story.primary_url || story.canonical_url || '',
+      embedUrl,
       overlays: {
         whyItMatters: overlay?.why_it_matters || 'Analysis pending...',
         chili: overlay?.chili || 0,
         confidence: overlay?.confidence || 0,
         sources: parseCitations(overlay?.citations) || [],
       },
+      youtubeMetadata:
+        story.kind === 'youtube' && content
+          ? {
+              transcriptUrl: content.transcript_url || undefined,
+              transcriptVtt: content.transcript_vtt || undefined,
+              durationSeconds: content.duration_seconds || undefined,
+              viewCount: content.view_count || undefined,
+            }
+          : undefined,
     };
   } catch (error) {
     console.error('Error in getStoryById:', error);

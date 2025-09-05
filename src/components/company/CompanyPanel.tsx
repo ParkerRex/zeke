@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useMemo } from 'react';
 
 import { useTabs } from '@/lib/tabsStore';
@@ -18,13 +18,13 @@ const COMPANIES: { name: string; slug: string; ceo: string; domain: string }[] =
 
 export default function CompanyPanel() {
   const { tabs, openTab, setActive, updateContext } = useTabs();
-  const companyTab = useMemo(() => tabs.find((t) => t.id === 'company'), [tabs]);
+  const companyTab = useMemo(() => tabs.find((t) => t.id === 'tab:company'), [tabs]);
 
   const openCompany = (slug: string) => {
     const meta = COMPANIES.find((c) => c.slug === slug)!;
     if (!companyTab) {
       openTab({
-        id: 'company',
+        id: 'tab:company',
         title: 'Company',
         embedKind: 'company' as any,
         embedUrl: '',
@@ -33,8 +33,8 @@ export default function CompanyPanel() {
       });
       return;
     }
-    updateContext('company', { company: meta.name, slug: meta.slug, ceo: meta.ceo, domain: meta.domain });
-    setActive('company');
+    updateContext('tab:company', { company: meta.name, slug: meta.slug, ceo: meta.ceo, domain: meta.domain });
+    setActive('tab:company');
   };
 
   return (
