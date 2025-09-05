@@ -14,6 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      clusters: {
+        Row: {
+          cluster_key: string
+          created_at: string | null
+          representative_story_id: string | null
+        }
+        Insert: {
+          cluster_key: string
+          created_at?: string | null
+          representative_story_id?: string | null
+        }
+        Update: {
+          cluster_key?: string
+          created_at?: string | null
+          representative_story_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clusters_representative_story_id_fkey"
+            columns: ["representative_story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contents: {
+        Row: {
+          content_hash: string
+          extracted_at: string | null
+          html_url: string | null
+          id: string
+          lang: string | null
+          pdf_url: string | null
+          raw_item_id: string
+          text: string | null
+          transcript_url: string | null
+        }
+        Insert: {
+          content_hash: string
+          extracted_at?: string | null
+          html_url?: string | null
+          id?: string
+          lang?: string | null
+          pdf_url?: string | null
+          raw_item_id: string
+          text?: string | null
+          transcript_url?: string | null
+        }
+        Update: {
+          content_hash?: string
+          extracted_at?: string | null
+          html_url?: string | null
+          id?: string
+          lang?: string | null
+          pdf_url?: string | null
+          raw_item_id?: string
+          text?: string | null
+          transcript_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contents_raw_item_id_fkey"
+            columns: ["raw_item_id"]
+            isOneToOne: false
+            referencedRelation: "raw_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           id: string
@@ -28,6 +98,48 @@ export type Database = {
           stripe_customer_id?: string | null
         }
         Relationships: []
+      }
+      highlights: {
+        Row: {
+          content_id: string
+          created_at: string | null
+          id: string
+          span: Json
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string | null
+          id?: string
+          span: Json
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string | null
+          id?: string
+          span?: Json
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "highlights_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "highlights_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prices: {
         Row: {
@@ -105,6 +217,197 @@ export type Database = {
           name?: string | null
         }
         Relationships: []
+      }
+      raw_items: {
+        Row: {
+          attempts: number | null
+          discovered_at: string | null
+          error: string | null
+          external_id: string
+          id: string
+          kind: string | null
+          metadata: Json | null
+          source_id: string
+          status: string | null
+          title: string | null
+          url: string
+        }
+        Insert: {
+          attempts?: number | null
+          discovered_at?: string | null
+          error?: string | null
+          external_id: string
+          id?: string
+          kind?: string | null
+          metadata?: Json | null
+          source_id: string
+          status?: string | null
+          title?: string | null
+          url: string
+        }
+        Update: {
+          attempts?: number | null
+          discovered_at?: string | null
+          error?: string | null
+          external_id?: string
+          id?: string
+          kind?: string | null
+          metadata?: Json | null
+          source_id?: string
+          status?: string | null
+          title?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_items_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sources: {
+        Row: {
+          authority_score: number | null
+          domain: string | null
+          id: string
+          kind: string
+          last_checked: string | null
+          last_cursor: Json | null
+          name: string | null
+          url: string | null
+        }
+        Insert: {
+          authority_score?: number | null
+          domain?: string | null
+          id?: string
+          kind: string
+          last_checked?: string | null
+          last_cursor?: Json | null
+          name?: string | null
+          url?: string | null
+        }
+        Update: {
+          authority_score?: number | null
+          domain?: string | null
+          id?: string
+          kind?: string
+          last_checked?: string | null
+          last_cursor?: Json | null
+          name?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      stories: {
+        Row: {
+          canonical_url: string | null
+          cluster_key: string | null
+          content_id: string
+          created_at: string | null
+          id: string
+          kind: string | null
+          primary_url: string | null
+          published_at: string | null
+          title: string | null
+        }
+        Insert: {
+          canonical_url?: string | null
+          cluster_key?: string | null
+          content_id: string
+          created_at?: string | null
+          id?: string
+          kind?: string | null
+          primary_url?: string | null
+          published_at?: string | null
+          title?: string | null
+        }
+        Update: {
+          canonical_url?: string | null
+          cluster_key?: string | null
+          content_id?: string
+          created_at?: string | null
+          id?: string
+          kind?: string | null
+          primary_url?: string | null
+          published_at?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: true
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_embeddings: {
+        Row: {
+          embedding: string
+          model_version: string | null
+          story_id: string
+        }
+        Insert: {
+          embedding: string
+          model_version?: string | null
+          story_id: string
+        }
+        Update: {
+          embedding?: string
+          model_version?: string | null
+          story_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_embeddings_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: true
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_overlays: {
+        Row: {
+          analyzed_at: string | null
+          chili: number | null
+          citations: Json | null
+          confidence: number | null
+          model_version: string | null
+          story_id: string
+          why_it_matters: string | null
+        }
+        Insert: {
+          analyzed_at?: string | null
+          chili?: number | null
+          citations?: Json | null
+          confidence?: number | null
+          model_version?: string | null
+          story_id: string
+          why_it_matters?: string | null
+        }
+        Update: {
+          analyzed_at?: string | null
+          chili?: number | null
+          citations?: Json | null
+          confidence?: number | null
+          model_version?: string | null
+          story_id?: string
+          why_it_matters?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_overlays_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: true
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -197,7 +500,98 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
     }
     Enums: {
       pricing_plan_interval: "day" | "week" | "month" | "year"

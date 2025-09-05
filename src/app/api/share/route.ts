@@ -6,7 +6,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-  const snapshot = getShareSnapshot(id) || getStoryById(id);
+  const snapshot = (await getShareSnapshot(id)) || (await getStoryById(id));
   if (!snapshot) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(snapshot);
 }

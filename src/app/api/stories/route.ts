@@ -3,6 +3,6 @@ import { NextResponse } from 'next/server';
 import { listStories } from '@/features/stories';
 
 export async function GET() {
-  const clusters = listStories();
+  const clusters = await listStories();
   return NextResponse.json({ clusters });
 }

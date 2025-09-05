@@ -16,7 +16,7 @@ Priority
 - [x] Implement `ingest:pull` (RSS first) + schedule via pg-boss cron (every 5 min); upsert `raw_items` and enqueue `ingest:fetch-content`.
 - [x] Implement Extraction v1 (Readability + canonicalize + `content_hash`) writing `contents`/`stories`.
 - [x] **FIXED**: LLM analysis pipeline with real OpenAI GPT-4o-mini + text-embedding-3-small integration
-- [ ] Add `/api/stories` and `/api/stories/:id` serving reader text.
+- [x] **COMPLETE**: Add `/api/stories` and `/api/stories/:id` serving real database data with AI overlays
 
 Stack Bootstrap (done locally)
 
@@ -34,7 +34,7 @@ Core Workflows v1
 - [x] Ingestion v1: RSS connectors with cursors; upsert `raw_items` (idempotent) and enqueue `fetch-content`. **Working: 2 RSS sources, 47 items ingested**
 - [x] Extraction v1: Readability HTML → `contents.text`, canonicalize URLs, compute `content_hash`, upsert `contents`/`stories` with link-by-hash. **Working: 16 contents, 17 stories created**
 - [x] **FIXED**: LLM Analysis v1: Real OpenAI GPT-4o-mini analysis + text-embedding-3-small embeddings **Working: 9 overlays, 9 embeddings generated**
-- [ ] APIs v1: `/api/stories` (list with representative + overlays lite placeholder) and `/api/stories/:id` (story + `contents.text`).
+- [x] **COMPLETE**: APIs v1: `/api/stories` (list with real data + overlays) and `/api/stories/:id` (story + AI analysis) **SERVING REAL DATA**
 - [ ] Highlights MVP: create `/api/highlights` (POST/GET) with spans anchored to `contents.text`.
 - [ ] RLS policies: authenticated reads for stories/overlays; per-user RLS on highlights; service-role writes for worker.
 - [ ] Local dev: seed 10–20 fixtures and enable “analysis stub” overlays for UI work.
