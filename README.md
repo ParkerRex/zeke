@@ -1,212 +1,311 @@
-<p align="center">
-  <h1 align="center">next-supabase-stripe-starter</h1>
-  <p align="center">
-    <a href="https://twitter.com/KolbySisk"><img src="/delete-me/github-banner.png" /></a>
-  </p>
-</p>
+# ZEKE - AI-Powered News Intelligence Platform
 
-<p align="center">
-  <a href="https://twitter.com/kolbysisk" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@kolbysisk-e57060.svg" alt="Created by Kolby Sisk"></a>
-  <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/github/license/kolbysisk/next-supabase-stripe-starter" alt="License"></a>
-</p>
+**Status (2025-09-05)**: Core pipeline working! 47 raw items → 16 contents → 17 stories → 9 overlays → 9 embeddings processed. Worker running every 5 min with **real OpenAI GPT-4o-mini analysis**!
 
-<p align="center">
-  <a href="https://next-supabase-stripe-starter-demo-mnqz.vercel.app" style="font-weight: bold; font-size: 20px; text-decoration: underline;">See the demo</a>
-</p>
+ZEKE is an intelligent news aggregation and analysis platform that ingests content from multiple sources (RSS, HN, Reddit, YouTube, arXiv), extracts and normalizes content, generates AI-powered summaries and insights, and serves them through a modern web interface.
 
-## Introduction
+## Architecture Overview
 
-Bootstrap your SaaS with a modern tech stack built to move quick. Follow the guide to get started.
+ZEKE consists of three main components:
 
-### What's included
+1. **Next.js Web Application** - User interface and API endpoints
+2. **Cloud Run Worker** - Background data processing pipeline
+3. **Supabase Database** - PostgreSQL with pgvector for storage and vector search
 
-- Next.js 15
-- [Supabase](https://supabase.com) - Postgres database & user authentication
-- [Stripe](https://stripe.com) - [Checkout](https://stripe.com/docs/payments/checkout), [subscriptions](https://stripe.com/docs/billing/subscriptions/overview), and [customer portal](https://stripe.com/docs/customer-management)
-- [React Email](https://react.email/) - Easily build emails and send them with [Resend](https://resend.com)
-- [Tailwindcss](https://tailwindcss.com/) - CSS framework
-- [shadcn/ui](https://ui.shadcn.com) - Prebuilt accessible components
-- Webhooks to automatically synchronize Stripe with Supabase
-- Stripe fixture to bootstrap product data
-- Supabase migrations to bootstrap and manage your db schema
-- Responsive, performant, and accessible prebuilt pages
-- Animated button borders! Now you can look cool without nerds saying you shipped too late
+### Current Data Flow
 
-## Getting started
+```
+RSS Feeds (2 sources) → raw_items (47) → contents (16) → stories (17) → ✅ overlays (9) → ✅ embeddings (9)
+                                                                          ↑ Real OpenAI Analysis ↑
+```
 
-### Supabase CLI
+## Current Status
 
-- This project uses the npm package `supabase` (local devDependency) so commands are reproducible via `bun run` or `npm run`.
-- Scripts call the local binary in `node_modules/.bin` (no global/brew dependency).
-- If you previously installed the Homebrew CLI, uninstall to avoid PATH conflicts:
-  - `brew uninstall supabase` (and optionally `brew untap supabase/tap`).
-  - Verify with `which supabase` → should point into `node_modules/.bin` when running scripts.
+### ✅ What's Working
 
-### 1. Setup Supabase
+**Data Pipeline Infrastructure:**
 
-1. Go to [supabase.com](https://supabase.com) and create a project
-1. Go to Project Settings → Database → Database password and click reset database password then click generate a new password. (I know you already made one, but this fixes a [bug with their CLI where it doesn't like special characters in the password](https://github.com/supabase/supabase/issues/15184))
-1. Save this password somewhere, you can't see it after closing the box
+- **Ingestion**: 47 raw items from 2 RSS sources (Hacker News + Ars Technica)
+- **Content Processing**: 16 contents extracted, 17 stories created with clean text
+- **AI Analysis**: 9 overlays with GPT-4o-mini summaries, 9 embeddings with text-embedding-3-small
+- **Worker Infrastructure**: pg-boss scheduling, Cloud Run deployment, 5-minute intervals
+- **Database**: All tables created, pgvector enabled, proper indexes and constraints
+- **Job Processing**: ingest:pull (17 completed), ingest:fetch-content (42 completed), analyze:llm (working)
 
-### 2. Setup Stripe
+**Next.js Application:**
 
-1. Go to [stripe.com](https://stripe.com) and create a project
-1. Go to [Customer Portal Settings](https://dashboard.stripe.com/test/settings/billing/portal) and click the `Active test link` button
+- Modern React 19 + Next.js 15 setup with TypeScript
+- Supabase integration for database and authentication
+- Stripe integration for subscriptions and payments
+- shadcn/ui components and Tailwind CSS styling
+- Email system with React Email and Resend
 
-### 3. Setup Resend
+### ✅ Recently Fixed
 
-1. Go to [resend.com](https://resend.com) and create an account
-1. Go to the [API Keys page](https://resend.com/api-keys) and create an API Key
-1. Add the [Supabase Resend integration](https://supabase.com/partners/integrations/resend)
+**LLM Analysis Pipeline (WORKING):**
 
-### 4. Deploy
+- Real OpenAI GPT-4o-mini integration generating contextual "why it matters" summaries
+- Smart chili scoring (0-5) and confidence ratings (0-1) based on content analysis
+- Real embeddings using text-embedding-3-small (1536-dimensional vectors)
+- Graceful fallbacks to stub analysis if OpenAI API fails
+- Proper error handling and JSON parsing for reliable operation
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FKolbySisk%2Fnext-supabase-stripe-starter&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,SUPABASE_DB_PASSWORD,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET,RESEND_API_KEY&demo-title=AI%20Twitter%20Banner%20Demo&demo-url=https%3A%2F%2Fai-twitter-banner.vercel.app&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
+### ❌ Current Issues
 
-1. Next click the deploy button ⬆️
-1. On the form create a new repo and add the Supabase integration
-1. Add the environment variables that you have available. For the stripe webhook secret just put any value - we will come back to update this after configuring the webhook
-1. Click Deploy
-1. While you wait, clone your new repo and open it in your code editor. Then create a file named `.env.local`. Copy and pase the contents of `.env.local.example` into this file and add the correct values. They should be the same values you added in above.
+**API Endpoints (INCOMPLETE):**
 
-![Vercel env config](/delete-me/deplyoment-env.png)
+- `/api/stories` returns mock data instead of real database content
+- `/api/stories/[id]` not fully implemented with real data
+- No connection between processed stories and frontend display
 
-### 5. Stripe Webhook
+### 🚧 In Development
 
-1. After deploying go to your Vercel dashboard and find your Vercel URL
-1. Next go to your Stripe dashboard, click `Developers` in the top nav, and then the `Webhooks` tab
-1. Add an endpoint. Enter your Vercel URL followed by `/api/webhooks`
-1. Click `Select events`
-1. Check `Select all events`
-1. Scroll to the bottom of the page and click `Add endpoint`
-1. Click to `Reveal` signing secret and copy it
-1. Go to your `Vercel project settings` → `Environment Variables`
-1. Update the value of the `STRIPE_WEBHOOK_SECRET` env with your newly acquired webhook secret. Press `Save`
+**Frontend Features:**
 
-### 6. Run Supabase Migration
+- Story reader interface and annotation system
+- Tab-based navigation with pinning and keyboard shortcuts
+- Company and industry analysis panels
+- See [frontend task list](docs/prompts/wdim-tasks.md) for detailed status
 
-Now we're going to run the initial [Supabase Migration](https://supabase.com/docs/reference/cli/supabase-migration-new) to create your database tables.
+**Pipeline Features:**
 
-1. Run `bunx supabase login`
-1. Run `bunx supabase init`
-1. Add `SUPABASE_PROJECT_ID` to your `.env.local` (see `.env.local.example`)
-1. Run `bun run supabase:link`
-1. Run `bun run migration:up`
+- Content clustering and deduplication
+- Additional sources (Reddit, arXiv, YouTube)
+- PDF and video transcript processing
+- See [pipeline task list](docs/plans/pipeline-tasks.md) for detailed status
 
-### 7. Run Stripe Fixture
+## Technology Stack
 
-[Stripe fixtures](https://stripe.com/docs/cli/fixtures) are an easy way to configure your product offering without messing around in the Stripe UI.
+### Core Technologies
 
-1. Install the [Stripe CLI](https://stripe.com/docs/stripe-cli#install). For Macs run: `brew install stripe/stripe-cli/stripe`
-1. Run (make sure to update the command with your Stripe sk) `stripe fixtures ./stripe-fixtures.json --api-key UPDATE_THIS_WITH_YOUR_STRIPE_SK`
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (PostgreSQL + pgvector), Stripe, Resend
+- **Worker**: Node.js, TypeScript, pg-boss, Cloud Run
+- **Content Processing**: Mozilla Readability, fast-xml-parser, jsdom
 
-### 8. Last steps
+### Data Pipeline Components
 
-1. Do a `Search All` in your code editor for `UPDATE_THIS` and update all instances with the relevant value (**except for .env.local.example!**)
-1. Delete the `delete-me` dir
+- **Scheduling**: pg-boss with cron-based job scheduling
+- **Ingestion**: RSS/Atom feed parsing, content fetching with 15s timeouts
+- **Extraction**: HTML cleaning with Readability, content hashing for deduplication
+- **Analysis**: LLM integration for summaries and scoring (currently broken)
+- **Storage**: PostgreSQL with pgvector for embeddings, Supabase Storage for raw content
 
-### 9. Check it out!
+## Quick Start
 
-You did it! You should be able to look in your Stripe dashboard and see your products, and you should also see the same data has been populated in your Supabase database. Now let's test everything.
+### Prerequisites
 
-1. Run `bun i`
-1. Run `bun run dev`.
-1. Go to the app and click `Get started for free` - this will take you to the login page
-1. We haven't configured auth providers, so for now click `Continue with Email` and submit your email address
-1. Click the link sent to your email and you should be redirected back to your app - authenticated
-1. Click `Get Started` on one of the plans. This will take you to a Stripe checkout page (In test mode)
-1. Enter `4242424242424242` as your credit card number. Fill out the rest of the form with any valid data and click Subscribe
-1. You should be redirect to the Account page where you can see your active subscription
-1. Click the `Manage your subscription` button
+- Node.js 20+
+- pnpm (recommended) or npm
+- Supabase account
+- Stripe account (for payments)
+- Resend account (for emails)
 
-**That's the end of the setup. The following are guides to help you code in your new codebase.**
+### 1. Clone and Install
+
+```bash
+git clone <your-repo>
+cd zeke
+pnpm install
+cd worker && pnpm install && cd ..
+```
+
+### 2. Environment Setup
+
+```bash
+cp .env.local.example .env.local
+# Fill in your Supabase, Stripe, and Resend credentials
+```
+
+### 3. Database Setup
+
+```bash
+# Link to your Supabase project
+pnpm run supabase:link
+
+# Run migrations to create tables
+pnpm run migration:up
+
+# Generate TypeScript types
+pnpm run generate-types
+```
+
+### 4. Run Development Servers
+
+**Frontend:**
+
+```bash
+pnpm run dev
+# Visit http://localhost:3000
+```
+
+**Worker (for pipeline development):**
+
+```bash
+cd worker
+cp .env.example .env.local
+# Add your DATABASE_URL and other worker-specific env vars
+pnpm run dev
+```
+
+### 5. Stripe Setup (for payments)
+
+```bash
+# Install Stripe CLI
+brew install stripe/stripe-cli/stripe
+
+# Configure products
+stripe fixtures ./stripe-fixtures.json --api-key YOUR_STRIPE_SECRET_KEY
+```
+
+## Database Schema
+
+The pipeline uses the following core tables:
+
+- **`sources`** - RSS feeds and other content sources (2 configured)
+- **`raw_items`** - Unprocessed items from sources (47 items)
+- **`contents`** - Extracted and cleaned content with content_hash (16 items)
+- **`stories`** - Normalized story records (15 items)
+- **`story_overlays`** - AI-generated summaries and scores (0 items - BROKEN)
+- **`story_embeddings`** - Vector embeddings for search (0 items - BROKEN)
+- **`clusters`** - Groups of related stories (not yet implemented)
+- **`highlights`** - User annotations and highlights
+
+See [pipeline diagrams](docs/plans/pipeline-diagrams.md) for detailed schema and relationships.
+
+## Data Pipeline Architecture
+
+### How It Works (Current)
+
+1. **Ingestion** (`ingest:pull`): Every 5 minutes, worker fetches new items from RSS feeds
+2. **Content Fetch** (`ingest:fetch-content`): Downloads and extracts clean text using Readability
+3. **Story Creation**: Generates content_hash for deduplication, creates story records
+4. **Analysis** (`analyze:llm`): **BROKEN** - Should generate summaries, scores, and embeddings
+
+### Worker Deployment
+
+The worker runs on Google Cloud Run and processes jobs from pg-boss queues:
+
+```bash
+cd worker
+
+# Deploy to production
+pnpm run deploy:prod
+
+# View logs
+pnpm run logs
+
+# View error logs only
+pnpm run logs:errors
+```
+
+### Job Queues (pg-boss)
+
+- **`system:heartbeat`** - Health check every 5 minutes ✅
+- **`ingest:pull`** - Fetch new RSS items every 5 minutes ✅
+- **`ingest:fetch-content`** - Extract content from URLs ✅
+- **`analyze:llm`** - Generate AI summaries and embeddings ✅ WORKING
+
+## Known Issues & Next Steps
+
+### 🚨 Critical Issues
+
+1. **API Endpoints Return Mock Data** (highest priority)
+   - `/api/stories` serves fixtures instead of real database content
+   - Need to implement database queries in `src/features/stories/controllers/`
+   - This is now the main blocker for frontend development
+
+### 📋 Next Steps
+
+1. **Connect APIs to Database** - Replace mock data with real story queries (highest priority)
+2. **Add Content Sources** - Implement Reddit, arXiv, YouTube ingestion
+3. **Implement Clustering** - Group related stories by similarity
+4. **Build Reader Interface** - Story viewing and annotation features
+5. **Enhance AI Analysis** - Add citation extraction and improved confidence scoring
+
+See detailed task lists:
+
+- [Pipeline Tasks](docs/plans/pipeline-tasks.md) - Worker and data processing
+- [Frontend Tasks](docs/prompts/wdim-tasks.md) - UI and user experience
+
+## Development Guide
+
+### File Structure
+
+```
+├── src/                    # Next.js application
+│   ├── app/               # App router pages and API routes
+│   ├── components/        # Reusable UI components
+│   ├── features/          # Feature-specific code (stories, auth, etc.)
+│   └── libs/              # Shared utilities and clients
+├── worker/                # Background processing pipeline
+│   ├── src/               # Worker source code
+│   └── scripts/           # Deployment and utility scripts
+├── supabase/              # Database migrations and config
+└── docs/                  # Project documentation
+```
+
+### Key Directories
+
+- **`src/features/stories/`** - Story-related controllers and types (currently uses mock data)
+- **`worker/src/`** - Data pipeline implementation (ingestion, extraction, analysis)
+- **`supabase/migrations/`** - Database schema definitions
+- **`docs/plans/`** - Architecture documentation and task tracking
+
+### Environment Variables
+
+**Frontend (`.env.local`):**
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+STRIPE_SECRET_KEY=your_stripe_secret
+RESEND_API_KEY=your_resend_key
+```
+
+**Worker (`worker/.env.local`):**
+
+```bash
+DATABASE_URL=postgresql://worker:password@host:5432/postgres?sslmode=require
+BOSS_SCHEMA=pgboss
+BOSS_CRON_TZ=UTC
+BOSS_MIGRATE=false
+```
+
+### Debugging the Pipeline
+
+1. **Check job status:**
+
+   ```sql
+   SELECT name, state, COUNT(*) FROM pgboss.job GROUP BY name, state;
+   ```
+
+2. **View recent stories:**
+
+   ```sql
+   SELECT title, canonical_url, created_at FROM stories ORDER BY created_at DESC LIMIT 10;
+   ```
+
+3. **Check worker logs:**
+   ```bash
+   cd worker && pnpm run logs:errors
+   ```
+
+## Contributing
+
+1. **Fix the LLM Analysis Bug** - The most critical issue blocking AI features
+2. **Connect APIs to Database** - Replace mock data with real queries
+3. **Add Content Sources** - Implement additional ingestion sources
+4. **Improve UI/UX** - See [frontend tasks](docs/prompts/wdim-tasks.md)
+
+## Documentation
+
+- [Pipeline Architecture](docs/plans/pipeline-diagrams.md) - Visual diagrams of system components
+- [Pipeline Specification](docs/plans/pipeline-spec.md) - Detailed technical specification
+- [Pipeline Tasks](docs/plans/pipeline-tasks.md) - Current development status and tasks
+- [Frontend Tasks](docs/prompts/wdim-tasks.md) - UI development checklist
 
 ---
 
-## Guides
-
-### Managing products
-
-Your products and prices are managed via the `stripe-fixtures.json` file. You can delete your test data in Stripe on the [Developers page](https://dashboard.stripe.com/test/developers), make the changes you'd like, and then run the fixture command from above. When changes are made in Stripe the webhook hits the api route at `src/app/api/webhooks`. The handler will synchronize the data sent from Stripe to your Supabase database.
-
-The `metadata` field in your fixture is where we can store info about the product that can be used in your app. For example, say you want to add a max number of team invites. You can add a field to the metadata like `team_invites`. Then update the Zod schema in `src/features/pricing/models/product-metadata.ts`
-
-Then you can make use of it like this:
-
-```ts
-const products = await getProducts();
-const productMetadata = productMetadataSchema.parse(products[0].metadata); // Now it's typesafe 🙌!
-productMetadata.researches; // The value you set in the fixture
-```
-
-### Managing your database schema
-
-[Migrations](https://supabase.com/docs/reference/cli/supabase-migration-new) are a powerful concept for managing your database schema. Any changes you make to your database schema should be done through migrations.
-
-Say you want to add a table named `invites`.
-
-First run `npm run migration:new add-invites-table`
-Then edit your file to include:
-
-```sql
-create table invites (
-  id uuid not null primary key default gen_random_uuid(),
-  email text not null,
-);
-alter table invites enable row level security;
-```
-
-Then run `npm run migration:up` and your table will be added.
-
-### Configuring auth providers
-
-There are many auth providers you can choose from. [See the Supabase docs](https://supabase.com/docs/guides/auth#providers) for the full the list and their respective guides to configure them.
-
-### Styling
-
-- [Learn more about shadcn/ui components](https://ui.shadcn.com/docs)
-- [Learn more about theming with shadcn/ui](https://ui.shadcn.com/docs/theming)
-- [Learn more about the Tailwindcss theme config](https://tailwindcss.com/docs/theme)
-
-### Emails
-
-Your emails live in the `src/features/emails` dir. Emails are finicky and difficult to style correctly, so make sure to reference the [React Email docs](https://react.email/docs/introduction). After creating your email component, sending an email is as simple as:
-
-```ts
-import WelcomeEmail from '@/features/emails/welcome';
-import { resendClient } from '@/libs/resend/resend-client';
-
-resendClient.emails.send({
-  from: 'no-reply@your-domain.com',
-  to: userEmail,
-  subject: 'Welcome!',
-  react: <WelcomeEmail />,
-});
-```
-
-### File structure
-
-The file structure uses the group by `feature` concept. This is where you will colocate code related to a specific feature, with the exception of UI code. Typically you want to keep your UI code in the `app` dir, with the exception of reusable components. Most of the time reusable components will be agnostic to a feature and should live in the `components` dir. The `components/ui` dir is where `shadcn/ui` components are generated to.
-
-### Going live
-
-Follow these steps when you're ready to go live:
-
-1. Activate your Stripe account and set the dashboard to live mode
-1. Repeat the steps above to create a Stripe webhook in live mode, this time using your live url
-1. Update Vercel env variables with your live Stripe pk, sk, and whsec
-1. After Vercel has redeployed with your new env variables, run the fixture command using your Stripe sk
-
----
-
-## Support
-
-If you need help with the setup, or developing in the codebase, feel free to reach out to me on Twitter [@kolbysisk](https://twitter.com/KolbySisk) - I'm always happy to help.
-
-## Contribute
-
-PRs are always welcome.
-
----
-
-This project was inspired by Vercel's [nextjs-subscription-payments](https://github.com/vercel/nextjs-subscription-payments).
+**Current Priority**: Connect APIs to database to serve real story data with AI-powered summaries and insights.

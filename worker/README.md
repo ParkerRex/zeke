@@ -2,6 +2,16 @@
 
 TypeScript worker that processes pg-boss jobs from Supabase Postgres. Run locally with a Direct connection; deploy on Cloud Run using the Session Pooler.
 
+## Current Status (2025-09-05)
+
+**✅ WORKING**: Complete data pipeline with real OpenAI integration!
+
+- **47 raw items** ingested from 2 RSS sources (Hacker News + Ars Technica)
+- **16 contents** extracted with clean text using Mozilla Readability
+- **17 stories** created with content deduplication via content_hash
+- **9 overlays** generated with GPT-4o-mini analysis ("why it matters" summaries)
+- **9 embeddings** created with text-embedding-3-small (1536-dimensional vectors)
+
 ## How It Works
 
 ```mermaid
@@ -22,13 +32,20 @@ sequenceDiagram
   Worker->>Worker: hash(text) → content_hash
   Worker->>DB: insert contents; insert or link story by content_hash
   Worker-->>Boss: send analyze:llm {storyId}
+  Boss-->>Worker: work analyze:llm
+  Worker->>OpenAI: GPT-4o-mini analysis + text-embedding-3-small
+  OpenAI-->>Worker: summaries, scores, embeddings
+  Worker->>DB: insert story_overlays + story_embeddings
   Worker->>HTTP: /healthz for Cloud Run
 ```
 
 Operational notes:
+
 - Uses Session Pooler in prod (`?sslmode=require`) and Direct in local dev.
 - Node `pg` Pool has an `error` handler to survive pooler resets.
 - Network calls use 15s abort guards to avoid hung jobs.
+- Real OpenAI integration with GPT-4o-mini and text-embedding-3-small models.
+- Graceful fallbacks to stub analysis if OpenAI API fails.
 - Minimal structured logs: `boss_started`, `heartbeat`, `ingest_pull_*`, `fetch_content_*`, `analyze_llm_*`.
 
 ## Prereqs
@@ -77,10 +94,12 @@ pnpm run deploy:local
 ```
 
 Environment variables (summary):
+
 - `DATABASE_URL_POOLER`: Session Pooler URL (prod deploy).
 - `DATABASE_URL`: Direct URL (local/dev and Docker local).
 - `BOSS_SCHEMA`: pg-boss schema name (default `pgboss`).
 - `BOSS_MIGRATE`: `true` to allow pg-boss to create/verify its schema (local first run), `false` in prod.
+- `OPENAI_API_KEY`: OpenAI API key for real GPT-4o-mini analysis and embeddings.
 
 ## Logs CLI
 
@@ -145,7 +164,31 @@ curl -X POST "$WORKER_URL/debug/ingest-now"
 
 Then verify in DB:
 
-```
-select count(*) from public.raw_items;
+```sql
+-- Check pipeline progress
+SELECT
+  (SELECT COUNT(*) FROM raw_items) as raw_items,
+  (SELECT COUNT(*) FROM contents) as contents,
+  (SELECT COUNT(*) FROM stories) as stories,
+  (SELECT COUNT(*) FROM story_overlays) as overlays,
+  (SELECT COUNT(*) FROM story_embeddings) as embeddings;
+
+-- View recent items
 select id, url, title, discovered_at from public.raw_items order by discovered_at desc limit 10;
+
+-- Check AI analysis results
+select story_id, chili, confidence, model_version, created_at
+from story_overlays order by created_at desc limit 5;
+```
+
+## Testing AI Analysis
+
+Test the OpenAI integration manually:
+
+```bash
+# Test LLM analysis on existing stories without overlays
+pnpm run test:analysis
+
+# Or use the built-in test script
+npx tsx src/test-analysis.ts
 ```

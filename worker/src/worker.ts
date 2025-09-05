@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import PgBoss from 'pg-boss';
 import express from 'express';
+import { log } from './log.js';
 import { runIngestRss } from './ingest/rss.js';
 import { runFetchAndExtract } from './extract/article.js';
+import { runAnalyzeStory } from './analyze/llm.js';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOSS_SCHEMA = process.env.BOSS_SCHEMA || 'pgboss';
@@ -15,12 +17,7 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-function log(msg: string, extra?: Record<string, unknown>) {
-  // minimal structured logging
-  const entry = { ts: new Date().toISOString(), msg, ...extra };
-  // eslint-disable-next-line no-console
-  console.log(JSON.stringify(entry));
-}
+// logging provided by ./log
 
 let bossRef: PgBoss | null = null;
 
@@ -77,9 +74,16 @@ async function initBoss() {
 
   await boss.work('analyze:llm', async (jobs) => {
     for (const job of jobs) {
-      log('analyze_llm_start', { jobId: job.id, storyId: (job.data as any)?.storyId });
-      await boss.complete('analyze:llm', job.id);
-      log('analyze_llm_done', { jobId: job.id });
+      const { storyId } = (job.data as any) || {};
+      log('analyze_llm_start', { jobId: job.id, storyId });
+      try {
+        if (!storyId) throw new Error('Missing storyId in job data');
+        await runAnalyzeStory(storyId);
+        await boss.complete('analyze:llm', job.id);
+      } catch (err) {
+        await boss.fail('analyze:llm', job.id, { error: String(err) });
+      }
+      log('analyze_llm_done', { jobId: job.id, storyId });
     }
   });
 
@@ -111,6 +115,23 @@ async function main() {
       await bossRef.createQueue('ingest:pull');
       await bossRef.schedule('ingest:pull', '*/5 * * * *', { source: 'rss' }, { tz: CRON_TZ });
       res.json({ ok: true });
+    } catch (e: any) {
+      res.status(503).json({ ok: false, error: String(e) });
+    }
+  });
+  // Simple status snapshot for quick observability
+  app.get('/debug/status', async (_req, res) => {
+    try {
+      const pg = (await import('./db.js')).default;
+      const [{ rows: sources }, { rows: rawCounts }, { rows: contentCounts }, { rows: jobStats }] = await Promise.all([
+        pg.query('select count(*)::int as sources_rss from public.sources where kind = "rss" and url is not null'),
+        pg.query(
+          "select count(*)::int as raw_total, count(*) filter (where discovered_at > now() - interval '24 hours')::int as raw_24h from public.raw_items"
+        ),
+        pg.query('select count(*)::int as contents_total from public.contents'),
+        pg.query('select name, state, count(*)::int as count from pgboss.job group by 1,2 order by 1,2'),
+      ]);
+      res.json({ ok: true, sources: sources[0], raw: rawCounts[0], contents: contentCounts[0], jobs: jobStats });
     } catch (e: any) {
       res.status(503).json({ ok: false, error: String(e) });
     }

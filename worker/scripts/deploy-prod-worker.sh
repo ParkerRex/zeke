@@ -19,7 +19,8 @@ fi
   "${DATABASE_URL_POOLER:=}" \
   "${BOSS_SCHEMA:=pgboss}" \
   "${BOSS_CRON_TZ:=UTC}" \
-  "${BOSS_MIGRATE:=false}"
+  "${BOSS_MIGRATE:=false}" \
+  "${OPENAI_API_KEY:=}"
 
 # Prefer DATABASE_URL_POOLER if provided
 if [[ -n "$DATABASE_URL_POOLER" ]]; then
@@ -36,11 +37,18 @@ if [[ "${DATABASE_URL}" != *"pooler.supabase.com"* ]]; then
   echo "       Expected host like <region>.pooler.supabase.com"
 fi
 
+ENV_VARS="DATABASE_URL=$DATABASE_URL,BOSS_SCHEMA=$BOSS_SCHEMA,BOSS_CRON_TZ=$BOSS_CRON_TZ,BOSS_MIGRATE=$BOSS_MIGRATE"
+
+# Add OpenAI API key if provided
+if [[ -n "$OPENAI_API_KEY" ]]; then
+  ENV_VARS="$ENV_VARS,OPENAI_API_KEY=$OPENAI_API_KEY"
+fi
+
 gcloud run deploy "$SERVICE" \
   --source "$ROOT_DIR" \
   --project "$PROJECT_ID" \
   --region "$REGION" \
   --min-instances=1 \
   --cpu=1 --memory=1Gi \
-  --set-env-vars "DATABASE_URL=$DATABASE_URL,BOSS_SCHEMA=$BOSS_SCHEMA,BOSS_CRON_TZ=$BOSS_CRON_TZ,BOSS_MIGRATE=$BOSS_MIGRATE" \
+  --set-env-vars "$ENV_VARS" \
   --no-allow-unauthenticated

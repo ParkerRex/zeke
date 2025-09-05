@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { log } from './log.js';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -11,8 +12,7 @@ const pool = new Pool({
 // Prevent process crashes from idle client errors (e.g., Supabase pooler resets)
 // See: https://node-postgres.com/features/connecting#idle-clients
 pool.on('error', (err) => {
-  // eslint-disable-next-line no-console
-  console.error('pg_pool_error', err);
+  log('pg_pool_error', { err: String(err) }, 'warn');
 });
 
 export type SourceRow = {
@@ -101,6 +101,62 @@ export async function insertStory(params: {
     [content_id, title ?? null, canonical_url ?? null, primary_url ?? null, kind ?? 'article', published_at ?? null]
   );
   return rows[0].id as string;
+}
+
+export async function getStoryWithContent(storyId: string): Promise<{
+  id: string;
+  title: string | null;
+  canonical_url: string | null;
+  text: string;
+  content_hash: string;
+} | null> {
+  const { rows } = await pool.query(
+    `select s.id, s.title, s.canonical_url, c.text, c.content_hash
+     from public.stories s
+     join public.contents c on c.id = s.content_id
+     where s.id = $1`,
+    [storyId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function upsertStoryOverlay(params: {
+  story_id: string;
+  why_it_matters?: string | null;
+  chili?: number | null;
+  confidence?: number | null;
+  citations?: any;
+  model_version?: string | null;
+}): Promise<void> {
+  const { story_id, why_it_matters, chili, confidence, citations, model_version } = params;
+  await pool.query(
+    `insert into public.story_overlays (story_id, why_it_matters, chili, confidence, citations, model_version, analyzed_at)
+     values ($1, $2, $3, $4, $5, $6, now())
+     on conflict (story_id) do update set
+       why_it_matters = excluded.why_it_matters,
+       chili = excluded.chili,
+       confidence = excluded.confidence,
+       citations = excluded.citations,
+       model_version = excluded.model_version,
+       analyzed_at = excluded.analyzed_at`,
+    [story_id, why_it_matters ?? null, chili ?? null, confidence ?? null, citations ?? null, model_version ?? null]
+  );
+}
+
+export async function upsertStoryEmbedding(params: {
+  story_id: string;
+  embedding: number[];
+  model_version?: string | null;
+}): Promise<void> {
+  const { story_id, embedding, model_version } = params;
+  await pool.query(
+    `insert into public.story_embeddings (story_id, embedding, model_version)
+     values ($1, $2, $3)
+     on conflict (story_id) do update set
+       embedding = excluded.embedding,
+       model_version = excluded.model_version`,
+    [story_id, JSON.stringify(embedding), model_version ?? null]
+  );
 }
 
 export default pool;

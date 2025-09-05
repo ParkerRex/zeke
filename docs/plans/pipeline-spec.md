@@ -1,8 +1,10 @@
 # ZEKE Data Pipeline Plan
 
-See companion visuals in `docs/plans/dp-diagrams.md` for architecture, data flow, and operations diagrams referenced throughout this plan.
+**Status (2025-09-05)**: Pipeline is working! 47 raw items → 16 contents → 15 stories processed. Worker running every 5 min. **Critical Issue**: LLM analysis jobs complete but produce 0 overlays/embeddings.
 
-This document proposes a pragmatic, incremental pipeline to ingest stories from multiple sources, normalize content, run summarization/analysis, and serve high‑quality artifacts to the app (Why it matters, chili score, confidence, citations, etc.). It is designed to fit our current stack (Next.js + Supabase), run TypeScript‑only workloads, and keep setup simple.
+See companion visuals in `docs/plans/pipeline-diagrams.md` for architecture, data flow, and operations diagrams referenced throughout this plan.
+
+This document describes the pragmatic, incremental pipeline to ingest stories from multiple sources, normalize content, run summarization/analysis, and serve high‑quality artifacts to the app (Why it matters, chili score, confidence, citations, etc.). It is designed to fit our current stack (Next.js + Supabase), run TypeScript‑only workloads, and keep setup simple.
 
 ## Goals
 
@@ -258,7 +260,21 @@ gcloud run deploy zeke-worker \
 - Start with open‑source PDF text extraction in the worker; if the text is too malformed, optionally call a managed service (e.g., GCP Document AI/AWS Textract) to obtain better structure.
 - Store the original PDF and extracted text; anchor highlights to the extracted text to enable reader annotations.
 
-## Operational Learnings (2025‑09‑05)
+## Current Status & Operational Learnings (2025‑09‑05)
+
+### What's Working ✅
+
+- **Ingestion**: 47 raw items from 2 RSS sources (HN + Ars Technica)
+- **Content Processing**: 16 contents extracted, 15 stories created
+- **Worker Infrastructure**: pg-boss running, jobs processing every 5 min
+- **Database**: All tables created, pgvector enabled, proper indexes
+
+### Critical Issue ❌
+
+- **LLM Analysis Pipeline**: analyze:llm jobs complete (16 completed) but write 0 overlays/embeddings
+- **Root Cause**: Unknown - needs investigation of worker code and logs
+
+### Operational Learnings
 
 - Supabase Session Pooler resets idle connections occasionally, emitting `{:shutdown, :db_termination}`. Add a Node `pg` Pool error handler to avoid unhandled `'error'` events and process crashes. Our worker now logs `pg_pool_error` and continues.
 - Use Session Pooler in production (`DATABASE_URL_POOLER` with `?sslmode=no-verify`) and the Direct DB URL for local dev (`DATABASE_URL` with `?sslmode=no-verify`). The prod deploy script prefers `DATABASE_URL_POOLER`.
@@ -325,25 +341,28 @@ Serving by medium:
 
 ## Incremental Delivery Plan
 
-Phase 0
+### Phase 0 - Foundation (MOSTLY COMPLETE ✅)
 
-- Tables: `sources`, `raw_items`, `contents`, `stories`, `clusters` (1:N), `story_overlays`, `story_embeddings vector(1536)`.
-- Ingest RSS + HN + arXiv; fetch & extract article text; de‑dup by `content_hash`.
-- Serve `/api/stories` and `/api/stories/:id` with internal reader for text.
+- [x] Tables: `sources`, `raw_items`, `contents`, `stories`, `clusters` (1:N), `story_overlays`, `story_embeddings vector(1536)`.
+- [x] Ingest RSS (2 sources working); fetch & extract article text; de‑dup by `content_hash`.
+- [ ] **URGENT**: Fix LLM analysis pipeline (jobs complete but write 0 overlays/embeddings)
+- [ ] Serve `/api/stories` and `/api/stories/:id` with internal reader for text.
 
-Phase 1
+### Phase 1 - Analysis & UI (BLOCKED ❌)
 
-- Overlays generation (why‑it‑matters, chili/confidence minimal rules + LLM prototype).
-- Add highlights table + `/api/highlights`; persist spans anchored to `contents.text`.
+- [ ] **BLOCKED**: Overlays generation (why‑it‑matters, chili/confidence) - LLM analysis broken
+- [ ] **BLOCKED**: Embeddings generation - LLM analysis broken
+- [ ] Add highlights table + `/api/highlights`; persist spans anchored to `contents.text`.
 
-Phase 2
+### Phase 2 - Advanced Features
 
-- Clustering thresholds tuned; representative selection persisted.
-- YouTube/Podcast transcripts; PDF extraction improvements (optional managed OCR).
+- [ ] Clustering thresholds tuned; representative selection persisted.
+- [ ] YouTube/Podcast transcripts; PDF extraction improvements (optional managed OCR).
+- [ ] Add more sources: HN, arXiv, Reddit, YouTube
 
-Phase 3 (ongoing)
+### Phase 3 - Production Hardening
 
-- Queue/worker hardening; monitoring; editorial feedback loop; domain reliability model.
+- [ ] Queue/worker hardening; monitoring; editorial feedback loop; domain reliability model.
 
 ## Open Questions
 

@@ -2,6 +2,7 @@ import { XMLParser } from 'fast-xml-parser';
 import PgBoss from 'pg-boss';
 import { getRssSources, upsertRawItem } from '../db.js';
 import { canonicalizeUrl } from '../util.js';
+import { log } from '../log.js';
 
 type RssItem = {
   guid?: string | { '#text'?: string };
@@ -32,6 +33,8 @@ export async function runIngestRss(boss: PgBoss) {
   for (const src of sources) {
     try {
       if (!src.url) continue;
+      const t0 = Date.now();
+      log('ingest_source_start', { comp: 'ingest', source_id: src.id, url: src.url });
       const ac = new AbortController();
       const timer = setTimeout(() => ac.abort(), 15_000);
       const res = await fetch(src.url, { redirect: 'follow', signal: ac.signal });
@@ -42,10 +45,13 @@ export async function runIngestRss(boss: PgBoss) {
 
       // RSS 2.0: rss.channel.item; Atom: feed.entry
       const items: RssItem[] = asArray(doc?.rss?.channel?.item).concat(asArray(doc?.feed?.entry));
+      let seen = 0;
+      let newCount = 0;
       for (const it of items) {
         const guid = getText(it.guid) || it.id || getText(it.link) || '';
         const link = canonicalizeUrl(getText(it.link) || '');
         if (!guid && !link) continue;
+        seen++;
         const external = guid || link;
         const title = it.title ? getText(it.title as any) ?? String(it.title) : null;
         const metadata = {
@@ -63,11 +69,19 @@ export async function runIngestRss(boss: PgBoss) {
         if (id) {
           // new item: enqueue fetch-content
           await boss.send('ingest:fetch-content', { rawItemIds: [id] });
+          newCount++;
         }
       }
+      log('ingest_source_done', {
+        comp: 'ingest',
+        source_id: src.id,
+        url: src.url,
+        items_seen: seen,
+        items_new: newCount,
+        duration_ms: Date.now() - t0,
+      });
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('rss_ingest_error', src.url, err);
+      log('rss_ingest_error', { comp: 'ingest', url: src.url, err: String(err) }, 'error');
     }
   }
 }

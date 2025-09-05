@@ -1,10 +1,165 @@
 # ZEKE Data Pipeline Diagrams
 
-This document contains Mermaid diagrams to visualize the data pipeline, storage, and serving architecture. Keep each diagram focused and use them together for clarity.
+This document contains Mermaid diagrams to visualize the data pipeline, storage, and serving architecture.
 
-## System Context
+**Status (2025-09-05)**: Pipeline is working! 47 raw items → 16 contents → 15 stories processed. LLM analysis jobs complete but produce 0 overlays/embeddings - needs debug.
 
-Shows the main components and external dependencies and how they communicate.
+## Current Implementation (Working)
+
+### System Context (Current)
+
+Shows the main components currently deployed and working.
+
+```mermaid
+graph LR
+  U[Browser App] --> R[Next.js Routes - TODO]
+  R --> DB[(Supabase Postgres + pgvector)]
+  R --> ST[(Supabase Storage - TODO)]
+  DB -. pg-boss (cron/enqueue) .-> W[Cloud Run Worker ✅]
+  W -. RSS feeds .-> RSS[RSS: HN + Ars Technica ✅]
+  W --> DB
+  W -.-> LLM[LLM API - BROKEN]
+  W -.-> EMB[Embeddings API - BROKEN]
+
+  style W fill:#90EE90
+  style RSS fill:#90EE90
+  style DB fill:#90EE90
+  style LLM fill:#FFB6C1
+  style EMB fill:#FFB6C1
+  style R fill:#FFE4B5
+  style ST fill:#FFE4B5
+```
+
+### Deployment Topology (Current)
+
+Shows where processes currently run and their status.
+
+```mermaid
+graph TB
+  subgraph Browser
+    UI[User - TODO]
+  end
+  subgraph Vercel/Next.js
+    Web[Route Handlers - TODO]
+  end
+  subgraph GCP Cloud Run
+    Work[Queue Worker ✅]
+  end
+  subgraph Supabase
+    PG[(Postgres + pgvector ✅)]
+    STO[(Storage - TODO)]
+    BOSS[(pg-boss schema ✅)]
+  end
+  UI-->Web
+  Web-->PG
+  Web-->STO
+  BOSS-. schedules/enqueues .->Work
+  Work-->PG
+  Work-->STO
+
+  style Work fill:#90EE90
+  style PG fill:#90EE90
+  style BOSS fill:#90EE90
+  style Web fill:#FFE4B5
+  style STO fill:#FFE4B5
+  style UI fill:#FFE4B5
+```
+
+### Current Data Flow (Working)
+
+Shows the actual data flow that's currently processing items.
+
+```mermaid
+graph LR
+  RSS[RSS Feeds] --> P[ingest:pull ✅]
+  P --> R[raw_items: 47 ✅]
+  R --> F[ingest:fetch-content ✅]
+  F --> C[contents: 16 ✅]
+  C --> S[stories: 15 ✅]
+  S --> A[analyze:llm ❌]
+  A --> O[story_overlays: 0 ❌]
+  A --> E[story_embeddings: 0 ❌]
+
+  style P fill:#90EE90
+  style R fill:#90EE90
+  style F fill:#90EE90
+  style C fill:#90EE90
+  style S fill:#90EE90
+  style A fill:#FFB6C1
+  style O fill:#FFB6C1
+  style E fill:#FFB6C1
+```
+
+### ERD (Current Tables)
+
+Shows the actual database schema that's deployed and working.
+
+```mermaid
+erDiagram
+  sources ||--o{ raw_items : has
+  raw_items ||--|| contents : yields
+  contents ||--|| stories : feeds
+  clusters ||--o{ stories : groups
+  stories ||--o{ story_overlays : has
+  stories ||--o{ story_embeddings : has
+  stories ||--o{ highlights : has
+
+  sources {
+    uuid id PK
+    text name
+    text kind
+    text url
+    jsonb last_cursor
+    timestamp last_checked
+  }
+
+  raw_items {
+    uuid id PK
+    uuid source_id FK
+    text external_id
+    text url
+    text title
+    timestamp discovered_at
+  }
+
+  contents {
+    uuid id PK
+    uuid raw_item_id FK
+    text text
+    text content_hash
+    timestamp extracted_at
+  }
+
+  stories {
+    uuid id PK
+    uuid content_id FK
+    text title
+    text canonical_url
+    timestamp created_at
+  }
+```
+
+### Job State Machine (Current)
+
+Shows the actual job lifecycle in pg-boss that's working.
+
+```mermaid
+stateDiagram-v2
+  [*] --> created: pg-boss.schedule/send
+  created --> active: worker claims
+  active --> completed: success ✅
+  active --> failed: error (2 in DLQ)
+  failed --> retry: backoff
+  retry --> active: reclaim
+  failed --> [*]: max attempts
+  completed --> [*]: done
+```
+
+## Future Implementation (Roadmap)
+
+### System Context (Full Vision)
+
+Shows the complete system once all features are implemented.
 
 ```mermaid
 graph LR
@@ -22,35 +177,7 @@ graph LR
   W -. pdf OCR .-> OCR[[PDF Extraction Service (optional)]]
 ```
 
-## Deployment Topology
-
-Shows where processes run (Edge, Worker, Supabase) and how they connect.
-
-```mermaid
-graph TB
-  subgraph Browser
-    UI[User]
-  end
-  subgraph Vercel/Next.js
-    Web[Route Handlers]
-  end
-  subgraph GCP Cloud Run
-    Work[Queue Worker (Node/TS)]
-  end
-  subgraph Supabase
-    PG[(Postgres + pgvector)]
-    STO[(Storage)]
-    BOSS[(pg-boss schema)]
-  end
-  UI-->Web
-  Web-->PG
-  Web-->STO
-  BOSS-. schedules/enqueues .->Work
-  Work-->PG
-  Work-->STO
-```
-
-## Trust Boundaries & RLS
+### Trust Boundaries & RLS (Future)
 
 Highlights public vs private components and where RLS/service-role apply.
 
@@ -67,9 +194,9 @@ graph LR
   Work-->STO[(Storage)]
 ```
 
-## Pipeline DAG (End-to-End)
+### Pipeline DAG (Full End-to-End Vision)
 
-Maps the end-to-end pipeline from ingest pull to overlays and embeddings.
+Maps the complete pipeline from ingest pull to overlays and embeddings.
 
 > What is a DAG and why it matters
 >
@@ -91,7 +218,7 @@ graph LR
   A --> E[[story_embeddings]]
 ```
 
-## Ingestion Sequence
+### Ingestion Sequence (Future)
 
 Walks through a single ingest run from cron to queued content fetch.
 
@@ -108,31 +235,7 @@ sequenceDiagram
   Work-->>Boss: enqueue fetch-content
 ```
 
-## Scheduling (pg‑boss)
-
-```mermaid
-graph LR
-  B[pg-boss cron] --> E[enqueue jobs]
-  E --> W[Cloud Run Worker]
-  W -->|claim/ack| B
-  W --> D[(Supabase)]
-```
-
-## Worker Internals (Queues)
-
-```mermaid
-graph LR
-  S[schedule every 5 min] --> P[ingest:pull]
-  P --> U[upsert raw_items]
-  U --> SF[send ingest:fetch-content rawItemIds]
-  F[ingest:fetch-content] --> H[fetch HTML (15s timeout)]
-  H --> X[Readability extract to text]
-  X --> C[hash to content_hash]
-  C --> I[insert contents; insert/link story]
-  I --> SA[send analyze:llm storyId]
-```
-
-## Content Fetch & Normalization
+### Content Fetch & Normalization (Future)
 
 Branches for articles vs audio and converges on normalized text/content_hash.
 
@@ -148,7 +251,7 @@ graph TD
   H -->|exists| L[Link story]
 ```
 
-## Analysis & Overlays
+### Analysis & Overlays (Future)
 
 Shows context building, LLM outputs (summaries/scores/citations), and persistence.
 
@@ -161,28 +264,7 @@ graph TD
   EM --> V[Upsert story_embeddings]
 ```
 
-## ERD (Core Tables)
-
-Depicts the core tables and their relationships.
-
-> What is an ERD and why it matters
->
-> - ERD = Entity-Relationship Diagram: visual map of entities (tables), their attributes, and how they relate.
-> - Importance: clarifies ownership and normalization, reveals join paths and constraints, and informs indexing and RLS before implementation.
-> - In this project: captures how `sources`, `raw_items`, `contents`, `stories`, `story_overlays`, `story_embeddings`, and `clusters` connect; guides keys like `content_hash` and `cluster_key`, and safe query patterns for APIs.
-
-```mermaid
-erDiagram
-  sources ||--o{ raw_items : has
-  raw_items ||--|| contents : yields
-  contents ||--|| stories : feeds
-  clusters ||--o{ stories : groups
-  stories ||--o{ story_overlays : has
-  stories ||--o{ story_embeddings : has
-  stories ||--o{ highlights : has
-```
-
-## Clustering Decision Flow
+### Clustering Decision Flow (Future)
 
 Decision gates to join an existing cluster or create a new one.
 
@@ -202,7 +284,7 @@ flowchart TD
 > - For development: reduces duplication, gives stable grouping keys for caching/URLs, powers retrieval for LLM context/citations, and simplifies dedupe/debugging and backfills.
 > - For users: avoids repetitive listings, shows a representative item with alternatives, aggregates corroboration to boost confidence, and enables trend/hype signals across sources.
 
-## Transcription Pipeline
+### Transcription Pipeline (Future)
 
 Steps to produce transcripts for media and store them alongside content.
 
@@ -215,7 +297,7 @@ flowchart LR
   STO --> DB[(contents.transcript_url, text)]
 ```
 
-## Reader & Annotation Flow
+### Reader & Annotation Flow (Future)
 
 End-to-end flow for reading and highlighting across mediums (articles, PDFs, transcripts).
 
@@ -234,22 +316,7 @@ sequenceDiagram
   API-->>UI: {id}
 ```
 
-## Job State Machine
-
-Lifecycle of a job with claim, retry, completion, and dead-letter.
-
-```mermaid
-stateDiagram-v2
-  [*] --> queued
-  queued --> claimed: advisory lock
-  claimed --> processing
-  processing --> completed
-  processing --> retry: error
-  retry --> claimed
-  retry --> dead_letter: max attempts
-```
-
-## API Read Path
+### API Read Path (Future)
 
 How the UI requests story lists and receives clusters with overlays.
 
@@ -264,7 +331,7 @@ sequenceDiagram
   API-->>UI: clusters + overlays lite
 ```
 
-## Data Lineage
+### Data Lineage (Future)
 
 Traceability from raw items through contents to stories and derived artifacts.
 
