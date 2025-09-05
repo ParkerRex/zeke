@@ -50,13 +50,13 @@ RSS Feeds (2 sources) → raw_items (47) → contents (16) → stories (17) → 
 - Graceful fallbacks to stub analysis if OpenAI API fails
 - Proper error handling and JSON parsing for reliable operation
 
-### ❌ Current Issues
+### ✅ Recently Fixed
 
-**API Endpoints (INCOMPLETE):**
+**API Endpoints (COMPLETE):**
 
-- `/api/stories` returns mock data instead of real database content
-- `/api/stories/[id]` not fully implemented with real data
-- No connection between processed stories and frontend display
+- `/api/stories` now serves real database content with AI overlays
+- `/api/stories/[id]` fully implemented with real story data and analysis
+- Frontend successfully displaying processed stories with AI-powered insights
 
 ### 🚧 In Development
 
@@ -208,20 +208,13 @@ pnpm run logs:errors
 
 ## Known Issues & Next Steps
 
-### 🚨 Critical Issues
+### � Next Steps
 
-1. **API Endpoints Return Mock Data** (highest priority)
-   - `/api/stories` serves fixtures instead of real database content
-   - Need to implement database queries in `src/features/stories/controllers/`
-   - This is now the main blocker for frontend development
-
-### 📋 Next Steps
-
-1. **Connect APIs to Database** - Replace mock data with real story queries (highest priority)
+1. **Build Reader Interface** - Story viewing and annotation features (highest priority)
 2. **Add Content Sources** - Implement Reddit, arXiv, YouTube ingestion
 3. **Implement Clustering** - Group related stories by similarity
-4. **Build Reader Interface** - Story viewing and annotation features
-5. **Enhance AI Analysis** - Add citation extraction and improved confidence scoring
+4. **Enhance AI Analysis** - Add citation extraction and improved confidence scoring
+5. **Add Highlights API** - Create `/api/highlights` for user annotations
 
 See detailed task lists:
 
