@@ -118,6 +118,20 @@ graph LR
   W --> D[(Supabase)]
 ```
 
+## Worker Internals (Queues)
+
+```mermaid
+graph LR
+  S[schedule every 5 min] --> P[ingest:pull]
+  P --> U[upsert raw_items]
+  U --> SF[send ingest:fetch-content rawItemIds]
+  F[ingest:fetch-content] --> H[fetch HTML (15s timeout)]
+  H --> X[Readability extract to text]
+  X --> C[hash to content_hash]
+  C --> I[insert contents; insert/link story]
+  I --> SA[send analyze:llm storyId]
+```
+
 ## Content Fetch & Normalization
 
 Branches for articles vs audio and converges on normalized text/content_hash.

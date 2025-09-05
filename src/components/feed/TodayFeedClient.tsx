@@ -20,8 +20,11 @@ export default function TodayFeedClient() {
         console.error(e);
         setError('Failed to load stories');
       })
-      .finally(() => setLoading(false));
-    return () => ac.abort();
+      .finally(() => {
+        if (!ac.signal.aborted) setLoading(false);
+      });
+    // Provide an explicit reason so dev overlay treats this as intentional.
+    return () => ac.abort('TodayFeedClient unmounted');
   }, []);
 
   return (

@@ -32,9 +32,11 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
       .then((x) => x.json())
       .then((r) => setItems(r.clusters ?? []))
       .catch((e) => {
-        if (e.name !== 'AbortError') console.error(e);
+        // Swallow intentional aborts; surface everything else.
+        if (e?.name !== 'AbortError') console.error(e);
       });
-    return () => ac.abort();
+    // Provide an explicit reason so dev overlay treats this as intentional.
+    return () => ac.abort('StoriesGridClient unmounted');
   }, []);
 
   // Sync from URL params (used when landed via link)

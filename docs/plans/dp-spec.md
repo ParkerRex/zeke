@@ -258,6 +258,33 @@ gcloud run deploy zeke-worker \
 - Start with open‑source PDF text extraction in the worker; if the text is too malformed, optionally call a managed service (e.g., GCP Document AI/AWS Textract) to obtain better structure.
 - Store the original PDF and extracted text; anchor highlights to the extracted text to enable reader annotations.
 
+## Operational Learnings (2025‑09‑05)
+
+- Supabase Session Pooler resets idle connections occasionally, emitting `{:shutdown, :db_termination}`. Add a Node `pg` Pool error handler to avoid unhandled `'error'` events and process crashes. Our worker now logs `pg_pool_error` and continues.
+- Use Session Pooler in production (`DATABASE_URL_POOLER` with `?sslmode=no-verify`) and the Direct DB URL for local dev (`DATABASE_URL` with `?sslmode=no-verify`). The prod deploy script prefers `DATABASE_URL_POOLER`.
+- Add 15s AbortController timeouts to external fetches (RSS/XML and article HTML) to prevent hung `fetch` calls from stalling jobs.
+- Ensure analysis is enqueued with a concrete `storyId`: link by `content_hash` and create a new story if none exists; send `{ storyId }` to `analyze:llm`.
+- Minimal structured logs make progress easy to trace: `boss_started`, `http_listen`, `heartbeat`, `ingest_pull_start/done`, `fetch_content_start/done`, `analyze_llm_start/done`.
+- Cloud Run health: expose `/healthz`; also provide debug endpoints `/debug/ingest-now` and `/debug/schedule-rss` for repeatable testing.
+
+### Queues and Scheduling (v1)
+
+- Queues: `system:heartbeat`, `ingest:pull`, `ingest:fetch-content`, `analyze:llm`.
+- Cron: `system:heartbeat` and `ingest:pull` scheduled `*/5 * * * *` in `pgboss.schedule` with `tz=UTC`.
+- Boss schema: `pgboss` (created once; `BOSS_MIGRATE=false` in prod).
+
+### Environment Variables
+
+- `DATABASE_URL_POOLER` (prod): `postgresql://worker.<project-ref>:<PASSWORD>@<region>.pooler.supabase.com:5432/postgres?sslmode=require`
+- `DATABASE_URL` (local): `postgresql://worker:<PASSWORD>@db.<project-ref>.supabase.co:5432/postgres?sslmode=no-verify`
+- `BOSS_SCHEMA=pgboss`, `BOSS_CRON_TZ=UTC`, `BOSS_MIGRATE=false|true`
+- `PORT=8080` for Cloud Run HTTP server
+
+### DeployScripts
+
+- `worker/scripts/deploy-prod-worker.sh`: Deploys to Cloud Run using envs from `worker/.env`; prefers `DATABASE_URL_POOLER`.
+- `worker/scripts/deploy-local-worker.sh`: Builds and runs Docker locally; prefers `worker/.env.local`; sets `BOSS_MIGRATE=true` by default.
+
 ## Serving
 
 Related diagrams:

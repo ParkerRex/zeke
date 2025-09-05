@@ -1,0 +1,127 @@
+[
+  {
+    "insertId": "68ba2b93000e3b700b7a5b50",
+    "jsonPayload": {
+      "data": {
+        "ping": "ok"
+      },
+      "jobId": "481051ef-38ad-4f96-bbde-0845bd08692c",
+      "msg": "heartbeat",
+      "ts": "2025-09-05T00:15:15.933Z"
+    },
+    "resource": {
+      "type": "cloud_run_revision",
+      "labels": {
+        "project_id": "zeke-471119",
+        "service_name": "zeke-worker",
+        "configuration_name": "zeke-worker",
+        "revision_name": "zeke-worker-00003-hlf",
+        "location": "us-central1"
+      }
+    },
+    "timestamp": "2025-09-05T00:15:15.932720Z",
+    "labels": {
+      "instanceId": "0069c7a9881a36a9573e1f6672921ad16db91ad040863054112b2512508deb267da08164a3dbe36684aba9f1be54708e620d27a368d37a7a750237029026449bf2f02d6a39b88ab5cec9fbcd7a"
+    },
+    "logName": "projects/zeke-471119/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-05T00:15:15.941057566Z"
+  },
+  {
+    "insertId": "68ba2b9400051a6a9d25a355",
+    "jsonPayload": {
+      "jobId": "44c38dd4-2dba-4b6c-bdb6-d96b7eda75da",
+      "source": "rss",
+      "msg": "ingest_pull_start",
+      "ts": "2025-09-05T00:15:16.335Z"
+    },
+    "resource": {
+      "type": "cloud_run_revision",
+      "labels": {
+        "revision_name": "zeke-worker-00003-hlf",
+        "location": "us-central1",
+        "service_name": "zeke-worker",
+        "project_id": "zeke-471119",
+        "configuration_name": "zeke-worker"
+      }
+    },
+    "timestamp": "2025-09-05T00:15:16.334442Z",
+    "labels": {
+      "instanceId": "0069c7a9881a36a9573e1f6672921ad16db91ad040863054112b2512508deb267da08164a3dbe36684aba9f1be54708e620d27a368d37a7a750237029026449bf2f02d6a39b88ab5cec9fbcd7a"
+    },
+    "logName": "projects/zeke-471119/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-05T00:15:16.607157801Z"
+  },
+  {
+    "insertId": "68ba2bba0003887d75bb2d1c",
+    "jsonPayload": {
+      "jobId": "c42ab3f9-57c9-4bc1-b87c-6a4c4b5bf9ed",
+      "storyId": null,
+      "ts": "2025-09-05T00:15:54.133Z",
+      "msg": "analyze_llm_start"
+    },
+    "resource": {
+      "type": "cloud_run_revision",
+      "labels": {
+        "project_id": "zeke-471119",
+        "location": "us-central1",
+        "service_name": "zeke-worker",
+        "revision_name": "zeke-worker-00003-hlf",
+        "configuration_name": "zeke-worker"
+      }
+    },
+    "timestamp": "2025-09-05T00:15:54.231549Z",
+    "labels": {
+      "instanceId": "0069c7a9881a36a9573e1f6672921ad16db91ad040863054112b2512508deb267da08164a3dbe36684aba9f1be54708e620d27a368d37a7a750237029026449bf2f02d6a39b88ab5cec9fbcd7a"
+    },
+    "logName": "projects/zeke-471119/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-05T00:15:54.241656828Z"
+  },
+  {
+    "insertId": "68ba2bba000390cc444a9b49",
+    "jsonPayload": {
+      "msg": "fetch_content_start",
+      "jobId": "2eea0942-c3ab-4ec2-a0c2-c04ae83f84e6",
+      "ts": "2025-09-05T00:15:54.234Z"
+    },
+    "resource": {
+      "type": "cloud_run_revision",
+      "labels": {
+        "service_name": "zeke-worker",
+        "configuration_name": "zeke-worker",
+        "location": "us-central1",
+        "project_id": "zeke-471119",
+        "revision_name": "zeke-worker-00003-hlf"
+      }
+    },
+    "timestamp": "2025-09-05T00:15:54.233676Z",
+    "labels": {
+      "instanceId": "0069c7a9881a36a9573e1f6672921ad16db91ad040863054112b2512508deb267da08164a3dbe36684aba9f1be54708e620d27a368d37a7a750237029026449bf2f02d6a39b88ab5cec9fbcd7a"
+    },
+    "logName": "projects/zeke-471119/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-05T00:15:54.572853561Z"
+  },
+  {
+    "insertId": "68ba2bba00043557ae1ceb88",
+    "jsonPayload": {
+      "jobId": "c42ab3f9-57c9-4bc1-b87c-6a4c4b5bf9ed",
+      "msg": "analyze_llm_done",
+      "ts": "2025-09-05T00:15:54.276Z"
+    },
+    "resource": {
+      "type": "cloud_run_revision",
+      "labels": {
+        "revision_name": "zeke-worker-00003-hlf",
+        "location": "us-central1",
+        "configuration_name": "zeke-worker",
+        "project_id": "zeke-471119",
+        "service_name": "zeke-worker"
+      }
+    },
+    "timestamp": "2025-09-05T00:15:54.275799Z",
+    "labels": {
+      "instanceId": "0069c7a9881a36a9573e1f6672921ad16db91ad040863054112b2512508deb267da08164a3dbe36684aba9f1be54708e620d27a368d37a7a750237029026449bf2f02d6a39b88ab5cec9fbcd7a"
+    },
+    "logName": "projects/zeke-471119/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-05T00:15:54.572853561Z"
+  }
+]

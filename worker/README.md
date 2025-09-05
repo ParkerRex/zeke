@@ -2,6 +2,35 @@
 
 TypeScript worker that processes pg-boss jobs from Supabase Postgres. Run locally with a Direct connection; deploy on Cloud Run using the Session Pooler.
 
+## How It Works
+
+```mermaid
+sequenceDiagram
+  participant Boss as pg-boss (cron)
+  participant Worker as Cloud Run Worker
+  participant Src as External Sources (RSS)
+  participant DB as Supabase Postgres
+
+  Boss-->>Worker: schedule ingest:pull (*/5)
+  Worker->>Src: fetch RSS/Atom feeds
+  Src-->>Worker: items (guid, link, title)
+  Worker->>DB: upsert public.raw_items (idempotent)
+  Worker-->>Boss: send ingest:fetch-content {rawItemIds}
+  Boss-->>Worker: work ingest:fetch-content
+  Worker->>Src: fetch article HTML (15s timeout)
+  Worker->>Worker: Readability extract → text
+  Worker->>Worker: hash(text) → content_hash
+  Worker->>DB: insert contents; insert or link story by content_hash
+  Worker-->>Boss: send analyze:llm {storyId}
+  Worker->>HTTP: /healthz for Cloud Run
+```
+
+Operational notes:
+- Uses Session Pooler in prod (`?sslmode=require`) and Direct in local dev.
+- Node `pg` Pool has an `error` handler to survive pooler resets.
+- Network calls use 15s abort guards to avoid hung jobs.
+- Minimal structured logs: `boss_started`, `heartbeat`, `ingest_pull_*`, `fetch_content_*`, `analyze_llm_*`.
+
 ## Prereqs
 
 - Supabase Postgres (Direct URL for local dev; Session Pooler URL for Cloud Run)
@@ -11,8 +40,8 @@ TypeScript worker that processes pg-boss jobs from Supabase Postgres. Run locall
 ## Connection guidance
 
 - Local (Direct, IPv6): `postgresql://worker:PASSWORD@db.<project>.supabase.co:5432/postgres?sslmode=no-verify`
-- Cloud Run (Session Pooler, IPv4): `postgresql://worker.<project>:PASSWORD@<region>.pooler.supabase.com:5432/postgres?sslmode=require`
-- Do not use the Transaction Pooler (breaks pg-boss LISTEN/NOTIFY).
+- Cloud Run (Session Pooler, IPv4): `postgresql://worker.<project>:PASSWORD@<region>.pooler.supabase.com:5432/postgres?sslmode=no-verify`
+  - Do not use the Transaction Pooler (breaks pg-boss LISTEN/NOTIFY).
 
 ## Local dev
 
@@ -29,14 +58,44 @@ After first successful start, you can harden:
 
 ## Deploy to Cloud Run
 
+Fill in worker/.env (see .env.example), then run:
+
 ```
-gcloud run deploy zeke-worker \
-  --source . \
-  --region us-central1 \
-  --min-instances=1 \
-  --cpu=1 --memory=1Gi \
-  --set-env-vars DATABASE_URL='postgresql://worker.<project>:PASSWORD@<region>.pooler.supabase.com:5432/postgres?sslmode=require',BOSS_SCHEMA=pgboss,BOSS_CRON_TZ=UTC,BOSS_MIGRATE=false \
-  --no-allow-unauthenticated
+pnpm run deploy
+```
+
+This script reads worker/.env and deploys with the configured env vars. For production, you can also run:
+
+```
+pnpm run deploy:prod
+```
+
+For local docker-based runs, use:
+
+```
+pnpm run deploy:local
+```
+
+Environment variables (summary):
+- `DATABASE_URL_POOLER`: Session Pooler URL (prod deploy).
+- `DATABASE_URL`: Direct URL (local/dev and Docker local).
+- `BOSS_SCHEMA`: pg-boss schema name (default `pgboss`).
+- `BOSS_MIGRATE`: `true` to allow pg-boss to create/verify its schema (local first run), `false` in prod.
+
+## Logs CLI
+
+Use the built-in script to stream Cloud Run logs without opening the console:
+
+```
+# Stream INFO+ level (default lookback FRESHNESS=15m). Uses streaming if available,
+# otherwise polls every 5s with `gcloud logging read`.
+pnpm run logs
+
+# Only warnings and errors
+pnpm run logs:errors
+
+# Custom lookback and filter (advanced filter syntax)
+FRESHNESS=30m pnpm run logs "jsonPayload.msg=fetch_content_start OR textPayload:extract_error"
 ```
 
 ## pg-boss DB setup (SQL)
@@ -68,4 +127,25 @@ After pg-boss is installed, you may set `BOSS_MIGRATE=false` and optionally:
 
 ```
 revoke create on database postgres from worker;
+```
+
+## Manual test endpoints (repeatable)
+
+The worker exposes simple debug endpoints for on-demand tests:
+
+- `POST /debug/schedule-rss` → creates the `ingest:pull` queue and schedules it every 5 minutes (idempotent).
+- `POST /debug/ingest-now` → immediately runs the RSS ingest once without waiting for cron.
+
+Examples:
+
+```
+curl -X POST "$WORKER_URL/debug/schedule-rss"
+curl -X POST "$WORKER_URL/debug/ingest-now"
+```
+
+Then verify in DB:
+
+```
+select count(*) from public.raw_items;
+select id, url, title, discovered_at from public.raw_items order by discovered_at desc limit 10;
 ```

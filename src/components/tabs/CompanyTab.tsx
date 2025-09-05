@@ -26,10 +26,17 @@ export default function CompanyTab({ tab }: { tab: Tab }) {
 
   const [clusters, setClusters] = useState<Cluster[]>([]);
   useEffect(() => {
+    const ac = new AbortController();
     (async () => {
-      const r = await fetch('/api/stories').then((x) => x.json());
-      setClusters(r.clusters ?? []);
+      try {
+        const r = await fetch('/api/stories', { signal: ac.signal }).then((x) => x.json());
+        if (!ac.signal.aborted) setClusters(r.clusters ?? []);
+      } catch (e: any) {
+        if (e?.name === 'AbortError') return;
+        console.error(e);
+      }
     })();
+    return () => ac.abort('CompanyTab unmounted');
   }, []);
 
   const { news, ceoNews } = useMemo(() => {

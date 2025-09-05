@@ -18,19 +18,18 @@ import { IoSearch } from 'react-icons/io5';
 export default function HomeSnapshot() {
   const [clusters, setClusters] = useState<Cluster[]>([]);
   useEffect(() => {
-    let mounted = true;
+    const ac = new AbortController();
     (async () => {
       try {
-        const res = await fetch('/api/stories');
+        const res = await fetch('/api/stories', { signal: ac.signal });
         const json = await res.json();
-        if (mounted) setClusters(json.clusters ?? []);
-      } catch (e) {
+        if (!ac.signal.aborted) setClusters(json.clusters ?? []);
+      } catch (e: any) {
+        if (e?.name === 'AbortError') return;
         console.error(e);
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => ac.abort('HomeSnapshot unmounted');
   }, []);
 
   const top = clusters.slice(0, 5);

@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import PgBoss from 'pg-boss';
 import express from 'express';
+import { runIngestRss } from './ingest/rss.js';
+import { runFetchAndExtract } from './extract/article.js';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOSS_SCHEMA = process.env.BOSS_SCHEMA || 'pgboss';
@@ -20,21 +22,22 @@ function log(msg: string, extra?: Record<string, unknown>) {
   console.log(JSON.stringify(entry));
 }
 
-async function main() {
+let bossRef: PgBoss | null = null;
+
+async function initBoss() {
   const boss = new PgBoss({
     connectionString: DATABASE_URL,
     schema: BOSS_SCHEMA,
-    // Supabase requires SSL; for self-signed chains, allow insecure
     ssl: { rejectUnauthorized: false } as any,
+    application_name: 'zeke-worker',
+    max: 2,
     migrate: BOSS_MIGRATE,
   });
-
   boss.on('error', (err) => log('boss_error', { err: String(err) }));
 
   await boss.start();
   log('boss_started', { schema: BOSS_SCHEMA, tz: CRON_TZ });
 
-  // Ensure queues exist before scheduling/working
   await Promise.all([
     boss.createQueue('system:heartbeat'),
     boss.createQueue('ingest:pull'),
@@ -42,26 +45,19 @@ async function main() {
     boss.createQueue('analyze:llm'),
   ]);
 
-  // --- Scheduling (cron) ---
-  // Heartbeat job: proves scheduling and processing end-to-end
   await boss.schedule('system:heartbeat', '*/5 * * * *', { ping: 'ok' }, { tz: CRON_TZ });
+  await boss.schedule('ingest:pull', '*/5 * * * *', { source: 'rss' }, { tz: CRON_TZ });
 
-  // Example: source pulls (disable until connectors are ready)
-  // await boss.schedule('ingest:pull', '*/10 * * * *', { source: 'rss' });
-
-  // --- Workers ---
   await boss.work('system:heartbeat', async (jobs) => {
-    for (const job of jobs) {
-      log('heartbeat', { jobId: job.id, data: job.data });
-    }
+    for (const job of jobs) log('heartbeat', { jobId: job.id, data: job.data });
   });
 
   await boss.work('ingest:pull', async (jobs) => {
     for (const job of jobs) {
       const { source } = (job.data || {}) as { source?: string };
       log('ingest_pull_start', { jobId: job.id, source });
-      // TODO: fetch RSS/HN/arXiv by cursor; upsert raw_items; enqueue fetch-content
-      await boss.send('ingest:fetch-content', { rawItemIds: [] });
+      if (source === 'rss') await runIngestRss(boss);
+      await boss.complete('ingest:pull', job.id);
       log('ingest_pull_done', { jobId: job.id, source });
     }
   });
@@ -69,8 +65,12 @@ async function main() {
   await boss.work('ingest:fetch-content', async (jobs) => {
     for (const job of jobs) {
       log('fetch_content_start', { jobId: job.id });
-      // TODO: fetch HTML/audio/pdf, extract/transcribe, write contents/stories, enqueue analyze
-      await boss.send('analyze:llm', { storyId: null });
+      try {
+        await runFetchAndExtract(job.data as any, boss);
+        await boss.complete('ingest:fetch-content', job.id);
+      } catch (err) {
+        await boss.fail('ingest:fetch-content', job.id, { error: String(err) });
+      }
       log('fetch_content_done', { jobId: job.id });
     }
   });
@@ -78,22 +78,64 @@ async function main() {
   await boss.work('analyze:llm', async (jobs) => {
     for (const job of jobs) {
       log('analyze_llm_start', { jobId: job.id, storyId: (job.data as any)?.storyId });
-      // TODO: build prompt, call LLM, persist overlays + embeddings
+      await boss.complete('analyze:llm', job.id);
       log('analyze_llm_done', { jobId: job.id });
     }
   });
 
-  // Cloud Run expects an HTTP server to consider the container healthy
+  bossRef = boss;
+}
+
+async function main() {
+  // Global guards to avoid process crash on unhandled errors
+  process.on('uncaughtException', (err) => log('uncaught_exception', { err: String(err) }));
+  process.on('unhandledRejection', (reason) => log('unhandled_rejection', { reason: String(reason) }));
+
+  // Start HTTP early to satisfy Cloud Run health checks
   const app = express();
+  app.use(express.json());
   app.get('/healthz', (_req, res) => res.status(200).send('ok'));
+  app.post('/debug/ingest-now', async (_req, res) => {
+    try {
+      if (!bossRef) throw new Error('boss_not_ready');
+      await bossRef.createQueue('ingest:pull');
+      await runIngestRss(bossRef);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(503).json({ ok: false, error: String(e) });
+    }
+  });
+  app.post('/debug/schedule-rss', async (_req, res) => {
+    try {
+      if (!bossRef) throw new Error('boss_not_ready');
+      await bossRef.createQueue('ingest:pull');
+      await bossRef.schedule('ingest:pull', '*/5 * * * *', { source: 'rss' }, { tz: CRON_TZ });
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(503).json({ ok: false, error: String(e) });
+    }
+  });
   const port = Number(process.env.PORT || 8080);
   app.listen(port, () => log('http_listen', { port }));
+
+  // Boss init with retry loop (no process exit)
+  const attempt = async () => {
+    try {
+      await initBoss();
+    } catch (err) {
+      log('boss_start_error', { err: String(err) });
+      setTimeout(() => {
+        void attempt();
+      }, 10_000);
+    }
+  };
+  void attempt();
 
   // Graceful shutdown
   const shutdown = async (sig: string) => {
     try {
       log('shutdown_signal', { sig });
-      await boss.stop({ graceful: true });
+      if (bossRef) await bossRef.stop({ graceful: true });
     } finally {
       process.exit(0);
     }
@@ -102,8 +144,4 @@ async function main() {
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
 }
 
-main().catch((err) => {
-  // eslint-disable-next-line no-console
-  console.error(err);
-  process.exit(1);
-});
+void main();
