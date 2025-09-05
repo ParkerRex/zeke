@@ -37,14 +37,14 @@ kill_port 8080 "Worker"
 
 # Stop Supabase
 echo -e "${BLUE}🗄️  Stopping Supabase...${NC}"
-if command_exists pnpm; then
-    if pnpm supabase stop; then
+if command_exists npx; then
+    if npx supabase stop; then
         echo -e "${GREEN}✅ Supabase stopped successfully${NC}"
     else
         echo -e "${YELLOW}⚠️  Supabase may not have been running${NC}"
     fi
 else
-    echo -e "${YELLOW}⚠️  pnpm not found${NC}"
+    echo -e "${YELLOW}⚠️  npx not found${NC}"
 fi
 
 # Stop any remaining Node processes that might be related to the project

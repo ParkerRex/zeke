@@ -53,7 +53,7 @@ echo -e "${GREEN}✅ Port check completed${NC}"
 
 # Start Supabase
 echo -e "${BLUE}🗄️  Starting Supabase...${NC}"
-if pnpm supabase start; then
+if npx supabase start; then
     echo -e "${GREEN}✅ Supabase started successfully${NC}"
 else
     echo -e "${RED}❌ Failed to start Supabase${NC}"
@@ -62,7 +62,7 @@ fi
 
 # Apply migrations
 echo -e "${BLUE}📦 Applying database migrations...${NC}"
-if pnpm supabase migration up --local; then
+if npx supabase migration up --local; then
     echo -e "${GREEN}✅ Migrations applied successfully${NC}"
 else
     echo -e "${RED}❌ Failed to apply migrations${NC}"
@@ -71,7 +71,7 @@ fi
 
 # Generate types
 echo -e "${BLUE}🔧 Generating TypeScript types...${NC}"
-if pnpm supabase gen types typescript --local --schema public > src/libs/supabase/types.ts; then
+if npx supabase gen types typescript --local --schema public > src/libs/supabase/types.ts; then
     echo -e "${GREEN}✅ Types generated successfully${NC}"
 else
     echo -e "${YELLOW}⚠️  Failed to generate types (continuing anyway)${NC}"
@@ -80,7 +80,7 @@ fi
 # Test worker connection
 echo -e "${BLUE}🔌 Testing worker database connection...${NC}"
 cd worker
-if pnpm run test:connection; then
+if bash scripts/test-connection.sh; then
     echo -e "${GREEN}✅ Worker connection test passed${NC}"
 else
     echo -e "${RED}❌ Worker connection test failed${NC}"
