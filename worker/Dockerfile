@@ -2,8 +2,19 @@
 FROM node:20-slim
 WORKDIR /app
 
-# System deps (if you later add yt-dlp/ffmpeg, add here)
-# RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# Install system dependencies for YouTube processing
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install yt-dlp and Whisper
+RUN pip3 install --no-cache-dir \
+    yt-dlp==2024.1.7 \
+    openai-whisper==20231117 \
+    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Install dependencies (include dev deps to build TypeScript)
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./

@@ -26,6 +26,8 @@ big news:
 - [ ] feature based file org
 - [ ] in mem persistence
 - [ ] store for the tabs
+- [ ] nuked the stripe fixtures
+- [ ] installed npm over pnpm on worker
 
 # Story cards:
 

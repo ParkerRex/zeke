@@ -3,7 +3,9 @@ import PgBoss from 'pg-boss';
 import express from 'express';
 import { log } from './log.js';
 import { runIngestRss } from './ingest/rss.js';
+import { runIngestYouTube } from './ingest/youtube.js';
 import { runFetchAndExtract } from './extract/article.js';
+import { runYouTubeFetchAndExtract } from './extract/youtube.js';
 import { runAnalyzeStory } from './analyze/llm.js';
 
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -39,11 +41,13 @@ async function initBoss() {
     boss.createQueue('system:heartbeat'),
     boss.createQueue('ingest:pull'),
     boss.createQueue('ingest:fetch-content'),
+    boss.createQueue('ingest:fetch-youtube-content'),
     boss.createQueue('analyze:llm'),
   ]);
 
   await boss.schedule('system:heartbeat', '*/5 * * * *', { ping: 'ok' }, { tz: CRON_TZ });
   await boss.schedule('ingest:pull', '*/5 * * * *', { source: 'rss' }, { tz: CRON_TZ });
+  await boss.schedule('ingest:pull', '*/15 * * * *', { source: 'youtube' }, { tz: CRON_TZ });
 
   await boss.work('system:heartbeat', async (jobs) => {
     for (const job of jobs) log('heartbeat', { jobId: job.id, data: job.data });
@@ -54,6 +58,7 @@ async function initBoss() {
       const { source } = (job.data || {}) as { source?: string };
       log('ingest_pull_start', { jobId: job.id, source });
       if (source === 'rss') await runIngestRss(boss);
+      if (source === 'youtube') await runIngestYouTube(boss);
       await boss.complete('ingest:pull', job.id);
       log('ingest_pull_done', { jobId: job.id, source });
     }
@@ -69,6 +74,19 @@ async function initBoss() {
         await boss.fail('ingest:fetch-content', job.id, { error: String(err) });
       }
       log('fetch_content_done', { jobId: job.id });
+    }
+  });
+
+  await boss.work('ingest:fetch-youtube-content', async (jobs) => {
+    for (const job of jobs) {
+      log('fetch_youtube_content_start', { jobId: job.id });
+      try {
+        await runYouTubeFetchAndExtract(job.data as any, boss);
+        await boss.complete('ingest:fetch-youtube-content', job.id);
+      } catch (err) {
+        await boss.fail('ingest:fetch-youtube-content', job.id, { error: String(err) });
+      }
+      log('fetch_youtube_content_done', { jobId: job.id });
     }
   });
 
@@ -114,6 +132,26 @@ async function main() {
       if (!bossRef) throw new Error('boss_not_ready');
       await bossRef.createQueue('ingest:pull');
       await bossRef.schedule('ingest:pull', '*/5 * * * *', { source: 'rss' }, { tz: CRON_TZ });
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(503).json({ ok: false, error: String(e) });
+    }
+  });
+  app.post('/debug/ingest-youtube', async (_req, res) => {
+    try {
+      if (!bossRef) throw new Error('boss_not_ready');
+      await bossRef.createQueue('ingest:pull');
+      await runIngestYouTube(bossRef);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(503).json({ ok: false, error: String(e) });
+    }
+  });
+  app.post('/debug/schedule-youtube', async (_req, res) => {
+    try {
+      if (!bossRef) throw new Error('boss_not_ready');
+      await bossRef.createQueue('ingest:pull');
+      await bossRef.schedule('ingest:pull', '*/15 * * * *', { source: 'youtube' }, { tz: CRON_TZ });
       res.json({ ok: true });
     } catch (e: any) {
       res.status(503).json({ ok: false, error: String(e) });

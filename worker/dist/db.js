@@ -16,6 +16,12 @@ export async function getRssSources() {
     const { rows } = await pool.query(`select id, kind, url, name from public.sources where kind = 'rss' and url is not null`);
     return rows;
 }
+export async function getYouTubeSources() {
+    const { rows } = await pool.query(`select id, kind, url, name, metadata from public.sources
+     where kind in ('youtube_channel', 'youtube_search')
+     and (url is not null or kind = 'youtube_search')`);
+    return rows;
+}
 export async function upsertRawItem(params) {
     const { source_id, external_id, url, title, kind, metadata } = params;
     const { rows } = await pool.query(`insert into public.raw_items (source_id, external_id, url, title, kind, metadata)

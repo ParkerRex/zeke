@@ -29,6 +29,23 @@ export async function getRssSources(): Promise<SourceRow[]> {
   return rows;
 }
 
+export type YouTubeSourceRow = {
+  id: string;
+  kind: string;
+  url: string | null;
+  name: string | null;
+  metadata: any;
+};
+
+export async function getYouTubeSources(): Promise<YouTubeSourceRow[]> {
+  const { rows } = await pool.query(
+    `select id, kind, url, name, metadata from public.sources
+     where kind in ('youtube_channel', 'youtube_search')
+     and (url is not null or kind = 'youtube_search')`
+  );
+  return rows;
+}
+
 export async function upsertRawItem(params: {
   source_id: string;
   external_id: string;

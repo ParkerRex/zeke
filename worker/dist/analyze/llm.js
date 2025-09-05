@@ -106,7 +106,12 @@ Respond only with valid JSON, no other text.`;
         if (!responseText) {
             throw new Error('Empty response from OpenAI');
         }
-        const parsed = JSON.parse(responseText);
+        // Clean up the response - remove markdown code blocks if present
+        const cleanedResponse = responseText
+            .replace(/^```json\s*/i, '')
+            .replace(/\s*```$/i, '')
+            .trim();
+        const parsed = JSON.parse(cleanedResponse);
         // Validate and sanitize the response
         return {
             why_it_matters: String(parsed.why_it_matters || '• Analysis not available'),
