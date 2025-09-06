@@ -1056,9 +1056,9 @@
 {"ts":"2025-09-06T05:36:11.038Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
 {"ts":"2025-09-06T05:36:21.045Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
 {"ts":"2025-09-06T05:36:31.062Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
-"}
-{"ts":"2025-09-06T05:16:31.514Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:16:41.517Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T05:36:41.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:36:51.069Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+ (0.0.0.0:0)"}
 {"ts":"2025-09-06T05:16:51.520Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
 {"ts":"2025-09-06T05:17:01.522Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
 {"ts":"2025-09-06T05:17:11.524Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
@@ -1178,3 +1178,4 @@
 {"ts":"2025-09-06T05:36:11.794Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
 {"ts":"2025-09-06T05:36:21.796Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
 {"ts":"2025-09-06T05:36:31.798Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T05:36:41.801Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
