@@ -1,3 +1,5 @@
+"use server";
+
 import { createSupabaseServerClient } from "@/libs/supabase/supabase-server-client";
 
 export async function getUser() {
@@ -11,3 +13,4 @@ export async function getUser() {
 
   return data;
 }
+

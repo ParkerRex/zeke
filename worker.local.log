@@ -1058,124 +1058,1015 @@
 {"ts":"2025-09-06T05:36:31.062Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
 {"ts":"2025-09-06T05:36:41.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
 {"ts":"2025-09-06T05:36:51.069Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
- (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:16:51.520Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:01.522Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:11.524Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:21.525Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:31.530Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:41.532Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:17:51.534Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:01.536Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:11.538Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:21.541Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:31.542Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:41.545Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:18:51.539Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:01.539Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:11.538Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:21.538Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:31.540Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:41.541Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:19:51.544Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:01.546Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:11.553Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:21.555Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:31.558Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:41.560Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:20:51.564Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:01.566Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:11.568Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:21.570Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:31.572Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:41.574Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:21:51.577Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:01.578Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:11.581Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:21.582Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:31.584Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:41.588Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:22:51.590Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:01.592Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:11.594Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:21.596Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:31.597Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:41.598Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:23:51.600Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:01.603Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:11.605Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:21.607Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:31.610Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:41.611Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:24:51.614Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:01.617Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:11.619Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:21.622Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:31.626Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:41.627Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:25:51.629Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:01.632Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:11.634Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:21.637Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:31.639Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:41.642Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:26:51.645Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:01.648Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:11.650Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:21.653Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:31.655Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:41.658Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:27:51.660Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:01.663Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:11.666Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:21.669Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:31.670Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:41.674Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:28:51.676Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:01.678Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:11.680Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:21.683Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:31.685Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:41.688Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:29:51.691Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:01.694Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:11.696Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:21.700Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:31.705Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:41.708Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:30:51.711Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:01.712Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:11.715Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:21.718Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:31.720Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:41.723Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:31:51.725Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:01.727Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:11.731Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:21.732Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:31.739Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:41.741Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:32:51.744Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:01.746Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:11.752Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:21.756Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:31.757Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:41.760Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:33:51.762Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:01.764Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:11.766Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:21.769Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:31.771Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:41.774Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:34:51.775Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:01.777Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:11.779Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:21.780Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:31.785Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:41.786Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:35:51.789Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:36:01.792Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:36:11.794Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:36:21.796Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:36:31.798Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
-{"ts":"2025-09-06T05:36:41.801Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T05:37:01.083Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:37:11.085Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:37:21.089Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:37:31.093Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:37:41.098Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:37:51.101Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:01.105Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:11.110Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:21.120Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:31.131Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:41.134Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:38:51.139Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:01.144Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:11.148Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:21.152Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:31.160Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:41.176Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:39:51.179Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:01.244Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:11.251Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:21.254Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:31.259Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:41.266Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:40:51.275Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:46:44.212Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:46:54.587Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:47:04.647Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:47:14.660Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T05:47:24.665Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:09.353Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:19.365Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:29.380Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:39.396Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:49.427Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:03:59.441Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:09.451Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:19.479Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:29.487Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:39.497Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:49.536Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:04:59.554Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:09.586Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:19.622Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:29.632Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:39.657Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:49.694Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:05:59.718Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:06:09.738Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:06:19.769Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:06:29.829Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:00.923Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:10.995Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:21.028Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:31.032Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:41.037Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:12:51.047Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:01.067Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:11.080Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:21.105Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:31.129Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:41.138Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:13:51.175Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:01.197Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:11.206Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:21.216Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:31.226Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:41.254Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:14:51.260Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:01.293Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:11.299Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:21.327Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:31.355Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:41.373Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:15:51.389Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:01.402Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:11.411Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:21.440Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:31.475Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:41.497Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:16:51.502Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:01.517Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:11.521Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:21.555Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:31.575Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:41.615Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:17:51.634Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:01.639Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:11.664Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:21.687Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:31.743Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:41.762Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:18:51.780Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:01.785Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:11.788Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:21.793Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:31.798Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:41.805Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:19:51.810Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:01.834Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:11.837Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:21.848Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:31.853Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:41.867Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:20:51.872Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:01.877Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:11.911Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:21.922Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:31.926Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:41.931Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:21:51.940Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:01.947Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:11.951Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:21.955Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:31.967Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:41.984Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:22:51.987Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:01.990Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:11.998Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:22.006Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:32.011Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:42.024Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:23:52.034Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:02.041Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:12.049Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:22.055Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:32.059Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:42.066Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:24:52.071Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:02.075Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:12.080Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:22.085Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:32.089Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:42.093Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:25:52.099Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:02.107Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:12.112Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:22.116Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:32.120Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:42.124Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:26:52.129Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:02.133Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:12.138Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:22.138Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:32.131Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:42.130Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:27:52.132Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:02.133Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:12.136Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:22.140Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:32.149Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:42.152Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:28:52.159Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:02.162Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:12.165Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:22.168Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:32.171Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:42.179Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:29:52.183Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:02.186Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:12.192Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:22.196Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:32.199Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:42.202Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:30:52.215Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:02.219Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:12.223Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:22.228Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:32.231Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:42.236Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:31:52.240Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:02.243Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:12.250Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:22.254Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:32.257Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:42.260Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:32:52.278Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:02.317Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:12.324Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:22.332Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:32.339Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:42.348Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:33:52.352Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:02.357Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:12.361Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:22.364Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:32.369Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:42.374Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:34:52.378Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:02.397Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:12.409Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:22.413Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:32.422Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:42.426Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:35:52.429Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:02.433Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:12.439Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:22.442Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:32.447Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:42.449Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:36:52.454Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:02.467Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:12.471Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:22.477Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:32.482Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:42.491Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:37:52.505Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:02.513Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:12.527Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:22.544Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:32.562Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:42.600Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:38:52.614Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:02.616Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:12.621Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:22.626Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:32.632Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:42.648Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:39:52.653Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:02.657Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:12.667Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:22.674Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:32.681Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:42.687Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:40:52.691Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:02.701Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:12.709Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:22.716Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:32.723Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:42.749Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:41:52.754Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:02.765Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:12.774Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:22.781Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:32.807Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:42.811Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:42:52.825Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:02.829Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:12.836Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:22.842Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:32.878Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:42.884Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:43:52.890Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:02.893Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:12.896Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:22.901Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:32.922Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:42.926Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:44:52.932Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:02.938Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:12.946Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:22.951Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:32.954Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:42.958Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:45:52.963Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:02.971Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:12.973Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:22.978Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:32.983Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:42.995Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:46:52.999Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:03.022Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:13.028Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:23.030Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:33.037Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:43.042Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:47:53.050Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:03.058Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:13.064Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:23.070Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:33.087Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:43.100Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:48:53.105Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:03.126Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:13.138Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:23.144Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:33.151Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:43.163Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:49:53.184Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:03.191Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:13.200Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:23.219Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:33.234Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:43.243Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:50:53.251Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:03.256Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:13.269Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:23.283Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:33.290Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:43.295Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:51:53.308Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:03.314Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:13.320Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:23.341Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:33.359Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:43.364Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:52:53.368Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:03.374Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:13.384Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:23.389Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:33.394Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:43.401Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:53:53.433Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:03.437Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:13.443Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:23.478Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:33.500Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:43.519Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:54:53.523Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:03.528Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:13.531Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:23.547Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:33.554Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:43.579Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:55:53.589Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:03.596Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:13.614Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:23.629Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:33.646Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:43.654Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:56:53.681Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:03.687Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:13.711Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:23.776Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:33.782Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:43.787Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:57:53.813Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:03.823Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:13.827Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:23.894Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:33.906Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:43.913Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:58:53.917Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:03.932Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:14.055Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:24.074Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:34.077Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:44.081Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T15:59:54.088Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:04.091Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:14.095Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:24.113Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:34.119Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:44.125Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:00:54.139Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:04.176Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:14.185Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:24.190Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:34.196Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:44.202Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:01:54.207Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:04.212Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:14.232Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:24.246Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:34.256Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:44.263Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:02:54.272Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:04.288Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:14.294Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:24.307Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:34.319Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:44.326Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:03:54.370Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:04.378Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:14.385Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:24.403Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:34.408Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:44.414Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:04:54.418Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:04.425Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:14.433Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:24.450Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:34.455Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:44.458Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:05:54.497Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:04.503Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:14.514Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:24.521Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:34.527Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:44.562Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:06:54.589Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:04.623Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:14.628Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:24.634Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:34.647Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:44.759Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:07:54.781Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:04.807Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:14.824Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:24.898Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:34.948Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:44.978Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:08:55.000Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:05.026Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:15.040Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:25.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:35.074Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:45.085Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:09:55.112Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:05.134Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:15.174Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:25.201Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:35.350Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:45.370Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:10:55.382Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:05.417Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:15.426Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:25.448Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:35.473Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:45.494Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:11:55.521Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:05.549Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:15.558Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:25.580Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:35.674Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:45.729Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:12:55.830Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:05.859Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:15.896Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:25.921Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:35.979Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:46.024Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:13:56.042Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:06.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:16.092Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:26.147Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:36.164Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:46.226Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:14:56.229Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:06.260Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:16.310Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:26.317Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:36.325Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:46.355Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:15:56.387Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:06.408Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:16.443Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:26.448Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:36.456Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:46.581Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:16:56.621Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:06.641Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:16.656Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:26.695Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:36.705Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:46.730Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:17:56.736Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:06.742Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:16.749Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:26.752Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:36.757Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:46.763Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:18:56.767Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:06.780Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:16.824Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:26.839Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:36.905Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:46.920Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:19:56.926Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:06.969Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:16.994Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:27.017Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:37.030Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:47.062Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:20:57.068Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:07.158Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:17.207Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:27.274Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:37.368Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:47.519Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:21:57.523Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:07.560Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:17.576Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:27.718Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:37.752Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:47.824Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:22:57.872Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:07.917Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:17.953Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:27.985Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:38.051Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:48.183Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:23:58.249Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:08.339Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:18.368Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:28.396Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:38.482Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:48.520Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:24:58.556Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:08.613Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:18.660Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:28.671Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:38.704Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:48.746Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:25:58.783Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:08.823Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:18.842Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:28.887Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:38.923Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:48.947Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:26:58.981Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:08.991Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:19.042Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:29.167Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:39.171Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:49.183Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:27:59.195Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:09.208Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:19.252Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:29.299Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:39.318Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:49.352Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:28:59.391Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:09.411Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:19.450Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:29.476Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:39.500Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:49.512Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:29:59.536Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:09.555Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:19.637Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:29.776Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:39.837Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:49.890Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:30:59.911Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:09.935Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:19.947Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:29.960Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:39.974Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:49.979Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:31:59.985Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:36:23.737Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:36:33.747Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:36:43.817Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:36:53.849Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:03.899Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:13.972Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:23.978Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:33.989Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:44.010Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:37:54.015Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:04.032Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:14.041Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:24.056Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:34.081Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:44.102Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:38:54.160Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:04.168Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:14.185Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:24.199Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:34.223Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:44.344Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:39:54.368Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:04.403Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:14.418Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:24.432Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:34.445Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:44.464Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:40:54.470Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:04.480Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:14.485Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:24.624Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:34.741Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:44.746Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:41:54.776Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:04.914Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:14.921Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:24.937Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:34.954Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:44.989Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:42:55.008Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:05.037Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:15.066Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:25.210Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:35.235Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:45.245Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:43:55.290Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:05.316Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:15.333Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:25.346Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:35.365Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:45.390Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:44:55.394Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:05.438Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:15.497Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:25.515Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:35.589Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:45.619Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:45:55.632Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:05.647Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:15.667Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:25.687Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:35.712Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:45.734Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:46:55.773Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:05.790Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:15.798Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:25.814Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:35.843Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:45.873Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:47:55.896Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:05.911Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:15.964Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:25.977Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:36.031Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:46.057Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:48:56.076Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:06.152Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:16.168Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:26.196Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:36.209Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:46.229Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:49:56.296Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:06.314Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:16.447Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:26.466Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:36.487Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:46.507Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:50:56.580Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:06.601Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:16.679Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:26.687Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:36.701Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:46.746Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:51:56.774Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:52:06.851Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:52:16.866Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:52:48.447Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:52:58.457Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:53:08.494Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:53:18.521Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T16:53:28.557Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T17:10:46.256Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T17:10:56.326Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T17:11:06.385Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T17:11:16.403Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+{"ts":"2025-09-06T17:11:26.441Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: The server does not support SSL connections"}
+_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:04:10.016Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:04:20.019Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:04:30.020Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:04:40.022Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:04:50.025Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:00.027Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:10.029Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:20.033Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:30.037Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:40.040Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:05:50.041Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:00.044Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:10.046Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:20.049Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:30.055Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:40.057Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:06:50.059Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:00.062Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:10.063Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:20.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:30.068Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:40.071Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:07:50.073Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:00.075Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:10.077Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:20.079Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:30.081Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:40.084Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:08:50.085Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:00.089Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:10.091Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:20.093Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:30.095Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:40.097Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:09:50.100Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:00.102Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:10.104Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:20.106Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:30.108Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:40.114Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:10:50.116Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:00.118Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:10.121Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:20.123Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:30.126Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:40.130Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:11:50.133Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:00.135Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:10.137Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:20.140Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:30.142Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:40.145Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:12:50.147Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:00.150Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:10.152Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:20.154Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:30.156Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:40.158Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:13:50.159Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:00.162Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:10.165Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:20.170Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:30.172Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:40.174Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:14:50.176Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:00.178Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:10.180Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:20.182Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:30.185Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:40.187Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:15:50.189Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:00.192Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:10.194Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:20.195Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:30.197Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:40.199Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:16:50.202Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:00.206Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:10.207Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:20.209Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:30.211Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:40.214Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:17:50.215Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:00.217Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:10.218Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:20.220Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:30.222Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:40.224Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:18:50.228Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:00.230Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:10.232Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:20.235Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:30.237Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:40.239Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:19:50.243Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:00.249Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:10.250Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:20.252Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:30.255Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:40.257Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:20:50.260Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:00.261Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:10.264Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:20.266Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:30.268Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:40.269Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:21:50.271Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:00.274Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:10.277Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:20.279Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:30.283Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:40.285Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:22:50.287Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:00.291Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:10.294Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:20.296Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:30.299Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:40.301Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:23:50.304Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:00.308Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:10.312Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:20.313Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:30.316Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:40.318Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:24:50.321Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:00.323Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:10.325Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:20.328Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:30.331Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:40.334Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:25:50.336Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:00.339Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:10.343Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:20.345Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:30.350Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:40.353Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:26:50.356Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:00.359Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:10.362Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:20.371Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:30.374Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:40.376Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:27:50.379Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:00.383Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:10.387Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:20.389Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:30.392Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:40.394Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:28:50.398Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:00.402Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:10.404Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:20.409Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:30.412Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:40.415Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:29:50.419Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:00.426Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:10.430Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:20.433Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:30.438Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:40.440Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:30:50.444Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:00.446Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:10.443Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:20.431Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:30.428Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:40.427Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:31:50.428Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:00.431Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:10.522Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:20.523Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:30.531Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:40.538Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:32:50.543Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:00.551Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:10.557Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:20.566Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:30.572Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:40.578Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:33:50.584Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:00.591Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:10.598Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:20.603Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:30.607Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:40.615Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:34:50.619Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:00.626Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:10.631Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:20.639Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:33.735Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:43.741Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:35:53.748Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:03.753Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:13.759Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:23.762Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:33.766Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:43.773Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:36:53.775Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:03.786Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:13.792Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:23.795Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:33.798Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:43.800Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:37:53.804Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:03.809Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:13.811Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:23.814Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:33.816Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:43.820Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:38:53.822Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:03.825Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:13.828Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:23.831Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:33.834Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:43.836Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:39:53.838Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:03.840Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:13.843Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:23.846Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:33.852Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:43.854Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:40:53.856Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:03.858Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:13.860Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:23.862Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:33.866Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:43.869Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:41:53.873Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:03.875Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:13.878Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:23.881Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:33.883Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:43.886Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:42:53.890Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:03.892Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:13.895Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:23.898Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:33.900Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:43.902Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:43:53.905Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:03.908Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:13.911Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:23.915Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:33.917Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:43.920Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:44:53.922Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:03.924Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:13.925Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:23.928Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:33.930Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:43.932Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:45:53.935Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:03.937Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:13.941Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:23.944Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:33.946Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:43.948Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:46:53.951Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:03.953Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:13.957Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:23.959Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:33.962Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:43.968Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:47:53.972Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:03.975Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:13.978Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:23.984Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:33.994Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:43.999Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:48:54.004Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:04.006Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:14.009Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:24.012Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:34.016Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:44.020Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:49:54.023Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:04.026Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:14.028Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:24.031Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:34.034Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:44.040Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:50:54.043Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:04.046Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:14.049Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:24.051Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:34.054Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:44.057Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:51:54.062Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:52:04.064Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:52:14.072Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:52:24.086Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:52:55.299Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:53:05.307Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:53:15.312Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:53:25.314Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:53:35.405Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:53:45.410Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:00.533Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:10.542Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:20.548Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:30.553Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:40.557Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:54:50.563Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:55:22.970Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:55:32.977Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:55:42.983Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:55:52.988Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:02.993Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:12.999Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:23.003Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:33.011Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:43.017Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:56:53.023Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:03.028Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:13.036Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:23.041Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:33.047Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:43.053Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:57:53.059Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:58:03.065Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:58:13.071Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:58:23.077Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:03.808Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:13.814Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:23.820Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:33.826Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:43.832Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T16:59:53.838Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:03.844Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:13.850Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:23.856Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:33.862Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:43.868Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:00:53.875Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:03.880Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:13.885Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:23.889Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:33.895Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:43.899Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:01:53.905Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:02:03.911Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:02:13.917Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:08.894Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:18.899Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:28.906Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:38.914Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:48.919Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:04:58.925Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:08.931Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:18.936Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:28.941Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:38.947Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:48.953Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:05:58.958Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:08.963Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:18.968Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:28.973Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:38.978Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:48.983Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:06:58.990Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:07:08.997Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:02.103Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:12.106Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:22.114Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:32.119Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:42.125Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:09:52.131Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:02.136Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:12.141Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:22.146Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:32.152Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:42.157Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:10:52.162Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:11:02.166Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:11:12.171Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}
+{"ts":"2025-09-06T17:11:22.173Z","lvl":"info","evt":"boss_start_error","msg":"boss_start_error","err":"Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)"}

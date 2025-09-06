@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { getSession } from '@/supabase/queries/account/get-session';
-import { getSubscription } from '@/supabase/queries/account/get-subscription';
+import { getSession } from '@db/queries/account/get-session';
+import { getSubscription } from '@db/queries/account/get-subscription';
 import { PricingCard } from '@/components/pricing/price-card';
-import { getProducts } from '@/supabase/queries/pricing/get-products';
+import { getProducts } from '@db/queries/pricing/get-products';
 import { Price, ProductWithPrices } from '@/types/pricing';
 
 export default async function AccountPage() {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { listStories } from '@/supabase/queries/stories/list-stories';
+import { listStories } from '@db/queries/stories/list-stories';
 
 export async function GET() {
   const clusters = await listStories();

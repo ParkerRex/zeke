@@ -9,4 +9,3 @@ export async function getCustomerId({ userId }: { userId: string }) {
   if (error) throw new Error('Error fetching stripe_customer_id');
   return data.stripe_customer_id as string;
 }
-

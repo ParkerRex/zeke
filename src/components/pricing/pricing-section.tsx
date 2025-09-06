@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { PricingCard } from '@/components/pricing/price-card';
-import { getProducts } from '@/supabase/queries/pricing/get-products';
+import { getProducts } from '@db/queries/pricing/get-products';
 import { createCheckoutSession } from '@/actions/pricing/create-checkout-session';
 
 export async function PricingSection({ isPricingPage }: { isPricingPage?: boolean }) {
@@ -26,4 +26,3 @@ export async function PricingSection({ isPricingPage }: { isPricingPage?: boolea
     </section>
   );
 }
-

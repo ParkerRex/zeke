@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { getShareSnapshot } from '@/supabase/queries/stories/get-share-snapshot';
-import { getStoryById } from '@/supabase/queries/stories/get-story-by-id';
+import { getShareSnapshot } from '@db/queries/stories/get-share-snapshot';
+import { getStoryById } from '@db/queries/stories/get-story-by-id';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

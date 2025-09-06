@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { IoAlbums, IoBookmark, IoLayers,IoMailOpen, IoShareSocial } from 'react-icons/io5';
 import { redirect } from 'next/navigation';
 
-import { getSession } from '@/supabase/queries/account/get-session';
+import { getSession } from '@db/queries/account/get-session';
 
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,7 @@ function HeroSection() {
           </p>
           <div className='flex flex-col gap-3 sm:flex-row'>
             <Button asChild variant='default'>
-              <Link href='/signup'>Get started for free</Link>
+              <Link href='/signup'>Launch your workspace</Link>
             </Button>
             <Button asChild variant='outline'>
               <Link href='/pricing'>See pricing</Link>
@@ -132,11 +132,7 @@ function FeaturesSection() {
             </li>
           ))}
         </ul>
-        <div className='flex justify-center'>
-          <Button asChild variant='default' size='lg'>
-            <Link href='/signup'>Start free — open your first tab</Link>
-          </Button>
-        </div>
+        {/* CTA removed per request to avoid "free" language */}
       </div>
       {/* Background image rendered above; nothing absolutely-positioned here */}
     </section>

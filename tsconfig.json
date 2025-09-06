@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@db/*": [
+        "./supabase/*"
       ]
     },
     "strictNullChecks": true

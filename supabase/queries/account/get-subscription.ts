@@ -11,3 +11,4 @@ export async function getSubscription(): Promise<SubscriptionWithProduct | null>
   if (error) console.error(error);
   return (data as SubscriptionWithProduct | null) ?? null;
 }
+

@@ -8,3 +8,4 @@ export async function getShareSnapshot(id: string): Promise<Cluster | undefined>
   const all = await listStories();
   return all[0];
 }
+

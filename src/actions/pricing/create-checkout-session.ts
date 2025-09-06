@@ -4,7 +4,7 @@ import type { Price } from '@/types/pricing';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
 import { getURL } from '@/utils/get-url';
 import { getOrCreateCustomer } from '@/actions/account/get-or-create-customer';
-import { getSession } from '@/supabase/queries/account/get-session';
+import { getSession } from '@db/queries/account/get-session';
 
 export async function createCheckoutSession({ price }: { price: Price }) {
   const session = await getSession();

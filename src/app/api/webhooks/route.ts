@@ -1,9 +1,9 @@
 import Stripe from 'stripe';
 
 import { upsertUserSubscription } from '@/actions/account/upsert-user-subscription';
-import { softDeleteProduct } from '@/supabase/mutations/pricing/soft-delete-product';
-import { upsertPrice } from '@/supabase/mutations/pricing/upsert-price';
-import { upsertProduct } from '@/supabase/mutations/pricing/upsert-product';
+import { softDeleteProduct } from '@db/mutations/pricing/soft-delete-product';
+import { upsertPrice } from '@db/mutations/pricing/upsert-price';
+import { upsertProduct } from '@db/mutations/pricing/upsert-product';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
 import { getEnvVar } from '@/utils/get-env-var';
 

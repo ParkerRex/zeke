@@ -18,3 +18,4 @@ export async function getProducts(): Promise<ProductWithPrices[]> {
 
   return (data as ProductWithPrices[]) ?? [];
 }
+

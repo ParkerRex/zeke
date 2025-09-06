@@ -1,4 +1,4 @@
-import { listStories } from '@/supabase/queries/stories/list-stories';
+import { listStories } from '@db/queries/stories/list-stories';
 
 import StoryRow from './StoryRow';
 

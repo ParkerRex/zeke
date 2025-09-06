@@ -1,144 +1,105 @@
-# Admin Console & Source Management Spec
+# Admin Console: Sources + Pipeline + Forecast (Admin-only)
 
-Status: Planning • Scope: Admin-only web UI + server guards + source CRUD + ingest controls + cost forecasts
+Status: Ready for implementation
 
-## Goals
-- Let admins add/update/pause/remove sources (web/RSS, podcasts, YouTube channels, YouTube searches; extensible to Reddit, arXiv).
-- Provide one place to control and forecast ingestion: live pipeline status, job triggers, and cost estimates.
-- Keep it safe: gated by admin rights, server-side checks, and clear audit logs.
+## MVP Scope
+- Admins can add/update/pause/remove sources: RSS (websites), podcasts (RSS), YouTube channels, YouTube searches.
+- Admins can preview “about to ingest” items and see estimated costs before kicking jobs.
+- One admin page combines live pipeline status, ingest controls, jobs view, and cost forecasts.
 
-## Access Control (Admin Rights)
-- Flag: `users.is_admin boolean default false not null` (RLS remains “user can read/update own row”).
-  - Local enable: in Supabase SQL, `update public.users set is_admin = true where id = '<your-auth-user-id>';` (one-time).
-- Server guard: `requireAdmin()` check on server-only surfaces.
-  - Implement `src/supabase/queries/account/get-admin-flag.ts` that returns `{ userId, isAdmin }` using `createSupabaseServerClient()`.
-  - Reusable guard for server routes and pages: if not admin, return 404/redirect to `/`.
-- UI gating: Admin-only navigation items render only if `isAdmin`.
+## Access Control
+- DB: add `users.is_admin boolean not null default false`.
+- Server guard: use existing `getSession()` + `get-admin-flag` (built on `createSupabaseServerClient()`).
+  - Not signed in: redirect to `/login` for protected routes.
+  - Signed in but not admin: redirect to `/home` for `/admin` and admin APIs.
+- UI: render Admin nav only when `isAdmin` (value provided by server component; no client-only checks).
 
-## Data Model
-Existing tables used (no breaking changes):
-- `public.sources` (already present): `id, kind, name, url, domain, authority_score, last_cursor, last_checked, metadata jsonb`.
-- `public.raw_items`, `public.contents`, `public.stories` (unchanged).
+### Auth Consistency (avoid new patterns)
+- Route groups:
+  - `(marketing)` and `(auth)`: public.
+  - `(account)`: requires session → redirect(`/login`) if missing.
+  - `(app)`: general app surfaces; follow existing behavior (no auth hard block).
+  - `(admin)`: requires session + admin.
+- Redirects policy:
+  - Marketing root: if session, redirect(`/home`).
+  - Checkout flows already redirect to `/signup` when unauthenticated; keep that specific behavior.
+  - Admin: unauthenticated → `/login`; authenticated non-admin → `/home`.
+- Clients: only use `createSupabaseServerClient()` and `supabaseAdminClient`; do not add new client types or middleware-based auth for admin.
+- Pages to deprecate/move under admin: `/testing` and `/temp` (keep content but surface inside `/admin`).
 
-Additions (migrations later):
-- `users.is_admin boolean default false not null`.
-- Optional, lightweight: `public.source_events` for audits (append-only): `{ id uuid pk, source_id uuid, actor uuid, event text, data jsonb, created_at timestamptz default now() }`.
+## Database Changes
+- Table: `public.users`
+  - Add column: `is_admin boolean not null default false`.
+- Table: `public.sources` (existing)
+  - Add columns: `active boolean not null default true`, `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()`.
+  - Enable RLS (no anon policies). Admin/API use service-role; worker uses privileged DB connection.
+- No other changes required.
 
-Kinds we will support initially (all lowercase):
-- `rss` (websites via RSS or auto-discovered)
-- `podcast` (RSS feed)
-- `youtube_channel`
-- `youtube_search`
+Kinds (initial): `rss`, `podcast`, `youtube_channel`, `youtube_search`.
 
-`metadata` conventions per kind:
-- `rss`: `{ feedUrl?: string, discovered?: boolean }`
-- `podcast`: `{ feedUrl: string, itunesId?: string }`
-- `youtube_channel`: `{ channelId?: string, uploadsPlaylistId?: string, handle?: string }`
-- `youtube_search`: `{ query: string, filters?: { duration?: 'short'|'long', afterDays?: number }, maxResults?: number }`
+`metadata` per kind (minimum):
+- rss: `{ feedUrl?: string }`
+- podcast: `{ feedUrl: string }`
+- youtube_channel: `{ channelId?: string, uploadsPlaylistId?: string, handle?: string, max_results?: number }`
+- youtube_search: `{ query: string, max_results?: number, duration?: 'short'|'long', published_after?: ISO8601 }`
 
-## Admin Console (Web UI)
-Route: `/admin` (repurpose existing testing page and cost playground into tabs)
+## Admin Page (/admin)
+Tabs: Overview • Sources • Forecast • Jobs (persist active tab via `nuqs`)
 
-Layout: Tabs — Overview • Sources • Forecast • Jobs
 - Overview
-  - Reuse `src/app/testing/page.tsx` content (rename/move) for live counts and triggers.
-  - Actions: `Trigger RSS Ingest`, `Trigger YouTube Ingest` (kept as-is, via `/api/pipeline/trigger`).
+  - Live counts (raw_items, contents, stories), worker status/port, last updated.
+  - Actions: Trigger RSS ingest; Trigger YouTube ingest.
+  - Reuse components from `src/app/testing/page.tsx`.
+
 - Sources
-  - Add Source form:
-    - Paste bar: accept any URL/text → auto-detect kind (YouTube video/channel/handle → channel; RSS → rss; podcast feed; generic site → RSS discovery attempt).
-    - Advanced: provider dropdown to force kind; backfill window (7/30/90) with 30 default; schedule cadence (use defaults from worker).
-  - Sources table:
-    - Columns: Name, Kind, Domain, Status (OK/Syncing/Error), Last Sync, Backfill progress, Actions.
-    - Row actions: Pause/Resume, Backfill N days, Retry, Edit, Remove.
+  - Add Source: paste bar (auto-detect), provider dropdown, backfill window (7/30/90; default 30).
+  - List: Name, Kind, Domain, Status, Last Sync, Actions (Edit, Pause/Resume, Backfill 7/30/90, Delete).
+  - Preview (dry-run): show up to N items and quota estimate, then “Seed now”.
+
 - Forecast
-  - Bring in `src/app/temp/page.tsx` “Worker Cost Playground”.
-  - Add per-source estimate rows (editable): expected items/day per source; roll up to totals.
-  - Show YouTube API quota hints using worker’s quota estimates (if available).
+  - Embed cost playground from `src/app/temp/page.tsx`.
+  - Add per-source daily volume inputs; roll up estimates.
+  - Costs included: YouTube API quota (search/details), LLM analysis ($/1k tokens), embeddings ($/1k tokens), optional transcription ($/min). All values editable.
+
 - Jobs
-  - Reuse “Job Queue” summary from testing page.
-  - Add linkouts: “View recent raw items/contents/stories” (already present lists on the testing page).
+  - Job queue summary (top name:state counts).
+  - Recent Raw Items / Contents / Stories lists.
 
-Navigation
-- Admin-only left nav or header dropdown item: “Admin Console”.
-- Badge indicating worker status (Connected/Offline) in the page header.
+## APIs (admin-only)
+- `GET /api/admin/sources` — list sources + lightweight health (last_checked, active).
+- `POST /api/admin/sources` — create/update (id optional). Body includes kind, name, url, domain, metadata, active.
+- `POST /api/admin/sources/:id/pause` | `resume` | `backfill` (7/30/90) | `delete`.
+- `GET /api/admin/sources/:id/preview?limit=10` — dry-run next items + quota estimate (no DB writes).
+- `POST /api/admin/ingest/trigger` — `{ kind: 'rss'|'youtube' }` (proxy to worker). Deprecate or guard existing `/api/pipeline/trigger` to require admin.
+ - Guard or replace: `/api/pipeline/status` and `/api/pipeline/recent` should be admin-only or moved under `/api/admin/pipeline/*` and the UI updated accordingly.
 
-## Flows
-Add Source (Admin)
-1) Paste URL or select provider.
-2) System parses → proposes normalized “kind + metadata”.
-3) Admin confirms → `actions/sources/upsert-source.ts` writes `public.sources`.
-4) Fire seed/backfill:
-   - Enqueue `ingest:pull` (RSS/YouTube). For backfill, write a `last_cursor` hint (e.g., publishedAfter) and let the ingest respect window.
-5) UI shows a toast “Seeding …” and progress in table row.
-
-Pause/Resume Source
-- Toggle `metadata.active: false|true` or add `paused_at` convention. Initial implementation: keep paused list in UI and skip in ingest queries (see Worker section).
-
-Backfill More
-- Admin picks 7/30/90 days → enqueue a one-off job or set a transient `metadata.backfillAfter` and honor in fetchers; show progress counts.
-
-## Server & API
-Pages
-- `src/app/(admin)/admin/page.tsx` — tabs container.
-  - Extract and reuse components from `src/app/testing/page.tsx` and `src/app/temp/page.tsx`.
-
-APIs (admin-only; return 403 if not admin)
-- `GET /api/admin/sources`: list with health summary.
-- `POST /api/admin/sources`: create/update (id optional).
-- `POST /api/admin/sources/:id/pause` | `resume` | `backfill` | `delete`.
-- `POST /api/admin/ingest/trigger`: body `{ kind: 'rss'|'youtube' }` (thin proxy to existing pipeline trigger).
-
-Actions/Queries (typed; no barrels)
-- `src/actions/sources/upsert-source.ts` (validates input, admin-check, writes via mutation, enqueues seed/backfill)
-- `src/supabase/mutations/sources/upsert-source.ts`
-- `src/supabase/mutations/sources/delete-source.ts`
-- `src/supabase/mutations/sources/update-source-status.ts` (pause/resume/backfill cursor)
-- `src/supabase/queries/sources/list-sources.ts`
-- `src/supabase/queries/sources/get-source-by-id.ts`
+## Actions/Queries
+- `src/supabase/queries/account/get-admin-flag.ts` — returns `{ userId, isAdmin }`.
+- `src/supabase/queries/sources/list-sources.ts`, `get-source-by-id.ts`.
+- `src/supabase/mutations/sources/upsert-source.ts`, `delete-source.ts`, `update-source-status.ts` (pause/resume/backfill).
+- `src/actions/sources/upsert-source.ts` — validates input, admin-check, writes via mutation, triggers seed/backfill.
 
 ## Worker Integration
-Current queues (pg-boss) used:
-- `ingest:pull` with `{ source: 'rss'|'youtube' }` — keep using.
-- `ingest:fetch-content`, `ingest:fetch-youtube-content`, `analyze:llm` — unchanged.
+- Respect pause: filter out `active = false` in `getRssSources` and `getYouTubeSources` queries.
+- Backfill window: read `sources.last_cursor` or `metadata.published_after` and pass to fetchers.
+- Dry-run preview: add worker helpers that call fetchers with small limits and skip `upsertRawItem`/enqueue (return items + estimated quota used).
+- No change to existing queues (`ingest:pull`, `ingest:fetch-content`, `ingest:fetch-youtube-content`, `analyze:llm`).
+- Respect existing YouTube fields: `metadata.published_after` for searches; prefer `last_cursor` for generic cursors to avoid duplicating fields.
 
-Respect admin controls:
-- Skip paused sources: update RSS/YouTube ingest queries to filter out sources with `metadata.active = false` (or by presence of `paused_at`).
-- Backfill window: read `sources.last_cursor` or a transient `metadata.backfillAfter` and honor in fetchers.
-- Record `sources.last_checked` and store lightweight per-run stats for the UI (already partially in place via `/debug/status`).
+## Rollout Plan
+1) Migrations: `users.is_admin`, `sources.active/created_at/updated_at`, enable RLS on `sources`.
+2) Guard: add `get-admin-flag`; protect `/admin` and admin APIs.
+3) UI: build `/admin` tabs; reuse Testing and Cost Playground components.
+4) Sources CRUD: form + table, actions, and seed/backfill hooks.
+5) Preview: admin API + worker dry-run helpers.
+6) Polish: per-source estimates in Forecast; ensure worker filters `active=false`; deprecate `/testing` and `/temp` public routes.
 
-## Cost Estimation
-- Global playground: embed existing `temp/page.tsx` (minor copy to a client component).
-- Per-source estimates (UI only at first): simple inputs per row (expected items/day, avg minutes for YouTube), roll up totals.
-- YouTube API quota: use helper from `worker/src/fetch/youtube.ts` to estimate quota use (search: `estimatedCost` in codebase).
+## Notes
+- Deletion: default to soft-delete (`active=false`). If hard delete needed, block when dependent content/stories exist.
+- Provider cadence: use existing global schedules; per-source cron can be added later if needed.
 
-## Security & Auditing
-- Server-only checks for all admin routes and actions using `get-admin-flag`.
-- Never expose service role key to client; use server actions/routes only.
-- Optional: append to `source_events` on create/update/pause/delete with actor id and payload.
-
-## Implementation Plan
-Phase 1 — Admin guard + page shell (0.5d)
-- Add `users.is_admin` (migration).
-- Add `get-admin-flag` and simple guard.
-- Create `/admin` with Overview + Jobs tabs reusing `testing/page.tsx` pieces.
-
-Phase 2 — Sources CRUD (0.5–1d)
-- Build Paste/Add form and Sources table UI.
-- Implement actions/mutations/queries for sources.
-- Hook to worker by enqueuing `ingest:pull` on create/update.
-
-Phase 3 — Forecast tab (0.5d)
-- Embed playground and add per-source estimate rows and totals.
-
-Phase 4 — Polish & ops (0.5d)
-- Pause/Resume handling in worker ingest queries.
-- Backfill window handling via `last_cursor`/metadata.
-- Basic audit log (optional).
-
-## Open Questions
-- Do we want role via `auth.users.app_metadata.role = 'admin'` instead of `users.is_admin`? (Current plan favors `users.is_admin` for simplicity.)
-- Should Sources have an explicit `active boolean` column vs `metadata.active`? (If we need SQL-only filters and indexes, add a column.)
-- Any additional provider types we should seed now (Reddit, arXiv)?
+## Delivery Checklist
+- See `docs/plans/admin-tasks.md` for the concrete task list and acceptance criteria.
 
 ## References (existing code to reuse)
 - Testing/diagnostics: `src/app/testing/page.tsx`
@@ -146,4 +107,3 @@ Phase 4 — Polish & ops (0.5d)
 - Pipeline APIs: `src/app/api/pipeline/*`
 - Supabase admin client: `src/libs/supabase/supabase-admin.ts`
 - Worker ingest + queues: `worker/src/worker.ts`, `worker/src/ingest/rss.ts`, `worker/src/ingest/youtube.ts`, `worker/src/fetch/youtube.ts`
-
