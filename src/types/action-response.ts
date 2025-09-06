@@ -1,6 +1,6 @@
-export type ActionResponse =
+export type ActionResponse<T = unknown, E = unknown> =
   | {
-      data: any;
-      error: any;
+      data: T;
+      error: E;
     }
   | undefined;

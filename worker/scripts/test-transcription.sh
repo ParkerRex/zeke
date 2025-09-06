@@ -11,8 +11,10 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}🎬 Testing transcription pipeline...${NC}"
 
 # Load environment variables
-if [ -f .env.local ]; then
-    export $(grep -v '^#' .env.local | xargs)
+if [ -f .env.development ]; then
+  set -a; source .env.development; set +a
+elif [ -f .env ]; then
+  set -a; source .env; set +a
 fi
 
 # Check required environment variables
@@ -24,6 +26,13 @@ fi
 BOSS_SCHEMA="${BOSS_SCHEMA:-pgboss}"
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 YOUTUBE_API_KEY="${YOUTUBE_API_KEY:-}"
+
+# Avoid interactive password prompts for worker role when URL lacks password
+if [ -z "${PGPASSWORD:-}" ]; then
+  if echo "$DATABASE_URL" | grep -Eq '^postgresql://worker@'; then
+    export PGPASSWORD="${WORKER_PASS:-worker_password}"
+  fi
+fi
 
 if [ -z "$OPENAI_API_KEY" ] || [[ "$OPENAI_API_KEY" == *"test"* ]]; then
     echo -e "${YELLOW}⚠️  OPENAI_API_KEY not set or is test key - transcription will be mocked${NC}"

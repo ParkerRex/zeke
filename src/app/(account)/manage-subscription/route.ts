@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
-import { getCustomerId } from '@/features/account/controllers/get-customer-id';
-import { getSession } from '@/features/account/controllers/get-session';
+import { getCustomerId } from '@/supabase/queries/account/get-customer-id';
+import { getSession } from '@/supabase/queries/account/get-session';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
 import { getURL } from '@/utils/get-url';
 

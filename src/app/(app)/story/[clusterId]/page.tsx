@@ -1,6 +1,5 @@
-import StoryClient from './story-client';
+import { redirect } from 'next/navigation';
 
-export default async function StoryRoute({ params }: { params: any }) {
-  const { clusterId } = await params;
-  return <StoryClient id={clusterId} />;
+export default function StoryRoute({ params }: { params: { clusterId: string } }) {
+  redirect(`/stories/${encodeURIComponent(params.clusterId)}`);
 }

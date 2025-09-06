@@ -10,7 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/worker.js",
     "dev": "tsx watch src/worker.ts",
-    "dev:docker": "bash scripts/dev-local.sh",
+    "dev:docker": "bash scripts/deploy-local-worker.sh",
     "deploy:prod": "bash scripts/deploy-prod-worker.sh",
     "lint": "tsc --noEmit",
     "logs": "bash scripts/logs.sh",

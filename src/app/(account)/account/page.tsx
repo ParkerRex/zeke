@@ -3,11 +3,11 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { getSession } from '@/features/account/controllers/get-session';
-import { getSubscription } from '@/features/account/controllers/get-subscription';
-import { PricingCard } from '@/features/pricing/components/price-card';
-import { getProducts } from '@/features/pricing/controllers/get-products';
-import { Price, ProductWithPrices } from '@/features/pricing/types';
+import { getSession } from '@/supabase/queries/account/get-session';
+import { getSubscription } from '@/supabase/queries/account/get-subscription';
+import { PricingCard } from '@/components/pricing/price-card';
+import { getProducts } from '@/supabase/queries/pricing/get-products';
+import { Price, ProductWithPrices } from '@/types/pricing';
 
 export default async function AccountPage() {
   const [session, subscription, products] = await Promise.all([getSession(), getSubscription(), getProducts()]);

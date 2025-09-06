@@ -1,7 +1,8 @@
 import PgBoss from 'pg-boss';
-import { getYouTubeSources, upsertRawItem } from '../db.js';
+import { getYouTubeSources, upsertRawItem, updateSourceMetadata } from '../db.js';
 import { YouTubeFetcher } from '../fetch/youtube.js';
 import { log } from '../log.js';
+import { YouTubeAPIClient } from '../clients/youtube-api.js';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -146,30 +147,54 @@ export async function runIngestYouTube(boss: PgBoss) {
  */
 async function processChannelSource(src: any, fetcher: YouTubeFetcher) {
   const metadata = src.metadata || {};
-  const uploadsPlaylistId = metadata.upload_playlist_id;
-
-  if (!uploadsPlaylistId) {
-    throw new Error(`No upload_playlist_id found in metadata for source ${src.id}`);
-  }
+  let uploadsPlaylistId: string | undefined = metadata.upload_playlist_id || undefined;
 
   const maxResults = metadata.max_videos_per_run || 10;
-
-  // Get videos from the last 7 days by default
   const publishedAfter = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  log('youtube_channel_fetch', {
-    source_id: src.id,
-    uploadsPlaylistId,
-    maxResults,
-    publishedAfter,
-  });
+  async function fetchWithId(id: string) {
+    log('youtube_channel_fetch', { source_id: src.id, uploadsPlaylistId: id, maxResults, publishedAfter });
+    return await fetcher.fetchChannelVideos(id, { maxResults, publishedAfter });
+  }
 
-  const videos = await fetcher.fetchChannelVideos(uploadsPlaylistId, {
-    maxResults,
-    publishedAfter,
-  });
+  // Attempt with configured uploads playlist id first
+  if (uploadsPlaylistId) {
+    try {
+      return await fetchWithId(uploadsPlaylistId);
+    } catch (err: any) {
+      const msg = String(err || '');
+      if (!msg.includes('playlistId') && !msg.toLowerCase().includes('not found')) throw err;
+      log('youtube_uploads_id_invalid', { source_id: src.id, uploadsPlaylistId, err: msg }, 'warn');
+      // fall through to derive id
+    }
+  }
 
-  return videos;
+  // Derive uploads playlist id from channel handle/name as a fallback
+  const client = new YouTubeAPIClient();
+  let query = '';
+  if (typeof src.url === 'string' && src.url.includes('youtube.com/')) {
+    const match = src.url.match(/@([A-Za-z0-9_\-\.]+)/);
+    if (match) query = match[1];
+  }
+  if (!query && typeof src.name === 'string') query = src.name;
+
+  log('youtube_derive_uploads_id_start', { source_id: src.id, query });
+  const candidates = await client.searchChannels(query || '');
+  const chosen = candidates[0];
+  if (!chosen?.uploadsPlaylistId) {
+    throw new Error(`Could not derive uploads playlist id for source ${src.id}`);
+  }
+  uploadsPlaylistId = chosen.uploadsPlaylistId;
+  log('youtube_derive_uploads_id_success', { source_id: src.id, uploadsPlaylistId });
+
+  // Persist derived id so future runs don’t need search (saves 100 quota)
+  try {
+    await updateSourceMetadata(src.id, { upload_playlist_id: uploadsPlaylistId });
+  } catch (e) {
+    log('youtube_derive_uploads_id_persist_error', { source_id: src.id, err: String(e) }, 'warn');
+  }
+
+  return await fetchWithId(uploadsPlaylistId);
 }
 
 /**

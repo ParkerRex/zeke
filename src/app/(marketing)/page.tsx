@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { IoAlbums, IoBookmark, IoLayers,IoMailOpen, IoShareSocial } from 'react-icons/io5';
 import { redirect } from 'next/navigation';
 
-import { getSession } from '@/features/account/controllers/get-session';
+import { getSession } from '@/supabase/queries/account/get-session';
 
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { WorkspacePreview } from '@/components/workspace-preview';
-import { PricingSection } from '@/features/pricing/components/pricing-section';
+import { PricingSection } from '@/components/pricing/pricing-section';
 
 export default async function HomePage() {
   const session = await getSession();

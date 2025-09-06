@@ -972,7 +972,7 @@ const content_id = await insertContents({
 
 **Implementation Details**:
 
-- Update `src/features/stories/controllers/stories.ts` to fetch YouTube content
+- Update `src/supabase/queries/stories/list-stories.ts` to fetch YouTube content
 - Filter stories by `contents.transcript_url LIKE 'youtube://%'` for YouTube identification
 - Display video metadata in story cards (title, channel, duration, view count)
 - Add YouTube branding and thumbnail display

@@ -8,10 +8,16 @@ import { runIngestRss } from "./ingest/rss.js";
 import { runIngestYouTube } from "./ingest/youtube.js";
 import { log } from "./log.js";
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL: string = process.env.DATABASE_URL ?? "";
 const BOSS_SCHEMA = process.env.BOSS_SCHEMA || "pgboss";
 const CRON_TZ = process.env.BOSS_CRON_TZ || "UTC";
 const BOSS_MIGRATE = process.env.BOSS_MIGRATE !== "false";
+// Use SSL only for non-local connections (local Supabase Postgres does not support TLS)
+const USE_SSL = !(
+  DATABASE_URL.includes("127.0.0.1") ||
+  DATABASE_URL.includes("localhost") ||
+  DATABASE_URL.includes("host.docker.internal")
+);
 
 if (!DATABASE_URL) {
   // eslint-disable-next-line no-console
@@ -27,9 +33,7 @@ async function initBoss() {
   const boss = new PgBoss({
     connectionString: DATABASE_URL,
     schema: BOSS_SCHEMA,
-    ssl: DATABASE_URL.includes("127.0.0.1")
-      ? false
-      : ({ rejectUnauthorized: false } as any),
+    ssl: USE_SSL ? ({ rejectUnauthorized: false } as any) : false,
     application_name: "zeke-worker",
     max: 2,
     migrate: BOSS_MIGRATE,
@@ -66,11 +70,20 @@ async function initBoss() {
     { tz: CRON_TZ }
   );
 
-  await boss.work("system:heartbeat", async (jobs) => {
+  // Kick off an immediate run on startup for faster local feedback
+  try {
+    await boss.send("ingest:pull", { source: "rss" });
+    await boss.send("ingest:pull", { source: "youtube" });
+    log("ingest_bootstrap_queued", { when: "startup" });
+  } catch (e) {
+    log("ingest_bootstrap_error", { err: String(e) }, "warn");
+  }
+
+  await boss.work("system:heartbeat", { batchSize: 10 }, async (jobs) => {
     for (const job of jobs) log("heartbeat", { jobId: job.id, data: job.data });
   });
 
-  await boss.work("ingest:pull", async (jobs) => {
+  await boss.work("ingest:pull", { batchSize: 5 }, async (jobs) => {
     for (const job of jobs) {
       const { source } = (job.data || {}) as { source?: string };
       log("ingest_pull_start", { jobId: job.id, source });
@@ -81,7 +94,7 @@ async function initBoss() {
     }
   });
 
-  await boss.work("ingest:fetch-content", async (jobs) => {
+  await boss.work("ingest:fetch-content", { batchSize: 5 }, async (jobs) => {
     for (const job of jobs) {
       log("fetch_content_start", { jobId: job.id });
       try {
@@ -94,22 +107,26 @@ async function initBoss() {
     }
   });
 
-  await boss.work("ingest:fetch-youtube-content", async (jobs) => {
-    for (const job of jobs) {
-      log("fetch_youtube_content_start", { jobId: job.id });
-      try {
-        await runYouTubeFetchAndExtract(job.data as any, boss);
-        await boss.complete("ingest:fetch-youtube-content", job.id);
-      } catch (err) {
-        await boss.fail("ingest:fetch-youtube-content", job.id, {
-          error: String(err),
-        });
+  await boss.work(
+    "ingest:fetch-youtube-content",
+    { batchSize: 2 },
+    async (jobs) => {
+      for (const job of jobs) {
+        log("fetch_youtube_content_start", { jobId: job.id });
+        try {
+          await runYouTubeFetchAndExtract(job.data as any, boss);
+          await boss.complete("ingest:fetch-youtube-content", job.id);
+        } catch (err) {
+          await boss.fail("ingest:fetch-youtube-content", job.id, {
+            error: String(err),
+          });
+        }
+        log("fetch_youtube_content_done", { jobId: job.id });
       }
-      log("fetch_youtube_content_done", { jobId: job.id });
     }
-  });
+  );
 
-  await boss.work("analyze:llm", async (jobs) => {
+  await boss.work("analyze:llm", { batchSize: 5 }, async (jobs) => {
     for (const job of jobs) {
       const { storyId } = (job.data as any) || {};
       log("analyze_llm_start", { jobId: job.id, storyId });
@@ -201,7 +218,7 @@ async function main() {
         { rows: jobStats },
       ] = await Promise.all([
         pg.query(
-          'select count(*)::int as sources_rss from public.sources where kind = "rss" and url is not null'
+          "select count(*)::int as sources_rss from public.sources where kind = 'rss' and url is not null"
         ),
         pg.query(
           "select count(*)::int as raw_total, count(*) filter (where discovered_at > now() - interval '24 hours')::int as raw_24h from public.raw_items"

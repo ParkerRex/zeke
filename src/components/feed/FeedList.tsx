@@ -1,4 +1,4 @@
-import { listStories } from '@/features/stories';
+import { listStories } from '@/supabase/queries/stories/list-stories';
 
 import StoryRow from './StoryRow';
 

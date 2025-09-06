@@ -9,7 +9,7 @@ import {
   IoCashOutline,
 } from 'react-icons/io5';
 
-import type { Cluster } from '@/features/stories';
+import type { Cluster } from '@/types/stories';
 import { StoryKindIcon } from '@/components/stories/StoryKindIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,8 +24,9 @@ export default function HomeSnapshot() {
         const res = await fetch('/api/stories', { signal: ac.signal });
         const json = await res.json();
         if (!ac.signal.aborted) setClusters(json.clusters ?? []);
-      } catch (e: any) {
-        if (e?.name === 'AbortError') return;
+      } catch (e: unknown) {
+        const { isAbortError } = await import('@/utils/errors');
+        if (isAbortError(e)) return;
         console.error(e);
       }
     })();

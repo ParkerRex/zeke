@@ -1,0 +1,13 @@
+import type { SubscriptionWithProduct } from '@/types/pricing';
+import { createSupabaseServerClient } from '@/libs/supabase/supabase-server-client';
+
+export async function getSubscription(): Promise<SubscriptionWithProduct | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*, prices(*, products(*))')
+    .in('status', ['trialing', 'active'])
+    .maybeSingle();
+  if (error) console.error(error);
+  return (data as SubscriptionWithProduct | null) ?? null;
+}

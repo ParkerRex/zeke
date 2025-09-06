@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   IoDocumentText,
   IoLogoReddit,
@@ -14,10 +14,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { StoryKindIcon } from '@/components/stories/StoryKindIcon';
-import type { Cluster, EmbedKind } from '@/features/stories';
+import type { Cluster, EmbedKind } from '@/types/stories';
 import { useTabs } from '@/lib/tabsStore';
+import { useStories } from '@/hooks/use-stories';
+import { STRINGS } from '@/constants/strings';
+import { useQueryState } from 'nuqs';
+import { kindParser, qParser } from '@/libs/nuqs';
+import { domainFromUrl } from '@/utils/url';
 
-const mediums: { key: EmbedKind | 'all'; label: string; Icon: any }[] = [
+type GridKindFilter = 'all' | 'youtube' | 'arxiv' | 'podcast' | 'reddit' | 'hn' | 'article';
+type IconComp = React.ComponentType<{ className?: string }>;
+const mediums: { key: GridKindFilter; label: string; Icon: IconComp }[] = [
   { key: 'all', label: 'All', Icon: IoNewspaper },
   { key: 'youtube', label: 'YouTube', Icon: IoLogoYoutube },
   { key: 'arxiv', label: 'arXiv', Icon: IoDocumentText },
@@ -30,23 +37,25 @@ const mediums: { key: EmbedKind | 'all'; label: string; Icon: any }[] = [
 export default function StoriesGridClient({ variant = 'full' }: { variant?: 'full' | 'embedded' }) {
   const { openTab } = useTabs();
   const router = useRouter();
-  const [q, setQ] = useState('');
-  const [kind, setKind] = useState<EmbedKind | 'all'>('all');
-  const [items, setItems] = useState<Cluster[]>([]);
-  const searchParams = useSearchParams();
-
+  const [q, setQ] = useQueryState('q', qParser);
+  const [kindRaw, setKind] = useQueryState('kind', kindParser);
+  const kind: GridKindFilter = (kindRaw ?? 'all') as GridKindFilter;
+  const [qInput, setQInput] = useState(q || '');
+  const { clusters: items, loading, error, reload } = useStories();
+  // Data loading handled by useStories
+  // Keep input field in sync with URL q
   useEffect(() => {
-    const ac = new AbortController();
-    fetch('/api/stories', { signal: ac.signal })
-      .then((x) => x.json())
-      .then((r) => setItems(r.clusters ?? []))
-      .catch((e) => {
-        // Swallow intentional aborts; surface everything else.
-        if (e?.name !== 'AbortError') console.error(e);
-      });
-    // Provide an explicit reason so dev overlay treats this as intentional.
-    return () => ac.abort('StoriesGridClient unmounted');
-  }, []);
+    setQInput(q || '');
+  }, [q]);
+
+  // Debounce text changes before writing to URL
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const clamped = qInput ? qInput.slice(0, 200) : '';
+      void setQ(clamped || null); // null removes the param
+    }, 250);
+    return () => clearTimeout(t);
+  }, [qInput, setQ]);
 
   // Sync from URL params (used when landed via link)
   useEffect(() => {
@@ -75,15 +84,6 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
       preview: true,
     });
   const openPermanent = (c: Cluster) => {
-    openTab({
-      id: c.id,
-      title: c.title,
-      embedKind: c.embedKind,
-      embedUrl: c.embedUrl,
-      clusterId: c.id,
-      overlays: c.overlays,
-      preview: false,
-    });
     router.push(`/stories/${encodeURIComponent(c.id)}`);
   };
 
@@ -107,8 +107,8 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
                 <div className='relative w-full'>
                   <IoSearch className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
                   <Input
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
+                    value={qInput}
+                    onChange={(e) => setQInput(e.target.value)}
                     className='h-11 rounded-lg pl-9'
                     placeholder='Search stories (title or URL)…'
                   />
@@ -122,7 +122,7 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
                   key={m.key}
                   size='sm'
                   variant={m.key === kind ? 'default' : 'outline'}
-                  onClick={() => setKind(m.key as any)}
+                  onClick={() => void setKind(m.key === 'all' ? null : m.key)}
                   className='flex items-center gap-2'
                 >
                   <m.Icon className='h-4 w-4' /> {m.label}
@@ -134,25 +134,40 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
       )}
 
       <section className={variant === 'full' ? 'p-4' : 'p-3'}>
-        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-          {filtered.map((c) => (
+        {loading ? (
+          <div className='p-3 text-sm text-muted-foreground'>{STRINGS.loading}</div>
+        ) : error ? (
+          <div className='flex items-center justify-between rounded-md border p-3 text-sm'>
+            <span className='text-red-600'>{error || STRINGS.loadError}</span>
             <button
-              key={c.id}
-              onClick={() => openPreview(c)}
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                openPermanent(c);
-              }}
-              className='group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm'
+              type='button'
+              className='rounded bg-gray-900 px-3 py-1 text-white hover:opacity-90'
+              onClick={reload}
             >
-              <div className='mb-2 flex items-center gap-2 text-sm font-medium'>
-                <StoryKindIcon kind={c.embedKind} />
-                <span className='truncate'>{c.title}</span>
-              </div>
-              <div className='truncate text-xs text-gray-500'>{c.primaryUrl}</div>
+              {STRINGS.retry}
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            {filtered.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => openPreview(c)}
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                  openPermanent(c);
+                }}
+                className='group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm'
+              >
+                <div className='mb-2 flex items-center gap-2 text-sm font-medium'>
+                  <StoryKindIcon kind={c.embedKind} />
+                  <span className='truncate'>{c.title}</span>
+                </div>
+              <div className='truncate text-xs text-gray-500'>{domainFromUrl(c.primaryUrl)}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

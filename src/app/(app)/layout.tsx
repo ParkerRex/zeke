@@ -1,6 +1,6 @@
 'use client';
 import type { ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import Sidebar from '@/components/shell/Sidebar';
 import TabsStrip from '@/components/tabs/TabsStrip';
@@ -13,12 +13,17 @@ import HomeSnapshot from '@/components/home/HomeSnapshot';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { IoMenu } from 'react-icons/io5';
+import { useQueryState } from 'nuqs';
+import { panelParser } from '@/libs/nuqs';
+import { toast } from '@/components/ui/use-toast';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   // 3-pane layout: Rail | Sidebar Panel (route content) | Main viewer (tabs)
   const pathname = usePathname();
   const router = useRouter();
-  const { sidePanelOpen, setSidePanelOpen } = useTabs();
+  const { sidePanelOpen, setSidePanelOpen, resetPanelState } = useTabs();
+  const searchParams = useSearchParams();
+  const [panel, setPanel] = useQueryState('panel', panelParser);
   const isHome = pathname === '/home';
   const usesViewer =
     pathname === '/today' ||
@@ -28,6 +33,22 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     pathname === '/watchlists';
   // Show the sidebar panel for all viewer routes except stories (stories is a full-page experience)
   const showSidebarPanel = !isHome && !(pathname?.startsWith('/stories') ?? false) && usesViewer;
+
+  // Initialize store from URL only when panel param is present; otherwise keep persisted fallback
+  React.useEffect(() => {
+    const hasParam = searchParams?.has('panel');
+    if (hasParam) setSidePanelOpen(!!panel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panel]);
+
+  // Back-compat for legacy panel=1/0 values: normalize to true/false via nuqs
+  React.useEffect(() => {
+    const raw = searchParams?.get('panel');
+    if (raw === '1' || raw === '0') {
+      void setPanel(raw === '1');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <TooltipProvider delayDuration={400}>
@@ -93,10 +114,59 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               variant='ghost'
               size='sm'
               className='ml-1 hidden sm:inline-flex'
-              onClick={() => setSidePanelOpen(!sidePanelOpen)}
+              onClick={() => {
+                setSidePanelOpen(!sidePanelOpen);
+                void setPanel(!sidePanelOpen);
+              }}
               title={sidePanelOpen ? 'Hide side panel' : 'Show side panel'}
             >
               {sidePanelOpen ? <IoChevronForward className='h-5 w-5' /> : <IoChevronBack className='h-5 w-5' />}
+            </Button>
+          )}
+
+          {/* Reset panel state (dev/UX utility) */}
+          {usesViewer && (
+            <Button
+              variant='ghost'
+              size='sm'
+              className='ml-1 hidden text-xs text-gray-600 hover:text-gray-900 sm:inline-flex'
+              onClick={() => resetPanelState()}
+              title='Reset side panel visibility (clears per-tab panel state)'
+            >
+              Reset panels
+            </Button>
+          )}
+
+          {/* Copy session link (tabs + active + panel) */}
+          {usesViewer && (
+            <Button
+              variant='ghost'
+              size='sm'
+              className='ml-1 hidden text-xs text-gray-600 hover:text-gray-900 sm:inline-flex'
+              onClick={() => {
+                try {
+                  const u = new URL(window.location.href);
+                  // Build tabs list from store (only story tabs)
+                  const state = useTabs.getState();
+                  const ids = state.tabs
+                    .map((t) => t.clusterId)
+                    .filter((x): x is string => !!x);
+                  const unique = Array.from(new Set(ids)).slice(0, 8);
+                  if (unique.length) u.searchParams.set('tabs', unique.join(','));
+                  else u.searchParams.delete('tabs');
+                  const active = state.activeId && state.tabs.find((t) => t.id === state.activeId)?.clusterId;
+                  if (active) u.searchParams.set('active', active);
+                  else u.searchParams.delete('active');
+                  u.searchParams.set('panel', (state.sidePanelOpen ?? true) ? 'true' : 'false');
+                  navigator.clipboard.writeText(u.toString());
+                  toast({ title: 'Session link copied', description: 'Share this URL to load the same tabs.' });
+                } catch (e: any) {
+                  toast({ title: 'Unable to copy link', description: String(e?.message || e) });
+                }
+              }}
+              title='Copy session link (open tabs + active + panel)'
+            >
+              Share session
             </Button>
           )}
         </header>
@@ -116,7 +186,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <section className='hidden overflow-auto border-r bg-gray-50 sm:block'>{children}</section>
           )}
           <main className='h-full min-w-0'>
-            {isHome ? <HomeSnapshot /> : usesViewer ? <TabsContentViewport /> : (children as any)}
+            {isHome ? <HomeSnapshot /> : usesViewer ? <TabsContentViewport /> : children}
           </main>
         </div>
       </div>

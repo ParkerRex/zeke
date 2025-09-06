@@ -447,8 +447,8 @@ This checklist captures the complete implementation of YouTube video ingestion f
 - [x] `worker/src/clients/youtube-api.ts`: 4 errors (googleapis v159 compatibility) - FIXED
 - [x] `src/libs/supabase/types.ts`: Missing module (6 import errors) - GENERATED
 - [x] `src/components/feed/FeedList.tsx`: Async/await issues (2 errors) - FIXED
-- [x] `src/features/pricing/components/price-card.tsx`: Implicit any types (3 errors) - RESOLVED
-- [x] `src/features/emails/welcome.tsx`: Missing @react-email/tailwind (1 error) - INSTALLED
+- [x] `src/components/pricing/price-card.tsx`: Implicit any types (3 errors) - RESOLVED
+- [x] `src/emails/welcome.tsx`: Missing @react-email/tailwind (1 error) - INSTALLED
 
 ### NEXT PRIORITY: AI Analysis Enhancement (Required for Content Value)
 

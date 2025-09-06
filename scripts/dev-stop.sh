@@ -32,8 +32,24 @@ kill_port() {
 # Stop Next.js (port 3000)
 kill_port 3000 "Next.js"
 
-# Stop Worker (if running on port 8080)
+# Stop Worker (common ports)
 kill_port 8080 "Worker"
+kill_port 8081 "Worker"
+kill_port 8082 "Worker"
+
+# Stop Docker worker container if present
+if command -v docker >/dev/null 2>&1; then
+  if docker ps --format '{{.Names}}' | grep -q '^zeke-worker-local$'; then
+    echo -e "${YELLOW}🔌 Stopping Docker worker container...${NC}"
+    docker stop zeke-worker-local >/dev/null || true
+    echo -e "${GREEN}✅ Docker worker container stopped${NC}"
+  fi
+  if docker ps --format '{{.Names}}' | grep -q '^zeke-worker-local-8082$'; then
+    echo -e "${YELLOW}🔌 Stopping Docker worker container (8082)...${NC}"
+    docker stop zeke-worker-local-8082 >/dev/null || true
+    echo -e "${GREEN}✅ Docker worker container (8082) stopped${NC}"
+  fi
+fi
 
 # Stop Supabase
 echo -e "${BLUE}🗄️  Stopping Supabase...${NC}"
@@ -59,6 +75,6 @@ pkill -f "next.*dev" 2>/dev/null || true
 echo -e "${GREEN}🎉 Development environment stopped!${NC}"
 echo ""
 echo -e "${BLUE}💡 To start again, run:${NC}"
-echo -e "   ${YELLOW}pnpm run dev${NC}     (full setup + start services)"
-echo -e "   ${YELLOW}pnpm run dev:setup${NC} (setup only)"
-echo -e "   ${YELLOW}pnpm run dev:full${NC}  (start services only)"
+echo -e "   ${YELLOW}pnpm run dev${NC}         (full setup + start services with Docker worker)"
+echo -e "   ${YELLOW}pnpm run dev:setup${NC}   (setup only)"
+echo -e "   ${YELLOW}pnpm run dev:full${NC}    (start services only, Docker worker)"

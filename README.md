@@ -1,5 +1,8 @@
 # ZEKE - AI-Powered News Intelligence Platform
 
+> Codex Config tips:
+> `codex --config model_reasoning_effort="high"`
+
 **Status (2025-09-05)**: Core pipeline working! 47 raw items → 16 contents → 17 stories → 9 overlays → 9 embeddings processed. Worker running every 5 min with **real OpenAI GPT-4o-mini analysis**!
 
 ZEKE is an intelligent news aggregation and analysis platform that ingests content from multiple sources (RSS, HN, Reddit, YouTube, arXiv), extracts and normalizes content, generates AI-powered summaries and insights, and serves them through a modern web interface.
@@ -152,7 +155,7 @@ cd worker && pnpm install && cd ..
 ### 2. Environment Setup
 
 ```bash
-cp .env.local.example .env.local
+cp .env.local.example .env.development
 # Fill in your Supabase, Stripe, and Resend credentials
 ```
 
@@ -182,7 +185,7 @@ pnpm run dev
 
 ```bash
 cd worker
-cp .env.example .env.local
+cp .env.example .env.development
 # Add your DATABASE_URL and other worker-specific env vars
 pnpm run dev
 ```
@@ -286,7 +289,7 @@ See detailed task lists:
 
 ### Environment Variables
 
-**Frontend (`.env.local`):**
+**Frontend (`.env.development`):**
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -296,7 +299,7 @@ STRIPE_SECRET_KEY=your_stripe_secret
 RESEND_API_KEY=your_resend_key
 ```
 
-**Worker (`worker/.env.local`):**
+**Worker (`worker/.env.development`):**
 
 ```bash
 DATABASE_URL=postgresql://worker:password@host:5432/postgres?sslmode=require

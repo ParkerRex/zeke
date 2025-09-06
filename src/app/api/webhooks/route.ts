@@ -1,9 +1,9 @@
 import Stripe from 'stripe';
 
-import { upsertUserSubscription } from '@/features/account/controllers/upsert-user-subscription';
-import { softDeleteProduct } from '@/features/pricing/controllers/soft-delete-product';
-import { upsertPrice } from '@/features/pricing/controllers/upsert-price';
-import { upsertProduct } from '@/features/pricing/controllers/upsert-product';
+import { upsertUserSubscription } from '@/actions/account/upsert-user-subscription';
+import { softDeleteProduct } from '@/supabase/mutations/pricing/soft-delete-product';
+import { upsertPrice } from '@/supabase/mutations/pricing/upsert-price';
+import { upsertProduct } from '@/supabase/mutations/pricing/upsert-product';
 import { stripeAdmin } from '@/libs/stripe/stripe-admin';
 import { getEnvVar } from '@/utils/get-env-var';
 
@@ -34,7 +34,8 @@ export async function POST(req: Request) {
     }
     event = stripeAdmin.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (error) {
-    return Response.json(`Webhook Error: ${(error as any).message}`, { status: 400 });
+    const { safeErrorMessage } = await import('@/utils/errors');
+    return Response.json(`Webhook Error: ${safeErrorMessage(error)}`, { status: 400 });
   }
 
   if (relevantEvents.has(event.type)) {

@@ -1,8 +1,9 @@
 'use client';
-import type { Cluster } from '@/features/stories';
+import type { Cluster } from '@/types/stories';
 import { useTabs } from '@/lib/tabsStore';
 import { StoryKindIcon } from '@/components/stories/StoryKindIcon';
 import { useRouter } from 'next/navigation';
+import { domainFromUrl } from '@/utils/url';
 
 export default function StoryRow({ cluster }: { cluster: Cluster }) {
   const { openTab } = useTabs();
@@ -18,15 +19,6 @@ export default function StoryRow({ cluster }: { cluster: Cluster }) {
       preview: true,
     });
   const openPermanent = () => {
-    openTab({
-      id: cluster.id,
-      title: cluster.title,
-      embedKind: cluster.embedKind,
-      embedUrl: cluster.embedUrl,
-      clusterId: cluster.id,
-      overlays: cluster.overlays,
-      preview: false,
-    });
     router.push(`/stories/${encodeURIComponent(cluster.id)}`);
   };
 
@@ -44,7 +36,7 @@ export default function StoryRow({ cluster }: { cluster: Cluster }) {
       </div>
       <div className='min-w-0 flex-1'>
         <div className='truncate text-sm font-medium text-gray-900'>{cluster.title}</div>
-        <div className='truncate text-[11px] text-gray-500'>{cluster.primaryUrl}</div>
+        <div className='truncate text-[11px] text-gray-500'>{domainFromUrl(cluster.primaryUrl)}</div>
       </div>
       <span aria-label='chili' className='flex-shrink-0 text-xs'>
         {Array.from({ length: cluster.overlays.chili }).map(() => '🌶')}

@@ -1,9 +1,17 @@
 import { Pool } from "pg";
 import { log } from "./log.js";
 
+const cnn = process.env.DATABASE_URL || "";
+// Use SSL only for non-local connections. Supabase local Postgres on 127.0.0.1:54322 does not support TLS.
+const useSsl = !(
+  cnn.includes("127.0.0.1") ||
+  cnn.includes("localhost") ||
+  cnn.includes("host.docker.internal")
+);
+
 const pool = new Pool({
-	connectionString: process.env.DATABASE_URL,
-	ssl: { rejectUnauthorized: false } as any,
+	connectionString: cnn,
+	ssl: useSsl ? ({ rejectUnauthorized: false } as any) : false,
 	keepAlive: true,
 	max: 3,
 	idleTimeoutMillis: 30_000, // Increased from 10s to 30s
@@ -46,6 +54,20 @@ export async function getYouTubeSources(): Promise<YouTubeSourceRow[]> {
      and (url is not null or kind = 'youtube_search')`,
 	);
 	return rows;
+}
+
+export async function updateSourceMetadata(
+  sourceId: string,
+  patch: Record<string, any>,
+): Promise<void> {
+  // Merge JSONB metadata with a shallow patch
+  await pool.query(
+    `update public.sources
+       set metadata = coalesce(metadata, '{}'::jsonb) || $2::jsonb,
+           updated_at = now()
+     where id = $1`,
+    [sourceId, JSON.stringify(patch)],
+  );
 }
 
 export async function upsertRawItem(params: {

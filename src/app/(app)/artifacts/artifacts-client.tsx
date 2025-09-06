@@ -97,12 +97,9 @@ export default function ArtifactsClient() {
     const root = containerRef.current;
     if (!anchor || !focus || !root) return;
 
-    const contentEl = (anchor instanceof Element ? anchor : anchor.parentElement)?.closest('[data-story-id]') as
-      | HTMLElement
-      | null;
-    const contentEl2 = (focus instanceof Element ? focus : (focus as any)?.parentElement)?.closest('[data-story-id]') as
-      | HTMLElement
-      | null;
+    const toElement = (n: Node | null): Element | null => (n instanceof Element ? n : (n as Node & { parentElement?: Element }).parentElement ?? null);
+    const contentEl = toElement(anchor)?.closest('[data-story-id]') as HTMLElement | null;
+    const contentEl2 = toElement(focus)?.closest('[data-story-id]') as HTMLElement | null;
     if (!contentEl || !contentEl2 || contentEl !== contentEl2) return;
 
     const storyId = contentEl.getAttribute('data-story-id') || '';

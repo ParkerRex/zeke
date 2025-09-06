@@ -8,3 +8,9 @@ export default function TodayPage() {
     </div>
   );
 }
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Today • ZEKE',
+  description: 'Today’s top AI and tech stories with contextual insights.',
+};

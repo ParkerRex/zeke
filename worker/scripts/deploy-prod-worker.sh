@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Production deploy to Cloud Run using envs from worker/.env (no secrets).
+# Production deploy to Cloud Run using envs from worker/.env.production (preferred) or worker/.env.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE_PROD="$ROOT_DIR/.env.production"
 ENV_FILE="$ROOT_DIR/.env"
-if [[ -f "$ENV_FILE" ]]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
+if [[ -f "$ENV_FILE_PROD" ]]; then
+  echo "[info] Using $ENV_FILE_PROD"
+  set -a; source "$ENV_FILE_PROD"; set +a
+elif [[ -f "$ENV_FILE" ]]; then
+  echo "[info] Using $ENV_FILE"
+  set -a; source "$ENV_FILE"; set +a
 fi
 
 : "${PROJECT_ID:?Set PROJECT_ID in worker/.env or env}" \

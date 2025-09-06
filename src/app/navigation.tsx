@@ -6,7 +6,7 @@ import { AccountMenu } from '@/components/account-menu';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTrigger } from '@/components/ui/sheet';
-import { getSession } from '@/features/account/controllers/get-session';
+import { getSession } from '@/supabase/queries/account/get-session';
 import SignOutButton from '@/components/sign-out-button';
 
 import { signOut } from './(auth)/auth-actions';

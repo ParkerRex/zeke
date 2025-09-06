@@ -1,34 +1,24 @@
-# home page jtbd
+## fri - sep 5 sesh:
 
-- what's changed with companies i follow
-- what tools got new pr's? aka whats the difference btwn cc yesterday and today (git diff summary)
-- whens the next big livestream or product announcement? add to cal
-
-big news:
-
-- fundraise announcements
-
-### Horses mouth (what the company or person says - not neceessarily objective, aka they could be hyping)
-
-- elon tweeted about a benchmark or grok or something
-- anthropic raised $$$ (newsroom)
-- admin or someone with a particular role in a model discord said something (we'd have to suck info out of discord for this)
+- get everything to a one script setup for testing locally
+- [x] setup agents.md
+- [x] setup codex dotfiles
 -
 
 ## vibe code debt
 
 - [ ] using sessions for user info instead of built in supabase hooks
-- [ ] swap out eslint for biome, use best practices from their docs
+- [x] swap out eslint for biome, use best practices from their docs
 - [ ] set up supabase rules, use best practices from their docs
-- [ ] set up ultracite
-- [ ] types organization
+- [x] set up ultracite
+- [x] types organization
 - [ ] optimistic updates
-- [ ] feature based file org
+- [x] feature based file org
 - [ ] in mem persistence
-- [ ] store for the tabs
+- [x] store for the tabs
 - [ ] nuked the stripe fixtures
-- [ ] installed npm over pnpm on worker
-- [ ] pgboss schema gets nuked on reset, move from supabase/sql to supabase/migrations
+- [x] installed npm over pnpm on worker
+- [x] pgboss schema gets nuked on reset, move from supabase/sql to supabase/migrations
 
 # Story cards:
 

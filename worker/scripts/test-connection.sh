@@ -10,9 +10,11 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}🔍 Testing database connection...${NC}"
 
-# Load environment variables
-if [ -f .env.local ]; then
-    export $(grep -v '^#' .env.local | xargs)
+# Load environment variables (.env.development preferred, fallback to .env)
+if [ -f .env.development ]; then
+    set -a; source .env.development; set +a
+elif [ -f .env ]; then
+    set -a; source .env; set +a
 fi
 
 # Check required environment variables
@@ -22,6 +24,14 @@ if [ -z "${DATABASE_URL:-}" ]; then
 fi
 
 BOSS_SCHEMA="${BOSS_SCHEMA:-pgboss}"
+
+# If psql would prompt for a password (e.g., URL lacks password for `worker`),
+# set PGPASSWORD from WORKER_PASS (default worker_password) for non-interactive use.
+if [ -z "${PGPASSWORD:-}" ]; then
+  if echo "$DATABASE_URL" | grep -Eq '^postgresql://worker@'; then
+    export PGPASSWORD="${WORKER_PASS:-worker_password}"
+  fi
+fi
 
 echo -e "${BLUE}📍 Schema: ${BOSS_SCHEMA}${NC}"
 echo -e "${BLUE}🔗 URL: ${DATABASE_URL//:*@/:***@}${NC}"

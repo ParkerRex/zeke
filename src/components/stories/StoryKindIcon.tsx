@@ -1,6 +1,6 @@
 import { IoLogoYoutube, IoMic, IoDocumentText, IoLogoTwitter, IoLogoReddit, IoNewspaper, IoCodeSlash, IoBusiness } from 'react-icons/io5';
 
-import type { EmbedKind } from '@/features/stories';
+import type { EmbedKind } from '@/types/stories';
 
 export function StoryKindIcon({ kind, className }: { kind: EmbedKind | string; className?: string }) {
   const common = className ?? 'h-4 w-4';

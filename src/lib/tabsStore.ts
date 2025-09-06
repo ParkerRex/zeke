@@ -1,7 +1,7 @@
 'use client';
 import { create } from 'zustand';
 
-import type { EmbedKind, Overlays } from '@/features/stories';
+import type { EmbedKind, Overlays } from '@/types/stories';
 
 const STORAGE_PANEL_MAP = 'tabs:panelOpenById';
 const STORAGE_PANEL_GLOBAL = 'tabs:sidePanelOpen';
@@ -70,6 +70,8 @@ type TabsState = {
   panelOpenById: Record<string, boolean>;
   // Batch: apply multiple changes and sort once
   batch: (fn: (tabs: Tab[]) => Tab[]) => void;
+  // Clear persisted panel visibility state
+  resetPanelState: () => void;
 };
 
 // TODO(perf): If tabs become very large, consider a stable in-place reordering
@@ -111,7 +113,7 @@ export const useTabs = create<TabsState>((set, get) => ({
       return {
         sidePanelOpen: v,
         panelOpenById,
-      } as any;
+      };
     }),
   openTab: (tab) =>
     set((s) => {
@@ -140,25 +142,41 @@ export const useTabs = create<TabsState>((set, get) => ({
     set((s) => ({ tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, pinned } : t))) })),
   updateOverlay: (id, partial) =>
     set((s) => ({
-      tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, overlays: { ...t.overlays, ...partial } } : t))),
+      // Overlay updates don't affect ordering; avoid re-sorting for perf
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, overlays: { ...t.overlays, ...partial } } : t)),
     })),
   updateContext: (id, partial) =>
     set((s) => ({
-      tabs: sortTabs(s.tabs.map((t) => (t.id === id ? { ...t, context: { ...(t.context ?? {}), ...partial } } : t))),
+      // Context updates don't affect ordering; avoid re-sorting for perf
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, context: { ...(t.context ?? {}), ...partial } } : t)),
     })),
   restoreFromUrl: async (id, isShare) => {
+    // Optimistic: open a placeholder preview tab immediately
+    const optimisticId = isShare ? `share:${id}` : id;
+    const optimistic: Tab = {
+      id: optimisticId,
+      title: 'Loading…',
+      embedKind: 'article',
+      embedUrl: 'about:blank',
+      clusterId: isShare ? undefined : id,
+      shareId: isShare ? id : undefined,
+      overlays: { whyItMatters: null, chili: null, confidence: null, citations: [], modelVersion: null },
+      preview: true,
+    } as any;
+    get().openTab(optimistic);
     try {
       const endpoint = isShare ? `/api/share?id=${id}` : `/api/stories/${id}`;
-      const res = await fetch(endpoint).then((r) => r.json());
+      const res = await fetch(endpoint, { cache: 'no-store' }).then((r) => r.json());
       if (!res || !res.title) throw new Error('Invalid story payload');
       const tab: Tab = {
-        id: isShare ? `share:${id}` : id,
+        id: optimisticId,
         title: res.title,
         embedKind: res.embedKind,
         embedUrl: res.embedUrl,
         clusterId: isShare ? undefined : id,
         shareId: isShare ? id : undefined,
         overlays: res.overlays, // whyItMatters, chili, sources, confidence
+        preview: false,
       };
       get().openTab(tab);
     } catch (e) {
@@ -175,10 +193,18 @@ export const useTabs = create<TabsState>((set, get) => ({
       // Use current visual order (s.tabs) to decide which are to the right
       const current = s.tabs; // already sorted for pinning
       const idx = current.findIndex((t) => t.id === id);
-      if (idx === -1 || current[idx]?.pinned) return {} as any; // no-op for pinned tabs
+      if (idx === -1 || current[idx]?.pinned) return {}; // no-op for pinned tabs
       // Keep everything up to idx, and always keep pinned tabs
       const kept = current.filter((t, i) => i <= idx || t.pinned);
       return { tabs: sortTabs(kept) };
     }),
   batch: (fn) => set((s) => ({ tabs: sortTabs(fn(s.tabs)) })),
+  resetPanelState: () =>
+    set((s) => {
+      try {
+        localStorage.removeItem(STORAGE_PANEL_MAP);
+        localStorage.removeItem(STORAGE_PANEL_GLOBAL);
+      } catch {}
+      return { ...s, panelOpenById: {}, sidePanelOpen: true };
+    }),
 }));
