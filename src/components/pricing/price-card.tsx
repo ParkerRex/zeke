@@ -93,11 +93,7 @@ export function PricingCard({
         </div>
 
         <div className="mx-auto w-full max-w-xs flex-1 space-y-3 py-2">
-          {metadata.researches === "unlimited" ? (
-            <CheckItem text={"Unlimited research"} />
-          ) : (
-            <CheckItem text={`Up to ${metadata.researches} researches`} />
-          )}
+          <CheckItem text={"Unlimited research"} />
           <CheckItem text={`${metadata.supportLevel} support`} />
         </div>
 

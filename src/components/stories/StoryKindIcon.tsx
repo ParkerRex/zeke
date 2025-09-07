@@ -1,27 +1,41 @@
-import { IoLogoYoutube, IoMic, IoDocumentText, IoLogoTwitter, IoLogoReddit, IoNewspaper, IoCodeSlash, IoBusiness } from 'react-icons/io5';
+import {
+  IoBusiness,
+  IoCodeSlash,
+  IoDocumentText,
+  IoLogoReddit,
+  IoLogoTwitter,
+  IoLogoYoutube,
+  IoMic,
+  IoNewspaper,
+} from "react-icons/io5";
 
-import type { EmbedKind } from '@/types/stories';
+import type { EmbedKind } from "@/types/stories";
 
-export function StoryKindIcon({ kind, className }: { kind: EmbedKind | string; className?: string }) {
-  const common = className ?? 'h-4 w-4';
+export function StoryKindIcon({
+  kind,
+  className,
+}: {
+  kind: EmbedKind | string;
+  className?: string;
+}) {
+  const common = className ?? "h-4 w-4";
   switch (kind) {
-    case 'youtube':
+    case "youtube":
       return <IoLogoYoutube className={common} />;
-    case 'podcast':
+    case "podcast":
       return <IoMic className={common} />;
-    case 'twitter':
+    case "twitter":
       return <IoLogoTwitter className={common} />;
-    case 'reddit':
+    case "reddit":
       return <IoLogoReddit className={common} />;
-    case 'arxiv':
+    case "arxiv":
       return <IoDocumentText className={common} />;
-    case 'hn':
+    case "hn":
       return <IoCodeSlash className={common} />;
-    case 'industry':
+    case "industry":
       return <IoBusiness className={common} />;
-    case 'company':
+    case "company":
       return <IoBusiness className={common} />;
-    case 'article':
     default:
       return <IoNewspaper className={common} />;
   }

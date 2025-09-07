@@ -7,7 +7,6 @@ import { AuthResearchAside } from '@/components/auth/AuthResearchAside';
 
 import { signInWithOAuth } from '@/actions/auth/sign-in-with-oauth';
 import { signInWithEmail } from '@/actions/auth/sign-in-with-email';
-import { signInWithPassword } from '@/actions/auth/sign-in-with-password';
 import { AuthUI } from '../auth-ui';
 
 export default async function LoginPage() {
@@ -36,7 +35,6 @@ export default async function LoginPage() {
             mode='login'
             signInWithOAuth={signInWithOAuth}
             signInWithEmail={signInWithEmail}
-            signInWithPassword={signInWithPassword}
             showBrand={false}
             align='left'
           />

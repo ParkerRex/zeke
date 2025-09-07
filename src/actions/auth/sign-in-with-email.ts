@@ -15,6 +15,7 @@ export async function signInWithEmail(email: string): Promise<ActionResponse> {
   });
 
   if (error) {
+    // Error is returned to the client for handling
     return { data: null, error };
   }
 

@@ -1,3 +1,6 @@
+-- Ensure we only touch the public schema during seeds
+set search_path = public;
+
 -- Example RSS sources (optional seed)
 insert into public.sources (kind, name, url, domain)
 values
@@ -5,17 +8,12 @@ values
   ('rss', 'Ars Technica', 'https://feeds.arstechnica.com/arstechnica/index', 'arstechnica.com')
 on conflict do nothing;
 
--- pg-boss schedules (optional seed; worker also schedules these on startup)
-insert into pgboss.schedule (name, cron, timezone, data, options)
-values
-  ('system:heartbeat', '*/5 * * * *', 'UTC', '{"ping": "ok"}', '{"tz": "UTC"}'),
-  ('ingest:pull', '*/15 * * * *', 'UTC', '{"source": "youtube"}', '{"tz": "UTC"}')
-on conflict do nothing;
+-- NOTE: Intentionally skipping direct inserts into pgboss.schedule here to avoid
+-- permission issues during `supabase db reset` when seeds run under roles that
+-- don’t have write access to the pgboss schema. The worker sets up recurring
+-- schedules on startup.
 
--- pg-boss schema version (idempotent)
-insert into pgboss.version (version)
-values (24)
-on conflict do nothing;
+-- pg-boss schema version is initialized in the baseline migration; no-op here
 
 -- YouTube AI-Focused Sources
 -- Insert AI research channels, tech/startup channels, and search queries

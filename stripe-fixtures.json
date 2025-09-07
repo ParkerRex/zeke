@@ -11,9 +11,8 @@
         "name": "Pro",
         "description": "Unlimited research for AI teams and pros.",
         "metadata": {
-          "price_card_variant": "pro",
-          "support_level": "live",
-          "research_limit": "unlimited"
+          "price_card_variant": "Pro",
+          "support_level": "founder chat"
         }
       }
     },
@@ -25,7 +24,7 @@
         "product": "${pro:id}",
         "currency": "usd",
         "billing_scheme": "per_unit",
-        "unit_amount": 9900,
+        "unit_amount": 10000,
         "recurring": {
           "interval": "month",
           "interval_count": 1

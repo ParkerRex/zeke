@@ -1,36 +1,32 @@
 import z from "zod";
 
+// Accept either 'pro' or 'Pro' in metadata; normalize to 'pro' for UI mapping.
+const rawPriceCardVariantSchema = z.enum(["pro", "Pro"]);
 export const priceCardVariantSchema = z.enum(["pro"]);
 
-// Pro product metadata: researches (number | 'unlimited') and support level.
+// Product metadata now focuses on: price (optional, if provided in metadata),
+// the card variant, and support level which we standardize to 'founder chat'.
 export const productMetadataSchema = z
   .object({
-    price_card_variant: priceCardVariantSchema,
-    researches: z.union([z.string(), z.number()]).optional(),
-    research_limit: z.union([z.string(), z.number()]).optional(),
-    support_level: z.enum(["email", "live"]),
+    price_card_variant: rawPriceCardVariantSchema,
+    // Optional price, if present in product metadata. Can be string or number.
+    price: z.union([z.string(), z.number()]).optional(),
+    // Incoming support_level is ignored; we standardize to 'founder chat'.
+    support_level: z.string().optional(),
   })
   .transform((data) => {
-    const raw = data.researches ?? data.research_limit;
+    const normalizedVariant = (typeof data.price_card_variant === "string"
+      ? data.price_card_variant.toLowerCase()
+      : data.price_card_variant) as z.infer<typeof priceCardVariantSchema>;
 
-    let researches: number | "unlimited" | undefined;
-    if (typeof raw === "string") {
-      if (raw.toLowerCase() === "unlimited") {
-        researches = "unlimited";
-      } else {
-        const n = Number.parseInt(raw, 10);
-        if (!Number.isNaN(n)) {
-          researches = n;
-        }
-      }
-    } else if (typeof raw === "number") {
-      researches = raw;
-    }
+    const price = typeof data.price === "string"
+      ? Number.parseFloat(data.price)
+      : data.price;
 
     return {
-      priceCardVariant: data.price_card_variant,
-      researches: researches ?? "unlimited",
-      supportLevel: data.support_level,
+      priceCardVariant: normalizedVariant,
+      price, // in whatever unit provided (recommend USD dollars)
+      supportLevel: "founder chat" as const,
     };
   });
 
