@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
-import type { Database } from "@/libs/supabase/types";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
+import type { Database } from "@/lib/supabase/types";
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
 

@@ -3,7 +3,7 @@ import { upsertPrice } from "@db/mutations/pricing/upsert-price";
 import { upsertProduct } from "@db/mutations/pricing/upsert-product";
 import type Stripe from "stripe";
 import { upsertUserSubscription } from "@/actions/account/upsert-user-subscription";
-import { stripeAdmin } from "@/libs/stripe/stripe-admin";
+import { stripeAdmin } from "@/lib/stripe/stripe-admin";
 import { getEnvVar } from "@/utils/get-env-var";
 
 export const runtime = "nodejs";

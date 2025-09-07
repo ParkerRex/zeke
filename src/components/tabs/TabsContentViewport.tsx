@@ -3,7 +3,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import StoriesGridClient from "@/components/stories/StoriesGridClient";
 import { STRINGS } from "@/constants/strings";
-import { useTabs } from "@/lib/tabsStore";
+import { useTabs } from "@/stores/tabsStore";
 import StoryTab from "./StoryTab";
 
 const STORIES_PATH_RE = /^\/stories\/(.+)$/;

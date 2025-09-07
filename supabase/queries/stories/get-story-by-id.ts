@@ -1,5 +1,5 @@
 import { sampleClusters } from "@/fixtures/stories/sample-clusters";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
 import type { Cluster } from "@/types/stories";
 import { mapKindToEmbedKind, parseCitations } from "@/utils/stories/transform";
 
@@ -9,28 +9,34 @@ type StoryWithRelations = {
   primary_url: string | null;
   canonical_url: string | null;
   kind: string | null;
-  story_overlays: {
-    why_it_matters: string | null;
-    chili: number | null;
-    confidence: number | null;
-    citations: unknown;
-  } | Array<{
-    why_it_matters: string | null;
-    chili: number | null;
-    confidence: number | null;
-    citations: unknown;
-  }> | null;
-  contents: {
-    transcript_url: string | null;
-    transcript_vtt: string | null;
-    duration_seconds: number | null;
-    view_count: number | null;
-  } | Array<{
-    transcript_url: string | null;
-    transcript_vtt: string | null;
-    duration_seconds: number | null;
-    view_count: number | null;
-  }> | null;
+  story_overlays:
+    | {
+        why_it_matters: string | null;
+        chili: number | null;
+        confidence: number | null;
+        citations: unknown;
+      }
+    | Array<{
+        why_it_matters: string | null;
+        chili: number | null;
+        confidence: number | null;
+        citations: unknown;
+      }>
+    | null;
+  contents:
+    | {
+        transcript_url: string | null;
+        transcript_vtt: string | null;
+        duration_seconds: number | null;
+        view_count: number | null;
+      }
+    | Array<{
+        transcript_url: string | null;
+        transcript_vtt: string | null;
+        duration_seconds: number | null;
+        view_count: number | null;
+      }>
+    | null;
 };
 
 function extractFirstItem<T>(data: T | T[] | null): T | null {
@@ -41,7 +47,11 @@ function extractFirstItem<T>(data: T | T[] | null): T | null {
 }
 
 function buildEmbedUrl(
-  story: { kind: string | null; primary_url: string | null; canonical_url: string | null },
+  story: {
+    kind: string | null;
+    primary_url: string | null;
+    canonical_url: string | null;
+  },
   content: { transcript_url?: string | null } | null
 ): string {
   if (story.kind === "youtube" && content?.transcript_url) {

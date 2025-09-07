@@ -66,9 +66,9 @@ echo -e "${BLUE}🧱 Applying migrations...${NC}"
 npx supabase migration up --local || { echo -e "${RED}❌ Migration up failed${NC}"; exit 1; }
 
 echo -e "${BLUE}🔧 Generating DB types...${NC}"
-npx supabase gen types typescript --local --schema public > src/libs/supabase/types.ts || true
-mkdir -p worker/src/libs/supabase
-cp -f src/libs/supabase/types.ts worker/src/libs/supabase/types.ts || true
+npx supabase gen types typescript --local --schema public > src/lib/supabase/types.ts || true
+mkdir -p worker/src/lib/supabase
+cp -f src/lib/supabase/types.ts worker/src/lib/supabase/types.ts || true
 
 # Ensure worker role password
 LOCAL_DB_URL=${LOCAL_DB_URL:-"postgresql://postgres:postgres@127.0.0.1:54322/postgres"}

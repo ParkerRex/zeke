@@ -3,7 +3,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { createSupabaseServerClient } from "@/libs/supabase/supabase-server-client";
+import { createSupabaseServerClient } from "@/lib/supabase/supabase-server-client";
 // Build redirects based on the incoming request origin to avoid localhost/127.0.0.1 cookie mismatches.
 
 export async function GET(request: NextRequest) {

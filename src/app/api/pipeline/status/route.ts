@@ -1,6 +1,6 @@
 import { getAdminFlag } from "@db/queries/account/get-admin-flag";
 import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
 
 type WorkerStatus = Record<string, unknown> & { port?: string };
 

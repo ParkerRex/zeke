@@ -106,7 +106,7 @@ For detailed heuristics, see `.github/copilot-instructions.md` and existing code
 
 Goal: Prefer URL as the source of truth for shareable UI state and use `nuqs` for reading/writing query params consistently.
 
-- Parsers live in `src/libs/nuqs.ts` (create if missing). Add and reuse:
+- Parsers live in `src/lib/nuqs.ts` (create if missing). Add and reuse:
   - `qParser = parseAsString.withDefault('')`
   - `kindParser = parseAsStringEnum(['all','youtube','arxiv','podcast','reddit','hn','article']).withDefault('all')`
   - `panelParser = parseAsBoolean.withDefault(true)`

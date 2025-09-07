@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import StoryRow from "@/components/feed/StoryRow";
-import type { Tab } from "@/lib/tabsStore";
+import type { Tab } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
 
 export default function IndustryTab({ tab }: { tab: Tab }) {

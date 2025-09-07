@@ -1,7 +1,7 @@
 import { getCustomerId } from "@db/queries/account/get-customer-id";
 import { getSession } from "@db/queries/account/get-session";
 import { redirect } from "next/navigation";
-import { stripeAdmin } from "@/libs/stripe/stripe-admin";
+import { stripeAdmin } from "@/lib/stripe/stripe-admin";
 import { getURL } from "@/utils/get-url";
 
 export const dynamic = "force-dynamic";

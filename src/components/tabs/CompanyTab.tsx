@@ -3,8 +3,8 @@ import Image from "next/image";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import StoryRow from "@/components/feed/StoryRow";
-import type { Tab } from "@/lib/tabsStore";
-import { companyViewParser } from "@/libs/nuqs";
+import { companyViewParser } from "@/lib/nuqs";
+import type { Tab } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
 
 const COMPANY_KEYWORDS: Record<string, { company: string[]; ceo: string[] }> = {

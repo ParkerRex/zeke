@@ -290,8 +290,8 @@ This checklist captures the complete implementation of YouTube video ingestion f
     duration_seconds: videoMetadata.duration,
     view_count: videoMetadata.viewCount,
     like_count: videoMetadata.likeCount,
-    transcript_format: 'vtt',
-    audio_format: 'm4a',
+    transcript_format: "vtt",
+    audio_format: "m4a",
     extraction_timestamp: new Date().toISOString(),
   };
   ```
@@ -307,7 +307,12 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
   ```typescript
   // Add YouTube scheduling (every 15 minutes, offset from RSS)
-  await boss.schedule('ingest:pull', '*/15 * * * *', { source: 'youtube' }, { tz: CRON_TZ });
+  await boss.schedule(
+    "ingest:pull",
+    "*/15 * * * *",
+    { source: "youtube" },
+    { tz: CRON_TZ }
+  );
   ```
 
 - [x] **Ingest Worker Updates**: Update `worker/src/worker.ts` ingest:pull handler
@@ -344,7 +349,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 - [x] **Fix Frontend Type Errors**: Resolve TypeScript compilation errors
 
   - [x] Fix FeedList.tsx async/await issue (missing await on Promise<Cluster[]>)
-  - [x] Generate missing Supabase types file (`src/libs/supabase/types.ts`)
+  - [x] Generate missing Supabase types file (`src/lib/supabase/types.ts`)
   - [x] Fix pricing component parameter types (implicit 'any' types)
   - [x] Fix @react-email/tailwind import error in welcome.tsx
 
@@ -445,7 +450,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 **Resolved Critical Errors**:
 
 - [x] `worker/src/clients/youtube-api.ts`: 4 errors (googleapis v159 compatibility) - FIXED
-- [x] `src/libs/supabase/types.ts`: Missing module (6 import errors) - GENERATED
+- [x] `src/lib/supabase/types.ts`: Missing module (6 import errors) - GENERATED
 - [x] `src/components/feed/FeedList.tsx`: Async/await issues (2 errors) - FIXED
 - [x] `src/components/pricing/price-card.tsx`: Implicit any types (3 errors) - RESOLVED
 - [x] `src/emails/welcome.tsx`: Missing @react-email/tailwind (1 error) - INSTALLED
@@ -551,12 +556,12 @@ This checklist captures the complete implementation of YouTube video ingestion f
 - [ ] **Embedding Metadata**: Enhance embedding records with YouTube context
   ```typescript
   const embeddingMetadata = {
-    content_type: 'youtube_transcript',
+    content_type: "youtube_transcript",
     channel_id: story.metadata.channel_id,
     duration_seconds: story.metadata.duration_seconds,
     view_count: story.metadata.view_count,
     transcript_language: content.lang,
-    embedding_model: 'text-embedding-3-small-v1',
+    embedding_model: "text-embedding-3-small-v1",
   };
   ```
 
@@ -571,11 +576,16 @@ This checklist captures the complete implementation of YouTube video ingestion f
     constructor(
       message: string,
       public readonly videoId: string,
-      public readonly errorType: 'quota' | 'extraction' | 'transcription' | 'upload' | 'analysis',
+      public readonly errorType:
+        | "quota"
+        | "extraction"
+        | "transcription"
+        | "upload"
+        | "analysis",
       public readonly retryable: boolean = false
     ) {
       super(message);
-      this.name = 'YouTubeProcessingError';
+      this.name = "YouTubeProcessingError";
     }
   }
   ```

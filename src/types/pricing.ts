@@ -1,4 +1,4 @@
-import type { Database } from "@/libs/supabase/types";
+import type { Database } from "@/lib/supabase/types";
 
 export type BillingInterval = "year" | "month";
 export type Subscription = Database["public"]["Tables"]["subscriptions"]["Row"];

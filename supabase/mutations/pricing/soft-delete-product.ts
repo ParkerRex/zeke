@@ -1,4 +1,4 @@
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
 
 export async function softDeleteProduct(productId: string) {
   const { error: pricesError } = await supabaseAdminClient

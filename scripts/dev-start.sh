@@ -71,7 +71,7 @@ fi
 
 # Generate types
 echo -e "${BLUE}🔧 Generating TypeScript types...${NC}"
-if npx supabase gen types typescript --local --schema public > src/libs/supabase/types.ts; then
+if npx supabase gen types typescript --local --schema public > src/lib/supabase/types.ts; then
     echo -e "${GREEN}✅ Types generated successfully${NC}"
 else
     echo -e "${YELLOW}⚠️  Failed to generate types (continuing anyway)${NC}"

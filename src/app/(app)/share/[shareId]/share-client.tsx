@@ -1,7 +1,7 @@
 "use client";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useTabs } from '@/lib/tabsStore';
+import { useTabs } from "@/stores/tabsStore";
 
 export default function ShareClient({ id }: { id: string }) {
   const { restoreFromUrl, setActive } = useTabs();
@@ -19,4 +19,3 @@ export default function ShareClient({ id }: { id: string }) {
 
   return null;
 }
-

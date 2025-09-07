@@ -1,6 +1,6 @@
 "use client";
 import { StoryKindIcon } from "@/components/stories/StoryKindIcon";
-import { type Tab, useTabs } from "@/lib/tabsStore";
+import { type Tab, useTabs } from "@/stores/tabsStore";
 import OverlayPanel from "../overlays/OverlayPanel";
 import CompanyTab from "./CompanyTab";
 import IndustryTab from "./IndustryTab";

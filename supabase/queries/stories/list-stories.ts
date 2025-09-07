@@ -1,6 +1,6 @@
 import { sampleClusters } from "@/fixtures/stories/sample-clusters";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
-import type { Database } from "@/libs/supabase/types";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
+import type { Database } from "@/lib/supabase/types";
 import type { Cluster } from "@/types/stories";
 import { mapKindToEmbedKind, parseCitations } from "@/utils/stories/transform";
 

@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
-import { stripeAdmin } from "@/libs/stripe/stripe-admin";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
-import type { Database } from "@/libs/supabase/types";
+import { stripeAdmin } from "@/lib/stripe/stripe-admin";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
+import type { Database } from "@/lib/supabase/types";
 import { toDateTime } from "@/utils/to-date-time";
 
 export async function upsertUserSubscription({

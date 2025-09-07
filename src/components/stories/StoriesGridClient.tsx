@@ -16,8 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { STRINGS } from "@/constants/strings";
 import { useStories } from "@/hooks/use-stories";
-import { useTabs } from "@/lib/tabsStore";
-import { kindParser, qParser } from "@/libs/nuqs";
+import { kindParser, qParser } from "@/lib/nuqs";
+import { useTabs } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
 import { domainFromUrl } from "@/utils/url";
 

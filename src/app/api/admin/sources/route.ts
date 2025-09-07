@@ -1,7 +1,7 @@
 import { getAdminFlag } from "@db/queries/account/get-admin-flag";
 import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
-import type { Json } from "@/libs/supabase/types";
+import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
+import type { Json } from "@/lib/supabase/types";
 
 type SourceUpsert = {
   id?: string | null;

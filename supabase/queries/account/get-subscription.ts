@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/libs/supabase/supabase-server-client";
+import { createSupabaseServerClient } from "@/lib/supabase/supabase-server-client";
 import type { SubscriptionWithProduct } from "@/types/pricing";
 
 export async function getSubscription(): Promise<SubscriptionWithProduct | null> {

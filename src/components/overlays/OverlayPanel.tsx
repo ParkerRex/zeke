@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import type { Tab } from "@/lib/tabsStore";
+import type { Tab } from "@/stores/tabsStore";
 
 const PERCENTAGE_MULTIPLIER = 100;
 
@@ -23,11 +23,10 @@ export default function OverlayPanel({ tab }: { tab: Tab }) {
 
       <div className="flex items-center gap-2">
         <span className="font-medium">Hype</span>
-        <span>
-          {Array.from({ length: tab.overlays.chili }).map(() => "🌶")}
-        </span>
+        <span>{Array.from({ length: tab.overlays.chili }).map(() => "🌶")}</span>
         <span className="text-muted-foreground text-xs">
-          confidence {(tab.overlays.confidence * PERCENTAGE_MULTIPLIER).toFixed(0)}%
+          confidence{" "}
+          {(tab.overlays.confidence * PERCENTAGE_MULTIPLIER).toFixed(0)}%
         </span>
       </div>
 

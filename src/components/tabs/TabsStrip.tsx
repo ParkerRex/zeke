@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import { EDGE_FADE_THRESHOLD_PX, MAX_CHILI_ICONS } from "@/constants/tabs";
-import { useTabs } from "@/lib/tabsStore";
+import { useTabs } from "@/stores/tabsStore";
 import { domainFromUrl } from "@/utils/url";
 
 const YT_EMBED_RE = /\/embed\/([a-zA-Z0-9_-]{6,})/;

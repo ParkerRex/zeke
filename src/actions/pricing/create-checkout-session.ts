@@ -2,7 +2,7 @@
 import { getSession } from "@db/queries/account/get-session";
 import { redirect } from "next/navigation";
 import { getOrCreateCustomer } from "@/actions/account/get-or-create-customer";
-import { stripeAdmin } from "@/libs/stripe/stripe-admin";
+import { stripeAdmin } from "@/lib/stripe/stripe-admin";
 import type { Price } from "@/types/pricing";
 import { getURL } from "@/utils/get-url";
 

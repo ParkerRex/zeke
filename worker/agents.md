@@ -140,7 +140,7 @@ Primitives used by these actions live under `extract/*`, `storage/*`, `transcrib
 
 Use this simple split to keep code easy to compose and test:
 
-- Actions (`src/actions/*`): business logic that composes helpers + libs and may write to DB or enqueue jobs.
+- Actions (`src/actions/*`): business logic that composes helpers + lib and may write to DB or enqueue jobs.
   - One function per file (verb-noun), typed inputs/outputs, explicit side effects.
   - Example: `analyze-story.ts`, `extract-article.ts`, `extract-youtube-content.ts`, `fetch-youtube-channel-videos.ts`.
 - Lib (`src/lib/*`): thin third‑party clients only (auth, transport, minimal request building).
@@ -151,6 +151,7 @@ Use this simple split to keep code easy to compose and test:
   - Examples: `extract-youtube-audio.ts`, `get-youtube-metadata.ts`, `generate-vtt-content.ts`, `prepare-youtube-transcript.ts`, `transcribe-audio.ts`.
 
 Heuristic
+
 - Calls external SDK? Put it in lib.
 - Spawns a local tool or formats/derives local data? Put it in primitives.
 - Combines multiple steps and performs side effects (DB/queues)? Put it in actions.

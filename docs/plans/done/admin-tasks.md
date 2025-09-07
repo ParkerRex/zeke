@@ -3,6 +3,7 @@
 Status: In progress • Owner: Web + Worker • Est: ~2–3 days
 
 Next Actions (high priority)
+
 - [ ] Add health badge/tooltip in Sources table using `source_health` (OK/Warn/Error + last message).
 - [ ] Add YouTube quota threshold coloring (warn when remaining < configurable %).
 - [ ] Remove Overview polling once job_metrics + platform_quota prove stable; optional Realtime for recent lists later.
@@ -11,6 +12,7 @@ Next Actions (high priority)
 This checklist implements the admin-only console per admin-spec.md. No code duplication; reuse existing components/APIs where possible.
 
 ## Phase 1 — DB Migrations (Supabase)
+
 - [ ] Users: add `is_admin boolean not null default false` to `public.users`.
 - [ ] Sources: add `active boolean not null default true`.
 - [ ] Sources: add `created_at timestamptz default now() not null`, `updated_at timestamptz default now() not null`.
@@ -19,27 +21,33 @@ This checklist implements the admin-only console per admin-spec.md. No code dupl
 - [ ] Seed local admin: `update public.users set is_admin = true where id = '<local-auth-user-id>';`
 
 Acceptance:
+
 - [ ] `select is_admin from public.users limit 1` returns a boolean column.
 - [ ] `select active, created_at, updated_at from public.sources limit 1` works.
 
 Progress:
+
 - [x] Baseline migration includes all of the above (plus admin-supporting indexes; optional audit table not included).
 
 ## Phase 2 — Server Guards
+
 - [ ] Query: `@db/queries/account/get-admin-flag.ts` returning `{ userId, isAdmin }` using `createSupabaseServerClient()`.
 - [ ] Guard helper (server-only): throws or returns redirect when not admin.
 - [ ] Apply guard to `/admin` page and all admin API routes.
 - [ ] Auth consistency: unauthenticated → `/login`; authed non-admin → `/home`.
 
 Acceptance:
+
 - [ ] Visiting `/admin` as non-auth → redirected to `/login`.
 - [ ] Visiting `/admin` as authed non-admin → `/home`.
 - [ ] Admin sees `/admin`.
 
 Progress:
+
 - [x] Implemented (`/admin` page guard; pipeline APIs gated; admin APIs gated).
 
 ## Phase 3 — Admin Page Shell (/admin)
+
 - [ ] Route: `src/app/(admin)/admin/page.tsx` with tabs: Overview • Sources • Forecast • Jobs.
 - [ ] Persist active tab with `nuqs`.
 - [ ] Reuse Overview + Jobs content from `src/app/testing/page.tsx` (extract into small components where needed).
@@ -48,17 +56,20 @@ Progress:
   - Import queries via `@db/*` alias.
 
 Acceptance:
+
 - [ ] Overview shows counts, worker status, triggers.
 - [ ] Jobs shows job summary and recent lists.
 - [ ] Forecast renders playground with editable inputs.
 
 Progress:
+
 - [x] Route created: `src/app/(admin)/admin/page.tsx`.
 - [x] Sources + Overview tabs implemented in `AdminConsole`.
 - [x] Forecast tab inline.
 - [x] Admin entry in nav (guarded) added.
 
 ## Phase 4 — Admin APIs
+
 - [ ] `GET /api/admin/sources`: list sources with minimal fields and health (last_checked, active).
 - [ ] `POST /api/admin/sources`: upsert (id optional). Validates kind + metadata.
 - [ ] `POST /api/admin/sources/:id/pause|resume|delete`.
@@ -69,10 +80,12 @@ Progress:
   - Use `@db` imports for queries inside route handlers.
 
 Acceptance:
+
 - [ ] All admin APIs return 403 for non-admin.
 - [ ] Preview returns within 3s and never writes DB.
 
 Progress:
+
 - [x] `GET /api/admin/sources`
 - [x] `POST /api/admin/sources`
 - [x] Pause/Resume/Delete/Backfill endpoints
@@ -80,6 +93,7 @@ Progress:
 - [x] `/api/pipeline/*` admin-gated
 
 ## Phase 5 — Sources UI
+
 - [ ] Add Source form: paste bar, provider select, backfill window (default 30), submit.
 - [ ] Auto-detect kind from pasted URL (YouTube video/channel/handle → channel; RSS/Podcast feed URLs; generic site attempts RSS discovery later).
 - [ ] Table: Name, Kind, Domain, Status, Last Sync, Actions (Edit, Pause/Resume, Backfill 7/30/90, Delete).
@@ -87,42 +101,50 @@ Progress:
 - [ ] Toasts and optimistic updates on actions.
 
 Acceptance:
+
 - [ ] Creating a source enqueues ingest and appears in table.
 - [ ] Paused sources do not ingest on next run.
 - [ ] Backfill requests adjust next run window.
 
 ## Phase 6 — Worker Hooks
+
 - [ ] Filter inactive: update `getRssSources` and `getYouTubeSources` to add `and coalesce(active, true)`.
 - [ ] Backfill window: respect `last_cursor` or `metadata.published_after` where applicable.
 - [ ] Dry-run helpers: functions to fetch next items with small limits and compute quota cost; no `upsertRawItem` and no enqueues.
 - [ ] HTTP debug endpoint (local only) to exercise preview if helpful (optional).
 
 Acceptance:
+
 - [ ] Inactive sources are skipped.
 - [ ] Preview returns items without creating raw_items or jobs.
 
 Progress:
+
 - [x] Filter inactive sources in worker ingest queries
 - [x] Backfill hint respected via `metadata.published_after` (admin writes it)
 - [ ] Dry-run preview helpers (no writes; small limits)
 
 ## Phase 7 — Deprecations & Polish
+
 - [ ] Gate or redirect `/testing` and `/temp` to `/admin` (admin only).
 - [ ] Ensure `/api/pipeline/*` routes aren’t publicly exposing pipeline data (guard or move to admin namespace).
 - [ ] Copy tweaks: buttons (“Follow channel”, “Subscribe to site”, etc.).
 - [ ] Empty states for Sources and Jobs tabs.
 
 Acceptance:
+
 - [ ] `/testing` and `/temp` no longer publicly accessible.
 - [ ] Admin page is the single entry for diagnostics and planning.
 
 ## Security
+
 - [ ] All admin endpoints check admin server-side (never trust client state).
 - [ ] `supabaseAdminClient` used only in server routes/actions.
 - [ ] No service keys in client bundles.
 - [ ] RLS enabled on `public.sources`; no anon policies.
 
 ## QA Plan
+
 - [ ] Unauth user → `/admin` redirects to `/login`.
 - [ ] Non-admin authed user → `/admin` redirects to `/home`.
 - [ ] Admin can: create/pause/resume/backfill/delete a source; see effects in worker logs and counts.
@@ -131,10 +153,12 @@ Acceptance:
 - [ ] Forecast tab editable inputs update totals.
 
 ## Dev Setup Dependencies
+
 - [ ] Baseline migrations applied locally (`pnpm run db:migrate`), worker role password set via psql, admin user flagged.
 - [ ] Stripe fixtures run to populate `products`/`prices` (webhook secret set; verify `/pricing`).
 
 ## Progress Summary (TL;DR)
+
 - [x] Baseline schema + indexes + RLS
 - [x] Admin gating for `/admin` + APIs
 - [x] Admin APIs for sources (preview pending)
@@ -148,6 +172,7 @@ Acceptance:
 Goal: Replace 2s polling with realtime updates and show per‑source counts (raw items, contents, stories, 24h deltas, last timestamps) in the Sources table.
 
 Plan
+
 - DB aggregation table (admin‑only): `public.source_metrics`
   - Columns: `source_id uuid pk`, `raw_total int`, `contents_total int`, `stories_total int`, `raw_24h int`, `contents_24h int`, `stories_24h int`, `last_raw_at timestamptz`, `last_content_at timestamptz`, `last_story_at timestamptz`, `updated_at timestamptz default now()`.
   - RLS: enable; policy allows only admins to select: `exists (select 1 from public.users u where u.id = auth.uid() and u.is_admin = true)`.
@@ -171,11 +196,13 @@ Plan
   - Remove 2s interval polling for Overview once Realtime is verified (keep as fallback when Realtime is offline).
 
 Acceptance
+
 - [ ] `source_metrics` exists and is updated in near‑real‑time when new raw_items/contents/stories appear.
 - [ ] Admin can see counts update live without refreshing or polling.
 - [ ] RLS prevents non‑admins from selecting `source_metrics` rows; Admin page subscriptions succeed for admin users.
 
 Notes
+
 - Backfill: call `refresh_source_metrics(_source_id)` at the end of each backfill run for accurate 24h/last timestamps when bulk inserts occur.
 - Performance: queries use existing indexes (`raw_items_source_discovered_idx`, `contents_extracted_idx`, `stories_created_idx`); aggregation slice per source keeps trigger work light.
 
@@ -184,12 +211,14 @@ Notes
 Goal: Show platform quota status (starting with YouTube) in Overview.
 
 Plan
+
 - Table: `public.platform_quota` (`provider text primary key`, `quota_limit int`, `used int`, `remaining int`, `reset_at timestamptz`, `updated_at timestamptz default now()`).
 - Worker: write snapshot every 5–10 minutes and after ingest bursts (use existing YouTubeFetcher quota tracker).
 - Realtime: add table to publication; Admin subscribes for live updates.
 - UI: “Quota” card in Overview: current used/remaining and reset time; warning color when remaining < threshold.
 
 Acceptance
+
 - [x] Quota card shows live values without reloads.
 - [x] Writes are throttled (no more than ~1/minute) to avoid noisy updates.
 
@@ -198,11 +227,13 @@ Acceptance
 Goal: Badge and details to highlight sources with recent errors.
 
 Plan
+
 - Table: `public.source_health` (`source_id pk`, `status enum('ok','warn','error')`, `last_success_at`, `last_error_at`, `error_24h int`, `message text`, `updated_at`).
 - Worker updates on ingest catch blocks and on success; keep payload small (last error string, timestamps). Consider rolling window counters.
 - Realtime: subscribe to table; Sources row shows status badge + hover tooltip with `message`.
 
 Acceptance
+
 - [ ] Sources with errors show “Error” or “Warn” badge quickly after a failed run.
 - [ ] Last success/error timestamps update appropriately.
 
@@ -211,11 +242,13 @@ Acceptance
 Goal: Replace job queue polling with realtime summaries.
 
 Plan
+
 - Table: `public.job_metrics` (`name text`, `state text`, `count int`, `updated_at timestamptz`, primary key (`name`,`state`)).
 - Worker: every 2–5 seconds (or after a work batch), aggregate from `pgboss.job` and upsert counts. Keep cadence light to reduce DB writes.
 - Realtime: add to publication; Admin subscribes and recomputes the map in the Overview “Job Queue” card.
 
 Acceptance
+
 - [x] Job counts update within a few seconds of queue changes without polling.
 - [x] Write cadence is low and does not regress performance.
 
@@ -224,13 +257,16 @@ Acceptance
 Goal: Ensure worker sees up-to-date DB types without manual steps.
 
 Plan
-- Script enhancement: after `supabase gen types ... > src/libs/supabase/types.ts`, copy/sync the file to `worker/src/libs/supabase/types.ts` (or establish a shared import path if desired).
+
+- Script enhancement: after `supabase gen types ... > src/lib/supabase/types.ts`, copy/sync the file to `worker/src/lib/supabase/types.ts` (or establish a shared import path if desired).
 - Optionally add a prebuild hook in worker to validate types are present.
 
 Acceptance
+
 - [x] `pnpm run bootstrap` regenerates types for app and worker so both compile against current schema.
 
 ## Post-Launch
+
 - [ ] Update README and docs to point to `/admin` console.
 - [ ] Remove or hide old testing/temp links.
 - [ ] Add Sentry breadcrumbs around admin actions if Sentry is enabled (optional).

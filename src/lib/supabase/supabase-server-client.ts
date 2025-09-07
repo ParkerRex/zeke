@@ -2,7 +2,7 @@
 
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "@/libs/supabase/types";
+import type { Database } from "@/lib/supabase/types";
 import { getEnvVar } from "@/utils/get-env-var";
 
 export async function createSupabaseServerClient() {
