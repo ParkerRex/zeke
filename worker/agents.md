@@ -13,7 +13,7 @@ This guide orients coding agents working inside `worker/` so changes stay reliab
   - `src/ingest/*`: Source ingestion (RSS, YouTube)
   - `src/extract/*`: Content extraction and normalization
   - `src/analyze/llm.ts`: LLM analysis and embeddings
-  - `src/fetch/*`, `src/utils/*`, `src/clients/*`: External API clients and helpers
+  - `src/fetch/*`, `src/utils/*`, `src/lib/*`: External API wrappers and helpers
 - **Queues (pg-boss):** `system:heartbeat`, `ingest:pull`, `ingest:fetch-content`, `ingest:fetch-youtube-content`, `analyze:llm`.
 - **HTTP Endpoints:** `/healthz`, `/debug/status`, `/debug/ingest-now`, `/debug/schedule-rss`, `/debug/ingest-youtube`, `/debug/schedule-youtube`.
 
@@ -90,3 +90,67 @@ This guide orients coding agents working inside `worker/` so changes stay reliab
 - **Errors:** `pool.on('error', ...)` prevents process crashes; log with `log('pg_pool_error', ...)`.
 
 By following these conventions—especially direct `pg` usage instead of the Supabase SDK—the worker remains efficient, portable, and production‑safe.
+
+## Third‑Party APIs Pattern
+
+Use a small, composable pattern for external services (e.g., YouTube) that matches our actions style and improves testability.
+
+- Client wrapper: put per‑service clients under `src/lib/<service>/<service>-client.ts`. The client:
+  - Handles auth/env once (e.g., API key), base URL, and shared config.
+  - Exposes a minimal object (transport + config). Do not bake business logic in the client.
+  - Example: `createYouTubeClient()` returns `{ youtube, quotaLimit, quotaBuffer, quotaResetHour }`.
+- Verb‑noun functions: one function per file in `src/lib/<service>/` (no barrels):
+  - Examples (YouTube): `search-videos.ts`, `search-channels.ts`, `get-video-details.ts`, `get-channel-uploads.ts`, `check-quota-status.ts`.
+  - Signature: `(client, input) => Promise<Output>`; never read env inside these methods.
+  - Keep side effects out; they should compose cleanly in higher‑level fetchers/ingesters.
+- Shared types: colocate `types.ts` with the client. Model only fields we use; expand as needed.
+- Retries: use `src/utils/retry.ts` (`withRetry`, `isRetryableDefault`).
+  - Treat `quotaExceeded` as non‑retryable; allow 429/5xx and transient network errors to retry with backoff.
+  - Customize `isRetryable` per method if a provider has special semantics.
+- Quota/rate limits:
+  - Keep provider quota awareness local (e.g., YouTube cost constants) and integrate with our `QuotaTracker` at the call site.
+  - Prefer explicit `part`/fields to reduce cost; avoid over‑fetching.
+- Logging: consistent structured logs via `log(evt, extra, lvl)`; include inputs (sanitized), counts, and quota usage.
+- Usage example (YouTube):
+  - Create client once: `const yt = createYouTubeClient()`.
+  - Call methods: `await searchVideos(yt, { query, maxResults })`, `await getVideoDetails(yt, ids)`.
+- Don’ts:
+  - Don’t add barrels (`index.ts`) — import concrete files.
+  - Don’t access env inside method files; only in the client factory.
+  - Don’t leak secrets or raw tokens to logs/errors.
+
+This structure keeps call sites explicit, isolates auth/transport, and makes unit tests trivial (inject a fake client and stub the transport).
+
+## Actions Catalog (worker/src/actions)
+
+- analyze-story.ts: Generate overlays + embedding for a story (OpenAI or stub), then persist.
+- extract-article.ts: Fetch + parse article content, create content/story, enqueue analysis.
+- extract-youtube-content.ts: Extract audio → transcribe → VTT → content/story → enqueue analysis.
+- fetch-youtube-channel-videos.ts: List channel uploads (via uploads playlist) + details with quota.
+- fetch-youtube-search-videos.ts: Search videos + map to domain with quota.
+- resolve-youtube-uploads-id.ts: Derive and persist channel uploads playlist ID.
+- ingest-rss-source.ts: Fetch → parse → normalize → upsert → enqueue (per RSS source).
+- preview-rss-source.ts: Fetch → parse → normalize → preview items (no writes).
+- ingest-youtube-source.ts: Orchestrate channel/search ingest, upsert raw items, enqueue extraction.
+- preview-youtube-source.ts: Preview channel/search items with current quota status.
+
+Primitives used by these actions live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access.
+
+## Actions vs Lib vs Primitives
+
+Use this simple split to keep code easy to compose and test:
+
+- Actions (`src/actions/*`): business logic that composes helpers + libs and may write to DB or enqueue jobs.
+  - One function per file (verb-noun), typed inputs/outputs, explicit side effects.
+  - Example: `analyze-story.ts`, `extract-article.ts`, `extract-youtube-content.ts`, `fetch-youtube-channel-videos.ts`.
+- Lib (`src/lib/*`): thin third‑party clients only (auth, transport, minimal request building).
+  - No domain logic, no DB, env only in client factory.
+  - Example: `lib/openai/*`, `lib/youtube/*`, `utils/retry.ts`.
+- Primitives (`src/extract/*`, `src/transcribe/*`, `src/storage/*`): single‑purpose local helpers.
+  - One function per file (verb-noun), no env, no DB, no queues. Small, typed, focus on doing one thing well.
+  - Examples: `extract-youtube-audio.ts`, `get-youtube-metadata.ts`, `generate-vtt-content.ts`, `prepare-youtube-transcript.ts`, `transcribe-audio.ts`.
+
+Heuristic
+- Calls external SDK? Put it in lib.
+- Spawns a local tool or formats/derives local data? Put it in primitives.
+- Combines multiple steps and performs side effects (DB/queues)? Put it in actions.

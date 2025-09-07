@@ -1,8 +1,8 @@
-import Stripe from 'stripe';
-import { supabaseAdminClient } from '@/libs/supabase/supabase-admin';
-import type { Database } from '@/libs/supabase/types';
+import type Stripe from "stripe";
+import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
+import type { Database } from "@/libs/supabase/types";
 
-type Product = Database['public']['Tables']['products']['Row'];
+type Product = Database["public"]["Tables"]["products"]["Row"];
 
 export async function upsertProduct(product: Stripe.Product) {
   const productData: Product = {
@@ -14,8 +14,10 @@ export async function upsertProduct(product: Stripe.Product) {
     metadata: product.metadata,
   };
 
-  const { error } = await supabaseAdminClient.from('products').upsert([productData]);
-  if (error) throw error;
-  console.info(`Product inserted/updated: ${product.id}`);
+  const { error } = await supabaseAdminClient
+    .from("products")
+    .upsert([productData]);
+  if (error) {
+    throw error;
+  }
 }
-

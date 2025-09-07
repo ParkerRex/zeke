@@ -223,13 +223,17 @@ export async function runYouTubeQueuedExtract(jobData, boss) {
                 throw new Error(`Audio extraction failed: ${audioResult.error}`);
             }
             // Step 2: Queue transcription job
-            const transcriptionJobId = transcriptionQueue.addJob(videoId, audioResult.audioPath, {
-                model: 'base',
-                language: undefined,
-                wordTimestamps: true,
-            }, sourceKind === 'youtube_channel' ? 'high' : 'medium', // Prioritize channel content
-            2 // max retries
-            );
+            const transcriptionJobId = transcriptionQueue.addJob({
+                videoId,
+                audioPath: audioResult.audioPath,
+                options: {
+                    model: 'base',
+                    language: undefined,
+                    wordTimestamps: true,
+                },
+                priority: sourceKind === 'youtube_channel' ? 'high' : 'medium', // Prioritize channel content
+                maxRetries: 2,
+            });
             // Step 3: Wait for transcription to complete
             const transcriptionJob = await transcriptionQueue.waitForJob(transcriptionJobId, 30 * 60 * 1000 // 30 minute timeout
             );

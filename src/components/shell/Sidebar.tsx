@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { IoCalendarClear, IoGrid, IoBusiness, IoBookmarks, IoHome, IoNewspaper, IoAlbums } from 'react-icons/io5';
+import { IoCalendarClear, IoGrid, IoBusiness, IoBookmarks, IoHome, IoNewspaper, IoAlbums, IoSettings } from 'react-icons/io5';
 
 const items = [
   { href: '/home', label: 'Home', Icon: IoHome },
@@ -15,6 +16,19 @@ const items = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/admin/ping', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((j) => {
+        if (mounted) setIsAdmin(!!j?.isAdmin);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
   return (
     <nav className='hidden h-full flex-col items-center gap-2 p-2 sm:flex'>
       {items.map(({ href, label, Icon }) => {
@@ -37,6 +51,19 @@ export default function Sidebar() {
           </Link>
         );
       })}
+      <div className='mt-auto' />
+      {isAdmin && (
+        <Link
+          href='/admin'
+          className={`mt-auto flex w-14 flex-col items-center gap-1 rounded-md px-1 py-2 text-center text-[10px] transition-colors hover:bg-gray-100 ${
+            pathname === '/admin' ? 'bg-gray-200 text-gray-900' : 'text-gray-700'
+          }`}
+          title='Admin'
+        >
+          <IoSettings className='h-5 w-5' />
+          <span className='truncate'>Admin</span>
+        </Link>
+      )}
     </nav>
   );
 }

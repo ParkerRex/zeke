@@ -171,6 +171,7 @@ export default function ArtifactsClient() {
                 return (
                   <li key={s.id} className='border rounded-md bg-white'>
                     <button
+                      type='button'
                       className='w-full text-left p-3 flex items-center justify-between gap-3 hover:bg-gray-50 rounded-t-md'
                       onClick={() =>
                         setExpanded((prev) =>

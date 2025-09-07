@@ -8,12 +8,21 @@ export const sampleClusters: Cluster[] = [
     embedKind: "article",
     embedUrl: "https://mistral.ai/news/",
     overlays: {
-      whyItMatters: "Open weights shift the competitive moat and speed up adoption.",
+      whyItMatters:
+        "Open weights shift the competitive moat and speed up adoption.",
       chili: 4,
       confidence: 0.72,
       sources: [
-        { title: "Reuters", url: "https://reuters.com/...", domain: "reuters.com" },
-        { title: "HN thread", url: "https://news.ycombinator.com/item?id=...", domain: "news.ycombinator.com" },
+        {
+          title: "Reuters",
+          url: "https://reuters.com/...",
+          domain: "reuters.com",
+        },
+        {
+          title: "HN thread",
+          url: "https://news.ycombinator.com/item?id=...",
+          domain: "news.ycombinator.com",
+        },
       ],
     },
   },
@@ -28,7 +37,11 @@ export const sampleClusters: Cluster[] = [
       chili: 2,
       confidence: 0.8,
       sources: [
-        { title: "arXiv", url: "https://arxiv.org/abs/2408.12345", domain: "arxiv.org" },
+        {
+          title: "arXiv",
+          url: "https://arxiv.org/abs/2408.12345",
+          domain: "arxiv.org",
+        },
       ],
     },
   },
@@ -42,7 +55,13 @@ export const sampleClusters: Cluster[] = [
       whyItMatters: "Leaders debate closed vs open; what wins in enterprise.",
       chili: 1,
       confidence: 0.55,
-      sources: [{ title: "Spotify", url: "https://open.spotify.com/episode/123", domain: "spotify.com" }],
+      sources: [
+        {
+          title: "Spotify",
+          url: "https://open.spotify.com/episode/123",
+          domain: "spotify.com",
+        },
+      ],
     },
   },
   {
@@ -52,10 +71,17 @@ export const sampleClusters: Cluster[] = [
     embedKind: "reddit",
     embedUrl: "https://www.redditmedia.com/r/Entrepreneur/comments/abc123/",
     overlays: {
-      whyItMatters: "Community data points on acquisition tactics for AI startups.",
+      whyItMatters:
+        "Community data points on acquisition tactics for AI startups.",
       chili: 3,
       confidence: 0.4,
-      sources: [{ title: "Reddit", url: "https://www.reddit.com/r/Entrepreneur/comments/abc123/", domain: "reddit.com" }],
+      sources: [
+        {
+          title: "Reddit",
+          url: "https://www.reddit.com/r/Entrepreneur/comments/abc123/",
+          domain: "reddit.com",
+        },
+      ],
     },
   },
   {
@@ -65,10 +91,17 @@ export const sampleClusters: Cluster[] = [
     embedKind: "hn",
     embedUrl: "https://news.ycombinator.com/item?id=12345678",
     overlays: {
-      whyItMatters: "Product teams gauge performance and costs before adopting.",
+      whyItMatters:
+        "Product teams gauge performance and costs before adopting.",
       chili: 2,
       confidence: 0.5,
-      sources: [{ title: "Hacker News", url: "https://news.ycombinator.com/item?id=12345678", domain: "news.ycombinator.com" }],
+      sources: [
+        {
+          title: "Hacker News",
+          url: "https://news.ycombinator.com/item?id=12345678",
+          domain: "news.ycombinator.com",
+        },
+      ],
     },
   },
   {
@@ -78,10 +111,17 @@ export const sampleClusters: Cluster[] = [
     embedKind: "article",
     embedUrl: "https://openai.com/news",
     overlays: {
-      whyItMatters: "Signals a push to standardize evals; impacts model comparisons.",
+      whyItMatters:
+        "Signals a push to standardize evals; impacts model comparisons.",
       chili: 3,
       confidence: 0.7,
-      sources: [{ title: "OpenAI", url: "https://openai.com/news", domain: "openai.com" }],
+      sources: [
+        {
+          title: "OpenAI",
+          url: "https://openai.com/news",
+          domain: "openai.com",
+        },
+      ],
     },
   },
   {
@@ -94,7 +134,13 @@ export const sampleClusters: Cluster[] = [
       whyItMatters: "CEO perspective on infra and roadmap.",
       chili: 2,
       confidence: 0.6,
-      sources: [{ title: "Podcast", url: "https://podcasts.example.com/sam-altman-chatgpt", domain: "example.com" }],
+      sources: [
+        {
+          title: "Podcast",
+          url: "https://podcasts.example.com/sam-altman-chatgpt",
+          domain: "example.com",
+        },
+      ],
     },
   },
   {
@@ -107,7 +153,13 @@ export const sampleClusters: Cluster[] = [
       whyItMatters: "Claude feature cadence indicates rapid progress.",
       chili: 3,
       confidence: 0.65,
-      sources: [{ title: "Anthropic", url: "https://www.anthropic.com/news", domain: "anthropic.com" }],
+      sources: [
+        {
+          title: "Anthropic",
+          url: "https://www.anthropic.com/news",
+          domain: "anthropic.com",
+        },
+      ],
     },
   },
   {
@@ -115,12 +167,19 @@ export const sampleClusters: Cluster[] = [
     title: "Demis Hassabis on AGI timelines — interview",
     primaryUrl: "https://youtube.com/watch?v=deepmind-agi",
     embedKind: "youtube",
-    embedUrl: "https://www.youtube.com/embed/deepmind-agi?modestbranding=1&rel=0",
+    embedUrl:
+      "https://www.youtube.com/embed/deepmind-agi?modestbranding=1&rel=0",
     overlays: {
       whyItMatters: "Signals DeepMind's view on near-term milestones.",
       chili: 2,
       confidence: 0.55,
-      sources: [{ title: "YouTube", url: "https://youtube.com/watch?v=deepmind-agi", domain: "youtube.com" }],
+      sources: [
+        {
+          title: "YouTube",
+          url: "https://youtube.com/watch?v=deepmind-agi",
+          domain: "youtube.com",
+        },
+      ],
     },
   },
   {
@@ -133,7 +192,9 @@ export const sampleClusters: Cluster[] = [
       whyItMatters: "Ecosystem momentum around Llama models.",
       chili: 3,
       confidence: 0.6,
-      sources: [{ title: "Meta", url: "https://ai.meta.com/blog/", domain: "meta.com" }],
+      sources: [
+        { title: "Meta", url: "https://ai.meta.com/blog/", domain: "meta.com" },
+      ],
     },
   },
   {
@@ -154,15 +215,20 @@ export const sampleClusters: Cluster[] = [
     title: "YouTube creators react to AI agents",
     primaryUrl: "https://youtube.com/watch?v=dQw4w9WgXcQ",
     embedKind: "youtube",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?modestbranding=1&rel=0",
+    embedUrl:
+      "https://www.youtube.com/embed/dQw4w9WgXcQ?modestbranding=1&rel=0",
     overlays: {
-      whyItMatters: "Early adopter sentiment shows strong interest and concerns.",
+      whyItMatters:
+        "Early adopter sentiment shows strong interest and concerns.",
       chili: 3,
       confidence: 0.6,
       sources: [
-        { title: "YT Video", url: "https://youtube.com/watch?v=dQw4w9WgXcQ", domain: "youtube.com" },
+        {
+          title: "YT Video",
+          url: "https://youtube.com/watch?v=dQw4w9WgXcQ",
+          domain: "youtube.com",
+        },
       ],
     },
   },
 ];
-

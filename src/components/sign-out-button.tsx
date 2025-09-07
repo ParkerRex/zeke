@@ -9,14 +9,14 @@ import type { ActionResponse } from "@/types/action-response";
 import { useToast } from "./ui/use-toast";
 
 type Props = {
-  signOut: () => Promise<ActionResponse>;
+  signOutAction: () => Promise<ActionResponse>;
   className?: string;
   variant?: ComponentProps<typeof Button>["variant"];
   size?: ComponentProps<typeof Button>["size"];
 };
 
 export function SignOutButton({
-  signOut,
+  signOutAction,
   className,
   variant = "destructive",
   size = "sm",
@@ -25,7 +25,7 @@ export function SignOutButton({
   const { toast } = useToast();
 
   async function handleClick() {
-    const response = await signOut();
+    const response = await signOutAction();
     if (response?.error) {
       toast({
         variant: "destructive",

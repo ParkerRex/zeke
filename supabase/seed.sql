@@ -5,6 +5,18 @@ values
   ('rss', 'Ars Technica', 'https://feeds.arstechnica.com/arstechnica/index', 'arstechnica.com')
 on conflict do nothing;
 
+-- pg-boss schedules (optional seed; worker also schedules these on startup)
+insert into pgboss.schedule (name, cron, timezone, data, options)
+values
+  ('system:heartbeat', '*/5 * * * *', 'UTC', '{"ping": "ok"}', '{"tz": "UTC"}'),
+  ('ingest:pull', '*/15 * * * *', 'UTC', '{"source": "youtube"}', '{"tz": "UTC"}')
+on conflict do nothing;
+
+-- pg-boss schema version (idempotent)
+insert into pgboss.version (version)
+values (24)
+on conflict do nothing;
+
 -- YouTube AI-Focused Sources
 -- Insert AI research channels, tech/startup channels, and search queries
 insert into public.sources (kind, name, url, domain, metadata)
@@ -52,4 +64,3 @@ values
   ('youtube_search', 'AI Breakthrough 2024', NULL, 'youtube.com',
    '{"query": "AI breakthrough announcement 2024", "order": "date", "max_results": 8, "published_after": "2024-01-01T00:00:00Z", "duration": "medium", "category": "ai_research"}')
 on conflict do nothing;
-

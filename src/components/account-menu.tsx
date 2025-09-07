@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IoPersonCircleOutline } from "react-icons/io5";
@@ -16,17 +17,17 @@ import type { ActionResponse } from "@/types/action-response";
 import { useToast } from "./ui/use-toast";
 
 type Props = {
-  signOut: () => Promise<ActionResponse>;
+  signOutAction: () => Promise<ActionResponse>;
   email?: string | null;
   avatarUrl?: string | null;
 };
 
-export function AccountMenu({ signOut, email, avatarUrl }: Props) {
+export function AccountMenu({ signOutAction, email, avatarUrl }: Props) {
   const router = useRouter();
   const { toast } = useToast();
 
   async function handleLogoutClick() {
-    const response = await signOut();
+    const response = await signOutAction();
 
     if (response?.error) {
       toast({
@@ -51,22 +52,31 @@ export function AccountMenu({ signOut, email, avatarUrl }: Props) {
         aria-label="Account menu"
         className="cursor-pointer rounded-full p-1 transition-all duration-150 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
       >
-        {avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt={email ?? "Account"}
-            className="h-8 w-8 rounded-full object-cover"
-            height={32}
-            src={avatarUrl}
-            width={32}
-          />
-        ) : initial ? (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700 text-sm">
-            {initial}
-          </div>
-        ) : (
-          <IoPersonCircleOutline className="text-gray-700" size={24} />
-        )}
+        {
+          // Render avatar image, initial badge, or fallback icon without nested ternaries
+        }
+        {(() => {
+          if (avatarUrl) {
+            return (
+              <Image
+                alt={email ?? "Account"}
+                className="h-8 w-8 rounded-full object-cover"
+                height={32}
+                src={avatarUrl}
+                unoptimized
+                width={32}
+              />
+            );
+          }
+          if (initial) {
+            return (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700 text-sm">
+                {initial}
+              </div>
+            );
+          }
+          return <IoPersonCircleOutline className="text-gray-700" size={24} />;
+        })()}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="me-4 min-w-40">
         <DropdownMenuItem asChild>

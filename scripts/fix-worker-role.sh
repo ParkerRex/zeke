@@ -12,16 +12,31 @@ WORKER_PASS=${WORKER_PASS:-"worker_password"}
 
 echo -e "${BLUE}🔧 Ensuring 'worker' role and grants in local Supabase...${NC}"
 
-psql "$DB_URL" <<SQL
-DO \
-\$\$\nBEGIN\n  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'worker') THEN\n    CREATE ROLE worker WITH LOGIN PASSWORD '$WORKER_PASS';\n  ELSE\n    ALTER ROLE worker WITH LOGIN PASSWORD '$WORKER_PASS';\n  END IF;\nEND\n\$\$;\n\n-- Basic grants for pg-boss schema
-GRANT USAGE, CREATE ON SCHEMA pgboss TO worker;\n
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA pgboss TO worker;\n
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pgboss TO worker;\n
-GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA pgboss TO worker;\n
-GRANT USAGE ON TYPE pgboss.job_state TO worker;\n\n-- Public schema access for local dev
-GRANT USAGE ON SCHEMA public TO worker;\n
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO worker;\n
+PW_SQL=$(printf "%s" "$WORKER_PASS" | sed "s/'/''/g")
+
+psql -v ON_ERROR_STOP=1 "$DB_URL" <<SQL
+DO \$do\$
+DECLARE pw text := '${PW_SQL}';
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'worker') THEN
+    EXECUTE format('CREATE ROLE worker WITH LOGIN PASSWORD %L', pw);
+  ELSE
+    EXECUTE format('ALTER ROLE worker WITH LOGIN PASSWORD %L', pw);
+  END IF;
+END
+\$do\$;
+
+-- Basic grants for pg-boss schema
+GRANT USAGE, CREATE ON SCHEMA pgboss TO worker;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA pgboss TO worker;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pgboss TO worker;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA pgboss TO worker;
+GRANT USAGE ON TYPE pgboss.job_state TO worker;
+
+-- Public schema access for local dev
+GRANT USAGE ON SCHEMA public TO worker;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO worker;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO worker;
 SQL
 
 echo -e "${GREEN}✅ Role and grants ensured${NC}"
@@ -33,4 +48,3 @@ PGPASSWORD="$WORKER_PASS" psql "postgresql://worker@127.0.0.1:54322/postgres" -c
 
 echo -e "${GREEN}✅ Worker login OK${NC}"
 echo -e "${YELLOW}Next:${NC} run: bash scripts/worker-rebuild-run-8082.sh, then open http://localhost:3000/testing"
-

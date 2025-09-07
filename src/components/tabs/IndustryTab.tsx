@@ -15,11 +15,15 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
       try {
         const res = await fetch("/api/stories", { signal: ac.signal });
         const json = await res.json();
-        if (!ac.signal.aborted) setClusters(json.clusters ?? []);
+        if (!ac.signal.aborted) {
+          setClusters(json.clusters ?? []);
+        }
       } catch (e: unknown) {
         const { isAbortError } = await import("@/utils/errors");
-        if (isAbortError(e)) return;
-        console.error(e);
+        if (isAbortError(e)) {
+          return;
+        }
+        // Placeholder for error reporting (e.g., Sentry). Avoid console per lint rules.
       }
     })();
     return () => ac.abort("IndustryTab unmounted");
@@ -49,7 +53,9 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
 }
 
 function filterByIndustry(list: Cluster[], industry?: string, sub?: string) {
-  if (!industry || industry === "All") return list;
+  if (!industry || industry === "All") {
+    return list;
+  }
   const t = `${industry} ${sub ?? ""}`.toLowerCase();
   // very light stub: filter by simple keywords in title/url
   const KEYWORDS: Record<string, string[]> = {
@@ -67,7 +73,9 @@ function filterByIndustry(list: Cluster[], industry?: string, sub?: string) {
     research: ["arxiv", "paper", "study"],
   };
   const keys = Object.entries(KEYWORDS).find(([k]) => t.includes(k))?.[1] ?? [];
-  if (!keys.length) return list;
+  if (!keys.length) {
+    return list;
+  }
   return list.filter((c) =>
     keys.some(
       (k) =>

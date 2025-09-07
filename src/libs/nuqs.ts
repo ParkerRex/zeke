@@ -1,7 +1,12 @@
 // Centralized nuqs parsers for URL state
 // See agents.md for usage patterns.
 "use client";
-import { parseAsArrayOf, parseAsBoolean, parseAsString, parseAsStringEnum } from "nuqs";
+import {
+  parseAsArrayOf,
+  parseAsBoolean,
+  parseAsString,
+  parseAsStringEnum,
+} from "nuqs";
 
 export const qParser = parseAsString.withDefault("");
 
@@ -22,4 +27,7 @@ export const tabsParser = parseAsArrayOf(parseAsString).withDefault([]);
 
 export const activeParser = parseAsString.withDefault("");
 
-export const companyViewParser = parseAsStringEnum(["news", "ceo"] as const).withDefault("news");
+export const companyViewParser = parseAsStringEnum([
+  "news",
+  "ceo",
+] as const).withDefault("news");

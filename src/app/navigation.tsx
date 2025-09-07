@@ -1,7 +1,8 @@
+import { getSession } from "@db/queries/account/get-session";
 import Link from "next/link";
 // import Image from 'next/image';
 import { IoMenu } from "react-icons/io5";
-
+import { signOut } from "@/actions/auth/sign-out";
 import { AccountMenu } from "@/components/account-menu";
 import { Logo } from "@/components/logo";
 import SignOutButton from "@/components/sign-out-button";
@@ -13,9 +14,6 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getSession } from "@db/queries/account/get-session";
-
-import { signOut } from "@/actions/auth/sign-out";
 
 export async function Navigation() {
   const session = await getSession();
@@ -24,7 +22,7 @@ export async function Navigation() {
     <div className="relative flex items-center gap-6">
       {session ? (
         <div className="flex items-center gap-3">
-          <AccountMenu email={session.user?.email} signOut={signOut} />
+          <AccountMenu email={session.user?.email} signOutAction={signOut} />
           {session.user?.email && (
             <Link
               className="hidden rounded-full border px-3 py-1 text-gray-700 text-sm transition-colors hover:bg-gray-50 lg:inline-block"
@@ -61,7 +59,7 @@ export async function Navigation() {
                       <Link href="/account">Account</Link>
                     </Button>
                     <SignOutButton
-                      signOut={signOut}
+                      signOutAction={signOut}
                       size="sm"
                       variant="ghost"
                     />
@@ -73,10 +71,18 @@ export async function Navigation() {
         </div>
       ) : (
         <>
-          <Button asChild className="hidden flex-shrink-0 lg:flex" variant="ghost">
+          <Button
+            asChild
+            className="hidden flex-shrink-0 lg:flex"
+            variant="ghost"
+          >
             <Link href="/login">Sign in</Link>
           </Button>
-          <Button asChild className="hidden flex-shrink-0 lg:flex" variant="default">
+          <Button
+            asChild
+            className="hidden flex-shrink-0 lg:flex"
+            variant="default"
+          >
             <Link href="/signup">Launch your workspace</Link>
           </Button>
           <Sheet>
@@ -89,7 +95,7 @@ export async function Navigation() {
             <SheetContent className="w-full bg-white">
               <SheetHeader>
                 <Logo />
-                <SheetDescription className="py-8 flex gap-3">
+                <SheetDescription className="flex gap-3 py-8">
                   <Button asChild className="flex-shrink-0" variant="secondary">
                     <Link href="/login">Sign in</Link>
                   </Button>

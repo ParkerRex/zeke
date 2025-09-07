@@ -1,42 +1,61 @@
-import type { Cluster } from '@/types/stories';
+import type { Cluster } from "@/types/stories";
 
-export function mapKindToEmbedKind(kind: string | null): Cluster['embedKind'] {
+export function mapKindToEmbedKind(kind: string | null): Cluster["embedKind"] {
   switch (kind) {
-    case 'article':
-      return 'article';
-    case 'youtube':
-      return 'youtube';
-    case 'reddit':
-      return 'reddit';
-    case 'hn':
-      return 'hn';
-    case 'podcast':
-      return 'podcast';
-    case 'arxiv':
-      return 'arxiv';
-    case 'twitter':
-      return 'twitter';
+    case "article":
+      return "article";
+    case "youtube":
+      return "youtube";
+    case "reddit":
+      return "reddit";
+    case "hn":
+      return "hn";
+    case "podcast":
+      return "podcast";
+    case "arxiv":
+      return "arxiv";
+    case "twitter":
+      return "twitter";
     default:
-      return 'article';
+      return "article";
   }
 }
 
-export function parseCitations(citations: unknown): Array<{ title: string; url: string; domain: string }> {
-  if (!citations || !Array.isArray(citations)) return [];
+function extractDomain(url: string): string {
   try {
-    return citations.map((c: any) => {
-      const title = typeof c?.title === 'string' ? c.title : 'Source';
-      const url = typeof c?.url === 'string' ? c.url : '';
-      let domain = 'unknown';
-      try {
-        domain = c?.domain || (url ? new URL(url).hostname : 'unknown');
-      } catch {}
+    return new URL(url).hostname;
+  } catch {
+    return "unknown";
+  }
+}
+
+export function parseCitations(
+  citations: unknown
+): Array<{ title: string; url: string; domain: string }> {
+  if (!(citations && Array.isArray(citations))) {
+    return [];
+  }
+  try {
+    return (citations as unknown[]).map((raw) => {
+      const obj: Record<string, unknown> =
+        raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+
+      const title =
+        typeof obj.title === "string" ? (obj.title as string) : "Source";
+      const url = typeof obj.url === "string" ? (obj.url as string) : "";
+
+      let domain =
+        typeof obj.domain === "string" && obj.domain
+          ? (obj.domain as string)
+          : "unknown";
+
+      if (domain === "unknown" && url) {
+        domain = extractDomain(url);
+      }
+
       return { title, url, domain };
     });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error parsing citations:', error);
+  } catch {
     return [];
   }
 }
-

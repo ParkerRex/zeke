@@ -1,13 +1,13 @@
-import Stripe from 'stripe';
-import { supabaseAdminClient } from '@/libs/supabase/supabase-admin';
-import type { Database } from '@/libs/supabase/types';
+import type Stripe from "stripe";
+import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
+import type { Database } from "@/libs/supabase/types";
 
-type Price = Database['public']['Tables']['prices']['Row'];
+type Price = Database["public"]["Tables"]["prices"]["Row"];
 
 export async function upsertPrice(price: Stripe.Price) {
   const priceData: Price = {
     id: price.id,
-    product_id: typeof price.product === 'string' ? price.product : null,
+    product_id: typeof price.product === "string" ? price.product : null,
     active: price.active,
     currency: price.currency,
     description: price.nickname ?? null,
@@ -19,8 +19,10 @@ export async function upsertPrice(price: Stripe.Price) {
     metadata: price.metadata,
   };
 
-  const { error } = await supabaseAdminClient.from('prices').upsert([priceData]);
-  if (error) throw error;
-  console.info(`Price inserted/updated: ${price.id}`);
+  const { error } = await supabaseAdminClient
+    .from("prices")
+    .upsert([priceData]);
+  if (error) {
+    throw error;
+  }
 }
-

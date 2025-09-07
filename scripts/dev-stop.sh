@@ -15,40 +15,69 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to kill processes on specific ports
-kill_port() {
-    local port=$1
-    local service=$2
+safe_kill_pid() {
+  local pid=$1
+  # Avoid killing docker/orbstack/containerd processes by PID
+  local cmd
+  cmd=$(ps -o command= -p "$pid" 2>/dev/null || true)
+  if echo "$cmd" | grep -Eiq '(docker|containerd|orbstack|orbctl|vpnkit|vmnetd)'; then
+    echo -e "${YELLOW}↪️  Skipping system/docker process (pid=$pid): $cmd${NC}"
+    return 0
+  fi
+  kill -TERM "$pid" 2>/dev/null || true
+  sleep 0.5
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -KILL "$pid" 2>/dev/null || true
+  fi
+}
 
-    if lsof -i :"$port" >/dev/null 2>&1; then
-        echo -e "${YELLOW}🔌 Stopping $service on port $port...${NC}"
-        lsof -ti :"$port" | xargs kill -9 2>/dev/null || true
-        echo -e "${GREEN}✅ $service stopped${NC}"
-    else
-        echo -e "${GREEN}✅ $service not running on port $port${NC}"
-    fi
+# Function to stop processes listening on a port (SIGTERM first). Skips Docker/OrbStack daemons.
+kill_port() {
+  local port=$1
+  local service=$2
+  if lsof -i :"$port" >/dev/null 2>&1; then
+    echo -e "${YELLOW}🔌 Stopping $service on port $port...${NC}"
+    for pid in $(lsof -ti :"$port" 2>/dev/null || true); do
+      safe_kill_pid "$pid"
+    done
+    echo -e "${GREEN}✅ $service stopped (or not listening)${NC}"
+  else
+    echo -e "${GREEN}✅ $service not running on port $port${NC}"
+  fi
+}
+
+# Gracefully stop worker Docker container(s) rather than killing host processes bound to 808x
+stop_worker_containers() {
+  if ! command -v docker >/dev/null 2>&1; then
+    echo -e "${YELLOW}⚠️  Docker not available; skipping container stop${NC}"
+    return 0
+  fi
+  # Stop known names
+  local candidates
+  candidates=$(docker ps --format '{{.ID}} {{.Names}} {{.Ports}}' | \
+    awk '/zeke-worker-local/ {print $1" "$2} /0\.0\.0\.0:8080|:8080->/ {print $1" "$2} /0\.0\.0\.0:8081|:8081->/ {print $1" "$2} /0\.0\.0\.0:8082|:8082->/ {print $1" "$2}' | sort -u)
+  if [ -n "$candidates" ]; then
+    echo -e "${YELLOW}🔌 Stopping worker containers...${NC}"
+    echo "$candidates" | awk '{print $1}' | xargs -r docker stop >/dev/null 2>&1 || true
+    echo -e "${GREEN}✅ Worker containers stopped${NC}"
+  else
+    echo -e "${GREEN}✅ No worker containers running${NC}"
+  fi
 }
 
 # Stop Next.js (port 3000)
 kill_port 3000 "Next.js"
 
-# Stop Worker (common ports)
-kill_port 8080 "Worker"
-kill_port 8081 "Worker"
-kill_port 8082 "Worker"
+# Stop Worker containers gracefully; avoid killing Docker/OrbStack daemons
+stop_worker_containers
 
-# Stop Docker worker container if present
+# Additional cleanup of legacy container names (if still present but not running)
 if command -v docker >/dev/null 2>&1; then
-  if docker ps --format '{{.Names}}' | grep -q '^zeke-worker-local$'; then
-    echo -e "${YELLOW}🔌 Stopping Docker worker container...${NC}"
-    docker stop zeke-worker-local >/dev/null || true
-    echo -e "${GREEN}✅ Docker worker container stopped${NC}"
-  fi
-  if docker ps --format '{{.Names}}' | grep -q '^zeke-worker-local-8082$'; then
-    echo -e "${YELLOW}🔌 Stopping Docker worker container (8082)...${NC}"
-    docker stop zeke-worker-local-8082 >/dev/null || true
-    echo -e "${GREEN}✅ Docker worker container (8082) stopped${NC}"
-  fi
+  for name in zeke-worker-local zeke-worker-local-8080 zeke-worker-local-8081 zeke-worker-local-8082; do
+    if docker ps -a --format '{{.Names}}' | grep -qx "$name"; then
+      docker rm -f "$name" >/dev/null 2>&1 || true
+    fi
+  done
 fi
 
 # Stop Supabase

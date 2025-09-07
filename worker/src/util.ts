@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 
 export function canonicalizeUrl(input: string): string {
   try {
@@ -16,7 +16,9 @@ export function canonicalizeUrl(input: string): string {
     ]);
     const kept = new URLSearchParams();
     for (const [k, v] of u.searchParams.entries()) {
-      if (!drop.has(k.toLowerCase())) kept.append(k, v);
+      if (!drop.has(k.toLowerCase())) {
+        kept.append(k, v);
+      }
     }
     // sort params for stability
     const sorted = new URLSearchParams(

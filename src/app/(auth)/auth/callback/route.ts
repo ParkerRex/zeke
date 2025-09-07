@@ -4,12 +4,11 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { createSupabaseServerClient } from '@/libs/supabase/supabase-server-client';
-import { getURL } from '@/utils/get-url';
-
-const siteUrl = getURL();
+// Build redirects based on the incoming request origin to avoid localhost/127.0.0.1 cookie mismatches.
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
+  const siteUrl = requestUrl.origin;
   const code = requestUrl.searchParams.get('code');
 
   if (code) {

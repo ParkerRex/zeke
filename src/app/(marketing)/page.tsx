@@ -10,7 +10,17 @@ import { Button } from '@/components/ui/button';
 import { WorkspacePreview } from '@/components/workspace-preview';
 import { PricingSection } from '@/components/pricing/pricing-section';
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: { code?: string };
+}) {
+  // If Supabase sent us a code to the root URL, forward to the auth callback.
+  const code = searchParams?.code;
+  if (typeof code === 'string' && code.length > 0) {
+    redirect(`/auth/callback?code=${encodeURIComponent(code)}`);
+  }
+
   const session = await getSession();
   if (session) redirect('/home');
   return (

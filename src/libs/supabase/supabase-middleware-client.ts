@@ -1,9 +1,8 @@
 // Ref: https://supabase.com/docs/guides/auth/server-side/nextjs
 
-import { type NextRequest,NextResponse } from 'next/server';
-
-import { getEnvVar } from '@/utils/get-env-var';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
+import { getEnvVar } from "@/utils/get-env-var";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -11,15 +10,18 @@ export async function updateSession(request: NextRequest) {
   });
 
   const supabase = createServerClient(
-    getEnvVar(process.env.NEXT_PUBLIC_SUPABASE_URL, 'NEXT_PUBLIC_SUPABASE_URL'),
-    getEnvVar(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    getEnvVar(process.env.NEXT_PUBLIC_SUPABASE_URL, "NEXT_PUBLIC_SUPABASE_URL"),
+    getEnvVar(
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    ),
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          for (const { name, value, options } of cookiesToSet) {
+          for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value);
           }
 
@@ -41,9 +43,8 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // This call is critical for session management - do not remove
+  await supabase.auth.getUser();
 
   // Add route guards here
   // const guardedRoutes = ['/dashboard'];

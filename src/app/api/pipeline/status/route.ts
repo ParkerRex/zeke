@@ -1,31 +1,42 @@
-import { NextResponse } from 'next/server';
-import { supabaseAdminClient } from '@/libs/supabase/supabase-admin';
+import { getAdminFlag } from "@db/queries/account/get-admin-flag";
+import { NextResponse } from "next/server";
+import { supabaseAdminClient } from "@/libs/supabase/supabase-admin";
 
-async function fetchWorkerStatus(): Promise<any | null> {
+type WorkerStatus = Record<string, unknown> & { port?: string };
+
+async function fetchWorkerStatus(): Promise<WorkerStatus | null> {
+  const DEFAULT_LOCAL_PORTS = ["8082", "8081", "8080"] as const;
   const ports = [
     process.env.WORKER_PORT,
     process.env.WORKER_HTTP_PORT,
-    '8082',
-    '8081',
-    '8080',
+    ...DEFAULT_LOCAL_PORTS,
   ].filter(Boolean) as string[];
 
   // De-duplicate ports
   const seen = new Set<string>();
-  const tryPorts = ports.filter((p) => (seen.has(p) ? false : (seen.add(p), true)));
+  const tryPorts = ports.filter((p) => {
+    if (seen.has(p)) {
+      return false;
+    }
+    seen.add(p);
+    return true;
+  });
 
   for (const port of tryPorts) {
     try {
       const ac = new AbortController();
-      const t = setTimeout(() => ac.abort(), 1500);
+      const TIMEOUT_MS = 1500;
+      const t = setTimeout(() => ac.abort(), TIMEOUT_MS);
       const res = await fetch(`http://127.0.0.1:${port}/debug/status`, {
         signal: ac.signal,
-        cache: 'no-store',
+        cache: "no-store",
       });
       clearTimeout(t);
-      if (!res.ok) continue;
-      const json = await res.json();
-      return { port, ...json };
+      if (!res.ok) {
+        continue;
+      }
+      const json = (await res.json()) as Record<string, unknown>;
+      return { port, ...json } satisfies WorkerStatus;
     } catch {
       // try next port
     }
@@ -33,13 +44,27 @@ async function fetchWorkerStatus(): Promise<any | null> {
   return null;
 }
 
-export async function GET() {
+export async function GET(): Promise<Response> {
+  const { isAdmin } = await getAdminFlag();
+  if (!isAdmin) {
+    const HTTP_FORBIDDEN = 403;
+    return NextResponse.json(
+      { ok: false, error: "forbidden" },
+      { status: HTTP_FORBIDDEN }
+    );
+  }
   try {
     const [worker, rawItems, contents, stories] = await Promise.all([
       fetchWorkerStatus(),
-      supabaseAdminClient.from('raw_items').select('id', { count: 'exact', head: true }),
-      supabaseAdminClient.from('contents').select('id', { count: 'exact', head: true }),
-      supabaseAdminClient.from('stories').select('id', { count: 'exact', head: true }),
+      supabaseAdminClient
+        .from("raw_items")
+        .select("id", { count: "exact", head: true }),
+      supabaseAdminClient
+        .from("contents")
+        .select("id", { count: "exact", head: true }),
+      supabaseAdminClient
+        .from("stories")
+        .select("id", { count: "exact", head: true }),
     ]);
 
     return NextResponse.json({
@@ -52,8 +77,11 @@ export async function GET() {
       },
       ts: new Date().toISOString(),
     });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: String(e) }, { status: 500 });
+  } catch (e: unknown) {
+    const HTTP_INTERNAL_SERVER_ERROR = 500;
+    return NextResponse.json(
+      { ok: false, error: String(e) },
+      { status: HTTP_INTERNAL_SERVER_ERROR }
+    );
   }
 }
-

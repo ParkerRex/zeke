@@ -1,4 +1,4 @@
-export function log(evt, extra, lvl = 'info') {
+export function log(evt, extra, lvl = "info") {
     const entry = {
         ts: new Date().toISOString(),
         lvl,

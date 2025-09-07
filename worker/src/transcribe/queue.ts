@@ -1,13 +1,43 @@
-import { log } from '../log.js';
-import { transcribeAudio, WhisperOptions, TranscriptionResult } from './whisper.js';
-import { cleanupVideoTempFiles } from '../utils/temp-files.js';
+import { log } from "../log.js";
+import { cleanupVideoTempFiles } from "../utils/temp-files.js";
+import {
+  type TranscriptionResult,
+  transcribeAudio,
+  type WhisperOptions,
+} from "./whisper.js";
 
-export interface TranscriptionJob {
+// Constants
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const MILLISECONDS_PER_SECOND = 1000;
+const MILLISECONDS_PER_HOUR =
+  MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+const DEFAULT_CLEANUP_AGE_HOURS = 24;
+const PROCESS_QUEUE_DELAY_MS = 100;
+const CHECK_JOB_INTERVAL_MS = 1000;
+const DEFAULT_WAIT_TIMEOUT_MINUTES = 30;
+const DEFAULT_WAIT_TIMEOUT_MS =
+  DEFAULT_WAIT_TIMEOUT_MINUTES * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+const MIN_RETRY_DELAY_MS = 1000;
+const MAX_RETRY_DELAY_MS = 30_000;
+const RETRY_DELAY_BASE = 2;
+const RECENT_JOBS_LIMIT = 10;
+const CLEANUP_INTERVAL_MS =
+  MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+const DEFAULT_MAX_RETRIES = 2;
+const DEFAULT_MAX_CONCURRENT_JOBS = 1; // Whisper is CPU intensive
+
+// Priority order values (lower value = higher priority)
+const PRIORITY_HIGH = 0;
+const PRIORITY_MEDIUM = 1;
+const PRIORITY_LOW = 2;
+
+export type TranscriptionJob = {
   id: string;
   videoId: string;
   audioPath: string;
   options: Partial<WhisperOptions>;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   createdAt: Date;
   startedAt?: Date;
   completedAt?: Date;
@@ -15,37 +45,46 @@ export interface TranscriptionJob {
   error?: string;
   retryCount: number;
   maxRetries: number;
-}
+};
 
-export interface QueueStats {
+export type AddJobParams = {
+  videoId: string;
+  audioPath: string;
+  options?: Partial<WhisperOptions>;
+  priority?: "high" | "medium" | "low";
+  maxRetries?: number;
+};
+
+export type QueueStats = {
   pending: number;
   processing: number;
   completed: number;
   failed: number;
   totalProcessingTimeMs: number;
   averageProcessingTimeMs: number;
-}
+};
 
 class TranscriptionQueue {
-  private jobs: Map<string, TranscriptionJob> = new Map();
-  private processingJobs: Set<string> = new Set();
-  private maxConcurrentJobs: number = 1; // Whisper is CPU intensive
-  private isProcessing: boolean = false;
+  private readonly jobs: Map<string, TranscriptionJob> = new Map();
+  private readonly processingJobs: Set<string> = new Set();
+  private readonly maxConcurrentJobs: number; // Whisper is CPU intensive
+  private isProcessing = false;
 
-  constructor(maxConcurrentJobs: number = 1) {
+  constructor(maxConcurrentJobs = DEFAULT_MAX_CONCURRENT_JOBS) {
     this.maxConcurrentJobs = maxConcurrentJobs;
   }
 
   /**
    * Add a transcription job to the queue
    */
-  addJob(
-    videoId: string,
-    audioPath: string,
-    options: Partial<WhisperOptions> = {},
-    priority: 'high' | 'medium' | 'low' = 'medium',
-    maxRetries: number = 2
-  ): string {
+  addJob(params: AddJobParams): string {
+    const {
+      videoId,
+      audioPath,
+      options = {},
+      priority = "medium",
+      maxRetries = DEFAULT_MAX_RETRIES,
+    } = params;
     const jobId = `${videoId}_${Date.now()}`;
 
     const job: TranscriptionJob = {
@@ -61,7 +100,7 @@ class TranscriptionQueue {
 
     this.jobs.set(jobId, job);
 
-    log('transcription_job_added', {
+    log("transcription_job_added", {
       jobId,
       videoId,
       priority,
@@ -86,7 +125,9 @@ class TranscriptionQueue {
    * Get all jobs for a video
    */
   getJobsForVideo(videoId: string): TranscriptionJob[] {
-    return Array.from(this.jobs.values()).filter((job) => job.videoId === videoId);
+    return Array.from(this.jobs.values()).filter(
+      (job) => job.videoId === videoId
+    );
   }
 
   /**
@@ -100,19 +141,19 @@ class TranscriptionQueue {
 
     if (this.processingJobs.has(jobId)) {
       log(
-        'transcription_job_cancel_processing',
+        "transcription_job_cancel_processing",
         {
           jobId,
           videoId: job.videoId,
         },
-        'warn'
+        "warn"
       );
       return false; // Cannot cancel processing jobs
     }
 
     this.jobs.delete(jobId);
 
-    log('transcription_job_cancelled', {
+    log("transcription_job_cancelled", {
       jobId,
       videoId: job.videoId,
     });
@@ -128,12 +169,22 @@ class TranscriptionQueue {
 
     const pending = jobs.filter((job) => !job.startedAt).length;
     const processing = this.processingJobs.size;
-    const completed = jobs.filter((job) => job.completedAt && job.result?.success).length;
-    const failed = jobs.filter((job) => job.completedAt && !job.result?.success).length;
+    const completed = jobs.filter(
+      (job) => job.completedAt && job.result?.success
+    ).length;
+    const failed = jobs.filter(
+      (job) => job.completedAt && !job.result?.success
+    ).length;
 
     const completedJobs = jobs.filter((job) => job.result?.processingTimeMs);
-    const totalProcessingTimeMs = completedJobs.reduce((sum, job) => sum + (job.result?.processingTimeMs || 0), 0);
-    const averageProcessingTimeMs = completedJobs.length > 0 ? totalProcessingTimeMs / completedJobs.length : 0;
+    const totalProcessingTimeMs = completedJobs.reduce(
+      (sum, job) => sum + (job.result?.processingTimeMs || 0),
+      0
+    );
+    const averageProcessingTimeMs =
+      completedJobs.length > 0
+        ? totalProcessingTimeMs / completedJobs.length
+        : 0;
 
     return {
       pending,
@@ -148,8 +199,8 @@ class TranscriptionQueue {
   /**
    * Clean up old completed jobs
    */
-  cleanupOldJobs(maxAgeHours: number = 24): void {
-    const cutoffTime = Date.now() - maxAgeHours * 60 * 60 * 1000;
+  cleanupOldJobs(maxAgeHours = DEFAULT_CLEANUP_AGE_HOURS): void {
+    const cutoffTime = Date.now() - maxAgeHours * MILLISECONDS_PER_HOUR;
     let cleanedCount = 0;
 
     for (const [jobId, job] of this.jobs.entries()) {
@@ -160,7 +211,7 @@ class TranscriptionQueue {
     }
 
     if (cleanedCount > 0) {
-      log('transcription_jobs_cleaned', {
+      log("transcription_jobs_cleaned", {
         cleanedCount,
         maxAgeHours,
         remainingJobs: this.jobs.size,
@@ -171,7 +222,7 @@ class TranscriptionQueue {
   /**
    * Process the queue
    */
-  private async processQueue(): Promise<void> {
+  private processQueue(): void {
     if (this.isProcessing) {
       return;
     }
@@ -198,11 +249,16 @@ class TranscriptionQueue {
    */
   private getNextJob(): TranscriptionJob | null {
     const pendingJobs = Array.from(this.jobs.values())
-      .filter((job) => !job.startedAt && !this.processingJobs.has(job.id))
+      .filter((job) => !(job.startedAt || this.processingJobs.has(job.id)))
       .sort((a, b) => {
         // Sort by priority first, then by creation time
-        const priorityOrder = { high: 0, medium: 1, low: 2 };
-        const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+        const priorityOrder = {
+          high: PRIORITY_HIGH,
+          medium: PRIORITY_MEDIUM,
+          low: PRIORITY_LOW,
+        };
+        const priorityDiff =
+          priorityOrder[a.priority] - priorityOrder[b.priority];
         if (priorityDiff !== 0) {
           return priorityDiff;
         }
@@ -219,7 +275,7 @@ class TranscriptionQueue {
     this.processingJobs.add(job.id);
     job.startedAt = new Date();
 
-    log('transcription_job_started', {
+    log("transcription_job_started", {
       jobId: job.id,
       videoId: job.videoId,
       priority: job.priority,
@@ -229,13 +285,17 @@ class TranscriptionQueue {
 
     try {
       // Perform transcription
-      const result = await transcribeAudio(job.audioPath, job.videoId, job.options);
+      const result = await transcribeAudio(
+        job.audioPath,
+        job.videoId,
+        job.options
+      );
 
       job.result = result;
       job.completedAt = new Date();
 
       if (result.success) {
-        log('transcription_job_completed', {
+        log("transcription_job_completed", {
           jobId: job.id,
           videoId: job.videoId,
           language: result.language,
@@ -245,19 +305,19 @@ class TranscriptionQueue {
         });
       } else {
         log(
-          'transcription_job_failed',
+          "transcription_job_failed",
           {
             jobId: job.id,
             videoId: job.videoId,
             error: result.error,
             retryCount: job.retryCount,
           },
-          'error'
+          "error"
         );
 
         // Retry if possible
         if (job.retryCount < job.maxRetries) {
-          await this.retryJob(job);
+          this.retryJob(job);
           return;
         }
       }
@@ -269,19 +329,19 @@ class TranscriptionQueue {
       job.completedAt = new Date();
 
       log(
-        'transcription_job_error',
+        "transcription_job_error",
         {
           jobId: job.id,
           videoId: job.videoId,
           error: String(error),
           retryCount: job.retryCount,
         },
-        'error'
+        "error"
       );
 
       // Retry if possible
       if (job.retryCount < job.maxRetries) {
-        await this.retryJob(job);
+        this.retryJob(job);
         return;
       }
 
@@ -291,21 +351,21 @@ class TranscriptionQueue {
       this.processingJobs.delete(job.id);
 
       // Continue processing queue
-      setTimeout(() => this.processQueue(), 100);
+      setTimeout(() => this.processQueue(), PROCESS_QUEUE_DELAY_MS);
     }
   }
 
   /**
    * Retry a failed job
    */
-  private async retryJob(job: TranscriptionJob): Promise<void> {
+  private retryJob(job: TranscriptionJob): void {
     job.retryCount++;
     job.startedAt = undefined;
     job.completedAt = undefined;
     job.result = undefined;
     job.error = undefined;
 
-    log('transcription_job_retry', {
+    log("transcription_job_retry", {
       jobId: job.id,
       videoId: job.videoId,
       retryCount: job.retryCount,
@@ -313,14 +373,20 @@ class TranscriptionQueue {
     });
 
     // Add delay before retry (exponential backoff)
-    const delayMs = Math.min(1000 * Math.pow(2, job.retryCount - 1), 30000);
+    const delayMs = Math.min(
+      MIN_RETRY_DELAY_MS * RETRY_DELAY_BASE ** (job.retryCount - 1),
+      MAX_RETRY_DELAY_MS
+    );
     setTimeout(() => this.processQueue(), delayMs);
   }
 
   /**
    * Wait for a job to complete
    */
-  async waitForJob(jobId: string, timeoutMs: number = 30 * 60 * 1000): Promise<TranscriptionJob | null> {
+  async waitForJob(
+    jobId: string,
+    timeoutMs: number = DEFAULT_WAIT_TIMEOUT_MS
+  ): Promise<TranscriptionJob | null> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeoutMs) {
@@ -334,16 +400,18 @@ class TranscriptionQueue {
       }
 
       // Wait a bit before checking again
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) =>
+        setTimeout(resolve, CHECK_JOB_INTERVAL_MS)
+      );
     }
 
     log(
-      'transcription_job_wait_timeout',
+      "transcription_job_wait_timeout",
       {
         jobId,
         timeoutMs,
       },
-      'warn'
+      "warn"
     );
 
     return null; // Timeout
@@ -357,7 +425,7 @@ class TranscriptionQueue {
     recentJobs: Array<{
       id: string;
       videoId: string;
-      status: 'pending' | 'processing' | 'completed' | 'failed';
+      status: "pending" | "processing" | "completed" | "failed";
       createdAt: Date;
       processingTimeMs?: number;
     }>;
@@ -365,30 +433,38 @@ class TranscriptionQueue {
     const stats = this.getStats();
     const jobs = Array.from(this.jobs.values())
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, 10); // Last 10 jobs
+      .slice(0, RECENT_JOBS_LIMIT); // Last 10 jobs
 
-    const recentJobs = jobs.map((job) => ({
-      id: job.id,
-      videoId: job.videoId,
-      status: this.processingJobs.has(job.id)
-        ? ('processing' as const)
-        : job.completedAt
-        ? job.result?.success
-          ? ('completed' as const)
-          : ('failed' as const)
-        : ('pending' as const),
-      createdAt: job.createdAt,
-      processingTimeMs: job.result?.processingTimeMs,
-    }));
+    const recentJobs = jobs.map((job) => {
+      let status: "pending" | "processing" | "completed" | "failed";
+
+      if (this.processingJobs.has(job.id)) {
+        status = "processing";
+      } else if (job.completedAt) {
+        status = job.result?.success ? "completed" : "failed";
+      } else {
+        status = "pending";
+      }
+
+      return {
+        id: job.id,
+        videoId: job.videoId,
+        status,
+        createdAt: job.createdAt,
+        processingTimeMs: job.result?.processingTimeMs,
+      };
+    });
 
     return { stats, recentJobs };
   }
 }
 
 // Global queue instance
-export const transcriptionQueue = new TranscriptionQueue(1);
+export const transcriptionQueue = new TranscriptionQueue(
+  DEFAULT_MAX_CONCURRENT_JOBS
+);
 
 // Cleanup old jobs every hour
 setInterval(() => {
-  transcriptionQueue.cleanupOldJobs(24);
-}, 60 * 60 * 1000);
+  transcriptionQueue.cleanupOldJobs(DEFAULT_CLEANUP_AGE_HOURS);
+}, CLEANUP_INTERVAL_MS);

@@ -5,6 +5,7 @@ set -euo pipefail
 # Uses worker/.env for env vars (expects a Direct DB URL for local dev).
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$ROOT_DIR/.." && pwd)"
 ENV_FILE_DEV="$ROOT_DIR/.env.development"
 ENV_FILE_LOCAL="$ROOT_DIR/.env.local"
 ENV_FILE="$ROOT_DIR/.env"
@@ -22,6 +23,27 @@ elif [[ -f "$ENV_FILE_LOCAL" ]]; then
 elif [[ -f "$ENV_FILE" ]]; then
   echo "[info] Using $ENV_FILE"
   set -a; source "$ENV_FILE"; set +a
+fi
+
+# Fallbacks for missing API keys: try repo root envs if not defined in worker/.env.*
+if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+  # Prefer worker/.env.production (may hold real API key)
+  if [[ -f "$ROOT_DIR/.env.production" ]]; then set -a; source "$ROOT_DIR/.env.production"; set +a; fi
+fi
+if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+  if [[ -f "$REPO_ROOT/.env.development" ]]; then set -a; source "$REPO_ROOT/.env.development"; set +a; fi
+fi
+if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+  if [[ -f "$REPO_ROOT/.env.production" ]]; then set -a; source "$REPO_ROOT/.env.production"; set +a; fi
+fi
+if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+  if [[ -f "$REPO_ROOT/.env" ]]; then set -a; source "$REPO_ROOT/.env"; set +a; fi
+fi
+
+# Ensure WORKER_DB_PASSWORD exists. If absent/empty, generate a random one for this session.
+if [[ -z "${WORKER_DB_PASSWORD:-}" ]]; then
+  WORKER_DB_PASSWORD=$(openssl rand -hex 16 2>/dev/null || echo "worker_password")
+  echo "[info] Generated ephemeral WORKER_DB_PASSWORD for this session"
 fi
 
 : "${DATABASE_URL:?Set DATABASE_URL in worker/.env or env (use Direct URL)}" \
@@ -51,11 +73,24 @@ if command -v docker >/dev/null 2>&1; then
   fi
 fi
 
-# Rewrite localhost in DATABASE_URL so the container can reach the host DB
+# Ensure DATABASE_URL contains a password for the worker
 DOCKER_DATABASE_URL="$DATABASE_URL"
+if echo "$DOCKER_DATABASE_URL" | grep -qE 'postgresql://worker:@'; then
+  DOCKER_DATABASE_URL=$(echo "$DOCKER_DATABASE_URL" | sed -E "s#(postgresql://worker:)[^@]*@#\1${WORKER_DB_PASSWORD}@#")
+fi
+
+# Rewrite localhost in DATABASE_URL so the container can reach the host DB
 if [[ "$DOCKER_DATABASE_URL" == *"127.0.0.1"* || "$DOCKER_DATABASE_URL" == *"localhost"* ]]; then
   DOCKER_DATABASE_URL=$(echo "$DOCKER_DATABASE_URL" | sed -E 's/(postgresql:\/\/[^@]*@)(127\.0\.0\.1|localhost)/\1host.docker.internal/')
   echo "[info] Rewriting DATABASE_URL host for Docker: host.docker.internal"
+fi
+
+# Preflight: ensure the local Postgres has the 'worker' role with the expected password
+if command -v psql >/dev/null 2>&1; then
+  if ! PGPASSWORD="$WORKER_DB_PASSWORD" psql "postgresql://worker@127.0.0.1:54322/postgres" -c "select 'ok'" >/dev/null 2>&1; then
+    echo "[info] Setting/repairing local 'worker' role password via scripts/fix-worker-role.sh"
+    DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres" WORKER_PASS="$WORKER_DB_PASSWORD" bash "$REPO_ROOT/scripts/fix-worker-role.sh" || true
+  fi
 fi
 
 echo "[info] Building Docker image $IMAGE_TAG (full deps)"

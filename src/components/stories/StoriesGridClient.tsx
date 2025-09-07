@@ -150,15 +150,16 @@ export default function StoriesGridClient({ variant = 'full' }: { variant?: 'ful
         ) : (
           <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             {filtered.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => openPreview(c)}
-                onDoubleClick={(e) => {
-                  e.preventDefault();
-                  openPermanent(c);
-                }}
-                className='group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm'
-              >
+            <button
+              type='button'
+              key={c.id}
+              onClick={() => openPreview(c)}
+              onDoubleClick={(e) => {
+                e.preventDefault();
+                openPermanent(c);
+              }}
+              className='group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm'
+            >
                 <div className='mb-2 flex items-center gap-2 text-sm font-medium'>
                   <StoryKindIcon kind={c.embedKind} />
                   <span className='truncate'>{c.title}</span>

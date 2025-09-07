@@ -1,5 +1,6 @@
 'use client';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import Sidebar from '@/components/shell/Sidebar';
@@ -35,14 +36,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const showSidebarPanel = !isHome && !(pathname?.startsWith('/stories') ?? false) && usesViewer;
 
   // Initialize store from URL only when panel param is present; otherwise keep persisted fallback
-  React.useEffect(() => {
+  useEffect(() => {
     const hasParam = searchParams?.has('panel');
     if (hasParam) setSidePanelOpen(!!panel);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel]);
 
   // Back-compat for legacy panel=1/0 values: normalize to true/false via nuqs
-  React.useEffect(() => {
+  useEffect(() => {
     const raw = searchParams?.get('panel');
     if (raw === '1' || raw === '0') {
       void setPanel(raw === '1');
@@ -83,6 +84,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           {/* Back button (IDE-style) */}
           {usesViewer && (
             <button
+              type='button'
               onClick={() => {
                 if (typeof window !== 'undefined') {
                   // Guard router.back with same-origin referrer; otherwise go to /stories

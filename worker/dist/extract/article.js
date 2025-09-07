@@ -1,8 +1,8 @@
-import { JSDOM } from 'jsdom';
-import { Readability } from '@mozilla/readability';
-import { canonicalizeUrl, hashText } from '../util.js';
-import { findRawItemsByIds, insertContents, findStoryIdByContentHash, insertStory } from '../db.js';
-import { log } from '../log.js';
+import { Readability } from "@mozilla/readability";
+import { JSDOM } from "jsdom";
+import { findRawItemsByIds, findStoryIdByContentHash, insertContents, insertStory, } from "../db.js";
+import { log } from "../log.js";
+import { canonicalizeUrl, hashText } from "../util.js";
 export async function runFetchAndExtract(jobData, boss) {
     const rows = await findRawItemsByIds(jobData.rawItemIds || []);
     for (const row of rows) {
@@ -11,7 +11,10 @@ export async function runFetchAndExtract(jobData, boss) {
             // Guard against hanging fetches
             const ac = new AbortController();
             const timer = setTimeout(() => ac.abort(), 15_000);
-            const resp = await fetch(row.url, { redirect: 'follow', signal: ac.signal });
+            const resp = await fetch(row.url, {
+                redirect: "follow",
+                signal: ac.signal,
+            });
             clearTimeout(timer);
             if (!resp.ok)
                 throw new Error(`HTTP ${resp.status}`);
@@ -20,9 +23,9 @@ export async function runFetchAndExtract(jobData, boss) {
             const dom = new JSDOM(html, { url: finalUrl });
             const reader = new Readability(dom.window.document);
             const parsed = reader.parse();
-            const text = parsed?.textContent?.trim() || '';
+            const text = parsed?.textContent?.trim() || "";
             if (!text)
-                throw new Error('no_text_extracted');
+                throw new Error("no_text_extracted");
             const content_hash = hashText(text);
             const content_id = await insertContents({
                 raw_item_id: row.id,
@@ -39,13 +42,13 @@ export async function runFetchAndExtract(jobData, boss) {
                     title: parsed?.title || row.title || null,
                     canonical_url: finalUrl,
                     primary_url: finalUrl,
-                    kind: 'article',
+                    kind: "article",
                     published_at: null,
                 }));
             // Enqueue analysis with a concrete storyId
-            await boss.send('analyze:llm', { storyId });
-            log('extract_success', {
-                comp: 'extract',
+            await boss.send("analyze:llm", { storyId });
+            log("extract_success", {
+                comp: "extract",
                 raw_item_id: row.id,
                 content_id,
                 story_id: storyId,
@@ -56,7 +59,12 @@ export async function runFetchAndExtract(jobData, boss) {
             });
         }
         catch (err) {
-            log('extract_error', { comp: 'extract', raw_item_id: row.id, url: row.url, err: String(err) }, 'error');
+            log("extract_error", {
+                comp: "extract",
+                raw_item_id: row.id,
+                url: row.url,
+                err: String(err),
+            }, "error");
         }
     }
 }

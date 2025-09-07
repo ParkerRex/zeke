@@ -1,8 +1,13 @@
 import { Pool } from "pg";
 import { log } from "./log.js";
+const cnn = process.env.DATABASE_URL || "";
+// Use SSL only for non-local connections. Supabase local Postgres on 127.0.0.1:54322 does not support TLS.
+const useSsl = !(cnn.includes("127.0.0.1") ||
+    cnn.includes("localhost") ||
+    cnn.includes("host.docker.internal"));
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    connectionString: cnn,
+    ssl: useSsl ? { rejectUnauthorized: false } : false,
     keepAlive: true,
     max: 3,
     idleTimeoutMillis: 30_000, // Increased from 10s to 30s
@@ -15,14 +20,40 @@ pool.on("error", (err) => {
     log("pg_pool_error", { err: String(err) }, "warn");
 });
 export async function getRssSources() {
-    const { rows } = await pool.query(`select id, kind, url, name from public.sources where kind = 'rss' and url is not null`);
+    const { rows } = await pool.query(`select id, kind, url, name
+		 from public.sources
+		 where kind = 'rss'
+		   and url is not null
+		   and coalesce(active, true)`);
     return rows;
 }
 export async function getYouTubeSources() {
     const { rows } = await pool.query(`select id, kind, url, name, metadata from public.sources
      where kind in ('youtube_channel', 'youtube_search')
-     and (url is not null or kind = 'youtube_search')`);
+       and (url is not null or kind = 'youtube_search')
+       and coalesce(active, true)`);
     return rows;
+}
+export async function getSourceById(sourceId) {
+    const { rows } = await pool.query(`select id, kind, url, name, metadata, domain from public.sources where id = $1`, [sourceId]);
+    return rows[0] ?? null;
+}
+export async function getOrCreateManualSource(kind, domain, name, url) {
+    // Try find an existing manual source by kind+domain+url (nullable)
+    const { rows: found } = await pool.query(`select id from public.sources where kind = $1 and coalesce(domain,'') = coalesce($2,'') and coalesce(url,'') = coalesce($3,'') limit 1`, [kind, domain ?? null, url ?? null]);
+    if (found[0]?.id)
+        return found[0].id;
+    const { rows } = await pool.query(`insert into public.sources (kind, name, url, domain, active, created_at, updated_at)
+     values ($1,$2,$3,$4,true, now(), now())
+     returning id`, [kind, name ?? null, url ?? null, domain ?? null]);
+    return rows[0].id;
+}
+export async function updateSourceMetadata(sourceId, patch) {
+    // Merge JSONB metadata with a shallow patch
+    await pool.query(`update public.sources
+       set metadata = coalesce(metadata, '{}'::jsonb) || $2::jsonb,
+           updated_at = now()
+     where id = $1`, [sourceId, JSON.stringify(patch)]);
 }
 export async function upsertRawItem(params) {
     const { source_id, external_id, url, title, kind, metadata } = params;
@@ -117,3 +148,34 @@ export async function upsertStoryEmbedding(params) {
        model_version = excluded.model_version`, [story_id, JSON.stringify(embedding), model_version ?? null]);
 }
 export default pool;
+// Admin instrumentation helpers
+export async function upsertPlatformQuota(provider, snapshot) {
+    await pool.query(`insert into public.platform_quota (provider, quota_limit, used, remaining, reset_at, updated_at)
+     values ($1,$2,$3,$4,$5, now())
+     on conflict (provider) do update set
+       quota_limit = excluded.quota_limit,
+       used = excluded.used,
+       remaining = excluded.remaining,
+       reset_at = excluded.reset_at,
+       updated_at = excluded.updated_at`, [provider, snapshot.limit ?? null, snapshot.used ?? null, snapshot.remaining ?? null, snapshot.reset_at ?? null]);
+}
+export async function upsertSourceHealth(sourceId, status, message) {
+    await pool.query(`insert into public.source_health (source_id, status, last_success_at, last_error_at, message, updated_at)
+     values ($1, $2, case when $2='ok' then now() else null end, case when $2='error' then now() else null end, $3, now())
+     on conflict (source_id) do update set
+       status = excluded.status,
+       last_success_at = coalesce(excluded.last_success_at, public.source_health.last_success_at),
+       last_error_at = coalesce(excluded.last_error_at, public.source_health.last_error_at),
+       message = excluded.message,
+       updated_at = excluded.updated_at`, [sourceId, status, message ?? null]);
+}
+export async function upsertJobMetrics(rows) {
+    if (!rows.length)
+        return;
+    const values = rows.map((r, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3}, now())`).join(',');
+    const params = [];
+    rows.forEach(r => { params.push(r.name, r.state, r.count); });
+    await pool.query(`insert into public.job_metrics (name, state, count, updated_at)
+     values ${values}
+     on conflict (name,state) do update set count = excluded.count, updated_at = excluded.updated_at`, params);
+}

@@ -1,6 +1,6 @@
 # Zeke Worker
 
-Background job processor for Zeke using pg-boss. Handles YouTube video transcription, content processing, and other async tasks.
+Background job processor for Zeke using pg-boss. Handles ingest (RSS/YouTube), extraction (audio → transcript → content), and analysis (LLM overlays/embeddings).
 
 ## 🚀 Quick Start
 
@@ -88,17 +88,83 @@ YOUTUBE_API_KEY="your-youtube-key"
 
 ## 🏗️ Architecture
 
-### Job Types
+### Queues (pg-boss)
 
-- `transcribe-video`: YouTube video transcription
-- `process-content`: Content analysis and processing
-- `cleanup-temp-files`: Temporary file cleanup
+- `system:heartbeat`: periodic heartbeat
+- `ingest:pull`: triggers ingest runs (rss, youtube)
+- `ingest:fetch-content`: article extraction for raw items
+- `ingest:fetch-youtube-content`: YouTube extract → transcribe → content
+- `analyze:llm`: overlay + embedding for a story
 
-### Database Schema
+### Actions Catalog (worker/src/actions)
 
-- Uses `pgboss` schema for job management
-- Worker role with appropriate permissions
-- Automatic job partitioning and cleanup
+- analyze-story.ts: Generate overlays + embedding for a story (OpenAI or stub), then persist.
+- extract-article.ts: Fetch + parse article content, create content/story, enqueue analysis.
+- extract-youtube-content.ts: Extract audio → transcribe → VTT → content/story → enqueue analysis.
+- fetch-youtube-channel-videos.ts: List channel uploads (via uploads playlist) + details with quota.
+- fetch-youtube-search-videos.ts: Search videos + map to domain with quota.
+- resolve-youtube-uploads-id.ts: Derive and persist channel uploads playlist ID.
+- ingest-rss-source.ts: Fetch → parse → normalize → upsert → enqueue (per RSS source).
+- preview-rss-source.ts: Fetch → parse → normalize → preview items (no writes).
+- ingest-youtube-source.ts: Orchestrate channel/search ingest, upsert raw items, enqueue extraction.
+- preview-youtube-source.ts: Preview channel/search items with current quota status.
+
+Primitives used by these actions live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access. Third‑party clients live under `lib/*`.
+
+### System Diagrams
+
+RSS Ingest (per source)
+
+```
+ingest:pull (rss)
+  -> actions/ingest-rss-source
+       fetchWithTimeout(url)
+       -> extract/parse-rss-feed
+       -> extract/normalize-rss-item (map guid/link/title/date)
+       -> extract/build-raw-item-article
+       -> db.upsertRawItem
+       -> enqueue ingest:fetch-content (article extract)
+```
+
+YouTube Ingest (per source)
+
+```
+ingest:pull (youtube)
+  -> actions/ingest-youtube-source
+       if channel:
+         -> actions/resolve-youtube-uploads-id -> uploadsPlaylistId
+         -> actions/fetch-youtube-channel-videos (quota)
+       if search:
+         -> actions/fetch-youtube-search-videos (quota)
+       for each video:
+         -> extract/build-raw-item-youtube
+         -> db.upsertRawItem
+         -> enqueue ingest:fetch-youtube-content (extract audio + transcribe)
+       -> db.upsertPlatformQuota (quota snapshot)
+```
+
+YouTube Extract → Transcribe → Content
+
+```
+ingest:fetch-youtube-content
+  -> actions/extract-youtube-content
+       -> extract/extract-youtube-audio (yt-dlp)
+       -> transcribe/whisper (OpenAI Whisper or local)
+       -> storage/generate-vtt-content
+       -> storage/prepare-youtube-transcript
+       -> db.insertContents + db.insertStory (if new)
+       -> enqueue analyze:llm
+```
+
+Analyze Story
+
+```
+analyze:llm
+  -> actions/analyze-story
+       (OpenAI or stub)
+       -> db.upsertStoryOverlay
+       -> db.upsertStoryEmbedding
+```
 
 ### Docker Images
 
@@ -118,6 +184,14 @@ YOUTUBE_API_KEY="your-youtube-key"
 | `pnpm run logs`                       | View production logs                           |
 | `pnpm run logs:errors`                | View error logs only                           |
 
+## 🔌 HTTP Debug Endpoints
+
+- `GET /healthz` — healthcheck
+- `GET /debug/status` — quick status snapshot (sources/raw/contents/jobs)
+- `GET /debug/preview-source?sourceId=...&limit=...` — preview items (rss/youtube)
+- `POST /debug/ingest-now` — run ingest for all RSS sources now
+- `POST /debug/ingest-youtube` — run ingest for all YouTube sources now
+- `POST /debug/ingest-source?sourceId=...` — run ingest for one source (rss/youtube)
 ## 🐛 Troubleshooting
 
 ### Common Issues

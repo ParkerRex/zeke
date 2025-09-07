@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(pnpm run lint:*)",
+      "Bash(pnpm biome lint:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

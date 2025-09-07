@@ -1,63 +1,67 @@
-import Stripe from 'stripe';
+import { softDeleteProduct } from "@db/mutations/pricing/soft-delete-product";
+import { upsertPrice } from "@db/mutations/pricing/upsert-price";
+import { upsertProduct } from "@db/mutations/pricing/upsert-product";
+import type Stripe from "stripe";
+import { upsertUserSubscription } from "@/actions/account/upsert-user-subscription";
+import { stripeAdmin } from "@/libs/stripe/stripe-admin";
+import { getEnvVar } from "@/utils/get-env-var";
 
-import { upsertUserSubscription } from '@/actions/account/upsert-user-subscription';
-import { softDeleteProduct } from '@db/mutations/pricing/soft-delete-product';
-import { upsertPrice } from '@db/mutations/pricing/upsert-price';
-import { upsertProduct } from '@db/mutations/pricing/upsert-product';
-import { stripeAdmin } from '@/libs/stripe/stripe-admin';
-import { getEnvVar } from '@/utils/get-env-var';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const relevantEvents = new Set([
-  'product.created',
-  'product.updated',
-  'price.created',
-  'price.updated',
-  'product.deleted',
-  'checkout.session.completed',
-  'customer.subscription.created',
-  'customer.subscription.updated',
-  'customer.subscription.deleted',
+  "product.created",
+  "product.updated",
+  "price.created",
+  "price.updated",
+  "product.deleted",
+  "checkout.session.completed",
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
 ]);
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   const body = await req.text();
-  const sig = req.headers.get('stripe-signature') as string;
-  const webhookSecret = getEnvVar(process.env.STRIPE_WEBHOOK_SECRET, 'STRIPE_WEBHOOK_SECRET');
+  const sig = req.headers.get("stripe-signature") as string;
+  const webhookSecret = getEnvVar(
+    process.env.STRIPE_WEBHOOK_SECRET,
+    "STRIPE_WEBHOOK_SECRET"
+  );
   let event: Stripe.Event;
 
   try {
     if (!sig) {
-      return Response.json('Missing stripe-signature header', { status: 400 });
+      return Response.json("Missing stripe-signature header", { status: 400 });
     }
     event = stripeAdmin.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (error) {
-    const { safeErrorMessage } = await import('@/utils/errors');
-    return Response.json(`Webhook Error: ${safeErrorMessage(error)}`, { status: 400 });
+  } catch (error: unknown) {
+    const { safeErrorMessage } = await import("@/utils/errors");
+    return Response.json(`Webhook Error: ${safeErrorMessage(error)}`, {
+      status: 400,
+    });
   }
 
   if (relevantEvents.has(event.type)) {
     try {
       switch (event.type) {
-        case 'product.created':
-        case 'product.updated':
+        case "product.created":
+        case "product.updated":
           await upsertProduct(event.data.object as Stripe.Product);
           break;
-        case 'product.deleted': {
+        case "product.deleted": {
           // Stripe sends a DeletedProduct object with { id, deleted: true }
           const deleted = event.data.object as { id: string };
           await softDeleteProduct(deleted.id);
           break;
         }
-        case 'price.created':
-        case 'price.updated':
+        case "price.created":
+        case "price.updated":
           await upsertPrice(event.data.object as Stripe.Price);
           break;
-        case 'customer.subscription.created':
-        case 'customer.subscription.updated':
-        case 'customer.subscription.deleted':
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted": {
           const subscription = event.data.object as Stripe.Subscription;
           await upsertUserSubscription({
             subscriptionId: subscription.id,
@@ -65,10 +69,11 @@ export async function POST(req: Request) {
             isCreateAction: false,
           });
           break;
-        case 'checkout.session.completed':
+        }
+        case "checkout.session.completed": {
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
-          if (checkoutSession.mode === 'subscription') {
+          if (checkoutSession.mode === "subscription") {
             const subscriptionId = checkoutSession.subscription;
             await upsertUserSubscription({
               subscriptionId: subscriptionId as string,
@@ -77,14 +82,18 @@ export async function POST(req: Request) {
             });
           }
           break;
+        }
         default:
-          throw new Error('Unhandled relevant event!');
+          throw new Error("Unhandled relevant event!");
       }
-    } catch (error) {
-      console.error(error);
-      return Response.json('Webhook handler failed. View your nextjs function logs.', {
-        status: 400,
-      });
+    } catch (error: unknown) {
+      const { safeErrorMessage } = await import("@/utils/errors");
+      return Response.json(
+        `Webhook handler failed: ${safeErrorMessage(error)}`,
+        {
+          status: 400,
+        }
+      );
     }
   }
   return Response.json({ received: true });

@@ -1,10 +1,15 @@
-import { NextResponse } from 'next/server';
+import { getStoryById } from "@db/queries/stories/get-story-by-id";
+import { NextResponse } from "next/server";
 
-import { getStoryById } from '@db/queries/stories/get-story-by-id';
-
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _req: Request,
+  ctx: { params: Promise<{ id: string }> }
+): Promise<Response> {
   const { id } = await ctx.params;
   const cluster = await getStoryById(id);
-  if (!cluster) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!cluster) {
+    const HTTP_NOT_FOUND = 404;
+    return NextResponse.json({ error: "Not found" }, { status: HTTP_NOT_FOUND });
+  }
   return NextResponse.json(cluster);
 }

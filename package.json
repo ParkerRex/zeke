@@ -15,10 +15,17 @@
     "worker:logs": "docker logs -f zeke-worker-local-8082",
     "worker:stop": "bash scripts/worker-stop.sh",
     "db:clean:youtube": "bash scripts/db-clean-youtube-bad.sh",
+    
     "dev:next": "next dev --turbopack --port 3000",
     "dev:setup": "bash scripts/dev-start.sh",
+    "bootstrap": "bash scripts/bootstrap.sh",
     "email:dev": "email dev --dir ./src/emails --port 3001",
     "lint": "next lint && cd worker && pnpm run lint",
+    "lint:biome": "biome lint --reporter=unix .",
+    "lint:biome:json": "biome lint --reporter=json .",
+    "lint:biome:save": "mkdir -p reports && biome lint --reporter=json . > reports/biome-report.json",
+    "lint:biome:save:ts": "node scripts/save-biome-report.js",
+    "fix:biome": "biome lint --apply .",
     "lint:main": "next lint",
     "lint:worker": "cd worker && pnpm run lint",
     "migration:new": "pnpm supabase migration new",
@@ -39,7 +46,7 @@
     "typecheck:worker": "cd worker && tsc --noEmit",
     "types:generate": "pnpm supabase gen types typescript --local --schema public > src/libs/supabase/types.ts",
     "types:generate:remote": "env-cmd -f ./.env.production pnpm supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/libs/supabase/types.ts",
-    "validate": "pnpm run typecheck && pnpm run lint",
+    "validate": "pnpm run typecheck && pnpm run lint && pnpm run lint:biome",
     "worker:deploy": "cd worker && pnpm run deploy:prod"
   },
   "dependencies": {
@@ -106,8 +113,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "zod": "^3.25.76",
-    "zustand": "^4.5.7",
-    "nuqs": "^2.2.3"
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.2",

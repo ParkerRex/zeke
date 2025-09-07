@@ -1,20 +1,34 @@
-import { log } from '../log.js';
+import { log } from "../log.js";
 
-export interface QuotaStatus {
+// Constants for quota allocation percentages
+const CHANNEL_INGESTION_ALLOCATION = 0.7;
+const SEARCH_QUERIES_ALLOCATION = 0.2;
+const VIDEO_DETAILS_ALLOCATION = 0.05;
+
+// Constants for calculations
+const PERCENTAGE_MULTIPLIER = 100;
+const MILLISECONDS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const MILLISECONDS_PER_HOUR =
+  MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+const DECIMAL_PRECISION = 10;
+
+export type QuotaStatus = {
   used: number;
   remaining: number;
   limit: number;
   resetAt: string;
   canProceed: boolean;
-}
+};
 
-export interface QuotaUsage {
+export type QuotaUsage = {
   operation: string;
   units: number;
   timestamp: string;
   videoId?: string;
   channelId?: string;
-}
+};
 
 /**
  * YouTube API Quota Management Utility
@@ -23,21 +37,30 @@ export interface QuotaUsage {
  * and reserve quota for operations.
  */
 export class QuotaTracker {
-  private dailyLimit: number;
-  private reserveBuffer: number;
-  private resetHour: number;
+  private readonly dailyLimit: number;
+  private readonly reserveBuffer: number;
+  private readonly resetHour: number;
   private usageLog: QuotaUsage[] = [];
 
   constructor() {
-    this.dailyLimit = parseInt(process.env.YOUTUBE_QUOTA_LIMIT || '10000');
-    this.reserveBuffer = parseInt(process.env.YOUTUBE_RATE_LIMIT_BUFFER || '500');
-    this.resetHour = parseInt(process.env.YOUTUBE_QUOTA_RESET_HOUR || '0');
+    this.dailyLimit = Number.parseInt(
+      process.env.YOUTUBE_QUOTA_LIMIT || "10000",
+      10
+    );
+    this.reserveBuffer = Number.parseInt(
+      process.env.YOUTUBE_RATE_LIMIT_BUFFER || "500",
+      10
+    );
+    this.resetHour = Number.parseInt(
+      process.env.YOUTUBE_QUOTA_RESET_HOUR || "0",
+      10
+    );
   }
 
   /**
    * Check current quota status
    */
-  checkQuotaStatus(currentUsage: number = 0): QuotaStatus {
+  checkQuotaStatus(currentUsage = 0): QuotaStatus {
     const now = new Date();
     const resetAt = this.getNextResetTime(now);
     const hasReset = this.hasQuotaReset(now);
@@ -55,7 +78,7 @@ export class QuotaTracker {
       canProceed,
     };
 
-    log('quota_status_check', {
+    log("quota_status_check", {
       ...status,
       reserveBuffer: this.reserveBuffer,
       hasReset,
@@ -67,25 +90,29 @@ export class QuotaTracker {
   /**
    * Reserve quota for an operation
    */
-  reserveQuota(operation: string, units: number, metadata?: { videoId?: string; channelId?: string }): boolean {
+  reserveQuota(
+    operation: string,
+    units: number,
+    metadata?: { videoId?: string; channelId?: string }
+  ): boolean {
     const status = this.checkQuotaStatus();
 
     if (status.remaining < units + this.reserveBuffer) {
       log(
-        'quota_reservation_failed',
+        "quota_reservation_failed",
         {
           operation,
           requestedUnits: units,
           remaining: status.remaining,
           reserveBuffer: this.reserveBuffer,
         },
-        'warn'
+        "warn"
       );
       return false;
     }
 
     // Log the reservation (not actual usage yet)
-    log('quota_reserved', {
+    log("quota_reserved", {
       operation,
       units,
       remaining: status.remaining - units,
@@ -98,7 +125,11 @@ export class QuotaTracker {
   /**
    * Consume quota after successful operation
    */
-  consumeQuota(operation: string, units: number, metadata?: { videoId?: string; channelId?: string }): void {
+  consumeQuota(
+    operation: string,
+    units: number,
+    metadata?: { videoId?: string; channelId?: string }
+  ): void {
     const usage: QuotaUsage = {
       operation,
       units,
@@ -111,7 +142,7 @@ export class QuotaTracker {
     // Keep only today's usage
     this.cleanupOldUsage();
 
-    log('quota_consumed', {
+    log("quota_consumed", {
       operation,
       units,
       totalUsedToday: this.getTodayUsage(),
@@ -124,7 +155,7 @@ export class QuotaTracker {
    * Get total quota usage for today
    */
   getTodayUsage(): number {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
     return this.usageLog
       .filter((usage) => usage.timestamp.startsWith(today))
@@ -135,8 +166,10 @@ export class QuotaTracker {
    * Get quota usage breakdown by operation type
    */
   getUsageBreakdown(): Record<string, { count: number; units: number }> {
-    const today = new Date().toISOString().split('T')[0];
-    const todayUsage = this.usageLog.filter((usage) => usage.timestamp.startsWith(today));
+    const today = new Date().toISOString().split("T")[0];
+    const todayUsage = this.usageLog.filter((usage) =>
+      usage.timestamp.startsWith(today)
+    );
 
     const breakdown: Record<string, { count: number; units: number }> = {};
 
@@ -155,8 +188,10 @@ export class QuotaTracker {
    * Check if quota has reset since last check
    */
   private hasQuotaReset(now: Date): boolean {
-    const today = now.toISOString().split('T')[0];
-    const resetTime = new Date(today + 'T' + String(this.resetHour).padStart(2, '0') + ':00:00.000Z');
+    const today = now.toISOString().split("T")[0];
+    const resetTime = new Date(
+      `${today}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+    );
 
     return now >= resetTime;
   }
@@ -165,19 +200,22 @@ export class QuotaTracker {
    * Get the next quota reset time
    */
   private getNextResetTime(now: Date): Date {
-    const today = now.toISOString().split('T')[0];
-    const todayReset = new Date(today + 'T' + String(this.resetHour).padStart(2, '0') + ':00:00.000Z');
+    const today = now.toISOString().split("T")[0];
+    const todayReset = new Date(
+      `${today}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+    );
 
     if (now >= todayReset) {
       // Next reset is tomorrow
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
-      return new Date(tomorrowStr + 'T' + String(this.resetHour).padStart(2, '0') + ':00:00.000Z');
-    } else {
-      // Next reset is today
-      return todayReset;
+      const tomorrowStr = tomorrow.toISOString().split("T")[0];
+      return new Date(
+        `${tomorrowStr}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+      );
     }
+    // Next reset is today
+    return todayReset;
   }
 
   /**
@@ -192,7 +230,7 @@ export class QuotaTracker {
     this.usageLog = this.usageLog.filter((usage) => usage.timestamp >= cutoff);
 
     if (this.usageLog.length < originalLength) {
-      log('quota_usage_cleanup', {
+      log("quota_usage_cleanup", {
         removed: originalLength - this.usageLog.length,
         remaining: this.usageLog.length,
         cutoff,
@@ -212,9 +250,9 @@ export class QuotaTracker {
     const available = this.dailyLimit - this.reserveBuffer;
 
     return {
-      channelIngestion: Math.floor(available * 0.7), // 70% for channel-based ingestion (efficient)
-      searchQueries: Math.floor(available * 0.2), // 20% for search queries (expensive)
-      videoDetails: Math.floor(available * 0.05), // 5% for video details
+      channelIngestion: Math.floor(available * CHANNEL_INGESTION_ALLOCATION), // 70% for channel-based ingestion (efficient)
+      searchQueries: Math.floor(available * SEARCH_QUERIES_ALLOCATION), // 20% for search queries (expensive)
+      videoDetails: Math.floor(available * VIDEO_DETAILS_ALLOCATION), // 5% for video details
       reserve: this.reserveBuffer, // 5% reserve buffer
     };
   }
@@ -227,12 +265,12 @@ export class QuotaTracker {
     const breakdown = this.getUsageBreakdown();
     const allocation = this.getQuotaAllocation();
 
-    log('quota_daily_report', {
+    log("quota_daily_report", {
       status,
       breakdown,
       allocation,
       efficiency: {
-        utilizationRate: (status.used / status.limit) * 100,
+        utilizationRate: (status.used / status.limit) * PERCENTAGE_MULTIPLIER,
         remainingHours: this.getHoursUntilReset(),
       },
     });
@@ -245,7 +283,10 @@ export class QuotaTracker {
     const now = new Date();
     const nextReset = this.getNextResetTime(now);
     const diffMs = nextReset.getTime() - now.getTime();
-    return Math.round((diffMs / (1000 * 60 * 60)) * 10) / 10; // Round to 1 decimal
+    return (
+      Math.round((diffMs / MILLISECONDS_PER_HOUR) * DECIMAL_PRECISION) /
+      DECIMAL_PRECISION
+    ); // Round to 1 decimal
   }
 }
 
