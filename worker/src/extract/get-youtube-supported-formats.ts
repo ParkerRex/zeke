@@ -9,7 +9,9 @@ export async function getSupportedFormats(videoUrl: string): Promise<string[]> {
     const formatsPromise = new Promise<string>((resolve, reject) => {
       const ytDlp = spawn("yt-dlp", ytDlpArgs);
       let stdout = "";
-      ytDlp.stdout.on("data", (data) => (stdout += data.toString()));
+      ytDlp.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
       ytDlp.on("close", (code) =>
         code === 0
           ? resolve(stdout)
