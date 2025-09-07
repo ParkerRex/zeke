@@ -22,6 +22,8 @@ export function parseRssFeed(xml: string): RssItem[] {
 }
 
 function asArray<T>(x: T | T[] | undefined): T[] {
-  if (!x) return [];
+  if (!x) {
+    return [];
+  }
   return Array.isArray(x) ? x : [x];
 }

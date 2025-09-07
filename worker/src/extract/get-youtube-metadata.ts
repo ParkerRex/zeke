@@ -39,8 +39,12 @@ export async function getVideoMetadata(
       const ytDlp = spawn("yt-dlp", ytDlpArgs);
       let stdout = "";
       let stderr = "";
-      ytDlp.stdout.on("data", (d) => (stdout += d.toString()));
-      ytDlp.stderr.on("data", (d) => (stderr += d.toString()));
+      ytDlp.stdout.on("data", (d) => {
+        stdout += d.toString();
+      });
+      ytDlp.stderr.on("data", (d) => {
+        stderr += d.toString();
+      });
       ytDlp.on("close", (code) =>
         code === 0
           ? resolve(stdout)

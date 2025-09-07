@@ -20,12 +20,12 @@ export function buildRawItemYouTube(
     duration: video.duration,
     viewCount: video.viewCount,
     likeCount: video.likeCount,
-    commentCount: (video as any).commentCount,
-    thumbnails: (video as any).thumbnails,
-    tags: (video as any).tags,
-    categoryId: (video as any).categoryId,
-    defaultLanguage: (video as any).defaultLanguage,
-    defaultAudioLanguage: (video as any).defaultAudioLanguage,
+    commentCount: video.commentCount,
+    thumbnails: video.thumbnails,
+    tags: video.tags,
+    categoryId: video.categoryId,
+    defaultLanguage: video.defaultLanguage,
+    defaultAudioLanguage: video.defaultAudioLanguage,
     src: src.url || `search:${srcMeta?.query}`,
   };
 

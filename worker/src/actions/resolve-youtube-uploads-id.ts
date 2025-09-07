@@ -20,7 +20,9 @@ export async function resolveYouTubeUploadsId(input: {
   let query = "";
   if (typeof input.url === "string" && input.url.includes("youtube.com/")) {
     const match = input.url.match(YOUTUBE_HANDLE_REGEX);
-    if (match) query = match[1];
+    if (match) {
+      query = match[1];
+    }
   }
   if (!query && typeof input.name === "string") {
     query = input.name;

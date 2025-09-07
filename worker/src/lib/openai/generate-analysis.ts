@@ -57,26 +57,51 @@ Respond only with valid JSON, no other text.`;
     );
 
     const responseText = completion.choices[0]?.message?.content?.trim();
-    if (!responseText) throw new Error("Empty response from OpenAI");
+    if (!responseText) {
+      throw new Error("Empty response from OpenAI");
+    }
 
-    const parsed = cleanAndParseJSON(responseText) as any;
+    type LLMAnalysisJSON = {
+      why_it_matters?: unknown;
+      chili?: unknown;
+      confidence?: unknown;
+      citations?: unknown;
+    };
+
+    const raw = cleanAndParseJSON(responseText) as LLMAnalysisJSON;
+
+    const toNumber = (v: unknown): number | null =>
+      typeof v === "number" ? v : typeof v === "string" ? Number(v) : null;
+    const clamp = (n: number, min: number, max: number) =>
+      Math.max(min, Math.min(max, n));
+
+    const why =
+      typeof raw.why_it_matters === "string" && raw.why_it_matters.trim()
+        ? raw.why_it_matters
+        : "• Analysis not available";
+
+    const chiliVal = clamp(
+      Math.round(toNumber(raw.chili) ?? CHILI_DEFAULT),
+      CHILI_MIN,
+      CHILI_MAX
+    );
+
+    const confidenceVal = clamp(
+      toNumber(raw.confidence) ?? CONFIDENCE_DEFAULT,
+      CONFIDENCE_MIN,
+      CONFIDENCE_MAX
+    );
+
+    const citationsVal =
+      typeof raw.citations === "object" && raw.citations !== null && !Array.isArray(raw.citations)
+        ? (raw.citations as Record<string, unknown>)
+        : {};
 
     return {
-      why_it_matters: String(
-        parsed.why_it_matters || "• Analysis not available"
-      ),
-      chili: Math.max(
-        CHILI_MIN,
-        Math.min(CHILI_MAX, Math.round(Number(parsed.chili) || CHILI_DEFAULT))
-      ),
-      confidence: Math.max(
-        CONFIDENCE_MIN,
-        Math.min(
-          CONFIDENCE_MAX,
-          Number(parsed.confidence) || CONFIDENCE_DEFAULT
-        )
-      ),
-      citations: {},
+      why_it_matters: String(why),
+      chili: chiliVal,
+      confidence: confidenceVal,
+      citations: citationsVal,
     };
   } catch (error) {
     log(

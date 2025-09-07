@@ -16,7 +16,9 @@ export async function previewRssSourceAction(
     { redirect: "follow" },
     FETCH_TIMEOUT_MS
   );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
   const xml = await res.text();
   const items = parseRssFeed(xml);
   const mapped = items

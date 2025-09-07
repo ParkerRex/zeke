@@ -43,7 +43,7 @@ type VideoMetadata = {
   uploader?: string;
   duration?: number;
   uploadDate?: string;
-  viewCount?: string;
+  viewCount?: number | string;
   description?: string;
   filesize?: number;
 };
@@ -55,6 +55,7 @@ type TranscriptionResult = {
   processingTimeMs: number;
   text: string;
   success?: boolean;
+  error?: string;
 };
 
 export async function extractYouTubeContent(
@@ -65,147 +66,174 @@ export async function extractYouTubeContent(
   const rows = await findRawItemsByIds(rawItemIds);
 
   for (const row of rows) {
-    try {
-      const t0 = Date.now();
+    await processYouTubeRow(row, videoId, sourceKind, boss);
+  }
+}
 
-      log("youtube_extract_start", {
-        comp: "extract",
-        raw_item_id: row.id,
-        video_id: videoId,
-        source_kind: sourceKind,
-        url: row.url,
-      });
+type RawItemRow = { id: string; url: string; title: string | null };
 
-      const videoUrl = row.url;
-      const audioResult = await extractAudio(videoUrl, videoId);
-      if (!audioResult.success)
-        throw new Error(`Audio extraction failed: ${audioResult.error}`);
+async function processYouTubeRow(
+  row: RawItemRow,
+  videoId: string,
+  sourceKind: string,
+  boss: PgBoss
+): Promise<void> {
+  const t0 = Date.now();
+  const videoUrl = row.url;
 
-      log("youtube_audio_extracted", {
-        comp: "extract",
-        raw_item_id: row.id,
-        video_id: videoId,
-        audio_path: audioResult.audioPath,
-        duration: audioResult.metadata.duration,
-        file_size_mb:
-          Math.round(
-            ((audioResult.metadata.filesize || 0) / BYTES_PER_MB) *
-              ROUNDING_FACTOR
-          ) / ROUNDING_FACTOR,
-      });
+  try {
+    log("youtube_extract_start", {
+      comp: "extract",
+      raw_item_id: row.id,
+      video_id: videoId,
+      source_kind: sourceKind,
+      url: row.url,
+    });
 
-      const transcriptionResult = await transcribeAudio(
-        audioResult.audioPath,
-        videoId,
-        {
-          model: "base",
-          language: undefined,
-          wordTimestamps: true,
-        }
-      );
-      if (!transcriptionResult.success) {
-        throw new Error(
-          `Transcription failed: ${String((transcriptionResult as any).error || "unknown")}`
-        );
-      }
+    const audioResult = await ensureAudioExtracted(videoUrl, videoId);
 
-      log("youtube_transcription_complete", {
-        comp: "extract",
-        raw_item_id: row.id,
-        video_id: videoId,
-        language: transcriptionResult.language,
-        text_length: transcriptionResult.text.length,
-        segments: transcriptionResult.segments.length,
-        processing_time_ms: transcriptionResult.processingTimeMs,
-      });
+    log("youtube_audio_extracted", {
+      comp: "extract",
+      raw_item_id: row.id,
+      video_id: videoId,
+      audio_path: audioResult.audioPath,
+      duration: audioResult.metadata.duration,
+      file_size_mb:
+        Math.round(
+          ((audioResult.metadata.filesize || 0) / BYTES_PER_MB) *
+            ROUNDING_FACTOR
+        ) / ROUNDING_FACTOR,
+    });
 
-      const transcriptText = transcriptionResult.text.trim();
-      if (!transcriptText)
-        throw new Error("No text extracted from transcription");
+    const transcriptionResult = await transcribeOrThrow(
+      audioResult.audioPath,
+      videoId
+    );
 
-      const vttContent = generateVTTContent(transcriptionResult);
-      const transcriptData = await prepareYouTubeTranscript(
-        videoId,
-        vttContent,
-        transcriptText
-      );
-      if (!transcriptData.success) {
-        throw new Error(
-          `Transcript preparation failed: ${transcriptData.error}`
-        );
-      }
+    log("youtube_transcription_complete", {
+      comp: "extract",
+      raw_item_id: row.id,
+      video_id: videoId,
+      language: transcriptionResult.language,
+      text_length: transcriptionResult.text.length,
+      segments: transcriptionResult.segments.length,
+      processing_time_ms: transcriptionResult.processingTimeMs,
+    });
 
-      const enhancedText = formatYouTubeContent(
-        transcriptText,
-        audioResult.metadata,
-        transcriptionResult
-      );
+    const transcriptText = ensureTranscriptText(transcriptionResult);
 
-      const content_hash = hashText(enhancedText);
-      const content_id = await insertContents({
-        raw_item_id: row.id,
-        text: enhancedText,
-        html_url: videoUrl,
-        transcript_url: transcriptData.transcriptUrl,
-        transcript_vtt: transcriptData.vttContent,
-        lang: transcriptionResult.language,
-        content_hash,
-      });
+    const vttContent = generateVTTContent(transcriptionResult);
+    const transcriptData = await prepareYouTubeTranscript(
+      videoId,
+      vttContent,
+      transcriptText
+    );
+    if (!transcriptData.success) {
+      throw new Error(`Transcript preparation failed: ${transcriptData.error}`);
+    }
 
-      const existingStoryId = await findStoryIdByContentHash(content_hash);
-      const storyId =
-        existingStoryId ??
-        (await insertStory({
-          content_id,
-          title: audioResult.metadata.title || row.title || null,
-          canonical_url: videoUrl,
-          primary_url: videoUrl,
-          kind: "youtube",
-          published_at: audioResult.metadata.uploadDate
-            ? new Date(
-                audioResult.metadata.uploadDate.replace(
-                  UPLOAD_DATE_REGEX,
-                  "$1-$2-$3"
-                )
-              ).toISOString()
-            : null,
-        }));
+    const enhancedText = formatYouTubeContent(
+      transcriptText,
+      audioResult.metadata,
+      transcriptionResult
+    );
 
-      await boss.send("analyze:llm", { storyId });
-      await cleanupVideoTempFiles(videoId);
+    const content_hash = hashText(enhancedText);
+    const content_id = await insertContents({
+      raw_item_id: row.id,
+      text: enhancedText,
+      html_url: videoUrl,
+      transcript_url: transcriptData.transcriptUrl,
+      transcript_vtt: transcriptData.vttContent,
+      lang: transcriptionResult.language,
+      content_hash,
+    });
 
-      log("youtube_extract_success", {
-        comp: "extract",
-        raw_item_id: row.id,
+    const existingStoryId = await findStoryIdByContentHash(content_hash);
+    const storyId =
+      existingStoryId ??
+      (await insertStory({
         content_id,
-        story_id: storyId,
+        title: audioResult.metadata.title || row.title || null,
+        canonical_url: videoUrl,
+        primary_url: videoUrl,
+        kind: "youtube",
+        published_at: audioResult.metadata.uploadDate
+          ? new Date(
+              audioResult.metadata.uploadDate.replace(
+                UPLOAD_DATE_REGEX,
+                "$1-$2-$3"
+              )
+            ).toISOString()
+          : null,
+      }));
+
+    await boss.send("analyze:llm", { storyId });
+    await cleanupVideoTempFiles(videoId);
+
+    log("youtube_extract_success", {
+      comp: "extract",
+      raw_item_id: row.id,
+      content_id,
+      story_id: storyId,
+      video_id: videoId,
+      content_hash,
+      url: videoUrl,
+      text_len: enhancedText.length,
+      duration: audioResult.metadata.duration,
+      language: transcriptionResult.language,
+      duration_ms: Date.now() - t0,
+    });
+  } catch (err) {
+    log(
+      "youtube_extract_error",
+      {
+        comp: "extract",
+        raw_item_id: row.id,
         video_id: videoId,
-        content_hash,
-        url: videoUrl,
-        text_len: enhancedText.length,
-        duration: audioResult.metadata.duration,
-        language: transcriptionResult.language,
-        duration_ms: Date.now() - t0,
-      });
-    } catch (err) {
-      log(
-        "youtube_extract_error",
-        {
-          comp: "extract",
-          raw_item_id: row.id,
-          video_id: videoId,
-          url: row.url,
-          err: String(err),
-        },
-        "error"
-      );
-      try {
-        await cleanupVideoTempFiles(videoId);
-      } catch {
-        // ignore cleanup errors
-      }
+        url: row.url,
+        err: String(err),
+      },
+      "error"
+    );
+    try {
+      await cleanupVideoTempFiles(videoId);
+    } catch {
+      // ignore cleanup errors
     }
   }
+}
+
+async function ensureAudioExtracted(videoUrl: string, videoId: string) {
+  const audioResult = await extractAudio(videoUrl, videoId);
+  if (!audioResult.success) {
+    throw new Error(`Audio extraction failed: ${audioResult.error}`);
+  }
+  return audioResult;
+}
+
+async function transcribeOrThrow(audioPath: string, videoId: string) {
+  const transcriptionResult = await transcribeAudio(audioPath, videoId, {
+    model: "base",
+    language: undefined,
+    wordTimestamps: true,
+  });
+  if (!transcriptionResult.success) {
+    throw new Error(
+      `Transcription failed: ${String(transcriptionResult.error || "unknown")}`
+    );
+  }
+  return transcriptionResult as TranscriptionResult;
+}
+
+function ensureTranscriptText(
+  transcriptionResult: TranscriptionResult
+): string {
+  const transcriptText = transcriptionResult.text.trim();
+  if (!transcriptText) {
+    throw new Error("No text extracted from transcription");
+  }
+  return transcriptText;
 }
 
 function formatYouTubeContent(
@@ -221,9 +249,13 @@ function formatYouTubeContent(
   sections.push(`Duration: ${formatDuration(metadata.duration)}`);
   sections.push(`Upload Date: ${formatUploadDate(metadata.uploadDate)}`);
   if (metadata.viewCount) {
-    sections.push(
-      `Views: ${Number.parseInt(metadata.viewCount, 10).toLocaleString()}`
-    );
+    const viewsNum =
+      typeof metadata.viewCount === "string"
+        ? Number.parseInt(metadata.viewCount, 10)
+        : metadata.viewCount;
+    if (Number.isFinite(viewsNum)) {
+      sections.push(`Views: ${viewsNum.toLocaleString()}`);
+    }
   }
   if (metadata.description) {
     sections.push(
@@ -268,7 +300,9 @@ function formatYouTubeContent(
 }
 
 function formatDuration(seconds?: number): string {
-  if (!seconds) return "0:00";
+  if (!seconds) {
+    return "0:00";
+  }
   const hours = Math.floor(seconds / SECONDS_PER_HOUR);
   const minutes = Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
   const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
@@ -279,7 +313,9 @@ function formatDuration(seconds?: number): string {
 }
 
 function formatUploadDate(uploadDate?: string): string {
-  if (!uploadDate || uploadDate.length !== UPLOAD_DATE_LENGTH) return "Unknown";
+  if (!uploadDate || uploadDate.length !== UPLOAD_DATE_LENGTH) {
+    return "Unknown";
+  }
   const year = uploadDate.substring(0, UPLOAD_DATE_YEAR_END);
   const month = uploadDate.substring(
     UPLOAD_DATE_MONTH_START,

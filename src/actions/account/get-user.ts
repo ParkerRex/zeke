@@ -8,9 +8,14 @@ export async function getUser() {
   const { data, error } = await supabase.from("users").select("*").single();
 
   if (error) {
-    console.error(error);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 
-  return data;
+  return {
+    success: true,
+    data,
+  };
 }
-

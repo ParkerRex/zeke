@@ -9,14 +9,20 @@ import { generateEmbedding as oaGenerateEmbedding } from "../lib/openai/generate
 import { generateStubAnalysis } from "../lib/openai/generate-stub-analysis.js";
 import { generateStubEmbedding } from "../lib/openai/generate-stub-embedding.js";
 import { createOpenAIClient } from "../lib/openai/openai-client.js";
-import type { AnalysisInput } from "../lib/openai/types.js";
+import type {
+  AnalysisInput,
+  AnalysisResult,
+  EmbeddingResult,
+} from "../lib/openai/types.js";
 import { log } from "../log.js";
 
 const USE_OPENAI = !!process.env.OPENAI_API_KEY;
 
 export async function analyzeStory(storyId: string): Promise<void> {
   const story = await getStoryWithContent(storyId);
-  if (!story) throw new Error(`Story not found: ${storyId}`);
+  if (!story) {
+    throw new Error(`Story not found: ${storyId}`);
+  }
 
   log("analyze_story_start", {
     comp: "analyze",
@@ -32,7 +38,8 @@ export async function analyzeStory(storyId: string): Promise<void> {
       text: story.text,
     };
 
-    let analysis, embedding;
+    let analysis: AnalysisResult;
+    let embedding: EmbeddingResult;
     if (USE_OPENAI) {
       const client = createOpenAIClient();
       analysis = await oaGenerateAnalysis(client, input).catch(async () => {

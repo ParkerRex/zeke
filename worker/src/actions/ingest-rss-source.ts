@@ -25,7 +25,9 @@ export async function ingestRssSource(
     { redirect: "follow" },
     FETCH_TIMEOUT_MS
   );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
   const xml = await res.text();
 
   const items = parseRssFeed(xml);
@@ -34,7 +36,9 @@ export async function ingestRssSource(
 
   for (const it of items) {
     const norm = normalizeRssItem(it, src.url);
-    if (!norm) continue;
+    if (!norm) {
+      continue;
+    }
     seen++;
     const payload = buildRawItemArticle(norm, src.id);
     const id = await upsertRawItem(payload);

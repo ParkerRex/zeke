@@ -28,9 +28,11 @@ export function normalizeRssItem(
 ): NormalizedRssItem | null {
   const guid = getText(item.guid) || item.id || getText(item.link) || "";
   const link = canonicalizeUrl(getText(item.link) || "");
-  if (!(guid || link)) return null;
+  if (guid === "" && link === "") {
+    return null;
+  }
 
-  const externalId = guid ? guid : link;
+  const externalId = guid;
   const url = link || externalId;
   const title = item.title
     ? (getText(item.title as ParsedText) ?? String(item.title))
@@ -41,9 +43,17 @@ export function normalizeRssItem(
 }
 
 function getText(v: ParsedText): string | undefined {
-  if (v == null) return;
-  if (typeof v === "string") return v;
-  if (typeof v === "object" && "#text" in v) return v["#text"] as string;
-  if (typeof v === "object" && "href" in v) return v.href as string;
+  if (v == null) {
+    return;
+  }
+  if (typeof v === "string") {
+    return v;
+  }
+  if (typeof v === "object" && "#text" in v) {
+    return v["#text"] as string;
+  }
+  if (typeof v === "object" && "href" in v) {
+    return v.href as string;
+  }
   return;
 }

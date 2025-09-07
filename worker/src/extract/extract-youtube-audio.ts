@@ -70,7 +70,9 @@ export async function extractAudio(
     const audioExtractionPromise = new Promise<void>((resolve, reject) => {
       const ytDlp = spawn("yt-dlp", ytDlpArgs);
       let stderr = "";
-      ytDlp.stderr.on("data", (data) => (stderr += data.toString()));
+      ytDlp.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
       ytDlp.on("close", (code) =>
         code === 0
           ? resolve()
@@ -128,7 +130,13 @@ export async function extractAudio(
     );
     try {
       await fs.unlink(audioPath);
-    } catch {}
+    } catch (deleteError) {
+      log(
+        "youtube_audio_deletion_error",
+        { videoId, audioPath, error: String(deleteError) },
+        "error"
+      );
+    }
     return {
       audioPath: "",
       metadata: {
