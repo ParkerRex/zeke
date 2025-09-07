@@ -16,6 +16,7 @@ export const EMBEDDING_DIMENSIONS = 1536;
 export const CHILI_MIN = 0;
 export const CHILI_MAX = 5;
 export const CHILI_DEFAULT = 1;
+export const CHILI_KEYWORD_BOOST = 1;
 
 export const CONFIDENCE_MIN = 0;
 export const CONFIDENCE_MAX = 1;

@@ -70,8 +70,15 @@ Respond only with valid JSON, no other text.`;
 
     const raw = cleanAndParseJSON(responseText) as LLMAnalysisJSON;
 
-    const toNumber = (v: unknown): number | null =>
-      typeof v === "number" ? v : typeof v === "string" ? Number(v) : null;
+    const toNumber = (v: unknown): number | null => {
+      if (typeof v === "number") {
+        return v;
+      }
+      if (typeof v === "string") {
+        return Number(v);
+      }
+      return null;
+    };
     const clamp = (n: number, min: number, max: number) =>
       Math.max(min, Math.min(max, n));
 
@@ -93,7 +100,9 @@ Respond only with valid JSON, no other text.`;
     );
 
     const citationsVal =
-      typeof raw.citations === "object" && raw.citations !== null && !Array.isArray(raw.citations)
+      typeof raw.citations === "object" &&
+      raw.citations !== null &&
+      !Array.isArray(raw.citations)
         ? (raw.citations as Record<string, unknown>)
         : {};
 

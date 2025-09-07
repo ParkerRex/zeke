@@ -56,6 +56,92 @@ type ArticleIngestResult =
   | { url: string; ok: true; raw_item_id: string; type: "article" }
   | { url: string; ok: false; error: string; type: "article" };
 
+// Helper: handle one ingest:pull job (reduces route complexity)
+async function processIngestPullJob(
+  boss: PgBoss,
+  job: { id: string; data?: unknown }
+) {
+  const { source } = (job.data || {}) as { source?: string };
+  log("ingest_pull_start", { jobId: job.id, source });
+  if (source === "rss") {
+    await handleRssIngest(boss);
+  }
+  if (source === "youtube") {
+    await handleYouTubeIngest(boss);
+  }
+  await boss.complete("ingest:pull", job.id);
+  log("ingest_pull_done", { jobId: job.id, source });
+}
+
+async function handleRssIngest(boss: PgBoss) {
+  const { getRssSources } = await import("./db.js");
+  const { ingestRssSource } = await import("./actions/ingest-rss-source.js");
+  const sources = await getRssSources();
+  for (const src of sources) {
+    if (!src.url) {
+      continue;
+    }
+    await ingestRssSource(boss, { id: src.id, url: src.url });
+  }
+}
+
+function computeQuotaResetAt(now: Date, resetHour: number): Date {
+  const resetAt = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    resetHour,
+    0,
+    0,
+    0
+  );
+  if (resetAt.getTime() < now.getTime()) {
+    resetAt.setDate(resetAt.getDate() + 1);
+  }
+  return resetAt;
+}
+
+async function handleYouTubeIngest(boss: PgBoss) {
+  if (!process.env.YOUTUBE_API_KEY) {
+    log("ingest_youtube_skipped", { reason: "missing_api_key" }, "warn");
+    return;
+  }
+  const { getYouTubeSources, upsertPlatformQuota } = await import("./db.js");
+  const { ingestYouTubeSource } = await import(
+    "./actions/ingest-youtube-source.js"
+  );
+  const { quotaTracker } = await import("./utils/quota-tracker.js");
+  const sources = await getYouTubeSources();
+  log("ingest_youtube_start", {
+    comp: "ingest",
+    sourceCount: sources.length,
+    quotaStatus: quotaTracker.checkQuotaStatus(),
+  });
+  for (const src of sources) {
+    await ingestYouTubeSource(boss, src);
+  }
+  const status = quotaTracker.checkQuotaStatus();
+  log("ingest_youtube_complete", {
+    comp: "ingest",
+    sourcesProcessed: sources.length,
+    quotaUsed: status.used,
+    quotaRemaining: status.remaining,
+  });
+  try {
+    const resetHour = Number(process.env.YOUTUBE_QUOTA_RESET_HOUR || "0") || 0;
+    const now = new Date();
+    const resetAt = computeQuotaResetAt(now, resetHour);
+    await upsertPlatformQuota("youtube", {
+      limit: Number(process.env.YOUTUBE_QUOTA_LIMIT || "10000"),
+      used: status.used,
+      remaining: status.remaining,
+      reset_at: resetAt.toISOString(),
+    });
+  } catch (e) {
+    log("platform_quota_update_error", { error: String(e) }, "debug");
+  }
+}
+
 async function initBoss() {
   const boss = new PgBoss({
     connectionString: DATABASE_URL,
@@ -125,78 +211,7 @@ async function initBoss() {
     { batchSize: INGEST_PULL_BATCH },
     async (jobs) => {
       for (const job of jobs) {
-        const { source } = (job.data || {}) as { source?: string };
-        log("ingest_pull_start", { jobId: job.id, source });
-        if (source === "rss") {
-          const { getRssSources } = await import("./db.js");
-          const { ingestRssSource } = await import(
-            "./actions/ingest-rss-source.js"
-          );
-          const sources = await getRssSources();
-          for (const src of sources) {
-            if (!src.url) continue;
-            await ingestRssSource(boss, { id: src.id, url: src.url });
-          }
-        }
-        if (source === "youtube") {
-          if (process.env.YOUTUBE_API_KEY) {
-            const { getYouTubeSources, upsertPlatformQuota } = await import(
-              "./db.js"
-            );
-            const { ingestYouTubeSource } = await import(
-              "./actions/ingest-youtube-source.js"
-            );
-            const { quotaTracker } = await import("./utils/quota-tracker.js");
-            const sources = await getYouTubeSources();
-            log("ingest_youtube_start", {
-              comp: "ingest",
-              sourceCount: sources.length,
-              quotaStatus: quotaTracker.checkQuotaStatus(),
-            });
-            for (const src of sources) {
-              await ingestYouTubeSource(boss, src);
-            }
-            const status = quotaTracker.checkQuotaStatus();
-            log("ingest_youtube_complete", {
-              comp: "ingest",
-              sourcesProcessed: sources.length,
-              quotaUsed: status.used,
-              quotaRemaining: status.remaining,
-            });
-            try {
-              const resetHour =
-                Number(process.env.YOUTUBE_QUOTA_RESET_HOUR || "0") || 0;
-              const now = new Date();
-              const resetAt = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
-                resetHour,
-                0,
-                0,
-                0
-              );
-              if (resetAt.getTime() < now.getTime())
-                resetAt.setDate(resetAt.getDate() + 1);
-              await upsertPlatformQuota("youtube", {
-                limit: Number(process.env.YOUTUBE_QUOTA_LIMIT || "10000"),
-                used: status.used,
-                remaining: status.remaining,
-                reset_at: resetAt.toISOString(),
-              });
-            } catch (e) {
-              log("platform_quota_update_error", { error: String(e) }, "debug");
-            }
-          } else {
-            log(
-              "ingest_youtube_skipped",
-              { reason: "missing_api_key" },
-              "warn"
-            );
-          }
-        }
-        await boss.complete("ingest:pull", job.id);
-        log("ingest_pull_done", { jobId: job.id, source });
+        await processIngestPullJob(boss, job);
       }
     }
   );
@@ -355,7 +370,9 @@ function registerIngestNow(app: express.Express) {
       );
       const sources = await getRssSources();
       for (const src of sources) {
-        if (!src.url) continue;
+        if (!src.url) {
+          continue;
+        }
         await ingestRssSource(bossRef, { id: src.id, url: src.url });
       }
       res.json({ ok: true });
@@ -424,15 +441,18 @@ function registerIngestYouTubeNow(app: express.Express) {
           0,
           0
         );
-        if (resetAt.getTime() < now.getTime())
+        if (resetAt.getTime() < now.getTime()) {
           resetAt.setDate(resetAt.getDate() + 1);
+        }
         await upsertPlatformQuota("youtube", {
           limit: Number(process.env.YOUTUBE_QUOTA_LIMIT || "10000"),
           used: status.used,
           remaining: status.remaining,
           reset_at: resetAt.toISOString(),
         });
-      } catch {}
+      } catch (e) {
+        log("platform_quota_update_error", { error: String(e) }, "debug");
+      }
       res.json({ ok: true });
     } catch (e: unknown) {
       res
@@ -453,50 +473,58 @@ function registerIngestSource(app: express.Express) {
       if (!sourceId) {
         throw new Error("missing_sourceId");
       }
-      const pg = (await import("./db.js")).default;
-      const { rows } = await pg.query(
-        "select id, kind from public.sources where id = $1",
-        [sourceId]
-      );
-      const row = rows[0];
-      if (!row) {
+      await ingestSourceById(bossRef, sourceId);
+      res.json({ ok: true });
+    } catch (e: unknown) {
+      const msg = String(e);
+      if (msg.includes("not_found")) {
         return res
           .status(HTTP_NOT_FOUND)
           .json({ ok: false, error: "not_found" });
       }
-      if (row.kind === "rss" || row.kind === "podcast") {
-        const { ingestRssSource } = await import(
-          "./actions/ingest-rss-source.js"
-        );
-        const { getSourceById } = await import("./db.js");
-        const srcFull = await getSourceById(sourceId);
-        if (!srcFull?.url) {
-          throw new Error("no_url_for_source");
-        }
-        await ingestRssSource(bossRef, { id: sourceId, url: srcFull.url });
-      } else if (
-        row.kind === "youtube_channel" ||
-        row.kind === "youtube_search"
-      ) {
-        const { ingestYouTubeSource } = await import(
-          "./actions/ingest-youtube-source.js"
-        );
-        const { getSourceById } = await import("./db.js");
-        const srcFull = await getSourceById(sourceId);
-        if (!srcFull) throw new Error("not_found");
-        await ingestYouTubeSource(bossRef, srcFull);
-      } else {
+      if (msg.includes("unsupported_kind")) {
         return res
           .status(HTTP_BAD_REQUEST)
           .json({ ok: false, error: "unsupported_kind" });
       }
-      res.json({ ok: true });
-    } catch (e: unknown) {
-      res
-        .status(HTTP_SERVICE_UNAVAILABLE)
-        .json({ ok: false, error: String(e) });
+      res.status(HTTP_SERVICE_UNAVAILABLE).json({ ok: false, error: msg });
     }
   });
+}
+
+async function ingestSourceById(boss: PgBoss, sourceId: string) {
+  const pg = (await import("./db.js")).default;
+  const { rows } = await pg.query(
+    "select id, kind from public.sources where id = $1",
+    [sourceId]
+  );
+  const row = rows[0];
+  if (!row) {
+    throw new Error("not_found");
+  }
+  if (row.kind === "rss" || row.kind === "podcast") {
+    const { ingestRssSource } = await import("./actions/ingest-rss-source.js");
+    const { getSourceById } = await import("./db.js");
+    const srcFull = await getSourceById(sourceId);
+    if (!srcFull?.url) {
+      throw new Error("no_url_for_source");
+    }
+    await ingestRssSource(boss, { id: sourceId, url: srcFull.url });
+    return;
+  }
+  if (row.kind === "youtube_channel" || row.kind === "youtube_search") {
+    const { ingestYouTubeSource } = await import(
+      "./actions/ingest-youtube-source.js"
+    );
+    const { getSourceById } = await import("./db.js");
+    const srcFull = await getSourceById(sourceId);
+    if (!srcFull) {
+      throw new Error("not_found");
+    }
+    await ingestYouTubeSource(boss, srcFull);
+    return;
+  }
+  throw new Error("unsupported_kind");
 }
 
 function registerScheduleYouTube(app: express.Express) {

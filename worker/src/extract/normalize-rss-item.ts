@@ -24,7 +24,7 @@ export type NormalizedRssItem = {
 
 export function normalizeRssItem(
   item: RssItem,
-  sourceUrl: string
+  _sourceUrl: string
 ): NormalizedRssItem | null {
   const guid = getText(item.guid) || item.id || getText(item.link) || "";
   const link = canonicalizeUrl(getText(item.link) || "");
