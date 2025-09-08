@@ -11,6 +11,7 @@ export async function signInWithEmail(email: string): Promise<ActionResponse> {
     email,
     options: {
       emailRedirectTo: getURL("/auth/callback"),
+      shouldCreateUser: false,
     },
   });
 

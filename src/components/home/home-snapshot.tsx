@@ -9,7 +9,7 @@ import {
   IoSearch,
   IoTrendingUp,
 } from "react-icons/io5";
-import { StoryKindIcon } from "@/components/stories/StoryKindIcon";
+import { StoryKindIcon } from "@/components/stories/story-kind-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Cluster } from "@/types/stories";

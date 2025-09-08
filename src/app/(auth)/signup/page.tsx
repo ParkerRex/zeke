@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { signInWithEmail } from "@/actions/auth/sign-in-with-email";
 
 import { signInWithOAuth } from "@/actions/auth/sign-in-with-oauth";
-import { AuthResearchAside } from "@/components/auth/AuthResearchAside";
+import { AuthResearchAside } from "@/components/auth/auth-research-aside";
 import { Logo } from "@/components/logo";
 import { AuthUI } from "../auth-ui";
 

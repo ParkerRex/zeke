@@ -1,4 +1,4 @@
-import CompanyPanel from '@/components/company/CompanyPanel';
+import CompanyPanel from '@/components/company/company-panel';
 import CompanyHydrator from './hydrate-client';
 
 export default function CompanySlugPage({ params }: { params: { slug: string } }) {

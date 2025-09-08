@@ -11,13 +11,19 @@ type ContentRow = Database["public"]["Tables"]["contents"]["Row"];
 type OverlayRow = Database["public"]["Tables"]["story_overlays"]["Row"];
 
 type StoryWithRelations = StoryRow & {
-  story_overlays?: OverlayRow | OverlayRow[];
-  contents?: ContentRow | ContentRow[];
+  story_overlays: Pick<
+    OverlayRow,
+    "why_it_matters" | "chili" | "confidence" | "citations"
+  > | null;
+  contents: Pick<
+    ContentRow,
+    "transcript_url" | "transcript_vtt" | "duration_seconds" | "view_count"
+  > | null;
 };
 
 function mapStoryToCluster(story: StoryWithRelations): Cluster {
-  const overlay = extractFirstElement(story.story_overlays);
-  const content = extractFirstElement(story.contents);
+  const overlay = story.story_overlays ?? undefined;
+  const content = story.contents ?? undefined;
   const embedUrl = buildEmbedUrl(story, content);
 
   return {
@@ -31,13 +37,11 @@ function mapStoryToCluster(story: StoryWithRelations): Cluster {
   };
 }
 
-function extractFirstElement<T>(data: T | T[] | undefined): T | undefined {
-  return Array.isArray(data) ? data[0] : data;
-}
+// Nested selects return objects for one-to-one relations; keep optional checks for safety.
 
 function buildEmbedUrl(
   story: StoryWithRelations,
-  content: ContentRow | undefined
+  content: Pick<ContentRow, "transcript_url"> | undefined
 ): string {
   if (story.kind === "youtube" && content?.transcript_url) {
     const videoId = content.transcript_url.replace("youtube://", "");
@@ -46,7 +50,14 @@ function buildEmbedUrl(
   return story.primary_url || story.canonical_url || "";
 }
 
-function buildOverlays(overlay: OverlayRow | undefined) {
+function buildOverlays(
+  overlay:
+    | Pick<
+        OverlayRow,
+        "why_it_matters" | "chili" | "confidence" | "citations"
+      >
+    | undefined
+) {
   return {
     whyItMatters: overlay?.why_it_matters || "Analysis pending...",
     chili: overlay?.chili || 0,
@@ -57,7 +68,12 @@ function buildOverlays(overlay: OverlayRow | undefined) {
 
 function buildYoutubeMetadata(
   kind: string | null,
-  content: ContentRow | undefined
+  content:
+    | Pick<
+        ContentRow,
+        "transcript_url" | "transcript_vtt" | "duration_seconds" | "view_count"
+      >
+    | undefined
 ) {
   if (kind !== "youtube" || !content) {
     return;
@@ -97,6 +113,7 @@ export async function listStories(): Promise<Cluster[]> {
         )
       `
       )
+      .returns<StoryWithRelations[]>()
       .order("created_at", { ascending: false })
       .limit(STORIES_LIMIT);
 

@@ -1,4 +1,4 @@
-import CompanyPanel from '@/components/company/CompanyPanel';
+import CompanyPanel from '@/components/company/company-panel';
 
 export default function CompanyPage() {
   return <CompanyPanel />;

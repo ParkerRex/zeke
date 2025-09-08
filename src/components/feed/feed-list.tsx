@@ -1,6 +1,6 @@
 import { listStories } from "@db/queries/stories/list-stories";
 
-import StoryRow from "./StoryRow";
+import StoryRow from "./story-row";
 
 export default async function FeedList() {
   // Server component: fetch clusters (placeholder from in-memory util)

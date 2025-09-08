@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@db/queries/account/get-session';
 import { getSubscription } from '@db/queries/account/get-subscription';
 import { Logo } from '@/components/logo';
-import { AuthResearchAside } from '@/components/auth/AuthResearchAside';
+import { AuthResearchAside } from '@/components/auth/auth-research-aside';
 
 import { signInWithOAuth } from '@/actions/auth/sign-in-with-oauth';
 import { signInWithEmail } from '@/actions/auth/sign-in-with-email';

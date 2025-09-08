@@ -1,6 +1,6 @@
 "use client";
 
-import StoryRow from "@/components/feed/StoryRow";
+import StoryRow from "@/components/feed/story-row";
 import { STRINGS } from "@/constants/strings";
 import { useStories } from "@/hooks/use-stories";
 

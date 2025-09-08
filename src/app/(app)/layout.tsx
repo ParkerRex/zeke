@@ -4,11 +4,11 @@ import { useQueryState } from "nuqs";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { IoChevronBack, IoChevronForward, IoMenu } from "react-icons/io5";
-import TodayFeedClient from "@/components/feed/TodayFeedClient";
-import HomeSnapshot from "@/components/home/HomeSnapshot";
-import Sidebar from "@/components/shell/Sidebar";
-import TabsContentViewport from "@/components/tabs/TabsContentViewport";
-import TabsStrip from "@/components/tabs/TabsStrip";
+import TodayFeedClient from "@/components/feed/today-feed-client";
+import HomeSnapshot from "@/components/home/home-snapshot";
+import Sidebar from "@/components/shell/sidebar";
+import TabsContentViewport from "@/components/tabs/tabs-content-viewport";
+import TabsStrip from "@/components/tabs/tabs-strip";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

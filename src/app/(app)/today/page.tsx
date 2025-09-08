@@ -1,4 +1,4 @@
-import FeedList from '@/components/feed/FeedList';
+import FeedList from '@/components/feed/feed-list';
 
 export default function TodayPage() {
   return (

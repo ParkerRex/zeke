@@ -1,5 +1,4 @@
 import { Tailwind } from "@react-email/tailwind";
-import * as React from "react";
 
 export default function WelcomeEmail() {
   return (

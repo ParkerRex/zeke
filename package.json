@@ -16,8 +16,6 @@
     "worker:stop": "bash scripts/worker-stop.sh",
     "db:clean:youtube": "bash scripts/db-clean-youtube-bad.sh",
     "dev:next": "next dev --turbopack --port 3000",
-    "dev:setup": "bash scripts/dev-start.sh",
-    "bootstrap": "bash scripts/bootstrap.sh",
     "email:dev": "email dev --dir ./src/emails --port 3001",
     "lint": "next lint && cd worker && pnpm run lint",
     "fix:biome": "biome lint --apply .",

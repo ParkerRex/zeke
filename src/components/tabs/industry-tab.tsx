@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import StoryRow from "@/components/feed/StoryRow";
+import StoryRow from "@/components/feed/story-row";
 import type { Tab } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
 

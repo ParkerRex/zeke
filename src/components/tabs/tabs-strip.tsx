@@ -7,7 +7,7 @@ import type {
   MouseEvent as ReactMouseEvent,
 } from "react";
 import { useEffect, useRef, useState } from "react";
-import { StoryKindIcon } from "@/components/stories/StoryKindIcon";
+import { StoryKindIcon } from "@/components/stories/story-kind-icon";
 import {
   ContextMenu,
   ContextMenuContent,

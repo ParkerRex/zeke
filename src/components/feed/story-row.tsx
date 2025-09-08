@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { StoryKindIcon } from "@/components/stories/StoryKindIcon";
+import { StoryKindIcon } from "@/components/stories/story-kind-icon";
 import { useTabs } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
 import { domainFromUrl } from "@/utils/url";

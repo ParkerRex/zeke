@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
-import StoryRow from "@/components/feed/StoryRow";
+import StoryRow from "@/components/feed/story-row";
 import { companyViewParser } from "@/lib/nuqs";
 import type { Tab } from "@/stores/tabsStore";
 import type { Cluster } from "@/types/stories";
