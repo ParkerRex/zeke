@@ -1,7 +1,7 @@
 import { getSession } from "@db/queries/account/get-session";
 import Link from "next/link";
-// import Image from 'next/image';
-import { IoMenu } from "react-icons/io5";
+import Image from "next/image";
+import { IoMenu, IoPerson } from "react-icons/io5";
 import { signOut } from "@/actions/auth/sign-out";
 import { AccountMenu } from "@/components/account-menu";
 import { Logo } from "@/components/logo";
@@ -17,12 +17,18 @@ import {
 
 export async function Navigation() {
   const session = await getSession();
+  const avatarUrl = (session?.user as any)?.user_metadata?.avatar_url ??
+    (session?.user as any)?.user_metadata?.picture ?? null;
 
   return (
     <div className="relative flex items-center gap-6">
       {session ? (
         <div className="flex items-center gap-3">
-          <AccountMenu email={session.user?.email} signOutAction={signOut} />
+          <AccountMenu
+            avatarUrl={avatarUrl}
+            email={session.user?.email}
+            signOutAction={signOut}
+          />
           {session.user?.email && (
             <Link
               className="hidden rounded-full border px-3 py-1 text-gray-700 text-sm transition-colors hover:bg-gray-50 lg:inline-block"
@@ -45,9 +51,20 @@ export async function Navigation() {
                 <SheetDescription className="py-8">
                   <div className="flex items-center gap-3">
                     {/* Inline avatar/initials */}
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700 text-sm">
-                      {(session.user?.email?.[0] ?? "").toUpperCase()}
-                    </div>
+                    {avatarUrl ? (
+                      <Image
+                        alt={session.user?.email ?? "Account"}
+                        className="h-9 w-9 rounded-full object-cover"
+                        height={36}
+                        src={avatarUrl}
+                        unoptimized
+                        width={36}
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700 text-sm">
+                        {(session.user?.email?.[0] ?? "").toUpperCase()}
+                      </div>
+                    )}
                     {session.user?.email && (
                       <div className="text-gray-700 text-xs">
                         {session.user.email}
@@ -74,16 +91,21 @@ export async function Navigation() {
           <Button
             asChild
             className="hidden flex-shrink-0 lg:flex"
-            variant="ghost"
+            size="nav"
+            variant="outline"
           >
-            <Link href="/login">Sign in</Link>
+            <Link className="flex items-center gap-2" href="/login">
+              <span>Login</span>
+              <IoPerson size={16} />
+            </Link>
           </Button>
           <Button
             asChild
             className="hidden flex-shrink-0 lg:flex"
+            size="nav"
             variant="default"
           >
-            <Link href="/signup">Launch your workspace</Link>
+            <Link href="/signup">Try for free</Link>
           </Button>
           <Sheet>
             <SheetTrigger
@@ -96,11 +118,11 @@ export async function Navigation() {
               <SheetHeader>
                 <Logo />
                 <SheetDescription className="flex gap-3 py-8">
-                  <Button asChild className="flex-shrink-0" variant="secondary">
+                  <Button asChild className="flex-shrink-0" variant="outline">
                     <Link href="/login">Sign in</Link>
                   </Button>
                   <Button asChild className="flex-shrink-0" variant="default">
-                    <Link href="/signup">Launch your workspace</Link>
+                    <Link href="/signup">Try for free</Link>
                   </Button>
                 </SheetDescription>
               </SheetHeader>

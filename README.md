@@ -52,4 +52,25 @@ Seed and verify Stripe → DB sync
 - Supabase Studio (http://127.0.0.1:54323):
   - `public.products` has “Pro”
   - `public.prices` has monthly USD `unit_amount=10000`
-- UI: `/pricing` shows $100/month (no “Custom”).
+ - UI: `/pricing` shows $100/month (no “Custom”).
+
+### Stripe Webhook Resiliency
+
+- The webhook at `src/app/api/webhooks/route.ts` is resilient to out‑of‑order deliveries:
+  - For `price.created` / `price.updated`, it first attempts to upsert the Price.
+  - On a foreign‑key violation (Price before Product), it fetches and upserts the Product, then retries the Price once.
+  - This covers cases where Stripe or the app processes Product/Price events non‑deterministically.
+
+### Quick Webhook Test
+
+1. Ensure `stripe listen` is running and `STRIPE_WEBHOOK_SECRET` is set in `.env.development` (restart Next after editing).
+2. Seed: `stripe fixtures ./stripe-fixtures.json --api-key "$STRIPE_SECRET_KEY"` → products/prices should populate.
+3. Optional out‑of‑order simulation:
+   - Delete the Product in Supabase Studio.
+   - In Workbench, open the related `price.created` event and click “Resend”.
+   - Webhook will fetch Product, upsert it, then upsert Price successfully.
+
+Notes
+
+- For local dev we use the Stripe CLI only; no tunnel required.
+- When you restart `stripe listen`, paste the new `whsec_…` into `.env.development` and restart Next.js.

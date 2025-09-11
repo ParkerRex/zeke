@@ -65,7 +65,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </aside>
 
         {/* Global top bar with tabs strip */}
-        <header className="col-start-2 flex items-center gap-2 border-b p-2">
+        <header className="col-start-2 flex h-11 items-center gap-2 border-b bg-[#EBEBEF] px-2">
           {/* Mobile: open sidebar panel in a sheet */}
           {showSidebarPanel && (
             <Sheet>
@@ -90,31 +90,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Sheet>
           )}
 
-          {/* Back button (IDE-style) */}
-          {usesViewer && (
-            <button
-              aria-label="Back"
-              className="hidden items-center gap-2 rounded-md border border-transparent px-2 py-1 text-gray-700 text-sm transition-colors hover:border-gray-200 hover:bg-white sm:inline-flex"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  // Guard router.back with same-origin referrer; otherwise go to /stories
-                  const ref = document.referrer;
-                  let sameOrigin = false;
-                  try {
-                    const refUrl = ref ? new URL(ref) : null;
-                    sameOrigin = !!(
-                      refUrl && refUrl.origin === window.location.origin
-                    );
-                  } catch {}
-                  if (window.history.length > 1 && sameOrigin) router.back();
-                  else router.push("/stories");
-                }
-              }}
-              type="button"
-            >
-              ← Back
-            </button>
-          )}
+          {/* Back button removed per design */}
 
           {/* Tabs strip */}
           <div className="ml-1 flex min-w-0 flex-1 overflow-hidden">

@@ -7,7 +7,7 @@ import type { ActionResponse } from "@/types/action-response";
 import { getURL } from "@/utils/get-url";
 
 export async function signInWithOAuth(
-  provider: "github" | "google"
+  provider: "google"
 ): Promise<ActionResponse> {
   const supabase = await createSupabaseServerClient();
 

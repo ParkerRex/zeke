@@ -1,6 +1,6 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
-import { Montserrat, Montserrat_Alternates } from "next/font/google";
+import { Hubot_Sans } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,14 +10,8 @@ import "@/styles/globals.css";
 
 export const dynamic = "force-dynamic";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-});
-
-const montserratAlternates = Montserrat_Alternates({
-  variable: "--font-montserrat-alternates",
-  weight: ["500", "600", "700"],
+const hubot = Hubot_Sans({
+  variable: "--font-hubot-sans",
   subsets: ["latin"],
 });
 
@@ -72,8 +66,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body
         className={cn(
           "font-sans antialiased",
-          montserrat.variable,
-          montserratAlternates.variable
+          hubot.variable
         )}
       >
         <NuqsAdapter>{children}</NuqsAdapter>

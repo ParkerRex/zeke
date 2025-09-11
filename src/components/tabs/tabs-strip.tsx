@@ -1,5 +1,5 @@
 "use client";
-import { Pin, X } from "lucide-react";
+import { Pin, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type {
@@ -7,7 +7,6 @@ import type {
   MouseEvent as ReactMouseEvent,
 } from "react";
 import { useEffect, useRef, useState } from "react";
-import { StoryKindIcon } from "@/components/stories/story-kind-icon";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -469,10 +468,10 @@ export default function TabsStrip() {
                         <div
                           aria-controls={`tabpanel-${t.id}`}
                           aria-selected={activeId === t.id}
-                          className={`group mr-1 flex min-w-[104px] max-w-[260px] flex-1 basis-[200px] select-none items-center gap-2 rounded-[10px] border px-2.5 py-1 text-sm transition-all ${
+                          className={`group mr-1 flex h-8 min-w-[120px] max-w-[280px] flex-1 basis-[200px] select-none items-center gap-2 rounded-[8px] border px-3 text-sm transition-all ${
                             activeId === t.id
-                              ? "border-gray-200 bg-white text-gray-900 shadow-sm"
-                              : "border-transparent bg-gray-100 text-gray-700 hover:border-gray-300 hover:bg-white hover:shadow-sm"
+                              ? "border-gray-300 bg-[#F7F7F9] text-gray-900 shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+                              : "border-transparent bg-[#EBEBEF] text-gray-800 hover:border-gray-300 hover:bg-[#F7F7F9]"
                           } ${t.preview ? "italic" : ""}`}
                           id={`tab-${t.id}`}
                           onClick={() => onTabClick(t as TabFull)}
@@ -492,14 +491,14 @@ export default function TabsStrip() {
                           tabIndex={activeId === t.id ? 0 : -1}
                           title={t.title}
                         >
-                          <StoryKindIcon kind={t.embedKind} />
+                          <Favicon kind={t.embedKind} url={t.embedUrl} />
                           <span className="truncate">{t.title}</span>
                           {t.pinned ? (
                             <Pin className="h-3.5 w-3.5 opacity-70" />
                           ) : null}
                           <button
                             aria-label={`Close ${t.title}`}
-                            className={`ml-1 inline-flex h-6 w-6 items-center justify-center rounded transition-opacity hover:bg-gray-100 ${
+                            className={`ml-1 inline-flex h-5 w-5 items-center justify-center rounded transition-opacity hover:bg-gray-200 ${
                               activeId === t.id
                                 ? "opacity-100"
                                 : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"
@@ -510,7 +509,7 @@ export default function TabsStrip() {
                             }}
                             type="button"
                           >
-                            <X className="h-4 w-4 opacity-80 transition-opacity hover:opacity-100" />
+                            <X className="h-3 w-3 opacity-70 transition-opacity hover:opacity-100" />
                           </button>
                         </div>
                       </ContextMenuTrigger>
@@ -521,7 +520,7 @@ export default function TabsStrip() {
                     >
                       <div className="p-2">
                         <div className="mb-2 flex items-center gap-2">
-                          <StoryKindIcon kind={t.embedKind} />
+                          <Favicon kind={t.embedKind} url={t.embedUrl} />
                           <div className="min-w-0 flex-1">
                             <div className="truncate font-medium text-sm">
                               {t.title}
@@ -570,9 +569,81 @@ export default function TabsStrip() {
                 </ContextMenu>
               </div>
             ))}
+            {/* New Tab button at the end */}
+            <div className="ml-1 flex items-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    aria-label="New Tab"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border bg-[#EBEBEF] text-gray-700 hover:bg-[#F7F7F9]"
+                    onClick={() => {
+                      const id = `tab:discover:${Date.now()}`;
+                      useTabs.getState().openTab({
+                        id,
+                        title: "Discover",
+                        embedKind: "industry",
+                        embedUrl: "",
+                        overlays: {
+                          whyItMatters: "",
+                          chili: 0,
+                          confidence: 0,
+                          sources: [],
+                        },
+                        context: { industry: "All" },
+                      });
+                      setActive(id);
+                    }}
+                    type="button"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">New Tab</TooltipContent>
+              </Tooltip>
+            </div>
           </TooltipProvider>
         </div>
       </div>
     </div>
+  );
+}
+
+function Favicon({ url, kind }: { url: string; kind: string }) {
+  const [broken, setBroken] = useState(false);
+  const d = (() => {
+    try {
+      return domainFromUrl(url);
+    } catch {
+      return "";
+    }
+  })();
+  const src = !broken && d ? `https://logo.clearbit.com/${d}` : undefined;
+  const fallbackColor =
+    kind === "youtube"
+      ? "bg-red-400"
+      : kind === "reddit"
+        ? "bg-orange-400"
+        : kind === "hn"
+          ? "bg-amber-500"
+          : "bg-gray-300";
+  const label = (d || kind || "").slice(0, 1).toUpperCase();
+  if (!src) {
+    return (
+      <div
+        className={`inline-flex h-4 w-4 items-center justify-center rounded-full ${fallbackColor} text-[10px] text-white`}
+      >
+        {label || "•"}
+      </div>
+    );
+  }
+  return (
+    <Image
+      alt=""
+      className="h-4 w-4 rounded-sm object-contain"
+      height={16}
+      onError={() => setBroken(true)}
+      src={src}
+      width={16}
+    />
   );
 }

@@ -1,8 +1,6 @@
 import { getSession } from "@db/queries/account/get-session";
 import { getSubscription } from "@db/queries/account/get-subscription";
 import { redirect } from "next/navigation";
-import { signInWithEmail } from "@/actions/auth/sign-in-with-email";
-
 import { signInWithOAuth } from "@/actions/auth/sign-in-with-oauth";
 import { AuthResearchAside } from "@/components/auth/auth-research-aside";
 import { Logo } from "@/components/logo";
@@ -34,7 +32,6 @@ export default async function SignUp() {
             align="left"
             mode="signup"
             showBrand={false}
-            signInWithEmail={signInWithEmail}
             signInWithOAuth={signInWithOAuth}
           />
         </div>

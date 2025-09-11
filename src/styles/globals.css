@@ -13,7 +13,8 @@
 }
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Light mode background set to #F2F2F7 */
+    --background: 240 10% 96%;
     --foreground: 0 0% 0%;
 
     --muted: 0 0% 97%;
@@ -77,6 +78,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Ensure exact match to requested light background color */
+    background-color: #F2F2F7;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
