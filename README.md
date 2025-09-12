@@ -1,4 +1,6 @@
-# ZEKE – AI-Powered News Intelligence Platform
+# ∆ / ZEKE
+
+** News Intelligence Platform**
 
 ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers stories and insights through a modern Next.js web app.
 
