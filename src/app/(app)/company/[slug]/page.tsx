@@ -1,7 +1,11 @@
-import CompanyPanel from '@/components/company/company-panel';
-import CompanyHydrator from './hydrate-client';
+import CompanyPanel from "@/components/company/company-panel";
+import CompanyHydrator from "./hydrate-client";
 
-export default function CompanySlugPage({ params }: { params: { slug: string } }) {
+export default function CompanySlugPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const { slug } = params;
   return (
     <>
@@ -10,14 +14,19 @@ export default function CompanySlugPage({ params }: { params: { slug: string } }
     </>
   );
 }
-import type { Metadata } from 'next';
-import { getCompanyMetaBySlug } from '@/data/company';
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+import type { Metadata } from "next";
+import { getCompanyMetaBySlug } from "@/data/company";
+
+export function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Metadata {
   const meta = getCompanyMetaBySlug(params.slug);
-  const title = meta ? `${meta.name} • Company • ZEKE` : `Company • ZEKE`;
+  const title = meta ? `${meta.name} • Company • ZEKE` : "Company • ZEKE";
   const description = meta
     ? `Latest news and CEO updates for ${meta.name}.`
-    : 'Explore company news and CEO updates.';
+    : "Explore company news and CEO updates.";
   return { title, description };
 }

@@ -52,10 +52,7 @@ function buildEmbedUrl(
 
 function buildOverlays(
   overlay:
-    | Pick<
-        OverlayRow,
-        "why_it_matters" | "chili" | "confidence" | "citations"
-      >
+    | Pick<OverlayRow, "why_it_matters" | "chili" | "confidence" | "citations">
     | undefined
 ) {
   return {

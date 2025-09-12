@@ -15,13 +15,16 @@ export const productMetadataSchema = z
     support_level: z.string().optional(),
   })
   .transform((data) => {
-    const normalizedVariant = (typeof data.price_card_variant === "string"
-      ? data.price_card_variant.toLowerCase()
-      : data.price_card_variant) as z.infer<typeof priceCardVariantSchema>;
+    const normalizedVariant = (
+      typeof data.price_card_variant === "string"
+        ? data.price_card_variant.toLowerCase()
+        : data.price_card_variant
+    ) as z.infer<typeof priceCardVariantSchema>;
 
-    const price = typeof data.price === "string"
-      ? Number.parseFloat(data.price)
-      : data.price;
+    const price =
+      typeof data.price === "string"
+        ? Number.parseFloat(data.price)
+        : data.price;
 
     return {
       priceCardVariant: normalizedVariant,

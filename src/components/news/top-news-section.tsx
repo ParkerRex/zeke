@@ -57,7 +57,10 @@ function TopNewsCard({ story }: { story: Cluster }) {
         {/* Placeholder for bookmark icon */}
       </div>
       <h3 className="mb-2 font-semibold leading-snug">
-        <Link className="hover:underline" href={`/stories/${encodeURIComponent(story.id)}`}>
+        <Link
+          className="hover:underline"
+          href={`/stories/${encodeURIComponent(story.id)}`}
+        >
           {story.title}
         </Link>
       </h3>
@@ -66,14 +69,21 @@ function TopNewsCard({ story }: { story: Cluster }) {
         <SourcesBadge count={Math.max(2, sources)} />
       </div>
       <div className="relative h-[150px] overflow-hidden rounded">
-        <Image alt="" fill className="object-cover" src={img} />
-        <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-[11px] text-white">1 hour ago</div>
+        <Image alt="" className="object-cover" fill src={img} />
+        <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-[11px] text-white">
+          1 hour ago
+        </div>
       </div>
     </article>
   );
 }
 
-export default async function TopNewsSection({ title = "Top News", limit = 6, showDate = true, stories }: Props) {
+export default async function TopNewsSection({
+  title = "Top News",
+  limit = 6,
+  showDate = true,
+  stories,
+}: Props) {
   const items = stories ?? (await listStories());
   const grid = items.slice(0, limit);
   return (
@@ -106,11 +116,16 @@ export default async function TopNewsSection({ title = "Top News", limit = 6, sh
         ))}
       </div>
       <div className="mt-4">
-        <Link className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm hover:bg-gray-50" href="/stories">
-          Show More <span aria-hidden className="text-lg leading-none">+</span>
+        <Link
+          className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm hover:bg-gray-50"
+          href="/stories"
+        >
+          Show More{" "}
+          <span aria-hidden className="text-lg leading-none">
+            +
+          </span>
         </Link>
       </div>
     </section>
   );
 }
-

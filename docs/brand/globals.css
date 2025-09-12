@@ -1,0 +1,513 @@
+/* biome-ignore-all lint: custom file */
+@import "tailwindcss";
+
+/* Custom Font Imports */
+@font-face {
+  font-family: "Mozilla Headline";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/MozillaHeadline-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Mozilla Headline";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/MozillaHeadline-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Mozilla Text";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/MozillaText-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Mozilla Text";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/MozillaText-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Metropolis";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/Metropolis-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Metropolis";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/Metropolis-Bold.woff2") format("woff2");
+}
+
+/* CSS Custom Properties for Dynamic Theming */
+:root {
+  /* Mozilla Brand Colors - Neon Palette */
+  --color-moz-neon-blue: #00ffff;
+  --color-moz-neon-green: #54ffbd;
+  --color-moz-lemon-yellow: #fff44f;
+  --color-moz-warm-red: #ff4f5e;
+  --color-moz-dark-purple: #6e008b;
+  --color-moz-dark-green: #005e5e;
+  --color-moz-dark-blue: #00458b;
+
+  /* Green Scale */
+  --color-green-50: #e3fff3;
+  --color-green-100: #d1ffee;
+  --color-green-200: #b3ffe3;
+  --color-green-300: #88ffd1;
+  --color-green-400: #54ffbd;
+  --color-green-500: #3fe1b0;
+  --color-green-600: #2ac3a2;
+  --color-green-700: #008787;
+  --color-green-800: #005e5e;
+  --color-green-900: #08403f;
+
+  /* Blue Scale */
+  --color-blue-50: #aaf2ff;
+  --color-blue-100: #80ebff;
+  --color-blue-200: #00ddff;
+  --color-blue-300: #00b3f4;
+  --color-blue-400: #0090ed;
+  --color-blue-500: #0060df;
+  --color-blue-600: #0250bb;
+  --color-blue-700: #054096;
+  --color-blue-800: #073072;
+  --color-blue-900: #09204d;
+
+  /* Violet Scale */
+  --color-violet-50: #e7dfff;
+  --color-violet-100: #d9bfff;
+  --color-violet-200: #cb9eff;
+  --color-violet-300: #c689ff;
+  --color-violet-400: #ab71ff;
+  --color-violet-500: #9059ff;
+  --color-violet-600: #7542e5;
+  --color-violet-700: #592acb;
+  --color-violet-800: #45278d;
+  --color-violet-900: #321c64;
+
+  /* Purple Scale */
+  --color-purple-50: #f7e2ff;
+  --color-purple-100: #f6b8ff;
+  --color-purple-200: #f68fff;
+  --color-purple-300: #f770ff;
+  --color-purple-400: #d74cf0;
+  --color-purple-500: #b833e1;
+  --color-purple-600: #952bb9;
+  --color-purple-700: #722291;
+  --color-purple-800: #4e1a69;
+  --color-purple-900: #2b1141;
+
+  /* Red Scale */
+  --color-red-50: #ffdfe7;
+  --color-red-100: #ffbdc5;
+  --color-red-200: #ff9aa2;
+  --color-red-300: #ff848b;
+  --color-red-400: #ff6a75;
+  --color-red-500: #ff4f5e;
+  --color-red-600: #e22850;
+  --color-red-700: #c50042;
+  --color-red-800: #810220;
+  --color-red-900: #440306;
+
+  /* Yellow Scale */
+  --color-yellow-50: #ffffcc;
+  --color-yellow-100: #ffff98;
+  --color-yellow-200: #ffea80;
+  --color-yellow-300: #ffd567;
+  --color-yellow-400: #ffbd4f;
+  --color-yellow-500: #ffa436;
+  --color-yellow-600: #e27f2e;
+  --color-yellow-700: #c45a27;
+  --color-yellow-800: #a7341f;
+  --color-yellow-900: #960e18;
+
+  /* Light Gray Scale */
+  --color-light-gray-50: #ffffff;
+  --color-light-gray-100: #f9f9fb;
+  --color-light-gray-200: #f0f0f4;
+  --color-light-gray-300: #e0e0e6;
+  --color-light-gray-400: #cfcfd8;
+  --color-light-gray-500: #bfbfc9;
+  --color-light-gray-600: #afafba;
+  --color-light-gray-700: #9f9fad;
+  --color-light-gray-800: #8f8f9e;
+  --color-light-gray-900: #80808f;
+
+  /* Dark Gray Scale */
+  --color-dark-gray-50: #5b5b66;
+  --color-dark-gray-100: #52525e;
+  --color-dark-gray-200: #4a4a55;
+  --color-dark-gray-300: #42414d;
+  --color-dark-gray-400: #3a3944;
+  --color-dark-gray-500: #32313c;
+  --color-dark-gray-600: #2b2a33;
+  --color-dark-gray-700: #23222b;
+  --color-dark-gray-800: #1c1b22;
+  --color-dark-gray-900: #15141a;
+
+  /* Semantic Colors */
+  --color-background: var(--color-light-gray-50);
+  --color-foreground: var(--color-dark-gray-900);
+  --color-card: var(--color-light-gray-50);
+  --color-card-foreground: var(--color-dark-gray-900);
+  --color-border: var(--color-light-gray-300);
+  --color-input: var(--color-light-gray-100);
+  --color-ring: var(--color-blue-500);
+  --color-primary: var(--color-blue-500);
+  --color-primary-foreground: var(--color-light-gray-50);
+  --color-secondary: var(--color-violet-500);
+  --color-secondary-foreground: var(--color-light-gray-50);
+  --color-success: var(--color-green-600);
+  --color-warning: var(--color-yellow-600);
+  --color-error: var(--color-red-600);
+  --color-link: var(--color-blue-500);
+  --color-link-hover: var(--color-blue-600);
+
+  /* Typography */
+  --font-heading:
+    "Mozilla Headline", "Inter", system-ui, -apple-system, sans-serif;
+  --font-body: "Mozilla Text", "Inter", system-ui, -apple-system, sans-serif;
+  --font-firefox: "Metropolis", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "Consolas", "Monaco", "Andale Mono", "Ubuntu Mono", monospace;
+
+  /* Border Radius */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Spacing - Component Level */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Spacing - Layout Level */
+  --layout-2xs: 16px;
+  --layout-xs: 24px;
+  --layout-sm: 32px;
+  --layout-md: 48px;
+  --layout-lg: 64px;
+  --layout-xl: 96px;
+  --layout-2xl: 192px;
+
+  /* Container Widths */
+  --content-xs: 304px;
+  --content-sm: 432px;
+  --content-md: 688px;
+  --content-lg: 928px;
+  --content-xl: 1152px;
+  --content-max: 1440px;
+
+  /* Animations */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--color-dark-gray-900);
+    --color-foreground: var(--color-light-gray-100);
+    --color-card: var(--color-dark-gray-800);
+    --color-card-foreground: var(--color-light-gray-100);
+    --color-border: var(--color-dark-gray-600);
+    --color-input: var(--color-dark-gray-700);
+  }
+}
+
+/* Base Styles */
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+    font-size: 16px;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  /* Typography defaults */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    @apply font-bold tracking-tight;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl lg:text-7xl;
+    line-height: 1.1;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+    line-height: 1.2;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    line-height: 1.3;
+  }
+
+  h4 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+    line-height: 1.4;
+  }
+
+  h5 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  h6 {
+    @apply text-lg md:text-xl lg:text-2xl;
+  }
+
+  p {
+    @apply text-base md:text-lg;
+    line-height: 1.6;
+  }
+
+  a {
+    @apply text-link transition-colors duration-200;
+    text-decoration: underline;
+  }
+
+  a:hover {
+    @apply text-link-hover;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* Component Styles */
+@layer components {
+  /* Button base styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-md font-medium transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    font-family: var(--font-body);
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border-2 border-current text-primary hover:bg-primary hover:text-primary-foreground;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-primary/10 text-primary;
+  }
+
+  .btn-danger {
+    @apply bg-error text-white hover:bg-error/90;
+  }
+
+  /* Size variants */
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-card text-card-foreground rounded-lg p-6 shadow-sm border border-border;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-2 rounded-md border border-border bg-input;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+    @apply placeholder:text-foreground/50;
+  }
+
+  .input-error {
+    @apply border-error focus:ring-error;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-sm text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .badge-success {
+    @apply bg-success/10 text-success;
+  }
+
+  .badge-warning {
+    @apply bg-warning/10 text-warning;
+  }
+
+  .badge-error {
+    @apply bg-error/10 text-error;
+  }
+
+  /* Container styles */
+  .container-content {
+    @apply mx-auto px-4 md:px-6 lg:px-8;
+    max-width: var(--content-xl);
+  }
+
+  .container-narrow {
+    @apply mx-auto px-4 md:px-6;
+    max-width: var(--content-md);
+  }
+
+  .container-wide {
+    @apply mx-auto px-4 md:px-6 lg:px-8;
+    max-width: var(--content-max);
+  }
+}
+
+/* Utility Styles */
+@layer utilities {
+  /* Mozilla Neon Accents */
+  .text-moz-cyan {
+    color: var(--color-moz-neon-blue);
+  }
+
+  .text-moz-green {
+    color: var(--color-moz-neon-green);
+  }
+
+  .text-moz-yellow {
+    color: var(--color-moz-lemon-yellow);
+  }
+
+  .text-moz-red {
+    color: var(--color-moz-warm-red);
+  }
+
+  .bg-moz-purple {
+    background-color: var(--color-moz-dark-purple);
+  }
+
+  /* Text Balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation: fadeIn var(--transition-slow) ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp var(--transition-base) ease-out;
+  }
+
+  .animate-scale {
+    animation: scaleIn var(--transition-fast) ease-out;
+  }
+
+  /* Gradient utilities */
+  .gradient-moz {
+    background: linear-gradient(
+      135deg,
+      var(--color-moz-neon-blue),
+      var(--color-moz-neon-green)
+    );
+  }
+
+  .gradient-firefox {
+    background: linear-gradient(
+      135deg,
+      var(--color-yellow-500),
+      var(--color-red-500)
+    );
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mozilla-specific shadow styles */
+.shadow-mozilla-sm {
+  box-shadow:
+    0 8px 12px 1px rgba(29, 17, 51, 0.04),
+    0 3px 16px 2px rgba(9, 32, 77, 0.12),
+    0 5px 10px -3px rgba(29, 17, 51, 0.12);
+}
+
+.shadow-mozilla-md {
+  box-shadow:
+    0 16px 24px 2px rgba(29, 17, 51, 0.04),
+    0 6px 32px 4px rgba(9, 32, 77, 0.12),
+    0 8px 12px -5px rgba(29, 17, 51, 0.12);
+}
+
+.shadow-mozilla-lg {
+  box-shadow:
+    0 24px 38px 3px rgba(29, 17, 51, 0.04),
+    0 10px 48px 8px rgba(9, 32, 77, 0.12),
+    0 12px 16px -6px rgba(29, 17, 51, 0.12);
+}

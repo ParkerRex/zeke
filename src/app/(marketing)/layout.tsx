@@ -22,7 +22,7 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
 
 function AppBar() {
   return (
-    <header className="flex h-12 max-h-12 items-center justify-between border-b border-[#e5e7eb]">
+    <header className="flex h-12 max-h-12 items-center justify-between border-[#e5e7eb] border-b">
       <Logo />
       <Navigation />
     </header>

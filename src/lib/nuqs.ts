@@ -22,6 +22,10 @@ export const kindParser = parseAsStringEnum([
 
 export const panelParser = parseAsBoolean.withDefault(true);
 
+// Left navigation (rail) expanded/collapsed state
+// false = collapsed (icons only), true = expanded (wide sidebar)
+export const navParser = parseAsBoolean.withDefault(false);
+
 // Optional: encode a list of tab IDs and the active one
 export const tabsParser = parseAsArrayOf(parseAsString).withDefault([]);
 

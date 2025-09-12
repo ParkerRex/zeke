@@ -9,7 +9,10 @@ export async function GET(
   const cluster = await getStoryById(id);
   if (!cluster) {
     const HTTP_NOT_FOUND = 404;
-    return NextResponse.json({ error: "Not found" }, { status: HTTP_NOT_FOUND });
+    return NextResponse.json(
+      { error: "Not found" },
+      { status: HTTP_NOT_FOUND }
+    );
   }
   return NextResponse.json(cluster);
 }

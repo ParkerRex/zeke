@@ -2,9 +2,9 @@
 
 // Simple test script to verify YouTube API client functionality
 import "dotenv/config";
-import { createYouTubeClient } from "./dist/lib/youtube/youtube-client.js";
-import { searchVideos } from "./dist/lib/youtube/search-videos.js";
 import { getChannelUploads } from "./dist/lib/youtube/get-channel-uploads.js";
+import { searchVideos } from "./dist/lib/youtube/search-videos.js";
+import { createYouTubeClient } from "./dist/lib/youtube/youtube-client.js";
 
 async function testYouTubeAPI() {
   console.log("🧪 Testing YouTube API Client...");
@@ -20,7 +20,10 @@ async function testYouTubeAPI() {
 
     // Test 1: Search for a simple video
     console.log("\n📹 Testing video search...");
-    const videos = await searchVideos(client, { query: "AI research", maxResults: 2 });
+    const videos = await searchVideos(client, {
+      query: "AI research",
+      maxResults: 2,
+    });
     console.log(`✅ Found ${videos.length} videos`);
 
     if (videos.length > 0) {
@@ -33,7 +36,11 @@ async function testYouTubeAPI() {
 
     // Test 2: Get channel uploads (using Two Minute Papers as test)
     console.log("\n📺 Testing channel uploads...");
-    const channelVideos = await getChannelUploads(client, "UUbfYPyITQ-7l4upoX8nvctg", 2);
+    const channelVideos = await getChannelUploads(
+      client,
+      "UUbfYPyITQ-7l4upoX8nvctg",
+      2
+    );
     console.log(`✅ Found ${channelVideos.length} channel videos`);
 
     if (channelVideos.length > 0) {

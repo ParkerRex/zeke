@@ -1,10 +1,9 @@
-import ArtifactsClient from './artifacts-client';
+import ArtifactsClient from "./artifacts-client";
 
 export const metadata = {
-  title: 'Artifacts',
+  title: "Artifacts",
 };
 
 export default function ArtifactsPage() {
   return <ArtifactsClient />;
 }
-

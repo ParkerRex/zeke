@@ -1,6 +1,6 @@
 import { getSession } from "@db/queries/account/get-session";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { IoMenu, IoPerson } from "react-icons/io5";
 import { signOut } from "@/actions/auth/sign-out";
 import { AccountMenu } from "@/components/account-menu";
@@ -17,8 +17,10 @@ import {
 
 export async function Navigation() {
   const session = await getSession();
-  const avatarUrl = (session?.user as any)?.user_metadata?.avatar_url ??
-    (session?.user as any)?.user_metadata?.picture ?? null;
+  const avatarUrl =
+    (session?.user as any)?.user_metadata?.avatar_url ??
+    (session?.user as any)?.user_metadata?.picture ??
+    null;
 
   return (
     <div className="relative flex items-center gap-6">

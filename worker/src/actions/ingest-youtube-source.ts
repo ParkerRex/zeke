@@ -60,7 +60,11 @@ export async function ingestYouTubeSource(boss: PgBoss, src: SourceBase) {
     );
   } finally {
     try {
-      await upsertSourceHealth(src.id, errorMessage ? "error" : "ok", errorMessage);
+      await upsertSourceHealth(
+        src.id,
+        errorMessage ? "error" : "ok",
+        errorMessage
+      );
     } catch (error) {
       log("source_health_update_error", { error: String(error) }, "error");
     }
@@ -92,7 +96,10 @@ async function getVideosForSource(src: SourceBase): Promise<YouTubeVideo[]> {
   }
 
   if (src.kind === "youtube_search") {
-    const maxResults = parsePositiveInt(metadata.max_results, DEFAULT_MAX_VIDEOS);
+    const maxResults = parsePositiveInt(
+      metadata.max_results,
+      DEFAULT_MAX_VIDEOS
+    );
     const publishedAfter =
       parseOptionalString(metadata.published_after) ||
       new Date(Date.now() - DAYS_LOOKBACK * MS_PER_DAY).toISOString();
@@ -117,7 +124,7 @@ async function getVideosForSource(src: SourceBase): Promise<YouTubeVideo[]> {
 async function processVideos(
   boss: PgBoss,
   src: SourceBase,
-  videos: YouTubeVideo[],
+  videos: YouTubeVideo[]
 ): Promise<{ seen: number; newCount: number }> {
   let seen = 0;
   let newCount = 0;

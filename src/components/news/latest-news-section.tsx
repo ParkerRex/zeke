@@ -4,6 +4,13 @@ import Link from "next/link";
 import type { Cluster } from "@/types/stories";
 import { domainFromUrl } from "@/utils/url";
 
+const HASH_MULTIPLIER = 31;
+const MIN_COVERAGE_PERCENT = 35;
+const MAX_COVERAGE_PERCENT = 90;
+const COVERAGE_MAX_PERCENT = 100;
+const MIN_SOURCES_COUNT = 3;
+const DEFAULT_STORIES_LIMIT = 6;
+
 type Props = {
   title?: string;
   stories?: Cluster[];
@@ -15,16 +22,24 @@ function imageFor(_story?: Cluster) {
   return "/hero-shape.png";
 }
 
-function deterministicPercent(id: string, min = 35, max = 90) {
+function deterministicPercent(
+  id: string,
+  min = MIN_COVERAGE_PERCENT,
+  max = MAX_COVERAGE_PERCENT
+) {
   // Simple deterministic range based on id hash
   let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < id.length; i++) {
+    h = Math.floor(
+      (h * HASH_MULTIPLIER + id.charCodeAt(i)) % Number.MAX_SAFE_INTEGER
+    );
+  }
   const span = Math.max(0, max - min);
   return min + (h % (span + 1));
 }
 
 function CoverageBar({ value, label }: { value: number; label: string }) {
-  const v = Math.max(0, Math.min(100, Math.round(value)));
+  const v = Math.max(0, Math.min(COVERAGE_MAX_PERCENT, Math.round(value)));
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[11px] text-gray-600">
@@ -58,8 +73,7 @@ function NewsCard({ story }: { story: Cluster }) {
     <article className="rounded-md border bg-white p-3 shadow-sm">
       <div className="mb-2 flex items-start justify-between text-[11px] text-gray-500">
         <span>
-          •{" "}
-          {kind === "youtube" ? "Video" : kind === "arxiv" ? "Research" : "AI"}
+          • {getKindLabel(kind)}
           {domain ? `, ${domain}` : ""}
         </span>
         {/* Bookmark icon could go here later */}
@@ -74,7 +88,7 @@ function NewsCard({ story }: { story: Cluster }) {
       </h3>
       <div className="mb-2 flex items-center justify-between gap-3">
         <CoverageBar label="left" value={coverage} />
-        <SourcesBadge count={Math.max(3, sources)} />
+        <SourcesBadge count={Math.max(MIN_SOURCES_COUNT, sources)} />
       </div>
       <div className="relative h-[150px] overflow-hidden rounded">
         <Image alt="" className="object-cover" fill src={img} />
@@ -86,10 +100,20 @@ function NewsCard({ story }: { story: Cluster }) {
   );
 }
 
+function getKindLabel(kind: string | undefined): string {
+  if (kind === "youtube") {
+    return "Video";
+  }
+  if (kind === "arxiv") {
+    return "Research";
+  }
+  return "AI";
+}
+
 export async function LatestNewsSection({
   title = "Latest News",
   stories,
-  limit = 6,
+  limit = DEFAULT_STORIES_LIMIT,
 }: Props) {
   const items = stories ?? (await listStories());
   const grid = items.slice(0, limit);

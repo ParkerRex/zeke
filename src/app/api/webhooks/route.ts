@@ -104,10 +104,15 @@ export async function POST(req: Request): Promise<Response> {
 function isForeignKeyViolation(error: unknown): boolean {
   const anyErr = error as any;
   const code = anyErr?.code ?? anyErr?.data?.code;
-  const message: string | undefined = anyErr?.message ?? anyErr?.error ?? anyErr?.data?.message;
+  const message: string | undefined =
+    anyErr?.message ?? anyErr?.error ?? anyErr?.data?.message;
   // Postgres FK violation code is 23503; PostgREST often returns 409 with this code.
   if (code === "23503") return true;
-  if (typeof message === "string" && /foreign key|violates foreign key/i.test(message)) return true;
+  if (
+    typeof message === "string" &&
+    /foreign key|violates foreign key/i.test(message)
+  )
+    return true;
   return false;
 }
 
@@ -122,7 +127,8 @@ async function ensureProductThenUpsertPrice(price: Stripe.Price) {
   }
 
   // If we get here, we likely tried to upsert a price whose product doesn't exist yet.
-  const productId = typeof price.product === "string" ? price.product : price.product.id;
+  const productId =
+    typeof price.product === "string" ? price.product : price.product.id;
   const product = await stripeAdmin.products.retrieve(productId);
   await upsertProduct(product);
   // Retry once after ensuring the product row exists

@@ -81,16 +81,14 @@ async function testYouTubePipeline() {
     );
     console.log(
       `   - Audio file size: ${(
-        audioResult.fileSizeBytes /
-        1024 /
-        1024
+        audioResult.fileSizeBytes / 1024 / 1024
       ).toFixed(2)} MB`
     );
     console.log(
       `   - Transcription efficiency: ${(
         (transcriptionResult.text.length /
           transcriptionResult.transcriptionTimeMs) *
-        1000
+          1000
       ).toFixed(2)} chars/sec`
     );
   } catch (error) {

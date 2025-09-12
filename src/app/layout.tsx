@@ -1,8 +1,8 @@
 import { Analytics } from "@vercel/analytics/react";
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Hubot_Sans } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import type { PropsWithChildren } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/utils/cn";
 
@@ -56,20 +56,22 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
-};
-
-export default function RootLayout({ children }: PropsWithChildren) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   return (
     <html lang="en">
-      <body
-        className={cn(
-          "font-sans antialiased",
-          hubot.variable
-        )}
-      >
-        <NuqsAdapter>{children}</NuqsAdapter>
+      <body className={cn("font-sans antialiased", hubot.variable)}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          disableTransitionOnChange
+          enableSystem
+        >
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </ThemeProvider>
         <Toaster />
         <Analytics />
       </body>

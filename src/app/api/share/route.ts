@@ -26,10 +26,12 @@ export async function GET(req: Request): Promise<Response> {
 export function POST(_req: Request): Response {
   // Prototype: ignore payload and return a fake share id
   const RADIX = 36;
-  const ID_PREFIX = 'shr_';
+  const ID_PREFIX = "shr_";
   const START_INDEX = 2; // skip '0.' from Math.random().toString(36)
   const ID_LENGTH = 6;
-  const rand = Math.random().toString(RADIX).slice(START_INDEX, START_INDEX + ID_LENGTH);
+  const rand = Math.random()
+    .toString(RADIX)
+    .slice(START_INDEX, START_INDEX + ID_LENGTH);
   const id = `${ID_PREFIX}${rand}`;
   return NextResponse.json({ id, url: `/share/${id}` });
 }
