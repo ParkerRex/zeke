@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import type { Cluster } from "@/types/stories";
+import type { Cluster } from "@zeke/supabase/types";
 import { isAbortError, safeErrorMessage } from "@/utils/errors";
 
 // Simple in-memory cache for stories

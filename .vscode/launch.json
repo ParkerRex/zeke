@@ -1,47 +1,180 @@
 {
   "version": "0.2.0",
   "configurations": [
+    // === FULL STACK DEVELOPMENT ===
     {
-      "name": "Next.js: debug server-side",
+      "name": "🚀 ZEKE: Full Stack (All Services)",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm dev"
+      "command": "pnpm dev",
+      "presentation": {
+        "group": "fullstack",
+        "order": 1
+      }
     },
     {
-      "name": "Next.js: debug client-side (app)",
-      "type": "chrome",
+      "name": "🔧 ZEKE: Full Pipeline Debug",
+      "type": "node-terminal",
       "request": "launch",
-      "url": "http://localhost:3000"
+      "command": "pnpm dev",
+      "env": {
+        "DEBUG": "zeke:*",
+        "NODE_ENV": "development"
+      },
+      "presentation": {
+        "group": "fullstack",
+        "order": 2
+      }
     },
+
+    // === INDIVIDUAL SERVICES ===
     {
-      "name": "Next.js: debug client-side (web)",
-      "type": "chrome",
+      "name": "📱 Dashboard App (port 3000)",
+      "type": "node-terminal",
       "request": "launch",
-      "url": "http://localhost:3001"
+      "command": "turbo dev --filter=app",
+      "presentation": {
+        "group": "services",
+        "order": 1
+      }
     },
     {
-      "name": "Next.js: debug client-side (api)",
-      "type": "chrome",
+      "name": "🌐 Marketing Web (port 3001)",
+      "type": "node-terminal",
       "request": "launch",
-      "url": "http://localhost:3002"
+      "command": "turbo dev --filter=web",
+      "presentation": {
+        "group": "services",
+        "order": 2
+      }
     },
     {
-      "name": "Next.js: debug client-side (email)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:3003"
-    },
-    {
-      "name": "Next.js: debug client-side (app)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:3004"
-    },
-    {
-      "name": "Next.js: debug full stack",
+      "name": "⚙️ Worker (Node.js)",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "program": "${workspaceFolder}/apps/worker/src/worker.ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": ["watch"],
+      "cwd": "${workspaceFolder}/apps/worker",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "8080"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": {
+        "group": "services",
+        "order": 3
+      }
+    },
+    {
+      "name": "📧 Email Templates (port 3003)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "turbo dev --filter=email",
+      "presentation": {
+        "group": "services",
+        "order": 4
+      }
+    },
+    {
+      "name": "🗄️ Supabase Local",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx supabase start",
+      "presentation": {
+        "group": "services",
+        "order": 5
+      }
+    },
+
+    // === WORKER DEBUGGING ===
+    {
+      "name": "🔍 Worker: Debug with Breakpoints",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/worker/dist/worker.js",
+      "preLaunchTask": "build-worker",
+      "cwd": "${workspaceFolder}/apps/worker",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "8080"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": {
+        "group": "worker",
+        "order": 1
+      }
+    },
+    {
+      "name": "🔄 Worker: Docker Container",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "bash scripts/deploy-local-worker.sh",
+      "cwd": "${workspaceFolder}/apps/worker",
+      "env": {
+        "PORT": "8082"
+      },
+      "presentation": {
+        "group": "worker",
+        "order": 2
+      }
+    },
+
+    // === CLIENT-SIDE DEBUGGING ===
+    {
+      "name": "🌐 Chrome: Dashboard App",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/apps/app",
+      "presentation": {
+        "group": "browser",
+        "order": 1
+      }
+    },
+    {
+      "name": "🌐 Chrome: Marketing Site",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/apps/web",
+      "presentation": {
+        "group": "browser",
+        "order": 2
+      }
+    },
+    {
+      "name": "📧 Chrome: Email Templates",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3003",
+      "webRoot": "${workspaceFolder}/apps/email",
+      "presentation": {
+        "group": "browser",
+        "order": 3
+      }
+    },
+    {
+      "name": "🗄️ Chrome: Supabase Studio",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:54323",
+      "presentation": {
+        "group": "browser",
+        "order": 4
+      }
+    },
+
+    // === ADVANCED DEBUGGING ===
+    {
+      "name": "🔧 Dashboard: Full Stack Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/app/node_modules/.bin/next",
+      "args": ["dev", "--port", "3000", "--turbopack"],
+      "cwd": "${workspaceFolder}/apps/app",
       "runtimeArgs": ["--inspect"],
       "skipFiles": ["<node_internals>/**"],
       "serverReadyAction": {
@@ -49,7 +182,32 @@
         "killOnServerStop": true,
         "pattern": "- Local:.+(https?://.+)",
         "uriFormat": "%s",
-        "webRoot": "${workspaceFolder}"
+        "webRoot": "${workspaceFolder}/apps/app"
+      },
+      "presentation": {
+        "group": "advanced",
+        "order": 1
+      }
+    },
+    {
+      "name": "🔧 Marketing: Full Stack Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/web/node_modules/.bin/next",
+      "args": ["dev", "-p", "3001", "--turbopack"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "action": "debugWithEdge",
+        "killOnServerStop": true,
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}/apps/web"
+      },
+      "presentation": {
+        "group": "advanced",
+        "order": 2
       }
     }
   ]

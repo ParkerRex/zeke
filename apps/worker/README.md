@@ -96,7 +96,7 @@ YOUTUBE_API_KEY="your-youtube-key"
 - `ingest:fetch-youtube-content`: YouTube extract → transcribe → content
 - `analyze:llm`: overlay + embedding for a story
 
-### Actions Catalog (worker/src/actions)
+### Tasks Catalog (worker/src/tasks)
 
 - analyze-story.ts: Generate overlays + embedding for a story (OpenAI or stub), then persist.
 - extract-article.ts: Fetch + parse article content, create content/story, enqueue analysis.
@@ -109,7 +109,7 @@ YOUTUBE_API_KEY="your-youtube-key"
 - ingest-youtube-source.ts: Orchestrate channel/search ingest, upsert raw items, enqueue extraction.
 - preview-youtube-source.ts: Preview channel/search items with current quota status.
 
-Primitives used by these actions live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access. Third‑party clients live under `lib/*`.
+Primitives used by these tasks live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access. Third‑party clients live under `lib/*`.
 
 ### System Diagrams
 
@@ -117,7 +117,7 @@ RSS Ingest (per source)
 
 ```
 ingest:pull (rss)
-  -> actions/ingest-rss-source
+  -> tasks/ingest-rss-source
        fetchWithTimeout(url)
        -> extract/parse-rss-feed
        -> extract/normalize-rss-item (map guid/link/title/date)
@@ -130,12 +130,12 @@ YouTube Ingest (per source)
 
 ```
 ingest:pull (youtube)
-  -> actions/ingest-youtube-source
+  -> tasks/ingest-youtube-source
        if channel:
-         -> actions/resolve-youtube-uploads-id -> uploadsPlaylistId
-         -> actions/fetch-youtube-channel-videos (quota)
+         -> tasks/resolve-youtube-uploads-id -> uploadsPlaylistId
+         -> tasks/fetch-youtube-channel-videos (quota)
        if search:
-         -> actions/fetch-youtube-search-videos (quota)
+         -> tasks/fetch-youtube-search-videos (quota)
        for each video:
          -> extract/build-raw-item-youtube
          -> db.upsertRawItem
@@ -147,7 +147,7 @@ YouTube Extract → Transcribe → Content
 
 ```
 ingest:fetch-youtube-content
-  -> actions/extract-youtube-content
+  -> tasks/extract-youtube-content
        -> extract/extract-youtube-audio (yt-dlp)
        -> transcribe/whisper (OpenAI Whisper or local)
        -> storage/generate-vtt-content
@@ -160,7 +160,7 @@ Analyze Story
 
 ```
 analyze:llm
-  -> actions/analyze-story
+  -> tasks/analyze-story
        (OpenAI or stub)
        -> db.upsertStoryOverlay
        -> db.upsertStoryEmbedding

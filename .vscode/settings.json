@@ -1,27 +1,26 @@
 {
-  "[javascript]": {
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "emmet.showExpandedAbbreviation": "never",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[jsonc]": {
+  "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[typescript]": {
+  "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
-  },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit"
-  },
-  "editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
-  "emmet.showExpandedAbbreviation": "never",
-  "prettier.enable": false,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "tailwindCSS.experimental.configFile": "packages/design-system/styles/globals.css"
+  }
 }

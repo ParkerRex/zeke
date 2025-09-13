@@ -1,10 +1,10 @@
-"use client";
-import { create } from "zustand";
+'use client';
+import { create } from 'zustand';
 
-import type { EmbedKind, Overlays } from "@/types/stories";
+import type { EmbedKind, Overlays } from '@zeke/supabase/types';
 
-const STORAGE_PANEL_MAP = "tabs:panelOpenById";
-const STORAGE_PANEL_GLOBAL = "tabs:sidePanelOpen";
+const STORAGE_PANEL_MAP = 'tabs:panelOpenById';
+const STORAGE_PANEL_GLOBAL = 'tabs:sidePanelOpen';
 
 function loadPanelMap(): Record<string, boolean> {
   try {
@@ -26,7 +26,7 @@ function savePanelMap(map: Record<string, boolean>) {
 function loadPanelGlobal(): boolean | undefined {
   try {
     const raw = localStorage.getItem(STORAGE_PANEL_GLOBAL);
-    return raw ? raw === "true" : undefined;
+    return raw ? raw === 'true' : undefined;
   } catch {
     return;
   }
@@ -62,7 +62,7 @@ type TabsState = {
   openTab: (tab: Tab) => void;
   closeTab: (id: string) => void;
   setActive: (id: string) => void;
-  updateOverlay: (id: string, partial: Partial<Tab["overlays"]>) => void;
+  updateOverlay: (id: string, partial: Partial<Tab['overlays']>) => void;
   updateContext: (id: string, partial: Record<string, unknown>) => void;
   restoreFromUrl: (
     clusterIdOrShareId: string,
@@ -121,13 +121,13 @@ function createOptimisticTab(
 ): Tab {
   return {
     id: optimisticId,
-    title: "Loading…",
-    embedKind: "article",
-    embedUrl: "about:blank",
+    title: 'Loading…',
+    embedKind: 'article',
+    embedUrl: 'about:blank',
     clusterId: isShare ? undefined : id,
     shareId: isShare ? id : undefined,
     overlays: {
-      whyItMatters: "",
+      whyItMatters: '',
       chili: 0,
       confidence: 0,
       sources: [],
@@ -144,8 +144,8 @@ export const useTabs = create<TabsState>((set, get) => ({
     const map = loadPanelMap();
     // Migrate legacy non-story IDs to prefixed equivalents
     const migrations: Record<string, string> = {
-      company: "tab:company",
-      industries: "tab:industries",
+      company: 'tab:company',
+      industries: 'tab:industries',
     };
     const migrationKeys = Object.entries(migrations).filter(
       ([oldKey, newKey]) => oldKey in map && !(newKey in map)
@@ -234,22 +234,21 @@ export const useTabs = create<TabsState>((set, get) => ({
       const endpoint = isShareTab
         ? `/api/share?id=${id}`
         : `/api/stories/${id}`;
-      const res = await fetch(endpoint, { cache: "no-store" }).then((r) =>
+      const res = await fetch(endpoint, { cache: 'no-store' }).then((r) =>
         r.json()
       );
 
       if (!res?.title) {
-        throw new Error("Invalid story payload");
+        throw new Error('Invalid story payload');
       }
 
       const tab = createTabFromResponse(res, optimisticId, isShareTab, id);
       get().openTab(tab);
     } catch (e) {
       try {
-        const { toast } = await import("@/components/ui/use-toast");
-        toast({
-          title: "Unable to open story",
-          description: String((e as Error)?.message || "Unknown error"),
+        const { toast } = await import('sonner');
+        toast.error('Unable to open story', {
+          description: String((e as Error)?.message || 'Unknown error'),
         });
       } catch {
         // Toast import failed, ignore

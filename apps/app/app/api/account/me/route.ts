@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/supabase-server-client";
+import { createSupabaseServerClient } from "@zeke/auth";
 
 export async function GET(): Promise<Response> {
   try {

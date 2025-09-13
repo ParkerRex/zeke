@@ -8,100 +8,87 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🧪 Testing Zeke Pipeline...${NC}"
+echo -e "${BLUE}🧪 Running ZEKE pipeline tests...${NC}"
 
-# Load environment variables
-if [ -f worker/.env.development ]; then
-    export $(grep -v '^#' worker/.env.development | xargs)
-elif [ -f .env.development ]; then
-    export $(grep -v '^#' .env.development | xargs)
-fi
+# Function to check if a service is running
+service_running() {
+    local port="$1"
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
 
-DATABASE_URL="${DATABASE_URL:-}"
-BOSS_SCHEMA="${BOSS_SCHEMA:-pgboss}"
-
-# Avoid interactive password prompts for worker role when URL lacks password
-if [ -z "${PGPASSWORD:-}" ]; then
-  if echo "$DATABASE_URL" | grep -Eq '^postgresql://worker@'; then
-    export PGPASSWORD="${WORKER_PASS:-worker_password}"
-  fi
-fi
-
-if [ -z "$DATABASE_URL" ]; then
-    echo -e "${RED}❌ DATABASE_URL not set${NC}"
+# Test 1: Check if Supabase is running
+echo -e "\n${YELLOW}1️⃣ Testing Supabase connection...${NC}"
+if service_running 54321; then
+    echo -e "${GREEN}✅ Supabase is running${NC}"
+    
+    # Test database connection
+    if echo "SELECT 1;" | psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -t -A >/dev/null 2>&1; then
+        echo -e "${GREEN}✅ Database connection successful${NC}"
+    else
+        echo -e "${RED}❌ Database connection failed${NC}"
+        exit 1
+    fi
+else
+    echo -e "${RED}❌ Supabase is not running${NC}"
+    echo -e "${YELLOW}💡 Run 'pnpm dev:setup' to start Supabase${NC}"
     exit 1
 fi
 
-echo -e "${BLUE}📊 Current System Status:${NC}"
-
-# Check if services are running
-echo -e "\n${YELLOW}🔍 Service Health Check:${NC}"
-
-# Check Next.js
-if curl -s http://localhost:3000 >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Next.js running on port 3000${NC}"
+# Test 2: Check worker connection
+echo -e "\n${YELLOW}2️⃣ Testing worker connection...${NC}"
+if service_running 8082; then
+    echo -e "${GREEN}✅ Worker is running${NC}"
+    
+    # Test worker health endpoint
+    if curl -fsS http://localhost:8082/healthz >/dev/null 2>&1; then
+        echo -e "${GREEN}✅ Worker health check passed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Worker health check failed, but service is running${NC}"
+    fi
 else
-    echo -e "${YELLOW}⚠️  Next.js not responding on port 3000${NC}"
+    echo -e "${YELLOW}⚠️  Worker is not running${NC}"
+    echo -e "${YELLOW}💡 Run 'pnpm dev:worker' to start the worker${NC}"
 fi
 
-# Check Worker (allow custom port and correct health path)
-WORKER_PORT="${WORKER_PORT:-8081}"
-if curl -s "http://localhost:${WORKER_PORT}/healthz" >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Worker running on port ${WORKER_PORT}${NC}"
+# Test 3: Run worker-specific tests
+echo -e "\n${YELLOW}3️⃣ Running worker tests...${NC}"
+cd apps/worker
+if pnpm run test:connection; then
+    echo -e "${GREEN}✅ Worker connection tests passed${NC}"
 else
-    echo -e "${YELLOW}⚠️  Worker not responding on port ${WORKER_PORT}${NC}"
+    echo -e "${RED}❌ Worker connection tests failed${NC}"
+    cd ../..
+    exit 1
 fi
 
-# Check Supabase
-if curl -s http://127.0.0.1:54321/health >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Supabase API running on port 54321${NC}"
+if pnpm run test:transcription; then
+    echo -e "${GREEN}✅ Worker transcription tests passed${NC}"
 else
-    echo -e "${YELLOW}⚠️  Supabase API not responding${NC}"
+    echo -e "${YELLOW}⚠️  Worker transcription tests failed, but continuing...${NC}"
+fi
+cd ../..
+
+# Test 4: Type checking
+echo -e "\n${YELLOW}4️⃣ Running type checks...${NC}"
+if pnpm run typecheck; then
+    echo -e "${GREEN}✅ Type checking passed${NC}"
+else
+    echo -e "${RED}❌ Type checking failed${NC}"
+    exit 1
 fi
 
-# Database stats
-echo -e "\n${YELLOW}📈 Database Statistics:${NC}"
-
-# Job queue stats
-TOTAL_JOBS=$(echo "SELECT COUNT(*) FROM $BOSS_SCHEMA.job;" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "0")
-ACTIVE_JOBS=$(echo "SELECT COUNT(*) FROM $BOSS_SCHEMA.job WHERE state IN ('created', 'active', 'retry');" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "0")
-COMPLETED_JOBS=$(echo "SELECT COUNT(*) FROM $BOSS_SCHEMA.job WHERE state = 'completed';" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "0")
-FAILED_JOBS=$(echo "SELECT COUNT(*) FROM $BOSS_SCHEMA.job WHERE state = 'failed';" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "0")
-
-echo -e "   📋 Total jobs: $TOTAL_JOBS"
-echo -e "   🔄 Active jobs: $ACTIVE_JOBS"
-echo -e "   ✅ Completed jobs: $COMPLETED_JOBS"
-echo -e "   ❌ Failed jobs: $FAILED_JOBS"
-
-# Content stats (if tables exist)
-RAW_ITEMS=$(echo "SELECT COUNT(*) FROM raw_items;" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "N/A")
-CONTENTS=$(echo "SELECT COUNT(*) FROM contents;" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "N/A")
-STORIES=$(echo "SELECT COUNT(*) FROM stories;" | psql "$DATABASE_URL" -t -A 2>/dev/null || echo "N/A")
-
-echo -e "   📰 Raw items: $RAW_ITEMS"
-echo -e "   📄 Contents: $CONTENTS"
-echo -e "   📚 Stories: $STORIES"
-
-# Recent activity
-echo -e "\n${YELLOW}⏰ Recent Activity:${NC}"
-
-# Recent jobs
-echo -e "${BLUE}Recent jobs (last 5):${NC}"
-echo "SELECT id, name, state, created_on FROM $BOSS_SCHEMA.job ORDER BY created_on DESC LIMIT 5;" | psql "$DATABASE_URL" -t 2>/dev/null || echo "No jobs found"
-
-############################################
-# Test pipeline trigger via worker endpoint #
-############################################
-echo -e "\n${YELLOW}🧪 Triggering ingest via worker:${NC}"
-if curl -fsS -X POST "http://localhost:${WORKER_PORT}/debug/ingest-now" >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Ingest trigger sent to worker${NC}"
+# Test 5: Build test
+echo -e "\n${YELLOW}5️⃣ Testing builds...${NC}"
+if turbo build --filter=app --filter=web --filter=worker; then
+    echo -e "${GREEN}✅ Build tests passed${NC}"
 else
-    echo -e "${YELLOW}⚠️  Could not reach worker ingest endpoint${NC}"
+    echo -e "${RED}❌ Build tests failed${NC}"
+    exit 1
 fi
 
-echo -e "\n${GREEN}🎉 Pipeline test completed!${NC}"
-echo -e "\n${BLUE}💡 Monitoring Tips:${NC}"
-echo -e "   🔍 Watch logs: ${YELLOW}cd worker && npm run logs${NC}"
-echo -e "   🎛️  Database UI: ${YELLOW}open http://127.0.0.1:54323${NC}"
-echo -e "   📊 Job queue: ${YELLOW}cd worker && bash scripts/test-transcription.sh${NC}"
-echo -e "   🔄 Re-run test: ${YELLOW}bash scripts/test-pipeline.sh${NC}"
+echo -e "\n${GREEN}🎉 All pipeline tests passed!${NC}"
+echo -e "${BLUE}📝 Pipeline is healthy and ready for development${NC}"

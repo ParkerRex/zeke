@@ -1,19 +1,19 @@
-import { getSession } from "@db/queries/account/get-session";
+import { getSession } from "@zeke/supabase/queries";
 import Image from "next/image";
 import Link from "next/link";
 import { IoMenu, IoPerson } from "react-icons/io5";
 import { signOut } from "@/actions/auth/sign-out";
-import { AccountMenu } from "@/components/account-menu";
-import { Logo } from "@/components/logo";
-import SignOutButton from "@/components/sign-out-button";
-import { Button } from "@/components/ui/button";
+import { AccountMenu } from "@/app/components/account-menu";
+import { Logo } from "@/app/components/logo";
+import SignOutButton from "@/app/components/sign-out-button";
+import { Button } from "@zeke/design-system/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "@zeke/design-system/components/ui/sheet";
 
 export async function Navigation() {
   const session = await getSession();

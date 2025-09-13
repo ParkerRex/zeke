@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import { createSupabaseServerClient } from "@/lib/supabase/supabase-server-client";
-import type { ActionResponse } from "@/types/action-response";
+import type { ActionResponse } from '@/types/action-response';
+import { createSupabaseServerClient } from '@zeke/auth';
 
 export async function signOut(): Promise<ActionResponse> {
   const supabase = await createSupabaseServerClient();

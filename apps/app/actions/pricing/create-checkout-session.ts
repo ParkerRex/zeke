@@ -1,9 +1,9 @@
 "use server";
-import { getSession } from "@db/queries/account/get-session";
+import { getSession } from "@zeke/supabase/queries";
 import { redirect } from "next/navigation";
-import { getOrCreateCustomer } from "@/actions/account/get-or-create-customer";
+import { getOrCreateCustomer } from "../account/get-or-create-customer";
 import { stripeAdmin } from "@/lib/stripe/stripe-admin";
-import type { Price } from "@/types/pricing";
+import type { Price } from "@zeke/supabase/types";
 import { getURL } from "@/utils/get-url";
 
 export async function createCheckoutSession({ price }: { price: Price }) {

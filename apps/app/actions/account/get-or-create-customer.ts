@@ -1,5 +1,5 @@
-import { stripeAdmin } from "@/lib/stripe/stripe-admin";
-import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
+import { stripeAdmin } from '@/lib/stripe/stripe-admin';
+import { supabaseAdminClient } from '@zeke/supabase/admin';
 
 export async function getOrCreateCustomer({
   userId,
@@ -9,9 +9,9 @@ export async function getOrCreateCustomer({
   email: string;
 }) {
   const { data, error } = await supabaseAdminClient
-    .from("customers")
-    .select("stripe_customer_id")
-    .eq("id", userId)
+    .from('customers')
+    .select('stripe_customer_id')
+    .eq('id', userId)
     .single();
 
   if (error || !data?.stripe_customer_id) {
@@ -20,7 +20,7 @@ export async function getOrCreateCustomer({
       metadata: { userId },
     });
     const { error: supabaseError } = await supabaseAdminClient
-      .from("customers")
+      .from('customers')
       .insert([{ id: userId, stripe_customer_id: customer.id }]);
     if (supabaseError) {
       throw supabaseError;

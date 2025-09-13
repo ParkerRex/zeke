@@ -2,10 +2,10 @@ import "dotenv/config";
 import type { ConnectionOptions as TlsConnectionOptions } from "node:tls";
 import express from "express";
 import PgBoss from "pg-boss";
-import { analyzeStory } from "./actions/analyze-story.js";
-import { extractArticle } from "./actions/extract-article.js";
-import { extractYouTubeContent } from "./actions/extract-youtube-content.js";
-// YouTube ingestion uses actions directly below
+import { analyzeStory } from "./tasks/analyze-story.js";
+import { extractArticle } from "./tasks/extract-article.js";
+import { extractYouTubeContent } from "./tasks/extract-youtube-content.js";
+// YouTube ingestion uses tasks directly below
 import { log } from "./log.js";
 
 const DATABASE_URL: string = process.env.DATABASE_URL ?? "";
@@ -75,7 +75,7 @@ async function processIngestPullJob(
 
 async function handleRssIngest(boss: PgBoss) {
   const { getRssSources } = await import("./db.js");
-  const { ingestRssSource } = await import("./actions/ingest-rss-source.js");
+  const { ingestRssSource } = await import("./tasks/ingest-rss-source.js");
   const sources = await getRssSources();
   for (const src of sources) {
     if (!src.url) {
@@ -108,7 +108,7 @@ async function handleYouTubeIngest(boss: PgBoss) {
   }
   const { getYouTubeSources, upsertPlatformQuota } = await import("./db.js");
   const { ingestYouTubeSource } = await import(
-    "./actions/ingest-youtube-source.js"
+    "./tasks/ingest-youtube-source.js"
   );
   const { quotaTracker } = await import("./utils/quota-tracker.js");
   const sources = await getYouTubeSources();
@@ -243,7 +243,7 @@ async function initBoss() {
         log("fetch_youtube_content_start", { jobId: job.id });
         try {
           await extractYouTubeContent(
-            job.data as unknown as import("./actions/extract-youtube-content.js").YouTubeExtractionJobData,
+            job.data as unknown as import("./tasks/extract-youtube-content.js").YouTubeExtractionJobData,
             boss
           );
           await boss.complete("ingest:fetch-youtube-content", job.id);
@@ -295,13 +295,13 @@ function registerPreviewSource(app: express.Express) {
   ): Promise<unknown> {
     if (src.kind === "rss" || src.kind === "podcast") {
       const { previewRssSourceAction } = await import(
-        "./actions/preview-rss-source.js"
+        "./tasks/preview-rss-source.js"
       );
       return previewRssSourceAction({ id: src.id, url: src.url ?? "" }, limit);
     }
     if (src.kind === "youtube_channel" || src.kind === "youtube_search") {
       const { previewYouTubeSourceAction } = await import(
-        "./actions/preview-youtube-source.js"
+        "./tasks/preview-youtube-source.js"
       );
       return previewYouTubeSourceAction(src, limit);
     }
@@ -366,7 +366,7 @@ function registerIngestNow(app: express.Express) {
       await bossRef.createQueue("ingest:pull");
       const { getRssSources } = await import("./db.js");
       const { ingestRssSource } = await import(
-        "./actions/ingest-rss-source.js"
+        "./tasks/ingest-rss-source.js"
       );
       const sources = await getRssSources();
       for (const src of sources) {
@@ -420,7 +420,7 @@ function registerIngestYouTubeNow(app: express.Express) {
         "./db.js"
       );
       const { ingestYouTubeSource } = await import(
-        "./actions/ingest-youtube-source.js"
+        "./tasks/ingest-youtube-source.js"
       );
       const { quotaTracker } = await import("./utils/quota-tracker.js");
       const sources = await getYouTubeSources();
@@ -503,7 +503,7 @@ async function ingestSourceById(boss: PgBoss, sourceId: string) {
     throw new Error("not_found");
   }
   if (row.kind === "rss" || row.kind === "podcast") {
-    const { ingestRssSource } = await import("./actions/ingest-rss-source.js");
+    const { ingestRssSource } = await import("./tasks/ingest-rss-source.js");
     const { getSourceById } = await import("./db.js");
     const srcFull = await getSourceById(sourceId);
     if (!srcFull?.url) {
@@ -514,7 +514,7 @@ async function ingestSourceById(boss: PgBoss, sourceId: string) {
   }
   if (row.kind === "youtube_channel" || row.kind === "youtube_search") {
     const { ingestYouTubeSource } = await import(
-      "./actions/ingest-youtube-source.js"
+      "./tasks/ingest-youtube-source.js"
     );
     const { getSourceById } = await import("./db.js");
     const srcFull = await getSourceById(sourceId);

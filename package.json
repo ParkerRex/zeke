@@ -1,41 +1,50 @@
 {
-	"name": "zeke",
-	"version": "1.0.0",
-	"bin": {
-		"zeke": "dist/index.js"
-	},
-	"files": [
-		"dist/index.js"
-	],
-	"scripts": {
-		"build": "turbo build",
-		"dev": "turbo dev",
-		"lint": "ultracite lint",
-		"format": "ultracite format",
-		"test": "turbo test",
-		"analyze": "turbo analyze",
-		"translate": "turbo translate",
-		"boundaries": "turbo boundaries",
-		"bump-deps": "npx npm-check-updates --deep -u -x react-day-picker",
-		"bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
-		"migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
-		"clean": "git clean -xdf node_modules"
-	},
-	"devDependencies": {
-		"@auto-it/first-time-contributor": "^11.3.0",
-		"@biomejs/biome": "1.9.4",
-		"@repo/typescript-config": "workspace:*",
-		"@turbo/gen": "^2.5.3",
-		"@types/node": "^22.15.21",
-		"tsup": "^8.5.0",
-		"turbo": "^2.5.3",
-		"typescript": "^5.8.3",
-		"ultracite": "^4.2.5",
-		"vitest": "^3.1.4"
-	},
-	"engines": {
-		"node": ">=18"
-	},
-	"packageManager": "pnpm@10.11.0",
-	"type": "module"
+  "name": "zeke",
+  "version": "1.0.0",
+  "bin": {
+    "zeke": "dist/index.js"
+  },
+  "files": ["dist/index.js"],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "bash scripts/dev-start.sh && turbo dev",
+    "dev:setup": "bash scripts/dev-setup.sh",
+    "dev:next": "turbo dev --filter=app",
+    "dev:web": "turbo dev --filter=web",
+    "dev:storybook": "turbo dev --filter=storybook",
+    "dev:worker": "bash scripts/dev-worker.sh",
+    "stop": "bash scripts/dev-stop.sh",
+    "lint": "ultracite lint",
+    "format": "ultracite format",
+    "test": "turbo test",
+    "test:pipeline": "bash scripts/test-pipeline.sh",
+    "analyze": "turbo analyze",
+    "translate": "turbo translate",
+    "boundaries": "turbo boundaries",
+    "bump-deps": "npx npm-check-updates --deep -u -x react-day-picker",
+    "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
+    "migration:new": "supabase migration new",
+    "migration:squash": "supabase migration squash --linked",
+    "db:migrate": "supabase migration up --local && turbo run types:generate --filter=app",
+    "db:reset": "supabase db reset --local",
+    "types:generate": "turbo run types:generate --filter=app",
+    "clean": "git clean -xdf node_modules"
+  },
+  "devDependencies": {
+    "@auto-it/first-time-contributor": "^11.3.0",
+    "@biomejs/biome": "1.9.4",
+    "@zeke/typescript-config": "workspace:*",
+    "@turbo/gen": "^2.5.3",
+    "@types/node": "^22.15.21",
+    "tsup": "^8.5.0",
+    "turbo": "^2.5.3",
+    "typescript": "^5.9.2",
+    "ultracite": "^4.2.5",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "type": "module"
 }

@@ -1,0 +1,200 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // === BUILD TASKS ===
+    {
+      "label": "build-worker",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "build"],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/worker"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "build-all",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "build"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+
+    // === DEVELOPMENT TASKS ===
+    {
+      "label": "dev-setup",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "dev:setup"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "supabase-start",
+      "type": "shell",
+      "command": "npx",
+      "args": ["supabase", "start"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "supabase-stop",
+      "type": "shell",
+      "command": "npx",
+      "args": ["supabase", "stop"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+
+    // === TESTING TASKS ===
+    {
+      "label": "test-pipeline",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "test:pipeline"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "test-worker",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "test:worker"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
+
+    // === UTILITY TASKS ===
+    {
+      "label": "typecheck-all",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "typecheck"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "lint-all",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "lint"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "worker-logs",
+      "type": "shell",
+      "command": "docker",
+      "args": ["logs", "-f", "zeke-worker-local-8082"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "isBackground": true
+    },
+    {
+      "label": "stop-all-services",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "stop"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

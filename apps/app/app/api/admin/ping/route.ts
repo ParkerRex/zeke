@@ -1,4 +1,4 @@
-import { getAdminFlag } from "@db/queries/account/get-admin-flag";
+import { getAdminFlag } from "@zeke/supabase/queries";
 import { NextResponse } from "next/server";
 
 export async function GET(): Promise<Response> {

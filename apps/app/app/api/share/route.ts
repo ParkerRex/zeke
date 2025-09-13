@@ -1,5 +1,4 @@
-import { getShareSnapshot } from "@db/queries/stories/get-share-snapshot";
-import { getStoryById } from "@db/queries/stories/get-story-by-id";
+import { getShareSnapshot, getStoryById } from "@zeke/supabase/queries";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request): Promise<Response> {

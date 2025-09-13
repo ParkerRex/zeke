@@ -93,7 +93,7 @@ By following these conventions—especially direct `pg` usage instead of the Sup
 
 ## Third‑Party APIs Pattern
 
-Use a small, composable pattern for external services (e.g., YouTube) that matches our actions style and improves testability.
+Use a small, composable pattern for external services (e.g., YouTube) that matches our tasks style and improves testability.
 
 - Client wrapper: put per‑service clients under `src/lib/<service>/<service>-client.ts`. The client:
   - Handles auth/env once (e.g., API key), base URL, and shared config.
@@ -121,7 +121,7 @@ Use a small, composable pattern for external services (e.g., YouTube) that match
 
 This structure keeps call sites explicit, isolates auth/transport, and makes unit tests trivial (inject a fake client and stub the transport).
 
-## Actions Catalog (worker/src/actions)
+## Tasks Catalog (worker/src/tasks)
 
 - analyze-story.ts: Generate overlays + embedding for a story (OpenAI or stub), then persist.
 - extract-article.ts: Fetch + parse article content, create content/story, enqueue analysis.
@@ -134,13 +134,13 @@ This structure keeps call sites explicit, isolates auth/transport, and makes uni
 - ingest-youtube-source.ts: Orchestrate channel/search ingest, upsert raw items, enqueue extraction.
 - preview-youtube-source.ts: Preview channel/search items with current quota status.
 
-Primitives used by these actions live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access.
+Primitives used by these tasks live under `extract/*`, `storage/*`, `transcribe/*`, and are single‑purpose (one function per file) without env/DB/queue access.
 
-## Actions vs Lib vs Primitives
+## Tasks vs Lib vs Primitives
 
 Use this simple split to keep code easy to compose and test:
 
-- Actions (`src/actions/*`): business logic that composes helpers + lib and may write to DB or enqueue jobs.
+- Tasks (`src/tasks/*`): business logic that composes helpers + lib and may write to DB or enqueue jobs.
   - One function per file (verb-noun), typed inputs/outputs, explicit side effects.
   - Example: `analyze-story.ts`, `extract-article.ts`, `extract-youtube-content.ts`, `fetch-youtube-channel-videos.ts`.
 - Lib (`src/lib/*`): thin third‑party clients only (auth, transport, minimal request building).
@@ -154,4 +154,4 @@ Heuristic
 
 - Calls external SDK? Put it in lib.
 - Spawns a local tool or formats/derives local data? Put it in primitives.
-- Combines multiple steps and performs side effects (DB/queues)? Put it in actions.
+- Combines multiple steps and performs side effects (DB/queues)? Put it in tasks.

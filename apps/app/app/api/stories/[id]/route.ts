@@ -1,4 +1,4 @@
-import { getStoryById } from "@db/queries/stories/get-story-by-id";
+import { getStoryById } from "@zeke/supabase/queries";
 import { NextResponse } from "next/server";
 
 export async function GET(

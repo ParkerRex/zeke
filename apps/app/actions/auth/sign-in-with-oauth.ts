@@ -1,20 +1,20 @@
-"use server";
+'use server';
 
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-import { createSupabaseServerClient } from "@/lib/supabase/supabase-server-client";
-import type { ActionResponse } from "@/types/action-response";
-import { getURL } from "@/utils/get-url";
+import type { ActionResponse } from '@/types/action-response';
+import { getURL } from '@/utils/get-url';
+import { createSupabaseServerClient } from '@zeke/auth';
 
 export async function signInWithOAuth(
-  provider: "google"
+  provider: 'google'
 ): Promise<ActionResponse> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: getURL("/auth/callback"),
+      redirectTo: getURL('/auth/callback'),
     },
   });
 

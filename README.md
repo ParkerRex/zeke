@@ -1,78 +1,213 @@
 # ∆ / ZEKE
 
-** News Intelligence Platform**
+**AI-Powered News Intelligence Platform**
 
-ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers stories and insights through a modern Next.js web app.
+ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers stories and insights through modern web applications.
 
 ## Architecture
 
-- **Next.js app** – user interface and API routes (`src/`)
-- **Background worker** – pg-boss pipeline for ingestion, analysis, and scheduling (`worker/`)
-- **Supabase/PostgreSQL** – database with pgvector for storage and embeddings (`supabase/`)
+**Turborepo Monorepo Structure:**
 
-## Development
+- **Main App** (`apps/app`) – Primary user interface and API routes
+- **Marketing Site** (`apps/web`) – Public marketing website  
+- **Storybook** (`apps/storybook`) – Component development and documentation
+- **Background Worker** (`apps/worker`) – pg-boss pipeline for ingestion, extraction, analysis
+- **Supabase/PostgreSQL** – Database with pgvector for storage and embeddings
+- **Shared Packages** (`packages/`) – Reusable utilities, design system, and configurations
 
-### Local Dev + Stripe Sync (No‑Wipe)
+## Quick Start
 
-Reset (no wipe)
+### Prerequisites
 
-- Stop services: `pnpm run stop`
-- Start Supabase: `npx supabase start`
-- Apply migrations + types: `pnpm run db:migrate`
+- **Node.js 20+** (current requirement)
+- **pnpm** (package manager)
+- **Docker** (for Supabase and worker containers)
+- **Supabase CLI** (`npm install -g supabase`)
 
-Ensure worker DB user (dev defaults)
+### Development Setup
 
-- Set password in shell: `export WORKER_PASS=worker_password`
-- Create/align role and grants:
-  - `DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres WORKER_PASS=$WORKER_PASS bash scripts/fix-worker-role.sh`
-- Confirm worker env file (`worker/.env.development`):
-  - `WORKER_DB_PASSWORD=worker_password`
-  - `DATABASE_URL=postgresql://worker:${WORKER_DB_PASSWORD}@127.0.0.1:54322/postgres`
-  - `BOSS_SCHEMA=pgboss`
-  - `BOSS_MIGRATE=true`
-- Verify connection:
-  - `cd worker && bash scripts/test-connection.sh && cd -`
-  - If “PostgreSQL connection failed”, re‑run the fix script and recheck `DATABASE_URL`.
+```bash
+# One-time setup (validates prerequisites, starts services, runs migrations)
+pnpm dev:setup
 
-Run app + worker
+# Start all services (full stack development)
+pnpm dev
 
-- Start Next: `pnpm run dev:next` (serves http://localhost:3000)
-- Start worker (new terminal): `PORT=8082 bash worker/scripts/deploy-local-worker.sh`
+# Stop all services
+pnpm stop
+```
 
-Stripe CLI (make it deliver)
+### Service URLs
 
-- Start listener pinned to your API key (new terminal):
-  - `stripe listen --api-key "$STRIPE_SECRET_KEY" --forward-to http://127.0.0.1:3000/api/webhooks`
-- Paste the printed signing secret into the root `.env.development`:
-  - `STRIPE_WEBHOOK_SECRET=whsec_…`
-- Restart Next to load the new env (Ctrl+C then `pnpm run dev:next`).
+When running `pnpm dev`, access services at:
 
-Seed and verify Stripe → DB sync
+- **Main App:** http://localhost:3000
+- **Marketing Site:** http://localhost:3001
+- **Storybook:** http://localhost:6006
+- **Supabase Studio:** http://127.0.0.1:54323
+- **Worker API:** http://localhost:8082
 
-- Seed products/prices: `stripe fixtures ./stripe-fixtures.json --api-key "$STRIPE_SECRET_KEY"`
-- Watch the listener; you should see `product.created` and `price.created` with 2xx.
-- Supabase Studio (http://127.0.0.1:54323):
-  - `public.products` has “Pro”
-  - `public.prices` has monthly USD `unit_amount=10000`
- - UI: `/pricing` shows $100/month (no “Custom”).
+## Development Commands
 
-### Stripe Webhook Resiliency
+### Unified Workflow
 
-- The webhook at `src/app/api/webhooks/route.ts` is resilient to out‑of‑order deliveries:
-  - For `price.created` / `price.updated`, it first attempts to upsert the Price.
-  - On a foreign‑key violation (Price before Product), it fetches and upserts the Product, then retries the Price once.
-  - This covers cases where Stripe or the app processes Product/Price events non‑deterministically.
+```bash
+# Full stack development
+pnpm dev                    # Start all services with orchestration
+pnpm dev:setup             # One-time environment setup
+pnpm stop                  # Stop all services gracefully
 
-### Quick Webhook Test
+# Individual services (Turborepo filtering)
+pnpm dev --filter=app      # Main app only
+pnpm dev --filter=web      # Marketing site only  
+pnpm dev --filter=storybook # Storybook only
+pnpm dev:worker            # Worker service only
 
-1. Ensure `stripe listen` is running and `STRIPE_WEBHOOK_SECRET` is set in `.env.development` (restart Next after editing).
-2. Seed: `stripe fixtures ./stripe-fixtures.json --api-key "$STRIPE_SECRET_KEY"` → products/prices should populate.
-3. Optional out‑of‑order simulation:
-   - Delete the Product in Supabase Studio.
-   - In Workbench, open the related `price.created` event and click “Resend”.
-   - Webhook will fetch Product, upsert it, then upsert Price successfully.
+# Build and validation
+pnpm build                 # Build all applications
+pnpm typecheck            # Type check across packages
+pnpm lint                 # Lint all code
+pnpm test:pipeline        # Comprehensive health check
+```
 
-Notes
+### Database Management
 
-- For local dev we use the Stripe CLI only; no tunnel required.
-- When you restart `stripe listen`, paste the new `whsec_…` into `.env.development` and restart Next.js.
+```bash
+# Local database operations
+pnpm db:migrate           # Apply migrations locally
+pnpm db:reset            # Reset local database
+pnpm types:generate      # Generate TypeScript types
+pnpm migration:new <name> # Create new migration
+```
+
+## Development Workflow
+
+### 1. Initial Setup
+
+Run the setup command to validate your environment:
+
+```bash
+pnpm dev:setup
+```
+
+This will:
+- Check Node.js 20+, pnpm, Docker, and Supabase CLI
+- Start Supabase if not running
+- Apply database migrations
+- Generate TypeScript types
+- Install dependencies
+
+### 2. Full Stack Development
+
+Start all services with proper orchestration:
+
+```bash
+pnpm dev
+```
+
+This starts services in dependency order:
+1. Supabase (if not running)
+2. Database migrations
+3. Worker container
+4. Next.js applications
+
+### 3. Focused Development
+
+Use Turborepo filtering for individual services:
+
+```bash
+# Work on main app only
+pnpm dev --filter=app
+
+# Work on marketing site only  
+pnpm dev --filter=web
+
+# Component development
+pnpm dev --filter=storybook
+```
+
+### 4. Pipeline Testing
+
+Validate the entire pipeline:
+
+```bash
+pnpm test:pipeline
+```
+
+Tests:
+- Supabase connectivity
+- Worker health and job queue
+- Database permissions
+- Type checking
+- Build processes
+
+## Stripe Integration (Optional)
+
+For payment features, set up Stripe webhooks:
+
+### Setup
+
+1. **Start webhook listener:**
+   ```bash
+   stripe listen --forward-to=localhost:3000/api/webhooks
+   ```
+
+2. **Configure environment:**
+   Add the webhook secret to `.env.development`:
+   ```bash
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+3. **Seed test data:**
+   ```bash
+   stripe fixtures ./apps/app/stripe-fixtures.json
+   ```
+
+### Webhook Resiliency
+
+The webhook handler (`apps/app/app/api/webhooks/route.ts`) handles out-of-order events:
+- Automatically fetches missing Product data when processing Price events
+- Retries failed operations with proper error handling
+- Maintains data consistency across Stripe and database
+
+## Troubleshooting
+
+### Common Issues
+
+**Node.js Version:** Ensure you're using Node.js 20+
+```bash
+node --version  # Should show v20.x.x or higher
+```
+
+**Service Ports:** Check if ports are already in use:
+```bash
+lsof -i :3000  # Main app
+lsof -i :3001  # Marketing site
+lsof -i :8082  # Worker
+```
+
+**Database Connection:** Test worker database connectivity:
+```bash
+cd apps/worker && pnpm run test:connection
+```
+
+**Pipeline Health:** Run comprehensive checks:
+```bash
+pnpm test:pipeline
+```
+
+### Getting Help
+
+- Check service logs: `docker logs -f zeke-worker-local-8082`
+- Validate Supabase: Visit http://127.0.0.1:54323
+- Review environment files: `.env.development`, `apps/worker/.env.development`
+
+## Contributing
+
+This monorepo uses:
+- **Turborepo** for build orchestration and caching
+- **TypeScript** strict mode across all packages
+- **Biome** for formatting and linting
+- **pnpm** for package management
+
+See `agents.md` for detailed development guidelines and architecture patterns.

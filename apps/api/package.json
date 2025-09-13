@@ -1,0 +1,35 @@
+{
+  "name": "api",
+  "private": true,
+  "scripts": {
+    "dev": "supabase start",
+    "login": "supabase login",
+    "analyze": "ANALYZE=true npm run build",
+    "test": "NODE_ENV=test vitest run",
+    "seed": "supabase db seed generate && supabase db seed run",
+    "reset": "supabase db reset",
+    "generate": "supabase gen types --lang=typescript --local --schema public > ../../packages/supabase/src/types/db.ts",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@zeke/analytics": "workspace:*",
+    "@zeke/auth": "workspace:*",
+    "@zeke/supabase": "workspace:*",
+    "@zeke/next-config": "workspace:*",
+    "@zeke/observability": "workspace:*",
+    "@zeke/testing": "workspace:*",
+    "@sentry/nextjs": "^9.22.0",
+    "@t3-oss/env-nextjs": "^0.13.4",
+    "vitest": "^3.1.4",
+    "zod": "^3.25.28"
+  },
+  "devDependencies": {
+    "@zeke/typescript-config": "workspace:*",
+    "@types/node": "22.15.21",
+    "@types/react": "19.1.5",
+    "@types/react-dom": "19.1.5",
+    "typescript": "^5.8.3",
+    "supabase": "^2.40.7"
+  }
+}

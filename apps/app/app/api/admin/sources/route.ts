@@ -1,7 +1,7 @@
-import { getAdminFlag } from "@db/queries/account/get-admin-flag";
+import { getAdminFlag } from "@zeke/supabase/queries";
 import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@/lib/supabase/supabase-admin";
-import type { Json } from "@/lib/supabase/types";
+import { supabaseAdminClient } from "@zeke/supabase/admin";
+import type { Json } from "@zeke/supabase/types";
 
 type SourceUpsert = {
   id?: string | null;

@@ -1,15 +1,15 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"outDir": "dist",
-		"rootDir": "src",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"resolveJsonModule": true
-	},
-	"include": ["src/**/*"]
+  "extends": "@zeke/typescript-config/nodejs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {
+      "@/*": ["./*"],
+      "@zeke/*": ["../../packages/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

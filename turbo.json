@@ -1,39 +1,54 @@
 {
-	"$schema": "https://turborepo.com/schema.json",
-	"globalDependencies": ["**/.env.*local"],
-	"ui": "tui",
-	"envMode": "loose",
-	"tasks": {
-		"build": {
-			"dependsOn": ["^build", "test"],
-			"outputs": [
-				".next/**",
-				"!.next/cache/**",
-				".basehub/**",
-				"**/generated/**",
-				"storybook-static/**",
-				".react-email/**"
-			]
-		},
-		"test": {
-			"dependsOn": ["^test"]
-		},
-		"analyze": {
-			"dependsOn": ["^analyze"]
-		},
-		"dev": {
-			"cache": false,
-			"persistent": true
-		},
-		"translate": {
-			"dependsOn": ["^translate"],
-			"cache": false
-		},
-		"clean": {
-			"cache": false
-		},
-		"//#clean": {
-			"cache": false
-		}
-	}
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "ui": "tui",
+  "envMode": "loose",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "test"],
+      "outputs": [".next/**", "!.next/cache/**", ".basehub/**", "dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^test"]
+    },
+    "analyze": {
+      "dependsOn": ["^analyze"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"]
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "types:generate": {
+      "cache": false,
+      "outputs": ["../../packages/supabase/src/types/db.ts"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
+    },
+    "//#dev:setup": {
+      "cache": false
+    },
+    "//#dev:worker": {
+      "cache": false,
+      "persistent": true
+    },
+    "//#stop": {
+      "cache": false
+    },
+    "//#test:pipeline": {
+      "cache": false
+    }
+  }
 }
