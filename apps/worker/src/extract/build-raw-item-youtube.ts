@@ -1,4 +1,4 @@
-import type { YouTubeVideo } from "../lib/youtube/types.js";
+import type { YouTubeVideo } from '../lib/youtube/types.js';
 
 type SourceWithMetadata = {
   id: string;
@@ -34,7 +34,7 @@ export function buildRawItemYouTube(
     external_id: video.videoId,
     url: videoUrl,
     title: video.title,
-    kind: "youtube" as const,
+    kind: 'youtube' as const,
     metadata,
   };
 }

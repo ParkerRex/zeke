@@ -1,12 +1,12 @@
-import { Pool } from "pg";
-import { log } from "./log.js";
+import { Pool } from 'pg';
+import { log } from './log.js';
 
-const cnn = process.env.DATABASE_URL || "";
+const cnn = process.env.DATABASE_URL || '';
 // Use SSL only for non-local connections. Supabase local Postgres on 127.0.0.1:54322 does not support TLS.
 const useSsl = !(
-  cnn.includes("127.0.0.1") ||
-  cnn.includes("localhost") ||
-  cnn.includes("host.docker.internal")
+  cnn.includes('127.0.0.1') ||
+  cnn.includes('localhost') ||
+  cnn.includes('host.docker.internal')
 );
 
 const pool = new Pool({
@@ -21,8 +21,8 @@ const pool = new Pool({
 
 // Prevent process crashes from idle client errors (e.g., Supabase pooler resets)
 // See: https://node-postgres.com/features/connecting#idle-clients
-pool.on("error", (err) => {
-  log("pg_pool_error", { err: String(err) }, "warn");
+pool.on('error', (err) => {
+  log('pg_pool_error', { err: String(err) }, 'warn');
 });
 
 export type SourceRow = {
@@ -75,7 +75,7 @@ export async function getSourceById(
   sourceId: string
 ): Promise<SourceRowFull | null> {
   const { rows } = await pool.query(
-    "select id, kind, url, name, metadata, domain from public.sources where id = $1",
+    'select id, kind, url, name, metadata, domain from public.sources where id = $1',
     [sourceId]
   );
   return rows[0] ?? null;
@@ -137,7 +137,7 @@ export async function upsertRawItem(params: {
       external_id,
       url,
       title ?? null,
-      kind ?? "article",
+      kind ?? 'article',
       metadata ?? null,
     ]
   );
@@ -151,7 +151,7 @@ export async function findRawItemsByIds(
     return [];
   }
   const { rows } = await pool.query(
-    "select id, url, title from public.raw_items where id = any($1::uuid[])",
+    'select id, url, title from public.raw_items where id = any($1::uuid[])',
     [ids]
   );
   return rows;
@@ -225,7 +225,7 @@ export async function insertStory(params: {
       title ?? null,
       canonical_url ?? null,
       primary_url ?? null,
-      kind ?? "article",
+      kind ?? 'article',
       published_at ?? null,
     ]
   );
@@ -335,7 +335,7 @@ export async function upsertPlatformQuota(
 
 export async function upsertSourceHealth(
   sourceId: string,
-  status: "ok" | "warn" | "error",
+  status: 'ok' | 'warn' | 'error',
   message?: string | null
 ) {
   await pool.query(
@@ -363,7 +363,7 @@ export async function upsertJobMetrics(
       (_, i) =>
         `($${i * PARAMS_PER_ROW + 1}, $${i * PARAMS_PER_ROW + 2}, $${i * PARAMS_PER_ROW + PARAMS_PER_ROW}, now())`
     )
-    .join(",");
+    .join(',');
   const params: Array<string | number> = [];
   for (const r of rows) {
     params.push(r.name, r.state, r.count);

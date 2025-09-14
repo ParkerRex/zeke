@@ -1,10 +1,15 @@
 import { env } from '@/env';
 import { Button } from '@zeke/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@zeke/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@zeke/design-system/components/ui/card';
 import { getDictionary } from '@zeke/internationalization';
 import { createMetadata } from '@zeke/seo/metadata';
+import { Check, Clock, MoveRight, PhoneCall, Target, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
-import { Check, Clock, Target, Zap, MoveRight, PhoneCall } from 'lucide-react';
 import Link from 'next/link';
 
 type PricingPageProps = {
@@ -17,17 +22,18 @@ export const generateMetadata = async ({
   params,
 }: PricingPageProps): Promise<Metadata> => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return createMetadata({
     title: 'Pricing - ZEKE Research Intelligence',
-    description: 'Simple pricing for research that goes from 10 hours to 5 minutes. Start free, upgrade when you need team features.',
+    description:
+      'Simple pricing for research that goes from 10 hours to 5 minutes. Start free, upgrade when you need team features.',
   });
 };
 
 const Pricing = async ({ params }: PricingPageProps) => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return (
     <div className="w-full">
@@ -40,8 +46,9 @@ const Pricing = async ({ params }: PricingPageProps) => {
               <span className="text-primary"> for everyone</span>
             </h1>
             <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed tracking-tight md:text-xl">
-              Simple pricing for research intelligence that turns chaos into actionable playbooks.
-              Start free, upgrade when you need team features.
+              Simple pricing for research intelligence that turns chaos into
+              actionable playbooks. Start free, upgrade when you need team
+              features.
             </p>
           </div>
         </div>
@@ -54,9 +61,10 @@ const Pricing = async ({ params }: PricingPageProps) => {
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Clock className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Compress Research</h3>
-                <p className="text-sm text-muted-foreground">
-                  Turn podcasts, papers, and videos into verified 5-minute briefs
+                <h3 className="font-semibold text-lg">Compress Research</h3>
+                <p className="text-muted-foreground text-sm">
+                  Turn podcasts, papers, and videos into verified 5-minute
+                  briefs
                 </p>
               </CardContent>
             </Card>
@@ -66,8 +74,8 @@ const Pricing = async ({ params }: PricingPageProps) => {
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Target className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Apply to Goals</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg">Apply to Goals</h3>
+                <p className="text-muted-foreground text-sm">
                   Load your SOPs and get ready-to-use plans and content
                 </p>
               </CardContent>
@@ -78,8 +86,8 @@ const Pricing = async ({ params }: PricingPageProps) => {
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Zap className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Create with Receipts</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg">Create with Receipts</h3>
+                <p className="text-muted-foreground text-sm">
                   Publish cited content with timestamps and source verification
                 </p>
               </CardContent>
@@ -97,7 +105,7 @@ const Pricing = async ({ params }: PricingPageProps) => {
                   Perfect for trying ZEKE's research compression
                 </p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$0</span>
+                  <span className="font-bold text-4xl">$0</span>
                   <span className="text-muted-foreground"> / month</span>
                 </div>
               </CardHeader>
@@ -120,9 +128,9 @@ const Pricing = async ({ params }: PricingPageProps) => {
                     <span className="text-sm">Export to common formats</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6" asChild>
+                <Button className="mt-6 w-full" asChild>
                   <Link href={env.NEXT_PUBLIC_APP_URL}>
-                    Start Free <MoveRight className="h-4 w-4 ml-2" />
+                    Start Free <MoveRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>
@@ -130,8 +138,8 @@ const Pricing = async ({ params }: PricingPageProps) => {
 
             {/* Pro Tier */}
             <Card className="relative border-primary">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+              <div className="-top-3 -translate-x-1/2 absolute left-1/2 transform">
+                <span className="rounded-full bg-primary px-3 py-1 font-medium text-primary-foreground text-sm">
                   Most Popular
                 </span>
               </div>
@@ -141,7 +149,7 @@ const Pricing = async ({ params }: PricingPageProps) => {
                   For individuals and small teams doing serious research
                 </p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$29</span>
+                  <span className="font-bold text-4xl">$29</span>
                   <span className="text-muted-foreground"> / month</span>
                 </div>
               </CardHeader>
@@ -153,7 +161,9 @@ const Pricing = async ({ params }: PricingPageProps) => {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Advanced analysis & insights</span>
+                    <span className="text-sm">
+                      Advanced analysis & insights
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-primary" />
@@ -168,9 +178,9 @@ const Pricing = async ({ params }: PricingPageProps) => {
                     <span className="text-sm">API access</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6" asChild>
+                <Button className="mt-6 w-full" asChild>
                   <Link href={env.NEXT_PUBLIC_APP_URL}>
-                    Start Pro Trial <MoveRight className="h-4 w-4 ml-2" />
+                    Start Pro Trial <MoveRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>
@@ -184,7 +194,7 @@ const Pricing = async ({ params }: PricingPageProps) => {
                   For teams that need shared playbooks and collaboration
                 </p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$99</span>
+                  <span className="font-bold text-4xl">$99</span>
                   <span className="text-muted-foreground"> / month</span>
                 </div>
               </CardHeader>
@@ -211,9 +221,9 @@ const Pricing = async ({ params }: PricingPageProps) => {
                     <span className="text-sm">Custom integrations</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full mt-6" asChild>
+                <Button variant="outline" className="mt-6 w-full" asChild>
                   <Link href="/contact">
-                    Contact Sales <PhoneCall className="h-4 w-4 ml-2" />
+                    Contact Sales <PhoneCall className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>
@@ -230,20 +240,26 @@ const Pricing = async ({ params }: PricingPageProps) => {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="mb-2 font-semibold">How much time will I actually save?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Most users go from 2-10 hours of research per week to 15-30 minutes.
-                    A 3-hour podcast becomes a 5-minute brief with timestamps to jump to what matters.
+                  <h3 className="mb-2 font-semibold">
+                    How much time will I actually save?
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    Most users go from 2-10 hours of research per week to 15-30
+                    minutes. A 3-hour podcast becomes a 5-minute brief with
+                    timestamps to jump to what matters.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="mb-2 font-semibold">What if I need to verify the insights?</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="mb-2 font-semibold">
+                    What if I need to verify the insights?
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
                     Every claim includes timestamps, quotes, or source snippets.
-                    Click any insight to jump to the exact moment in the original content.
+                    Click any insight to jump to the exact moment in the
+                    original content.
                   </p>
                 </CardContent>
               </Card>
@@ -251,19 +267,22 @@ const Pricing = async ({ params }: PricingPageProps) => {
               <Card>
                 <CardContent className="p-6">
                   <h3 className="mb-2 font-semibold">Can I cancel anytime?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Yes, cancel anytime. You can export all your research briefs and playbooks
-                    before your subscription ends.
+                  <p className="text-muted-foreground text-sm">
+                    Yes, cancel anytime. You can export all your research briefs
+                    and playbooks before your subscription ends.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="mb-2 font-semibold">Do you offer team discounts?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Yes! Contact us for custom pricing for larger teams or enterprise needs.
-                    We also offer academic and nonprofit discounts.
+                  <h3 className="mb-2 font-semibold">
+                    Do you offer team discounts?
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    Yes! Contact us for custom pricing for larger teams or
+                    enterprise needs. We also offer academic and nonprofit
+                    discounts.
                   </p>
                 </CardContent>
               </Card>
@@ -278,18 +297,15 @@ const Pricing = async ({ params }: PricingPageProps) => {
               Ready to compress your research?
             </h3>
             <p className="mb-6 text-muted-foreground">
-              Join operators, founders, marketers, and PMs who've made research effortless with ZEKE.
+              Join operators, founders, marketers, and PMs who've made research
+              effortless with ZEKE.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button size="lg" asChild>
-                <Link href={env.NEXT_PUBLIC_APP_URL}>
-                  Start Free Trial
-                </Link>
+                <Link href={env.NEXT_PUBLIC_APP_URL}>Start Free Trial</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/contact">
-                  Talk to Sales
-                </Link>
+                <Link href="/contact">Talk to Sales</Link>
               </Button>
             </div>
           </div>

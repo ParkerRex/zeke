@@ -18,6 +18,7 @@
     "format": "ultracite format",
     "test": "turbo test",
     "test:pipeline": "bash scripts/test-pipeline.sh",
+    "test:worker": "cd apps/worker && pnpm run test:unit && pnpm run test:integration",
     "analyze": "turbo analyze",
     "translate": "turbo translate",
     "boundaries": "turbo boundaries",

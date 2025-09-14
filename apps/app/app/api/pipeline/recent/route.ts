@@ -1,13 +1,13 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@zeke/supabase/admin";
+import { supabaseAdminClient } from '@zeke/supabase/admin';
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 export async function GET(): Promise<Response> {
   const { isAdmin } = await getAdminFlag();
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
@@ -15,19 +15,19 @@ export async function GET(): Promise<Response> {
     const LIMIT_RECENT = 25;
     const [rawItems, contents, stories] = await Promise.all([
       supabaseAdminClient
-        .from("raw_items")
-        .select("id,url,title,discovered_at,kind")
-        .order("discovered_at", { ascending: false })
+        .from('raw_items')
+        .select('id,url,title,discovered_at,kind')
+        .order('discovered_at', { ascending: false })
         .limit(LIMIT_RECENT),
       supabaseAdminClient
-        .from("contents")
-        .select("id,raw_item_id,html_url,extracted_at,lang")
-        .order("extracted_at", { ascending: false, nullsFirst: false })
+        .from('contents')
+        .select('id,raw_item_id,html_url,extracted_at,lang')
+        .order('extracted_at', { ascending: false, nullsFirst: false })
         .limit(LIMIT_RECENT),
       supabaseAdminClient
-        .from("stories")
-        .select("id,title,canonical_url,primary_url,created_at,kind")
-        .order("created_at", { ascending: false })
+        .from('stories')
+        .select('id,title,canonical_url,primary_url,created_at,kind')
+        .order('created_at', { ascending: false })
         .limit(LIMIT_RECENT),
     ]);
 

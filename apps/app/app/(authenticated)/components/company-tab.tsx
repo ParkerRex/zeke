@@ -1,11 +1,11 @@
 'use client';
-import StoryRow from './story-row';
 import { companyViewParser } from '@/lib/nuqs';
 import type { Tab } from '@/stores/tabsStore';
 import type { Cluster } from '@zeke/supabase/types';
 import Image from 'next/image';
 import { useQueryState } from 'nuqs';
 import { useEffect, useMemo, useState } from 'react';
+import StoryRow from './story-row';
 
 const COMPANY_KEYWORDS: Record<string, { company: string[]; ceo: string[] }> = {
   openai: { company: ['openai', 'gpt', 'chatgpt'], ceo: ['sam altman'] },

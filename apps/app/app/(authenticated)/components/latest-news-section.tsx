@@ -1,8 +1,8 @@
-import { listStories } from "@zeke/supabase/queries";
-import Image from "next/image";
-import Link from "next/link";
-import type { Cluster } from "@zeke/supabase/types";
-import { domainFromUrl } from "@/utils/url";
+import { domainFromUrl } from '@/utils/url';
+import { listStories } from '@zeke/supabase/queries';
+import type { Cluster } from '@zeke/supabase/types';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const HASH_MULTIPLIER = 31;
 const MIN_COVERAGE_PERCENT = 35;
@@ -19,7 +19,7 @@ type Props = {
 
 function imageFor(_story?: Cluster) {
   // Placeholder imagery for now; wire real thumbnails later.
-  return "/hero-shape.png";
+  return '/hero-shape.png';
 }
 
 function deterministicPercent(
@@ -74,7 +74,7 @@ function NewsCard({ story }: { story: Cluster }) {
       <div className="mb-2 flex items-start justify-between text-[11px] text-gray-500">
         <span>
           • {getKindLabel(kind)}
-          {domain ? `, ${domain}` : ""}
+          {domain ? `, ${domain}` : ''}
         </span>
         {/* Bookmark icon could go here later */}
       </div>
@@ -101,17 +101,17 @@ function NewsCard({ story }: { story: Cluster }) {
 }
 
 function getKindLabel(kind: string | undefined): string {
-  if (kind === "youtube") {
-    return "Video";
+  if (kind === 'youtube') {
+    return 'Video';
   }
-  if (kind === "arxiv") {
-    return "Research";
+  if (kind === 'arxiv') {
+    return 'Research';
   }
-  return "AI";
+  return 'AI';
 }
 
 export async function LatestNewsSection({
-  title = "Latest News",
+  title = 'Latest News',
   stories,
   limit = DEFAULT_STORIES_LIMIT,
 }: Props) {
@@ -136,7 +136,7 @@ export async function LatestNewsSection({
           className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm hover:bg-gray-50"
           href="/stories"
         >
-          Show More{" "}
+          Show More{' '}
           <span aria-hidden className="text-lg leading-none">
             +
           </span>

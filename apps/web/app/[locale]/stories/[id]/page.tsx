@@ -4,26 +4,31 @@
 
 import { Badge } from '@zeke/design-system/components/ui/badge';
 import { Button } from '@zeke/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@zeke/design-system/components/ui/card';
-import { listStories } from '@zeke/supabase/queries';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@zeke/design-system/components/ui/card';
 import { getDictionary } from '@zeke/internationalization';
 import { createMetadata } from '@zeke/seo/metadata';
+import { listStories } from '@zeke/supabase/queries';
+import { ArrowLeft, Clock, ExternalLink, Users } from 'lucide-react';
 import type { Metadata } from 'next';
-import { ArrowLeft, ExternalLink, Clock, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { 
-  deterministicPercent, 
-  domainFromUrl, 
-  getKindLabel, 
-  hypePercent, 
-  imageFor,
-  MIN_SOURCES_COUNT 
-} from '../../../../lib/stories-utils';
 import { CoverageBar } from '../../../../components/stories/coverage-bar';
 import { HypeBar } from '../../../../components/stories/hype-bar';
 import { SourcesBadge } from '../../../../components/stories/sources-badge';
+import {
+  MIN_SOURCES_COUNT,
+  deterministicPercent,
+  domainFromUrl,
+  getKindLabel,
+  hypePercent,
+  imageFor,
+} from '../../../../lib/stories-utils';
 
 type StoryPageProps = {
   params: Promise<{
@@ -36,12 +41,12 @@ export const generateMetadata = async ({
   params,
 }: StoryPageProps): Promise<Metadata> => {
   const { locale, id } = await params;
-  const dictionary = await getDictionary(locale);
-  
+  const _dictionary = await getDictionary(locale);
+
   // Get the story for metadata
   const stories = await listStories();
-  const story = stories.find(s => s.id === decodeURIComponent(id));
-  
+  const story = stories.find((s) => s.id === decodeURIComponent(id));
+
   if (!story) {
     return createMetadata({
       title: 'Story Not Found - ZEKE',
@@ -57,12 +62,12 @@ export const generateMetadata = async ({
 
 const StoryPage = async ({ params }: StoryPageProps) => {
   const { locale, id } = await params;
-  const dictionary = await getDictionary(locale);
-  
+  const _dictionary = await getDictionary(locale);
+
   // Get all stories and find the specific one
   const stories = await listStories();
-  const story = stories.find(s => s.id === decodeURIComponent(id));
-  
+  const story = stories.find((s) => s.id === decodeURIComponent(id));
+
   if (!story) {
     notFound();
   }
@@ -93,25 +98,21 @@ const StoryPage = async ({ params }: StoryPageProps) => {
             {/* Header */}
             <header className="mb-6">
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge variant="outline">
-                  {getKindLabel(kind)}
-                </Badge>
-                {domain && (
-                  <Badge variant="secondary">
-                    {domain}
-                  </Badge>
-                )}
+                <Badge variant="outline">{getKindLabel(kind)}</Badge>
+                {domain && <Badge variant="secondary">{domain}</Badge>}
               </div>
-              
-              <h1 className="mb-4 text-3xl font-bold leading-tight">
+
+              <h1 className="mb-4 font-bold text-3xl leading-tight">
                 {story.title}
               </h1>
-              
+
               {/* Metrics */}
               <div className="flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">1 hour ago</span>
+                  <span className="text-muted-foreground text-sm">
+                    1 hour ago
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
@@ -122,39 +123,54 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 
             {/* Featured image */}
             <div className="relative mb-6 h-[300px] overflow-hidden rounded-lg">
-              <Image 
-                alt={story.title} 
-                className="object-cover" 
-                fill 
-                src={img} 
+              <Image
+                alt={story.title}
+                className="object-cover"
+                fill
+                src={img}
                 priority
               />
             </div>
 
             {/* Content placeholder */}
-            <div className="prose prose-gray max-w-none dark:prose-invert">
+            <div className="prose prose-gray dark:prose-invert max-w-none">
               <p className="lead">
-                This story has been compressed from hours of research into key insights with verified sources and timestamps.
+                This story has been compressed from hours of research into key
+                insights with verified sources and timestamps.
               </p>
-              
+
               <h2>Key Insights</h2>
               <ul>
-                <li>AI research breakthrough in {getKindLabel(kind).toLowerCase()} format</li>
-                <li>Verified through {Math.max(MIN_SOURCES_COUNT, sources)} independent sources</li>
-                <li>Coverage analysis shows {Math.round(coverage)}% comprehensive review</li>
-                <li>Community hype level indicates {hype > 60 ? 'high' : hype > 30 ? 'moderate' : 'low'} interest</li>
+                <li>
+                  AI research breakthrough in {getKindLabel(kind).toLowerCase()}{' '}
+                  format
+                </li>
+                <li>
+                  Verified through {Math.max(MIN_SOURCES_COUNT, sources)}{' '}
+                  independent sources
+                </li>
+                <li>
+                  Coverage analysis shows {Math.round(coverage)}% comprehensive
+                  review
+                </li>
+                <li>
+                  Community hype level indicates{' '}
+                  {hype > 60 ? 'high' : hype > 30 ? 'moderate' : 'low'} interest
+                </li>
               </ul>
-              
+
               <h2>Why This Matters</h2>
               <p>
-                This research represents a significant development in the AI field, with implications for 
-                operators, founders, marketers, and product managers working with AI technologies.
+                This research represents a significant development in the AI
+                field, with implications for operators, founders, marketers, and
+                product managers working with AI technologies.
               </p>
-              
+
               <h2>Receipts & Verification</h2>
               <p>
-                All insights are backed by source material with timestamps and citations. 
-                Click the source links below to verify claims and dive deeper into the original content.
+                All insights are backed by source material with timestamps and
+                citations. Click the source links below to verify claims and
+                dive deeper into the original content.
               </p>
             </div>
           </article>
@@ -170,16 +186,20 @@ const StoryPage = async ({ params }: StoryPageProps) => {
             <CardContent className="space-y-4">
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium">Coverage</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(coverage)}%</span>
+                  <span className="font-medium text-sm">Coverage</span>
+                  <span className="text-muted-foreground text-sm">
+                    {Math.round(coverage)}%
+                  </span>
                 </div>
                 <CoverageBar value={coverage} />
               </div>
-              
+
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium">Hype Level</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(hype)}%</span>
+                  <span className="font-medium text-sm">Hype Level</span>
+                  <span className="text-muted-foreground text-sm">
+                    {Math.round(hype)}%
+                  </span>
                 </div>
                 <HypeBar value={hype} />
               </div>
@@ -194,9 +214,9 @@ const StoryPage = async ({ params }: StoryPageProps) => {
               </CardHeader>
               <CardContent>
                 <Button asChild className="w-full">
-                  <a 
-                    href={story.primaryUrl} 
-                    target="_blank" 
+                  <a
+                    href={story.primaryUrl}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2"
                   >

@@ -31,7 +31,7 @@ export function StoriesGrid({
   className,
 }: StoriesGridProps) {
   const gridClasses = cn(
-    "grid grid-cols-1 gap-4",
+    'grid grid-cols-1 gap-4',
     columns.sm && `sm:grid-cols-${columns.sm}`,
     columns.md && `md:grid-cols-${columns.md}`,
     columns.lg && `lg:grid-cols-${columns.lg}`,

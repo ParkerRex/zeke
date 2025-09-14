@@ -1,8 +1,8 @@
 'use client';
-import StoryRow from './story-row';
 import type { Tab } from '@/stores/tabsStore';
 import type { Cluster } from '@zeke/supabase/types';
 import { useEffect, useMemo, useState } from 'react';
+import StoryRow from './story-row';
 
 export default function IndustryTab({ tab }: { tab: Tab }) {
   const industry = (tab.context?.industry as string | undefined) ?? 'All';

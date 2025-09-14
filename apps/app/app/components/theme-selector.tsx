@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@zeke/design-system/components/ui/select";
+} from '@zeke/design-system/components/ui/select';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export default function ThemeSelector() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -17,10 +17,11 @@ export default function ThemeSelector() {
   // Avoid hydration mismatch by waiting until mounted
   useEffect(() => setMounted(true), []);
 
-  const value = (theme ?? "system") as "light" | "dark" | "system";
+  const value = (theme ?? 'system') as 'light' | 'dark' | 'system';
 
-  if (!mounted)
+  if (!mounted) {
     return <div className="h-9 w-40 animate-pulse rounded-md bg-muted" />;
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -31,8 +32,8 @@ export default function ThemeSelector() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="system">
-            {"System"}
-            {resolvedTheme ? " (" + resolvedTheme + ")" : ""}
+            {'System'}
+            {resolvedTheme ? ` (${resolvedTheme})` : ''}
           </SelectItem>
           <SelectItem value="light">Light</SelectItem>
           <SelectItem value="dark">Dark</SelectItem>

@@ -1,17 +1,17 @@
-import type PgBoss from "pg-boss";
+import type PgBoss from 'pg-boss';
 import {
   findRawItemsByIds,
   findStoryIdByContentHash,
   insertContents,
   insertStory,
-} from "../db.js";
-import { extractAudio } from "../extract/extract-youtube-audio.js";
-import { log } from "../log.js";
-import { generateVTTContent } from "../storage/generate-vtt-content.js";
-import { prepareYouTubeTranscript } from "../storage/prepare-youtube-transcript.js";
-import { transcribeAudio } from "../transcribe/whisper.js";
-import { hashText } from "../util.js";
-import { cleanupVideoTempFiles } from "../utils/temp-files.js";
+} from '../db.js';
+import { extractAudio } from '../extract/extract-youtube-audio.js';
+import { log } from '../log.js';
+import { generateVTTContent } from '../storage/generate-vtt-content.js';
+import { prepareYouTubeTranscript } from '../storage/prepare-youtube-transcript.js';
+import { transcribeAudio } from '../transcribe/whisper.js';
+import { hashText } from '../util.js';
+import { cleanupVideoTempFiles } from '../utils/temp-files.js';
 
 // Constants
 const SECONDS_PER_HOUR = 3600;
@@ -82,8 +82,8 @@ async function processYouTubeRow(
   const videoUrl = row.url;
 
   try {
-    log("youtube_extract_start", {
-      comp: "extract",
+    log('youtube_extract_start', {
+      comp: 'extract',
       raw_item_id: row.id,
       video_id: videoId,
       source_kind: sourceKind,
@@ -92,8 +92,8 @@ async function processYouTubeRow(
 
     const audioResult = await ensureAudioExtracted(videoUrl, videoId);
 
-    log("youtube_audio_extracted", {
-      comp: "extract",
+    log('youtube_audio_extracted', {
+      comp: 'extract',
       raw_item_id: row.id,
       video_id: videoId,
       audio_path: audioResult.audioPath,
@@ -110,8 +110,8 @@ async function processYouTubeRow(
       videoId
     );
 
-    log("youtube_transcription_complete", {
-      comp: "extract",
+    log('youtube_transcription_complete', {
+      comp: 'extract',
       raw_item_id: row.id,
       video_id: videoId,
       language: transcriptionResult.language,
@@ -157,22 +157,22 @@ async function processYouTubeRow(
         title: audioResult.metadata.title || row.title || null,
         canonical_url: videoUrl,
         primary_url: videoUrl,
-        kind: "youtube",
+        kind: 'youtube',
         published_at: audioResult.metadata.uploadDate
           ? new Date(
               audioResult.metadata.uploadDate.replace(
                 UPLOAD_DATE_REGEX,
-                "$1-$2-$3"
+                '$1-$2-$3'
               )
             ).toISOString()
           : null,
       }));
 
-    await boss.send("analyze:llm", { storyId });
+    await boss.send('analyze:llm', { storyId });
     await cleanupVideoTempFiles(videoId);
 
-    log("youtube_extract_success", {
-      comp: "extract",
+    log('youtube_extract_success', {
+      comp: 'extract',
       raw_item_id: row.id,
       content_id,
       story_id: storyId,
@@ -186,15 +186,15 @@ async function processYouTubeRow(
     });
   } catch (err) {
     log(
-      "youtube_extract_error",
+      'youtube_extract_error',
       {
-        comp: "extract",
+        comp: 'extract',
         raw_item_id: row.id,
         video_id: videoId,
         url: row.url,
         err: String(err),
       },
-      "error"
+      'error'
     );
     try {
       await cleanupVideoTempFiles(videoId);
@@ -214,13 +214,13 @@ async function ensureAudioExtracted(videoUrl: string, videoId: string) {
 
 async function transcribeOrThrow(audioPath: string, videoId: string) {
   const transcriptionResult = await transcribeAudio(audioPath, videoId, {
-    model: "base",
+    model: 'base',
     language: undefined,
     wordTimestamps: true,
   });
   if (!transcriptionResult.success) {
     throw new Error(
-      `Transcription failed: ${String(transcriptionResult.error || "unknown")}`
+      `Transcription failed: ${String(transcriptionResult.error || 'unknown')}`
     );
   }
   return transcriptionResult as TranscriptionResult;
@@ -231,7 +231,7 @@ function ensureTranscriptText(
 ): string {
   const transcriptText = transcriptionResult.text.trim();
   if (!transcriptText) {
-    throw new Error("No text extracted from transcription");
+    throw new Error('No text extracted from transcription');
   }
   return transcriptText;
 }
@@ -243,14 +243,14 @@ function formatYouTubeContent(
 ): string {
   const sections: string[] = [];
 
-  sections.push("=== VIDEO INFORMATION ===");
+  sections.push('=== VIDEO INFORMATION ===');
   sections.push(`Title: ${metadata.title}`);
   sections.push(`Channel: ${metadata.uploader}`);
   sections.push(`Duration: ${formatDuration(metadata.duration)}`);
   sections.push(`Upload Date: ${formatUploadDate(metadata.uploadDate)}`);
   if (metadata.viewCount) {
     const viewsNum =
-      typeof metadata.viewCount === "string"
+      typeof metadata.viewCount === 'string'
         ? Number.parseInt(metadata.viewCount, 10)
         : metadata.viewCount;
     if (Number.isFinite(viewsNum)) {
@@ -259,12 +259,12 @@ function formatYouTubeContent(
   }
   if (metadata.description) {
     sections.push(
-      `Description: ${metadata.description.substring(0, DESCRIPTION_MAX_LENGTH)}${metadata.description.length > DESCRIPTION_MAX_LENGTH ? "..." : ""}`
+      `Description: ${metadata.description.substring(0, DESCRIPTION_MAX_LENGTH)}${metadata.description.length > DESCRIPTION_MAX_LENGTH ? '...' : ''}`
     );
   }
 
-  sections.push("");
-  sections.push("=== TRANSCRIPTION INFORMATION ===");
+  sections.push('');
+  sections.push('=== TRANSCRIPTION INFORMATION ===');
   sections.push(`Language: ${transcriptionResult.language}`);
   sections.push(`Model: ${transcriptionResult.modelUsed}`);
   sections.push(`Segments: ${transcriptionResult.segments.length}`);
@@ -272,13 +272,13 @@ function formatYouTubeContent(
     `Processing Time: ${Math.round(transcriptionResult.processingTimeMs / MILLISECONDS_PER_SECOND)}s`
   );
 
-  sections.push("");
-  sections.push("=== TRANSCRIPT ===");
+  sections.push('');
+  sections.push('=== TRANSCRIPT ===');
   sections.push(transcriptText);
 
   if (transcriptionResult.segments && transcriptionResult.segments.length > 0) {
-    sections.push("");
-    sections.push("=== TIMESTAMPED SEGMENTS ===");
+    sections.push('');
+    sections.push('=== TIMESTAMPED SEGMENTS ===');
     const maxSegments = Math.min(
       MAX_PREVIEW_SEGMENTS,
       transcriptionResult.segments.length
@@ -296,25 +296,25 @@ function formatYouTubeContent(
     }
   }
 
-  return sections.join("\n");
+  return sections.join('\n');
 }
 
 function formatDuration(seconds?: number): string {
   if (!seconds) {
-    return "0:00";
+    return '0:00';
   }
   const hours = Math.floor(seconds / SECONDS_PER_HOUR);
   const minutes = Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
   const secs = Math.floor(seconds % SECONDS_PER_MINUTE);
   if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(TIME_PAD_LENGTH, "0")}:${secs.toString().padStart(TIME_PAD_LENGTH, "0")}`;
+    return `${hours}:${minutes.toString().padStart(TIME_PAD_LENGTH, '0')}:${secs.toString().padStart(TIME_PAD_LENGTH, '0')}`;
   }
-  return `${minutes}:${secs.toString().padStart(TIME_PAD_LENGTH, "0")}`;
+  return `${minutes}:${secs.toString().padStart(TIME_PAD_LENGTH, '0')}`;
 }
 
 function formatUploadDate(uploadDate?: string): string {
   if (!uploadDate || uploadDate.length !== UPLOAD_DATE_LENGTH) {
-    return "Unknown";
+    return 'Unknown';
   }
   const year = uploadDate.substring(0, UPLOAD_DATE_YEAR_END);
   const month = uploadDate.substring(
@@ -328,5 +328,5 @@ function formatUploadDate(uploadDate?: string): string {
 function formatTimestamp(seconds?: number): string {
   const minutes = Math.floor((seconds || 0) / SECONDS_PER_MINUTE);
   const secs = Math.floor((seconds || 0) % SECONDS_PER_MINUTE);
-  return `${minutes}:${secs.toString().padStart(TIME_PAD_LENGTH, "0")}`;
+  return `${minutes}:${secs.toString().padStart(TIME_PAD_LENGTH, '0')}`;
 }

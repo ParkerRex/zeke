@@ -7,9 +7,9 @@ import {
   IoLogoYoutube,
   IoMic,
   IoNewspaper,
-} from "react-icons/io5";
+} from 'react-icons/io5';
 
-import type { EmbedKind } from "@zeke/supabase/types";
+import type { EmbedKind } from '@zeke/supabase/types';
 
 export function StoryKindIcon({
   kind,
@@ -18,23 +18,23 @@ export function StoryKindIcon({
   kind: EmbedKind | string;
   className?: string;
 }) {
-  const common = className ?? "h-4 w-4";
+  const common = className ?? 'h-4 w-4';
   switch (kind) {
-    case "youtube":
+    case 'youtube':
       return <IoLogoYoutube className={common} />;
-    case "podcast":
+    case 'podcast':
       return <IoMic className={common} />;
-    case "twitter":
+    case 'twitter':
       return <IoLogoTwitter className={common} />;
-    case "reddit":
+    case 'reddit':
       return <IoLogoReddit className={common} />;
-    case "arxiv":
+    case 'arxiv':
       return <IoDocumentText className={common} />;
-    case "hn":
+    case 'hn':
       return <IoCodeSlash className={common} />;
-    case "industry":
+    case 'industry':
       return <IoBusiness className={common} />;
-    case "company":
+    case 'company':
       return <IoBusiness className={common} />;
     default:
       return <IoNewspaper className={common} />;

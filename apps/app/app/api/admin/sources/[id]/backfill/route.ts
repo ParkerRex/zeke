@@ -1,6 +1,6 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@zeke/supabase/admin";
+import { supabaseAdminClient } from '@zeke/supabase/admin';
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 export async function POST(
   req: Request,
@@ -10,7 +10,7 @@ export async function POST(
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
@@ -23,17 +23,17 @@ export async function POST(
       days?: unknown;
     };
     const d =
-      typeof days === "number" ? days : Number(days) || DEFAULT_BACKFILL_DAYS;
+      typeof days === 'number' ? days : Number(days) || DEFAULT_BACKFILL_DAYS;
     const MS_PER_DAY = 86_400_000; // 24 * 60 * 60 * 1000
     const after = new Date(Date.now() - d * MS_PER_DAY).toISOString();
     // Store backfill hint in metadata; fetchers should honor published_after
     const { error } = await supabaseAdminClient
-      .from("sources")
+      .from('sources')
       .update({
         metadata: { published_after: after },
         updated_at: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq('id', id);
     if (error) {
       throw error;
     }

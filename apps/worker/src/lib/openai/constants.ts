@@ -1,7 +1,7 @@
 export const DEFAULT_CHAT_MODEL =
-  process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini";
+  process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini';
 export const DEFAULT_EMBEDDING_MODEL =
-  process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+  process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small';
 
 export const MODEL_VERSION_LABELS = {
   chat: `${DEFAULT_CHAT_MODEL}-v1`,

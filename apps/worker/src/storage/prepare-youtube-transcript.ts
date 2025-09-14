@@ -1,4 +1,4 @@
-import { log } from "../log.js";
+import { log } from '../log.js';
 
 export type TranscriptData = {
   vttContent: string;
@@ -13,16 +13,16 @@ export function prepareYouTubeTranscript(
   plainText: string
 ): TranscriptData {
   try {
-    log("youtube_transcript_prepare_start", {
+    log('youtube_transcript_prepare_start', {
       videoId,
       vttSize: vttContent.length,
       txtSize: plainText.length,
     });
     if (!(vttContent.trim() && plainText.trim())) {
-      throw new Error("Empty transcript content");
+      throw new Error('Empty transcript content');
     }
     const transcriptUrl = `youtube://${videoId}`;
-    log("youtube_transcript_prepare_success", {
+    log('youtube_transcript_prepare_success', {
       videoId,
       transcriptUrl,
       vttSize: vttContent.length,
@@ -32,13 +32,13 @@ export function prepareYouTubeTranscript(
   } catch (error) {
     const errorMessage = String(error);
     log(
-      "youtube_transcript_prepare_error",
+      'youtube_transcript_prepare_error',
       { videoId, error: errorMessage },
-      "error"
+      'error'
     );
     return {
-      vttContent: "",
-      transcriptUrl: "",
+      vttContent: '',
+      transcriptUrl: '',
       success: false,
       error: errorMessage,
     };

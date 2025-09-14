@@ -1,7 +1,7 @@
-import { spawn } from "node:child_process";
-import { promises as fs } from "node:fs";
-import { join } from "node:path";
-import { log } from "../log.js";
+import { spawn } from 'node:child_process';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
+import { log } from '../log.js';
 
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;
@@ -39,53 +39,53 @@ export async function extractAudio(
   videoUrl: string,
   videoId: string
 ): Promise<AudioExtractionResult> {
-  const tempDir = "/tmp/youtube-processing";
+  const tempDir = '/tmp/youtube-processing';
   const audioPath = join(tempDir, `${videoId}.m4a`);
 
   try {
     await fs.mkdir(tempDir, { recursive: true });
 
-    log("youtube_audio_extraction_start", { videoId, videoUrl, audioPath });
+    log('youtube_audio_extraction_start', { videoId, videoUrl, audioPath });
 
     const ytDlpArgs = [
       videoUrl,
-      "--extract-audio",
-      "--audio-format",
-      "m4a",
-      "--audio-quality",
-      "0",
-      "--output",
-      audioPath.replace(".m4a", ".%(ext)s"),
-      "--no-playlist",
-      "--max-filesize",
-      "500M",
-      "--socket-timeout",
-      "30",
-      "--retries",
-      "3",
-      "--fragment-retries",
-      "3",
+      '--extract-audio',
+      '--audio-format',
+      'm4a',
+      '--audio-quality',
+      '0',
+      '--output',
+      audioPath.replace('.m4a', '.%(ext)s'),
+      '--no-playlist',
+      '--max-filesize',
+      '500M',
+      '--socket-timeout',
+      '30',
+      '--retries',
+      '3',
+      '--fragment-retries',
+      '3',
     ];
 
     const audioExtractionPromise = new Promise<void>((resolve, reject) => {
-      const ytDlp = spawn("yt-dlp", ytDlpArgs);
-      let stderr = "";
-      ytDlp.stderr.on("data", (data) => {
+      const ytDlp = spawn('yt-dlp', ytDlpArgs);
+      let stderr = '';
+      ytDlp.stderr.on('data', (data) => {
         stderr += data.toString();
       });
-      ytDlp.on("close", (code) =>
+      ytDlp.on('close', (code) =>
         code === 0
           ? resolve()
           : reject(new Error(`yt-dlp failed with code ${code}: ${stderr}`))
       );
-      ytDlp.on("error", (error) =>
+      ytDlp.on('error', (error) =>
         reject(new Error(`Failed to spawn yt-dlp: ${error.message}`))
       );
     });
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
-        () => reject(new Error("Audio extraction timeout")),
+        () => reject(new Error('Audio extraction timeout')),
         AUDIO_EXTRACTION_TIMEOUT_MS
       );
     });
@@ -99,7 +99,7 @@ export async function extractAudio(
       Math.round((fileSizeBytes / BYTES_TO_MB) * DECIMAL_PLACES) /
       DECIMAL_PLACES;
 
-    log("youtube_audio_extraction_complete", {
+    log('youtube_audio_extraction_complete', {
       videoId,
       audioPath,
       fileSizeMb,
@@ -109,44 +109,44 @@ export async function extractAudio(
       audioPath,
       metadata: {
         videoId,
-        title: "",
+        title: '',
         duration: 0,
-        uploadDate: new Date().toISOString().split("T")[0].replace(/-/g, ""),
-        uploader: "",
-        description: "",
+        uploadDate: new Date().toISOString().split('T')[0].replace(/-/g, ''),
+        uploader: '',
+        description: '',
         thumbnailUrl: undefined,
         viewCount: undefined,
         likeCount: undefined,
-        format: "m4a",
+        format: 'm4a',
         filesize: fileSizeBytes,
       },
       success: true,
     };
   } catch (error) {
     log(
-      "youtube_audio_extraction_error",
+      'youtube_audio_extraction_error',
       { videoId, videoUrl, error: String(error) },
-      "error"
+      'error'
     );
     try {
       await fs.unlink(audioPath);
     } catch (deleteError) {
       log(
-        "youtube_audio_deletion_error",
+        'youtube_audio_deletion_error',
         { videoId, audioPath, error: String(deleteError) },
-        "error"
+        'error'
       );
     }
     return {
-      audioPath: "",
+      audioPath: '',
       metadata: {
         videoId,
-        title: "",
+        title: '',
         duration: 0,
-        uploadDate: "",
-        uploader: "",
-        description: "",
-        format: "m4a",
+        uploadDate: '',
+        uploader: '',
+        description: '',
+        format: 'm4a',
       },
       success: false,
       error: String(error),

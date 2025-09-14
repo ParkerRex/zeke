@@ -1,7 +1,11 @@
 import { upsertUserSubscription } from '@/actions/account/upsert-user-subscription';
 import { stripeAdmin } from '@/lib/stripe/stripe-admin';
 import { getEnvVar } from '@/utils/get-env-var';
-import { softDeleteProduct, upsertPrice, upsertProduct } from '@zeke/supabase/mutations';
+import {
+  softDeleteProduct,
+  upsertPrice,
+  upsertProduct,
+} from '@zeke/supabase/mutations';
 import type Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -105,12 +109,15 @@ function isForeignKeyViolation(error: unknown): boolean {
   const message: string | undefined =
     anyErr?.message ?? anyErr?.error ?? anyErr?.data?.message;
   // Postgres FK violation code is 23503; PostgREST often returns 409 with this code.
-  if (code === '23503') return true;
+  if (code === '23503') {
+    return true;
+  }
   if (
     typeof message === 'string' &&
     /foreign key|violates foreign key/i.test(message)
-  )
+  ) {
     return true;
+  }
   return false;
 }
 

@@ -31,7 +31,9 @@ type Source = {
 };
 
 function formatTs(ts: string | null) {
-  if (!ts) return '–';
+  if (!ts) {
+    return '–';
+  }
   try {
     return new Date(ts).toLocaleString();
   } catch {
@@ -81,11 +83,15 @@ export default function AdminConsole() {
     try {
       const res = await fetch('/api/admin/sources', { cache: 'no-store' });
       const json = await res.json();
-      if (json?.sources) setSources(json.sources);
+      if (json?.sources) {
+        setSources(json.sources);
+      }
       // Seed metrics map from embedded source_metrics if present
       const m: Record<string, any> = {};
       (json?.sources || []).forEach((s: any) => {
-        if (s.source_metrics) m[s.id] = s.source_metrics;
+        if (s.source_metrics) {
+          m[s.id] = s.source_metrics;
+        }
       });
       setMetrics(m);
     } finally {
@@ -135,7 +141,9 @@ export default function AdminConsole() {
         { event: '*', schema: 'public', table: 'job_metrics' },
         (payload: any) => {
           const row = (payload.new ?? payload.record) as any;
-          if (!(row?.name && row?.state)) return;
+          if (!(row?.name && row?.state)) {
+            return;
+          }
           setJobMetrics((prev) => ({
             ...prev,
             [`${row.name}:${row.state}`]: row.count,
@@ -167,7 +175,9 @@ export default function AdminConsole() {
         { event: '*', schema: 'public', table: 'source_metrics' },
         (payload: any) => {
           const row = (payload.new ?? payload.record) as any;
-          if (!row?.source_id) return;
+          if (!row?.source_id) {
+            return;
+          }
           setMetrics((prev) => ({ ...prev, [row.source_id]: row }));
         }
       )
@@ -176,7 +186,9 @@ export default function AdminConsole() {
         { event: '*', schema: 'public', table: 'source_health' },
         (payload: any) => {
           const row = (payload.new ?? payload.record) as any;
-          if (!row?.source_id) return;
+          if (!row?.source_id) {
+            return;
+          }
           // Attach health to the matching source object
           setSources(
             (prev) =>
@@ -212,7 +224,9 @@ export default function AdminConsole() {
     if (!qKind && qUrl) {
       const d = detectKindFromUrl(qUrl);
       body.kind = d.kind;
-      if (!body.domain && d.domain) body.domain = d.domain;
+      if (!body.domain && d.domain) {
+        body.domain = d.domain;
+      }
     }
     const res = await fetch('/api/admin/sources', {
       method: 'POST',
@@ -230,7 +244,9 @@ export default function AdminConsole() {
     const res = await fetch(`/api/admin/sources/${id}/${op}`, {
       method: 'POST',
     });
-    if (res.ok) await load();
+    if (res.ok) {
+      await load();
+    }
   }
 
   async function backfill(id: string, days: number) {
@@ -239,7 +255,9 @@ export default function AdminConsole() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ days }),
     });
-    if (res.ok) await load();
+    if (res.ok) {
+      await load();
+    }
   }
 
   async function trigger(kind: 'rss' | 'youtube') {
@@ -262,8 +280,9 @@ export default function AdminConsole() {
         cache: 'no-store',
       });
       const json = await res.json();
-      if (json?.ok)
+      if (json?.ok) {
         setPreview({ id, items: json.items || [], quota: json.quota || null });
+      }
     } finally {
       setPreviewLoading(false);
     }
@@ -344,7 +363,9 @@ export default function AdminConsole() {
                         .split(/\n|\r/)
                         .map((x) => x.trim())
                         .filter(Boolean);
-                      if (!urls.length) return;
+                      if (!urls.length) {
+                        return;
+                      }
                       const res = await fetch('/api/admin/ingest/oneoff', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -428,7 +449,9 @@ export default function AdminConsole() {
                         <td className="py-2 pr-3">
                           {(() => {
                             const m = metrics[s.id];
-                            if (!m) return '—';
+                            if (!m) {
+                              return '—';
+                            }
                             return (
                               <span className="text-muted-foreground text-xs">
                                 Raw {m.raw_total ?? 0} / Cont{' '}
@@ -696,12 +719,13 @@ export default function AdminConsole() {
               {(() => {
                 const entries = Object.entries(jobMetrics);
                 const items = entries.sort((a, b) => b[1] - a[1]).slice(0, 8);
-                if (items.length === 0)
+                if (items.length === 0) {
                   return (
                     <div className="text-muted-foreground text-sm">
                       No jobs reported.
                     </div>
                   );
+                }
                 return (
                   <ul className="space-y-1.5 text-sm">
                     {items.map(([k, v]) => (
@@ -863,7 +887,7 @@ function QuotaCard() {
       void supabase.removeChannel(channel);
     };
   }, []);
-  if (!quota || quota.length === 0)
+  if (!quota || quota.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -875,6 +899,7 @@ function QuotaCard() {
         </CardContent>
       </Card>
     );
+  }
   return (
     <Card>
       <CardHeader>

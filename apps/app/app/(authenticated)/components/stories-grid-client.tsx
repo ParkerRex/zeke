@@ -1,16 +1,15 @@
 'use client';
-import { StoryKindIcon } from './story-kind-icon';
 import { STRINGS } from '@/constants/strings';
 import { useStories } from '@/hooks/use-stories';
 import { kindParser, qParser } from '@/lib/nuqs';
 import { useTabs } from '@/stores/tabsStore';
-import type { Cluster } from '@zeke/supabase/types';
 import { domainFromUrl } from '@/utils/url';
 import { Button } from '@zeke/design-system/components/ui/button';
 import { Input } from '@zeke/design-system/components/ui/input';
+import type { Cluster } from '@zeke/supabase/types';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IoCodeSlash,
   IoDocumentText,
@@ -20,6 +19,7 @@ import {
   IoNewspaper,
   IoSearch,
 } from 'react-icons/io5';
+import { StoryKindIcon } from './story-kind-icon';
 
 type GridKindFilter =
   | 'all'
@@ -54,8 +54,21 @@ export default function StoriesGridClient({
   const [kindRaw, setKind] = useQueryState('kind', kindParser);
   const kind: GridKindFilter = (kindRaw ?? 'all') as GridKindFilter;
   const [qInput, setQInput] = useState(q || '');
-  const { clusters: items, loading, error, reload } = useStories();
-  // Data loading handled by useStories
+
+  // Use server-side filtering with the new hook
+  const {
+    stories: items,
+    pagination,
+    loading,
+    error,
+    reload,
+    loadMore,
+  } = useStories({
+    kind,
+    q: q || undefined,
+    limit: 20,
+  });
+
   // Keep input field in sync with URL q
   useEffect(() => {
     setQInput(q || '');
@@ -70,15 +83,8 @@ export default function StoriesGridClient({
     return () => clearTimeout(t);
   }, [qInput, setQ]);
 
-  const filtered = useMemo(() => {
-    return items.filter((c) => {
-      const matchesKind = kind === 'all' ? true : c.embedKind === kind;
-      const matchesQ = q
-        ? `${c.title} ${c.primaryUrl}`.toLowerCase().includes(q.toLowerCase())
-        : true;
-      return matchesKind && matchesQ;
-    });
-  }, [items, q, kind]);
+  // No client-side filtering needed - all done server-side
+  const filtered = items;
 
   const openPreview = (c: Cluster) =>
     openTab({
@@ -168,27 +174,50 @@ export default function StoriesGridClient({
               );
             }
             return (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filtered.map((c) => (
-                  <button
-                    className="group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm"
-                    key={c.id}
-                    onClick={() => openPreview(c)}
-                    onDoubleClick={(e) => {
-                      e.preventDefault();
-                      openPermanent(c);
-                    }}
-                    type="button"
-                  >
-                    <div className="mb-2 flex items-center gap-2 font-medium text-sm">
-                      <StoryKindIcon kind={c.embedKind} />
-                      <span className="truncate">{c.title}</span>
-                    </div>
-                    <div className="truncate text-gray-500 text-xs">
-                      {domainFromUrl(c.primaryUrl)}
-                    </div>
-                  </button>
-                ))}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {filtered.map((c) => (
+                    <button
+                      className="group rounded-md border bg-white p-3 text-left transition-all hover:border-gray-300 hover:shadow-sm"
+                      key={c.id}
+                      onClick={() => openPreview(c)}
+                      onDoubleClick={(e) => {
+                        e.preventDefault();
+                        openPermanent(c);
+                      }}
+                      type="button"
+                    >
+                      <div className="mb-2 flex items-center gap-2 font-medium text-sm">
+                        <StoryKindIcon kind={c.embedKind} />
+                        <span className="truncate">{c.title}</span>
+                      </div>
+                      <div className="truncate text-gray-500 text-xs">
+                        {domainFromUrl(c.primaryUrl)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {pagination?.hasMore && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={loadMore}
+                      disabled={loading}
+                      variant="outline"
+                      className="min-w-32"
+                    >
+                      {loading ? 'Loading...' : 'Load More'}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Pagination Info */}
+                {pagination && (
+                  <div className="text-center text-gray-500 text-sm">
+                    Showing {filtered.length} of {pagination.totalCount} stories
+                  </div>
+                )}
               </div>
             );
           })()

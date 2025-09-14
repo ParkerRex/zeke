@@ -42,27 +42,29 @@ export function hypePercent(cluster: Cluster): number {
  * TODO: Replace with actual story thumbnails when available
  */
 export function imageFor(_story?: Cluster): string {
-  return "/hero-shape.png";
+  return '/hero-shape.png';
 }
 
 /**
  * Get human-readable label for story kind
  */
 export function getKindLabel(kind: string | undefined): string {
-  if (kind === "youtube") {
-    return "Video";
+  if (kind === 'youtube') {
+    return 'Video';
   }
-  if (kind === "arxiv") {
-    return "Research";
+  if (kind === 'arxiv') {
+    return 'Research';
   }
-  return "AI";
+  return 'AI';
 }
 
 /**
  * Extract domain from URL for display
  */
 export function domainFromUrl(url: string | undefined): string | null {
-  if (!url) return null;
+  if (!url) {
+    return null;
+  }
   try {
     const domain = new URL(url).hostname;
     return domain.replace(/^www\./, '');
@@ -86,7 +88,7 @@ export function getDailyIndexScore(): {
     (today.getMonth() + 1) * 100 +
     today.getDate();
   const score = seed % 100; // 0..99
-  
+
   const labels = ['Negative', 'Neutral', 'Optimistic', 'Positive'] as const;
   const bucket = score < 25 ? 0 : score < 50 ? 1 : score < 75 ? 2 : 3;
   const bucketLabel = labels[bucket];
@@ -104,9 +106,15 @@ export const topicsData = {
       title: 'Top Topics',
       links: [
         { label: 'AGI Debate', href: '/stories?q=AGI' },
-        { label: 'Open‑source Models', href: '/stories?q=open-source%20models' },
+        {
+          label: 'Open‑source Models',
+          href: '/stories?q=open-source%20models',
+        },
         { label: 'Agentic Workflows', href: '/stories?q=agent%20workflows' },
-        { label: 'Safety & Governance', href: '/stories?q=AI%20safety%20governance' },
+        {
+          label: 'Safety & Governance',
+          href: '/stories?q=AI%20safety%20governance',
+        },
       ],
     },
     {
@@ -114,7 +122,10 @@ export const topicsData = {
       links: [
         { label: 'Models & Benchmarks', href: '/stories?q=benchmark' },
         { label: 'Tooling & Frameworks', href: '/stories?q=framework%20SDK' },
-        { label: 'Inference & Serving', href: '/stories?q=inference%20serving' },
+        {
+          label: 'Inference & Serving',
+          href: '/stories?q=inference%20serving',
+        },
         { label: 'Funding & M&A', href: '/stories?q=funding%20acquisition' },
       ],
     },
@@ -124,7 +135,10 @@ export const topicsData = {
         { label: 'Language', href: '/stories?q=LLM%20NLP' },
         { label: 'Vision', href: '/stories?q=multimodal%20vision' },
         { label: 'Robotics', href: '/stories?q=robotics' },
-        { label: 'Reinforcement Learning', href: '/stories?q=reinforcement%20learning' },
+        {
+          label: 'Reinforcement Learning',
+          href: '/stories?q=reinforcement%20learning',
+        },
       ],
     },
     {

@@ -29,8 +29,8 @@ export type VideoSearchOptions = {
   query: string;
   maxResults?: number;
   publishedAfter?: string;
-  order?: "date" | "relevance" | "viewCount";
-  duration?: "short" | "medium" | "long" | "any";
+  order?: 'date' | 'relevance' | 'viewCount';
+  duration?: 'short' | 'medium' | 'long' | 'any';
 };
 
 export type QuotaStatus = {

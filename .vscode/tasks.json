@@ -1,7 +1,6 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // === BUILD TASKS ===
     {
       "label": "build-worker",
       "type": "shell",
@@ -44,8 +43,6 @@
       },
       "problemMatcher": ["$tsc"]
     },
-
-    // === DEVELOPMENT TASKS ===
     {
       "label": "dev-setup",
       "type": "shell",
@@ -94,8 +91,6 @@
         "panel": "shared"
       }
     },
-
-    // === TESTING TASKS ===
     {
       "label": "test-pipeline",
       "type": "shell",
@@ -113,12 +108,12 @@
       }
     },
     {
-      "label": "test-worker",
+      "label": "test-worker-unit",
       "type": "shell",
       "command": "pnpm",
-      "args": ["run", "test:worker"],
+      "args": ["run", "test:unit"],
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/apps/worker"
       },
       "group": "test",
       "presentation": {
@@ -128,8 +123,22 @@
         "panel": "shared"
       }
     },
-
-    // === UTILITY TASKS ===
+    {
+      "label": "test-worker-integration",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "test:integration"],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/worker"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
     {
       "label": "typecheck-all",
       "type": "shell",

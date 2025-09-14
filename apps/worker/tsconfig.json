@@ -9,7 +9,5 @@
       "@zeke/*": ["../../packages/*"]
     }
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

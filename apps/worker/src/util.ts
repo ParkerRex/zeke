@@ -1,18 +1,18 @@
-import { createHash } from "node:crypto";
+import { createHash } from 'node:crypto';
 
 export function canonicalizeUrl(input: string): string {
   try {
     const u = new URL(input);
     // drop common tracking params
     const drop = new Set([
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_term",
-      "utm_content",
-      "utm_id",
-      "gclid",
-      "fbclid",
+      'utm_source',
+      'utm_medium',
+      'utm_campaign',
+      'utm_term',
+      'utm_content',
+      'utm_id',
+      'gclid',
+      'fbclid',
     ]);
     const kept = new URLSearchParams();
     for (const [k, v] of u.searchParams.entries()) {
@@ -25,7 +25,7 @@ export function canonicalizeUrl(input: string): string {
       Array.from(kept.entries()).sort(([a], [b]) => a.localeCompare(b))
     );
     u.search = sorted.toString();
-    u.hash = "";
+    u.hash = '';
     return u.toString();
   } catch {
     return input;
@@ -33,6 +33,6 @@ export function canonicalizeUrl(input: string): string {
 }
 
 export function hashText(text: string): string {
-  const normalized = text.replace(/\s+/g, " ").trim();
-  return createHash("sha256").update(normalized).digest("hex");
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  return createHash('sha256').update(normalized).digest('hex');
 }

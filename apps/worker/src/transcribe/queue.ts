@@ -1,10 +1,10 @@
-import { log } from "../log.js";
-import { cleanupVideoTempFiles } from "../utils/temp-files.js";
+import { log } from '../log.js';
+import { cleanupVideoTempFiles } from '../utils/temp-files.js';
 import {
   type TranscriptionResult,
-  transcribeAudio,
   type WhisperOptions,
-} from "./whisper.js";
+  transcribeAudio,
+} from './whisper.js';
 
 // Constants
 const SECONDS_PER_MINUTE = 60;
@@ -37,7 +37,7 @@ export type TranscriptionJob = {
   videoId: string;
   audioPath: string;
   options: Partial<WhisperOptions>;
-  priority: "high" | "medium" | "low";
+  priority: 'high' | 'medium' | 'low';
   createdAt: Date;
   startedAt?: Date;
   completedAt?: Date;
@@ -51,7 +51,7 @@ export type AddJobParams = {
   videoId: string;
   audioPath: string;
   options?: Partial<WhisperOptions>;
-  priority?: "high" | "medium" | "low";
+  priority?: 'high' | 'medium' | 'low';
   maxRetries?: number;
 };
 
@@ -82,7 +82,7 @@ class TranscriptionQueue {
       videoId,
       audioPath,
       options = {},
-      priority = "medium",
+      priority = 'medium',
       maxRetries = DEFAULT_MAX_RETRIES,
     } = params;
     const jobId = `${videoId}_${Date.now()}`;
@@ -100,7 +100,7 @@ class TranscriptionQueue {
 
     this.jobs.set(jobId, job);
 
-    log("transcription_job_added", {
+    log('transcription_job_added', {
       jobId,
       videoId,
       priority,
@@ -141,19 +141,19 @@ class TranscriptionQueue {
 
     if (this.processingJobs.has(jobId)) {
       log(
-        "transcription_job_cancel_processing",
+        'transcription_job_cancel_processing',
         {
           jobId,
           videoId: job.videoId,
         },
-        "warn"
+        'warn'
       );
       return false; // Cannot cancel processing jobs
     }
 
     this.jobs.delete(jobId);
 
-    log("transcription_job_cancelled", {
+    log('transcription_job_cancelled', {
       jobId,
       videoId: job.videoId,
     });
@@ -211,7 +211,7 @@ class TranscriptionQueue {
     }
 
     if (cleanedCount > 0) {
-      log("transcription_jobs_cleaned", {
+      log('transcription_jobs_cleaned', {
         cleanedCount,
         maxAgeHours,
         remainingJobs: this.jobs.size,
@@ -275,7 +275,7 @@ class TranscriptionQueue {
     this.processingJobs.add(job.id);
     job.startedAt = new Date();
 
-    log("transcription_job_started", {
+    log('transcription_job_started', {
       jobId: job.id,
       videoId: job.videoId,
       priority: job.priority,
@@ -295,7 +295,7 @@ class TranscriptionQueue {
       job.completedAt = new Date();
 
       if (result.success) {
-        log("transcription_job_completed", {
+        log('transcription_job_completed', {
           jobId: job.id,
           videoId: job.videoId,
           language: result.language,
@@ -305,14 +305,14 @@ class TranscriptionQueue {
         });
       } else {
         log(
-          "transcription_job_failed",
+          'transcription_job_failed',
           {
             jobId: job.id,
             videoId: job.videoId,
             error: result.error,
             retryCount: job.retryCount,
           },
-          "error"
+          'error'
         );
 
         // Retry if possible
@@ -329,14 +329,14 @@ class TranscriptionQueue {
       job.completedAt = new Date();
 
       log(
-        "transcription_job_error",
+        'transcription_job_error',
         {
           jobId: job.id,
           videoId: job.videoId,
           error: String(error),
           retryCount: job.retryCount,
         },
-        "error"
+        'error'
       );
 
       // Retry if possible
@@ -365,7 +365,7 @@ class TranscriptionQueue {
     job.result = undefined;
     job.error = undefined;
 
-    log("transcription_job_retry", {
+    log('transcription_job_retry', {
       jobId: job.id,
       videoId: job.videoId,
       retryCount: job.retryCount,
@@ -406,12 +406,12 @@ class TranscriptionQueue {
     }
 
     log(
-      "transcription_job_wait_timeout",
+      'transcription_job_wait_timeout',
       {
         jobId,
         timeoutMs,
       },
-      "warn"
+      'warn'
     );
 
     return null; // Timeout
@@ -425,7 +425,7 @@ class TranscriptionQueue {
     recentJobs: Array<{
       id: string;
       videoId: string;
-      status: "pending" | "processing" | "completed" | "failed";
+      status: 'pending' | 'processing' | 'completed' | 'failed';
       createdAt: Date;
       processingTimeMs?: number;
     }>;
@@ -436,14 +436,14 @@ class TranscriptionQueue {
       .slice(0, RECENT_JOBS_LIMIT); // Last 10 jobs
 
     const recentJobs = jobs.map((job) => {
-      let status: "pending" | "processing" | "completed" | "failed";
+      let status: 'pending' | 'processing' | 'completed' | 'failed';
 
       if (this.processingJobs.has(job.id)) {
-        status = "processing";
+        status = 'processing';
       } else if (job.completedAt) {
-        status = job.result?.success ? "completed" : "failed";
+        status = job.result?.success ? 'completed' : 'failed';
       } else {
-        status = "pending";
+        status = 'pending';
       }
 
       return {

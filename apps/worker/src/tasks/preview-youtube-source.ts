@@ -1,8 +1,8 @@
-import type { SourceBase } from "../types/sources.js";
-import { quotaTracker } from "../utils/quota-tracker.js";
-import { fetchYouTubeChannelVideos } from "./fetch-youtube-channel-videos.js";
-import { fetchYouTubeSearchVideos } from "./fetch-youtube-search-videos.js";
-import { resolveYouTubeUploadsId } from "./resolve-youtube-uploads-id.js";
+import type { SourceBase } from '../types/sources.js';
+import { quotaTracker } from '../utils/quota-tracker.js';
+import { fetchYouTubeChannelVideos } from './fetch-youtube-channel-videos.js';
+import { fetchYouTubeSearchVideos } from './fetch-youtube-search-videos.js';
+import { resolveYouTubeUploadsId } from './resolve-youtube-uploads-id.js';
 
 const DEFAULT_MAX_VIDEOS = 10;
 const DAYS_LOOKBACK = 7;
@@ -17,7 +17,7 @@ export async function previewYouTubeSourceAction(
   src: SourceBase,
   limit = DEFAULT_MAX_VIDEOS
 ) {
-  if (src.kind === "youtube_channel") {
+  if (src.kind === 'youtube_channel') {
     const metadata = (src.metadata ?? {}) as Record<string, unknown>;
     const maxResults = Math.min(
       parsePositiveInt(metadata.max_videos_per_run, DEFAULT_MAX_VIDEOS),
@@ -43,9 +43,9 @@ export async function previewYouTubeSourceAction(
       quota: quotaTracker.checkQuotaStatus(),
     };
   }
-  if (src.kind === "youtube_search") {
+  if (src.kind === 'youtube_search') {
     const metadata = (src.metadata ?? {}) as Record<string, unknown>;
-    const query = typeof metadata.query === "string" ? metadata.query : "";
+    const query = typeof metadata.query === 'string' ? metadata.query : '';
     const maxResults = Math.min(
       parsePositiveInt(metadata.max_results, DEFAULT_MAX_VIDEOS),
       limit
@@ -83,28 +83,28 @@ function toPreviewItem(v: {
   };
 }
 
-type SearchOrder = "date" | "relevance" | "viewCount";
-type SearchDuration = "short" | "medium" | "long" | "any" | undefined;
+type SearchOrder = 'date' | 'relevance' | 'viewCount';
+type SearchDuration = 'short' | 'medium' | 'long' | 'any' | undefined;
 
 function parseOrder(value: unknown): SearchOrder {
-  const allowed: SearchOrder[] = ["date", "relevance", "viewCount"];
-  return typeof value === "string" && (allowed as string[]).includes(value)
+  const allowed: SearchOrder[] = ['date', 'relevance', 'viewCount'];
+  return typeof value === 'string' && (allowed as string[]).includes(value)
     ? (value as SearchOrder)
-    : "relevance";
+    : 'relevance';
 }
 
 function parseDuration(value: unknown): SearchDuration {
-  const allowed = new Set(["short", "medium", "long", "any"]);
-  return typeof value === "string" && allowed.has(value)
+  const allowed = new Set(['short', 'medium', 'long', 'any']);
+  return typeof value === 'string' && allowed.has(value)
     ? (value as SearchDuration)
     : undefined;
 }
 
 function parsePositiveInt(value: unknown, fallback: number): number {
-  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
     return Math.floor(value);
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const n = Number.parseInt(value, 10);
     if (Number.isFinite(n) && n > 0) {
       return n;
@@ -114,5 +114,5 @@ function parsePositiveInt(value: unknown, fallback: number): number {
 }
 
 function parseOptionalString(value: unknown): string | undefined {
-  return typeof value === "string" && value ? value : undefined;
+  return typeof value === 'string' && value ? value : undefined;
 }

@@ -24,9 +24,7 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
 
   return (
     <SidebarProvider>
-      <GlobalSidebar>
-        {children}
-      </GlobalSidebar>
+      <GlobalSidebar>{children}</GlobalSidebar>
       <PostHogIdentifier />
     </SidebarProvider>
   );

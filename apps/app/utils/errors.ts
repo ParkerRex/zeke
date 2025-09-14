@@ -1,9 +1,9 @@
 export function isAbortError(e: unknown): e is { name: string } {
   return (
-    typeof e === "object" &&
+    typeof e === 'object' &&
     e !== null &&
-    "name" in e &&
-    (e as { name?: unknown }).name === "AbortError"
+    'name' in e &&
+    (e as { name?: unknown }).name === 'AbortError'
   );
 }
 
@@ -12,10 +12,10 @@ export function safeErrorMessage(e: unknown): string {
     return e.message;
   }
   if (
-    typeof e === "object" &&
+    typeof e === 'object' &&
     e &&
-    "message" in e &&
-    typeof (e as { message: unknown }).message === "string"
+    'message' in e &&
+    typeof (e as { message: unknown }).message === 'string'
   ) {
     return (e as { message: string }).message;
   }

@@ -1,6 +1,6 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@zeke/supabase/admin";
+import { supabaseAdminClient } from '@zeke/supabase/admin';
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 export async function POST(
   _req: Request,
@@ -10,16 +10,16 @@ export async function POST(
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
   try {
     const { id } = params;
     const { error } = await supabaseAdminClient
-      .from("sources")
+      .from('sources')
       .update({ active: false, updated_at: new Date().toISOString() })
-      .eq("id", id);
+      .eq('id', id);
     if (error) {
       throw error;
     }

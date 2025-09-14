@@ -1,7 +1,7 @@
-import { RiGithubFill, RiTwitterXFill } from "@remixicon/react";
-import Link from "next/link";
-import { buttonVariants } from "@zeke/design-system/components/ui/button";
-import { cn } from "@zeke/design-system/lib/utils";
+import { RiGithubFill, RiTwitterXFill } from '@remixicon/react';
+import { buttonVariants } from '@zeke/design-system/components/ui/button';
+import { cn } from '@zeke/design-system/lib/utils';
+import Link from 'next/link';
 
 export default function Socials() {
   return (
@@ -11,9 +11,9 @@ export default function Socials() {
           aria-label="Open link"
           className={cn(
             buttonVariants({
-              variant: "outline",
+              variant: 'outline',
               className:
-                "hidden rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10 md:block",
+                'hidden rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10 md:block',
             })
           )}
           href="https://x.com/felixlyu_1018/status/1852376714569015541"
@@ -26,10 +26,10 @@ export default function Socials() {
           aria-label="Open link"
           className={cn(
             buttonVariants({
-              variant: "outline",
-              size: "icon",
+              variant: 'outline',
+              size: 'icon',
               className:
-                "rounded-lg shadow-none focus-visible:z-10 md:rounded-none md:last:rounded-e-lg md:first:rounded-s-lg",
+                'rounded-lg shadow-none focus-visible:z-10 md:rounded-none md:last:rounded-e-lg md:first:rounded-s-lg',
             })
           )}
           href="https://x.com/felixlyu_1018/status/1852376714569015541"
@@ -45,10 +45,10 @@ export default function Socials() {
           aria-label="Open link"
           className={cn(
             buttonVariants({
-              variant: "outline",
-              size: "icon",
+              variant: 'outline',
+              size: 'icon',
               className:
-                "rounded-lg shadow-none focus-visible:z-10 md:rounded-none md:last:rounded-e-lg md:first:rounded-s-lg",
+                'rounded-lg shadow-none focus-visible:z-10 md:rounded-none md:last:rounded-e-lg md:first:rounded-s-lg',
             })
           )}
           href="https://github.com/lumpinif/drag-to-resize-sidebar.git"

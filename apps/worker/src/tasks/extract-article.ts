@@ -1,15 +1,15 @@
-import { Readability } from "@mozilla/readability";
-import { JSDOM } from "jsdom";
-import type PgBoss from "pg-boss";
+import { Readability } from '@mozilla/readability';
+import { JSDOM } from 'jsdom';
+import type PgBoss from 'pg-boss';
 import {
   findRawItemsByIds,
   findStoryIdByContentHash,
   insertContents,
   insertStory,
-} from "../db.js";
-import { log } from "../log.js";
-import { canonicalizeUrl, hashText } from "../util.js";
-import { fetchWithTimeout } from "../utils/http.js";
+} from '../db.js';
+import { log } from '../log.js';
+import { canonicalizeUrl, hashText } from '../util.js';
+import { fetchWithTimeout } from '../utils/http.js';
 
 const FETCH_TIMEOUT_MS = 15_000;
 
@@ -23,7 +23,7 @@ export async function extractArticle(
       const t0 = Date.now();
       const resp = await fetchWithTimeout(
         row.url,
-        { redirect: "follow" },
+        { redirect: 'follow' },
         FETCH_TIMEOUT_MS
       );
       if (!resp.ok) {
@@ -34,9 +34,9 @@ export async function extractArticle(
       const dom = new JSDOM(html, { url: finalUrl });
       const reader = new Readability(dom.window.document);
       const parsed = reader.parse();
-      const text = parsed?.textContent?.trim() || "";
+      const text = parsed?.textContent?.trim() || '';
       if (!text) {
-        throw new Error("no_text_extracted");
+        throw new Error('no_text_extracted');
       }
 
       const content_hash = hashText(text);
@@ -56,13 +56,13 @@ export async function extractArticle(
           title: parsed?.title || row.title || null,
           canonical_url: finalUrl,
           primary_url: finalUrl,
-          kind: "article",
+          kind: 'article',
           published_at: null,
         }));
 
-      await boss.send("analyze:llm", { storyId });
-      log("extract_success", {
-        comp: "extract",
+      await boss.send('analyze:llm', { storyId });
+      log('extract_success', {
+        comp: 'extract',
         raw_item_id: row.id,
         content_id,
         story_id: storyId,
@@ -73,14 +73,14 @@ export async function extractArticle(
       });
     } catch (err) {
       log(
-        "extract_error",
+        'extract_error',
         {
-          comp: "extract",
+          comp: 'extract',
           raw_item_id: row.id,
           url: row.url,
           err: String(err),
         },
-        "error"
+        'error'
       );
     }
   }

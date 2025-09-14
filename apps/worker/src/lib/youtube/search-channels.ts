@@ -1,7 +1,7 @@
-import { log } from "../../log.js";
-import { withRetry } from "../../utils/retry.js";
-import type { YouTubeChannel } from "./types.js";
-import type { YouTubeClient } from "./youtube-client.js";
+import { log } from '../../log.js';
+import { withRetry } from '../../utils/retry.js';
+import type { YouTubeChannel } from './types.js';
+import type { YouTubeClient } from './youtube-client.js';
 
 const SEARCH_QUOTA_COST = 100;
 const CHANNEL_DETAILS_QUOTA_COST = 1;
@@ -12,13 +12,13 @@ export async function searchChannels(
   maxResults = 10
 ): Promise<YouTubeChannel[]> {
   try {
-    log("youtube_search_channels_start", { query, maxResults });
+    log('youtube_search_channels_start', { query, maxResults });
 
     const searchResponse = await withRetry(() =>
       client.youtube.search.list({
-        part: ["snippet"],
+        part: ['snippet'],
         q: query,
-        type: ["channel"],
+        type: ['channel'],
         maxResults,
       })
     );
@@ -30,7 +30,7 @@ export async function searchChannels(
         const channelId = item.id.channelId;
         const channelDetails = await withRetry(() =>
           client.youtube.channels.list({
-            part: ["contentDetails"],
+            part: ['contentDetails'],
             id: [channelId],
           })
         );
@@ -42,15 +42,15 @@ export async function searchChannels(
         if (uploadsPlaylistId) {
           channels.push({
             channelId,
-            title: item.snippet.title || "",
-            description: item.snippet.description || "",
+            title: item.snippet.title || '',
+            description: item.snippet.description || '',
             uploadsPlaylistId,
           });
         }
       }
     }
 
-    log("youtube_search_channels_complete", {
+    log('youtube_search_channels_complete', {
       query,
       channelsFound: channels.length,
       quotaUsed:
@@ -60,12 +60,12 @@ export async function searchChannels(
     return channels;
   } catch (error) {
     log(
-      "youtube_search_channels_error",
+      'youtube_search_channels_error',
       {
         query,
         error: String(error),
       },
-      "error"
+      'error'
     );
     throw error;
   }

@@ -1,7 +1,7 @@
-"use client";
-import { useEffect } from "react";
+'use client';
+import { useEffect } from 'react';
 
-import { useTabs } from "@/stores/tabsStore";
+import { useTabs } from '@/stores/tabsStore';
 
 export default function StoryClient({ id }: { id: string }) {
   const { restoreFromUrl, setActive } = useTabs();
@@ -10,7 +10,9 @@ export default function StoryClient({ id }: { id: string }) {
     let mounted = true;
     (async () => {
       await restoreFromUrl(id, false);
-      if (mounted) setActive(id);
+      if (mounted) {
+        setActive(id);
+      }
     })();
     return () => {
       mounted = false;

@@ -8,7 +8,15 @@ import { keys as security } from '@zeke/security/keys';
 import { keys as supabase } from '@zeke/supabase/keys';
 
 export const env = createEnv({
-  extends: [analytics(), auth(), core(), email(), observability(), security(), supabase()],
+  extends: [
+    analytics(),
+    auth(),
+    core(),
+    email(),
+    observability(),
+    security(),
+    supabase(),
+  ],
   server: {},
   client: {},
   runtimeEnv: {},

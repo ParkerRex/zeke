@@ -4,7 +4,12 @@
  */
 
 import { Button } from '@zeke/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@zeke/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@zeke/design-system/components/ui/card';
 import { ExternalLink, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { topicsData } from '../../lib/stories-utils';
@@ -23,11 +28,14 @@ export function TopTopicsSidebar() {
           <div className="h-[1px] bg-foreground" />
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <ul className="divide-y divide-border">
           {items.map((topic) => (
-            <li className="flex items-center justify-between py-3" key={topic.label}>
+            <li
+              className="flex items-center justify-between py-3"
+              key={topic.label}
+            >
               <Link
                 className="flex items-center gap-3 hover:underline"
                 href={topic.href}
@@ -39,7 +47,7 @@ export function TopTopicsSidebar() {
             </li>
           ))}
         </ul>
-        
+
         <div className="mt-4">
           <Button variant="outline" size="sm" asChild>
             <Link href="/stories" className="flex items-center gap-2">

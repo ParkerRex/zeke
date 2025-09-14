@@ -1,8 +1,8 @@
 export type SourceKind =
-  | "rss"
-  | "podcast"
-  | "youtube_channel"
-  | "youtube_search";
+  | 'rss'
+  | 'podcast'
+  | 'youtube_channel'
+  | 'youtube_search';
 
 export type SourceBase = {
   id: string;

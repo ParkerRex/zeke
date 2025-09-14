@@ -1,7 +1,7 @@
-import { spawn } from "node:child_process";
-import { promises as fs } from "node:fs";
-import { log } from "../log.js";
-import { cleanupTempFiles, createTempPath } from "../utils/temp-files.js";
+import { spawn } from 'node:child_process';
+import { promises as fs } from 'node:fs';
+import { log } from '../log.js';
+import { cleanupTempFiles, createTempPath } from '../utils/temp-files.js';
 
 export type TranscriptionSegment = {
   start: number;
@@ -22,18 +22,18 @@ export type TranscriptionResult = {
 };
 
 export type WhisperModel =
-  | "tiny"
-  | "base"
-  | "small"
-  | "medium"
-  | "large"
-  | "large-v2"
-  | "large-v3";
+  | 'tiny'
+  | 'base'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'large-v2'
+  | 'large-v3';
 
 export type WhisperOptions = {
   model: WhisperModel;
   language?: string; // Auto-detect if not specified
-  task?: "transcribe" | "translate"; // Default: transcribe
+  task?: 'transcribe' | 'translate'; // Default: transcribe
   temperature?: number; // 0.0 to 1.0, default: 0
   bestOf?: number; // Number of candidates, default: 5
   beamSize?: number; // Beam search size, default: 5
@@ -59,8 +59,8 @@ const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const DECIMAL_PLACES = 100;
 
 const DEFAULT_WHISPER_OPTIONS: WhisperOptions = {
-  model: "base",
-  task: "transcribe",
+  model: 'base',
+  task: 'transcribe',
   temperature: 0,
   bestOf: 5,
   beamSize: 5,
@@ -86,15 +86,15 @@ export async function transcribeAudio(
   const opts = { ...DEFAULT_WHISPER_OPTIONS, ...options };
 
   // Create temp file for output
-  const outputPath = createTempPath(videoId, "json");
+  const outputPath = createTempPath(videoId, 'json');
 
   try {
-    log("whisper_transcription_start", {
+    log('whisper_transcription_start', {
       videoId,
       audioPath,
       outputPath,
       model: opts.model,
-      language: opts.language || "auto-detect",
+      language: opts.language || 'auto-detect',
       task: opts.task,
     });
 
@@ -102,7 +102,7 @@ export async function transcribeAudio(
     await fs.access(audioPath);
     const audioStats = await fs.stat(audioPath);
 
-    log("whisper_audio_file_info", {
+    log('whisper_audio_file_info', {
       videoId,
       audioPath,
       fileSizeBytes: audioStats.size,
@@ -116,19 +116,19 @@ export async function transcribeAudio(
 
     // Run Whisper transcription
     const transcriptionPromise = new Promise<void>((resolve, reject) => {
-      const whisper = spawn("whisper", whisperArgs);
-      let stderr = "";
-      let stdout = "";
+      const whisper = spawn('whisper', whisperArgs);
+      let stderr = '';
+      let stdout = '';
 
-      whisper.stdout.on("data", (data) => {
+      whisper.stdout.on('data', (data) => {
         stdout += data.toString();
       });
 
-      whisper.stderr.on("data", (data) => {
+      whisper.stderr.on('data', (data) => {
         stderr += data.toString();
       });
 
-      whisper.on("close", (code) => {
+      whisper.on('close', (code) => {
         if (code === 0) {
           resolve();
         } else {
@@ -140,7 +140,7 @@ export async function transcribeAudio(
         }
       });
 
-      whisper.on("error", (error) => {
+      whisper.on('error', (error) => {
         reject(new Error(`Failed to spawn whisper: ${error.message}`));
       });
     });
@@ -165,7 +165,7 @@ export async function transcribeAudio(
     await Promise.race([transcriptionPromise, timeoutPromise]);
 
     // Read and parse the output JSON
-    const outputContent = await fs.readFile(outputPath, "utf-8");
+    const outputContent = await fs.readFile(outputPath, 'utf-8');
     const whisperOutput = JSON.parse(outputContent);
 
     // Extract segments with proper typing
@@ -178,23 +178,23 @@ export async function transcribeAudio(
       }) => ({
         start: seg.start || 0,
         end: seg.end || 0,
-        text: (seg.text || "").trim(),
+        text: (seg.text || '').trim(),
         confidence: seg.avg_logprob ? Math.exp(seg.avg_logprob) : undefined,
       })
     );
 
     const processingTimeMs = Date.now() - startTime;
     const result: TranscriptionResult = {
-      text: whisperOutput.text || "",
+      text: whisperOutput.text || '',
       segments,
-      language: whisperOutput.language || "unknown",
+      language: whisperOutput.language || 'unknown',
       duration: whisperOutput.duration || 0,
       success: true,
       modelUsed: opts.model,
       processingTimeMs,
     };
 
-    log("whisper_transcription_complete", {
+    log('whisper_transcription_complete', {
       videoId,
       model: opts.model,
       language: result.language,
@@ -215,7 +215,7 @@ export async function transcribeAudio(
     const processingTimeMs = Date.now() - startTime;
 
     log(
-      "whisper_transcription_error",
+      'whisper_transcription_error',
       {
         videoId,
         audioPath,
@@ -223,7 +223,7 @@ export async function transcribeAudio(
         error: String(error),
         processingTimeMs,
       },
-      "error"
+      'error'
     );
 
     // Clean up temp files
@@ -234,9 +234,9 @@ export async function transcribeAudio(
     }
 
     return {
-      text: "",
+      text: '',
       segments: [],
-      language: "unknown",
+      language: 'unknown',
       duration: 0,
       success: false,
       error: String(error),
@@ -259,34 +259,34 @@ function buildBasicWhisperArgs(
 ): string[] {
   return [
     audioPath,
-    "--output_format",
-    "json",
-    "--output_dir",
-    outputPath.replace(DIRECTORY_REGEX, ""), // Directory only
-    "--model",
+    '--output_format',
+    'json',
+    '--output_dir',
+    outputPath.replace(DIRECTORY_REGEX, ''), // Directory only
+    '--model',
     options.model,
-    "--task",
-    options.task || "transcribe",
-    "--temperature",
+    '--task',
+    options.task || 'transcribe',
+    '--temperature',
     String(options.temperature || 0),
-    "--best_of",
+    '--best_of',
     String(options.bestOf || DEFAULT_WHISPER_OPTIONS.bestOf),
-    "--beam_size",
+    '--beam_size',
     String(options.beamSize || DEFAULT_WHISPER_OPTIONS.beamSize),
-    "--patience",
+    '--patience',
     String(options.patience || DEFAULT_WHISPER_OPTIONS.patience),
-    "--length_penalty",
+    '--length_penalty',
     String(options.lengthPenalty || DEFAULT_WHISPER_OPTIONS.lengthPenalty),
-    "--compression_ratio_threshold",
+    '--compression_ratio_threshold',
     String(
       options.compressionRatioThreshold ||
         DEFAULT_WHISPER_OPTIONS.compressionRatioThreshold
     ),
-    "--logprob_threshold",
+    '--logprob_threshold',
     String(
       options.logprobThreshold || DEFAULT_WHISPER_OPTIONS.logprobThreshold
     ),
-    "--no_speech_threshold",
+    '--no_speech_threshold',
     String(
       options.noSpeechThreshold || DEFAULT_WHISPER_OPTIONS.noSpeechThreshold
     ),
@@ -298,35 +298,35 @@ function buildBasicWhisperArgs(
  */
 function addOptionalWhisperArgs(args: string[], options: WhisperOptions): void {
   if (options.language) {
-    args.push("--language", options.language);
+    args.push('--language', options.language);
   }
 
   if (options.initialPrompt) {
-    args.push("--initial_prompt", options.initialPrompt);
+    args.push('--initial_prompt', options.initialPrompt);
   }
 
   if (options.suppressTokens) {
-    args.push("--suppress_tokens", options.suppressTokens);
+    args.push('--suppress_tokens', options.suppressTokens);
   }
 
   if (options.conditionOnPreviousText === false) {
-    args.push("--condition_on_previous_text", "False");
+    args.push('--condition_on_previous_text', 'False');
   }
 
   if (options.fp16 === false) {
-    args.push("--fp16", "False");
+    args.push('--fp16', 'False');
   }
 
   if (options.wordTimestamps) {
-    args.push("--word_timestamps", "True");
+    args.push('--word_timestamps', 'True');
   }
 
   if (options.prepend_punctuations) {
-    args.push("--prepend_punctuations", options.prepend_punctuations);
+    args.push('--prepend_punctuations', options.prepend_punctuations);
   }
 
   if (options.append_punctuations) {
-    args.push("--append_punctuations", options.append_punctuations);
+    args.push('--append_punctuations', options.append_punctuations);
   }
 }
 
@@ -349,13 +349,13 @@ function buildWhisperArgs(
 export async function checkWhisperAvailability(): Promise<boolean> {
   try {
     const checkPromise = new Promise<boolean>((resolve, reject) => {
-      const whisper = spawn("whisper", ["--help"]);
+      const whisper = spawn('whisper', ['--help']);
 
-      whisper.on("close", (code) => {
+      whisper.on('close', (code) => {
         resolve(code === 0);
       });
 
-      whisper.on("error", (error) => {
+      whisper.on('error', (error) => {
         reject(error);
       });
     });
@@ -369,18 +369,18 @@ export async function checkWhisperAvailability(): Promise<boolean> {
 
     const isAvailable = await Promise.race([checkPromise, timeoutPromise]);
 
-    log("whisper_availability_check", {
+    log('whisper_availability_check', {
       available: isAvailable,
     });
 
     return isAvailable;
   } catch (error) {
     log(
-      "whisper_availability_error",
+      'whisper_availability_error',
       {
         error: String(error),
       },
-      "error"
+      'error'
     );
     return false;
   }
@@ -390,7 +390,7 @@ export async function checkWhisperAvailability(): Promise<boolean> {
  * Get available Whisper models
  */
 export function getAvailableModels(): WhisperModel[] {
-  return ["tiny", "base", "small", "medium", "large", "large-v2", "large-v3"];
+  return ['tiny', 'base', 'small', 'medium', 'large', 'large-v2', 'large-v3'];
 }
 
 // Duration thresholds for model selection
@@ -413,23 +413,23 @@ export function getRecommendedModel(
   prioritizeSpeed = false
 ): WhisperModel {
   if (prioritizeSpeed) {
-    return durationSeconds > DURATION_THRESHOLDS.ONE_HOUR ? "tiny" : "base"; // Use faster models for long content
+    return durationSeconds > DURATION_THRESHOLDS.ONE_HOUR ? 'tiny' : 'base'; // Use faster models for long content
   }
 
   // Balance quality and speed based on duration
   if (durationSeconds < DURATION_THRESHOLDS.FIVE_MINUTES) {
     // < 5 minutes
-    return "small";
+    return 'small';
   }
   if (durationSeconds < DURATION_THRESHOLDS.THIRTY_MINUTES) {
     // < 30 minutes
-    return "base";
+    return 'base';
   }
   if (durationSeconds < DURATION_THRESHOLDS.ONE_HOUR) {
     // < 1 hour
-    return "base";
+    return 'base';
   }
-  return "tiny"; // Use fastest model for very long content
+  return 'tiny'; // Use fastest model for very long content
 }
 
 /**
@@ -446,8 +446,8 @@ export function estimateTranscriptionTime(
     small: 0.4,
     medium: 0.8,
     large: 1.2,
-    "large-v2": 1.2,
-    "large-v3": 1.2,
+    'large-v2': 1.2,
+    'large-v3': 1.2,
   };
 
   return Math.ceil(durationSeconds * modelMultipliers[model]);

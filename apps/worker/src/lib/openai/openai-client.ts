@@ -1,11 +1,11 @@
-import OpenAI from "openai";
+import OpenAI from 'openai';
 import {
   DEFAULT_CHAT_MODEL,
   DEFAULT_EMBEDDING_MODEL,
   EMBEDDING_DIMENSIONS,
   MAX_CONTENT_LENGTH_ANALYSIS,
   MAX_CONTENT_LENGTH_EMBEDDING,
-} from "./constants.js";
+} from './constants.js';
 
 export type OpenAIClient = {
   openai: OpenAI;
@@ -26,7 +26,7 @@ export function createOpenAIClient(config?: {
 }): OpenAIClient {
   const apiKey = config?.apiKey ?? process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY environment variable is required");
+    throw new Error('OPENAI_API_KEY environment variable is required');
   }
 
   const openai = new OpenAI({ apiKey });

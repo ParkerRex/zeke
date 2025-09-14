@@ -1,4 +1,4 @@
-import { log } from "../log.js";
+import { log } from '../log.js';
 
 // Constants for quota allocation percentages
 const CHANNEL_INGESTION_ALLOCATION = 0.7;
@@ -44,15 +44,15 @@ export class QuotaTracker {
 
   constructor() {
     this.dailyLimit = Number.parseInt(
-      process.env.YOUTUBE_QUOTA_LIMIT || "10000",
+      process.env.YOUTUBE_QUOTA_LIMIT || '10000',
       10
     );
     this.reserveBuffer = Number.parseInt(
-      process.env.YOUTUBE_RATE_LIMIT_BUFFER || "500",
+      process.env.YOUTUBE_RATE_LIMIT_BUFFER || '500',
       10
     );
     this.resetHour = Number.parseInt(
-      process.env.YOUTUBE_QUOTA_RESET_HOUR || "0",
+      process.env.YOUTUBE_QUOTA_RESET_HOUR || '0',
       10
     );
   }
@@ -78,7 +78,7 @@ export class QuotaTracker {
       canProceed,
     };
 
-    log("quota_status_check", {
+    log('quota_status_check', {
       ...status,
       reserveBuffer: this.reserveBuffer,
       hasReset,
@@ -99,20 +99,20 @@ export class QuotaTracker {
 
     if (status.remaining < units + this.reserveBuffer) {
       log(
-        "quota_reservation_failed",
+        'quota_reservation_failed',
         {
           operation,
           requestedUnits: units,
           remaining: status.remaining,
           reserveBuffer: this.reserveBuffer,
         },
-        "warn"
+        'warn'
       );
       return false;
     }
 
     // Log the reservation (not actual usage yet)
-    log("quota_reserved", {
+    log('quota_reserved', {
       operation,
       units,
       remaining: status.remaining - units,
@@ -142,7 +142,7 @@ export class QuotaTracker {
     // Keep only today's usage
     this.cleanupOldUsage();
 
-    log("quota_consumed", {
+    log('quota_consumed', {
       operation,
       units,
       totalUsedToday: this.getTodayUsage(),
@@ -155,7 +155,7 @@ export class QuotaTracker {
    * Get total quota usage for today
    */
   getTodayUsage(): number {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
 
     return this.usageLog
       .filter((usage) => usage.timestamp.startsWith(today))
@@ -166,7 +166,7 @@ export class QuotaTracker {
    * Get quota usage breakdown by operation type
    */
   getUsageBreakdown(): Record<string, { count: number; units: number }> {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
     const todayUsage = this.usageLog.filter((usage) =>
       usage.timestamp.startsWith(today)
     );
@@ -188,9 +188,9 @@ export class QuotaTracker {
    * Check if quota has reset since last check
    */
   private hasQuotaReset(now: Date): boolean {
-    const today = now.toISOString().split("T")[0];
+    const today = now.toISOString().split('T')[0];
     const resetTime = new Date(
-      `${today}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+      `${today}T${String(this.resetHour).padStart(2, '0')}:00:00.000Z`
     );
 
     return now >= resetTime;
@@ -200,18 +200,18 @@ export class QuotaTracker {
    * Get the next quota reset time
    */
   private getNextResetTime(now: Date): Date {
-    const today = now.toISOString().split("T")[0];
+    const today = now.toISOString().split('T')[0];
     const todayReset = new Date(
-      `${today}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+      `${today}T${String(this.resetHour).padStart(2, '0')}:00:00.000Z`
     );
 
     if (now >= todayReset) {
       // Next reset is tomorrow
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split("T")[0];
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
       return new Date(
-        `${tomorrowStr}T${String(this.resetHour).padStart(2, "0")}:00:00.000Z`
+        `${tomorrowStr}T${String(this.resetHour).padStart(2, '0')}:00:00.000Z`
       );
     }
     // Next reset is today
@@ -230,7 +230,7 @@ export class QuotaTracker {
     this.usageLog = this.usageLog.filter((usage) => usage.timestamp >= cutoff);
 
     if (this.usageLog.length < originalLength) {
-      log("quota_usage_cleanup", {
+      log('quota_usage_cleanup', {
         removed: originalLength - this.usageLog.length,
         remaining: this.usageLog.length,
         cutoff,
@@ -265,7 +265,7 @@ export class QuotaTracker {
     const breakdown = this.getUsageBreakdown();
     const allocation = this.getQuotaAllocation();
 
-    log("quota_daily_report", {
+    log('quota_daily_report', {
       status,
       breakdown,
       allocation,

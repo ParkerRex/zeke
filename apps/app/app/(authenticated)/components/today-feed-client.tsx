@@ -1,8 +1,8 @@
 'use client';
 
-import StoryRow from './story-row';
 import { STRINGS } from '@/constants/strings';
 import { useStories } from '@/hooks/use-stories';
+import StoryRow from './story-row';
 
 export default function TodayFeedClient() {
   const { clusters, loading, error, reload } = useStories();

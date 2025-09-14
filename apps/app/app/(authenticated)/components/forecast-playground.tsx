@@ -1,14 +1,16 @@
-"use client";
-import { useMemo, useState } from "react";
-import { Input } from "@zeke/design-system/components/ui/input";
-import { Label } from "@zeke/design-system/components/ui/label";
-import { Slider } from "@zeke/design-system/components/ui/slider";
+'use client';
+import { Input } from '@zeke/design-system/components/ui/input';
+import { Label } from '@zeke/design-system/components/ui/label';
+import { Slider } from '@zeke/design-system/components/ui/slider';
+import { useMemo, useState } from 'react';
 
 function formatCurrency(n: number) {
-  if (Number.isNaN(n)) return "$0";
+  if (Number.isNaN(n)) {
+    return '$0';
+  }
   return n.toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
+    style: 'currency',
+    currency: 'USD',
     maximumFractionDigits: 2,
   });
 }
@@ -32,7 +34,7 @@ export default function ForecastPlayground() {
   const [renderMonthly, setRenderMonthly] = useState<number>(40);
   const [vmMonthly, setVmMonthly] = useState<number>(30);
   const [notes, setNotes] = useState<string>(
-    "Scratch Pad – Worker Strategy\n\nGoals\n- Ship fast; keep costs reasonable; scale later\n- Prefer free YouTube captions where possible\n- Hybrid plan: captions → API/GPU only when needed\n\nAssumptions (adjust on the right)\n- API price: $0.006/min (editable)\n- Local throughput: 6,000 minutes/day/instance (placeholder; measure!)\n- Orchestrator baseline: $40/mo\n\nNext decisions\n- Start on GCP/Render for the worker (simple deploy)\n- Add captions-first extraction\n- Consider GPU transcriber if API costs dominate\n"
+    'Scratch Pad – Worker Strategy\n\nGoals\n- Ship fast; keep costs reasonable; scale later\n- Prefer free YouTube captions where possible\n- Hybrid plan: captions → API/GPU only when needed\n\nAssumptions (adjust on the right)\n- API price: $0.006/min (editable)\n- Local throughput: 6,000 minutes/day/instance (placeholder; measure!)\n- Orchestrator baseline: $40/mo\n\nNext decisions\n- Start on GCP/Render for the worker (simple deploy)\n- Add captions-first extraction\n- Consider GPU transcriber if API costs dominate\n'
   );
 
   const derived = useMemo(() => {

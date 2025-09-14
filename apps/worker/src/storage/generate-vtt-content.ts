@@ -11,9 +11,9 @@ function formatVTTTime(seconds: number): string {
   const hours = Math.floor(seconds / SECONDS_PER_HOUR);
   const minutes = Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
   const secs = seconds % SECONDS_PER_MINUTE;
-  const h = hours.toString().padStart(PADDING_HOURS_MINUTES, "0");
-  const m = minutes.toString().padStart(PADDING_HOURS_MINUTES, "0");
-  const s = secs.toFixed(DECIMAL_PLACES).padStart(PADDING_SECONDS, "0");
+  const h = hours.toString().padStart(PADDING_HOURS_MINUTES, '0');
+  const m = minutes.toString().padStart(PADDING_HOURS_MINUTES, '0');
+  const s = secs.toFixed(DECIMAL_PLACES).padStart(PADDING_SECONDS, '0');
   return `${h}:${m}:${s}`;
 }
 
@@ -21,12 +21,12 @@ export function generateVTTContent(
   transcriptionResult: TranscriptionResult
 ): string {
   const segments = transcriptionResult.segments || [];
-  let vttContent = "WEBVTT\n\n";
+  let vttContent = 'WEBVTT\n\n';
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
     const startTime = formatVTTTime(segment.start || 0);
     const endTime = formatVTTTime(segment.end || segment.start || 0);
-    const text = (segment.text || "").trim();
+    const text = (segment.text || '').trim();
     if (text) {
       vttContent += `${i + 1}\n`;
       vttContent += `${startTime} --> ${endTime}\n`;

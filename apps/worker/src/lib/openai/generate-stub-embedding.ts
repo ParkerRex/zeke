@@ -3,13 +3,13 @@ import {
   CONFIDENCE_DEFAULT,
   EMBEDDING_DIMENSIONS,
   EMBEDDING_NORMALIZATION_FACTOR,
-} from "./constants.js";
-import type { EmbeddingInput, EmbeddingResult } from "./types.js";
+} from './constants.js';
+import type { EmbeddingInput, EmbeddingResult } from './types.js';
 
 export function generateStubEmbedding(
   story: EmbeddingInput
 ): Promise<EmbeddingResult> {
-  const content = `${story.title || ""} ${story.text}`.toLowerCase();
+  const content = `${story.title || ''} ${story.text}`.toLowerCase();
   const embedding = new Array(EMBEDDING_DIMENSIONS).fill(0);
 
   for (let i = 0; i < content.length && i < EMBEDDING_DIMENSIONS; i++) {

@@ -2,6 +2,8 @@
 
 Background job processor for Zeke using pg-boss. Handles ingest (RSS/YouTube), extraction (audio → transcript → content), and analysis (LLM overlays/embeddings).
 
+**🎉 New Modular Architecture**: The worker has been restructured into a clean, beginner-friendly modular system. See [ARCHITECTURE.md](ARCHITECTURE.md) for details.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -32,12 +34,27 @@ Background job processor for Zeke using pg-boss. Handles ingest (RSS/YouTube), e
    pnpm run test:connection
    ```
 
-4. **Start worker (Docker, full deps)**:
+4. **Start worker**:
    ```bash
+   # New modular architecture (default)
+   pnpm run dev
+
+   # Or with Docker (full deps)
    bash scripts/deploy-local-worker.sh
+
+   # Legacy architecture (if needed)
+   pnpm run dev:old
    ```
 
 ## 🧪 Testing
+
+### New Architecture Tests
+
+```bash
+pnpm run test:unit           # Unit tests for core modules
+pnpm run test:integration    # End-to-end pipeline tests
+pnpm run status             # System health check
+```
 
 ### Connection Tests
 

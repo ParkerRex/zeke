@@ -1,9 +1,9 @@
 'use client';
-import { StoryKindIcon } from './story-kind-icon';
 import { type Tab, useTabs } from '@/stores/tabsStore';
 import CompanyTab from './company-tab';
 import IndustryTab from './industry-tab';
 import OverlayPanel from './overlay-panel';
+import { StoryKindIcon } from './story-kind-icon';
 
 // Precompiled regex for performance (Biome: useTopLevelRegex)
 const WWW_PREFIX = /^www\./;

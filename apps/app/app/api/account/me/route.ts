@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@zeke/auth";
+import { createSupabaseServerClient } from '@zeke/auth';
+import { NextResponse } from 'next/server';
 
 export async function GET(): Promise<Response> {
   try {
@@ -13,9 +13,9 @@ export async function GET(): Promise<Response> {
     }
 
     const { data, error } = await supabase
-      .from("users")
-      .select("full_name, avatar_url, is_admin")
-      .eq("id", userId)
+      .from('users')
+      .select('full_name, avatar_url, is_admin')
+      .eq('id', userId)
       .limit(1)
       .maybeSingle();
 

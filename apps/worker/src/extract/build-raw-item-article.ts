@@ -12,7 +12,7 @@ export function buildRawItemArticle(
     external_id: norm.externalId,
     url: norm.url,
     title: norm.title,
-    kind: "article" as const,
+    kind: 'article' as const,
     metadata: {
       pubDate: norm.pubDate,
       src: norm.url,

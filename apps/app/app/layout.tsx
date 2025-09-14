@@ -10,7 +10,7 @@ type RootLayoutProperties = {
 };
 
 // TODO: Add nuqs back
-const RootLayout = ({ children }: RootLayoutProperties) => (
+const _RootLayout = ({ children }: RootLayoutProperties) => (
   <html lang="en" className={fonts} suppressHydrationWarning>
     <body>
       <AuthProvider
@@ -21,9 +21,7 @@ const RootLayout = ({ children }: RootLayoutProperties) => (
         termsUrl={new URL('/legal/terms', env.NEXT_PUBLIC_WEB_URL).toString()}
         helpUrl={env.NEXT_PUBLIC_DOCS_URL}
       >
-        <DesignSystemProvider>
-          {children}
-        </DesignSystemProvider>
+        <DesignSystemProvider>{children}</DesignSystemProvider>
       </AuthProvider>
     </body>
   </html>

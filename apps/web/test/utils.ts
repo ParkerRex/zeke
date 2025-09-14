@@ -15,7 +15,7 @@ export function createMockStory(overrides: Partial<Cluster> = {}): Cluster {
         domain: 'example.com',
       },
       {
-        title: 'Test Source 2', 
+        title: 'Test Source 2',
         url: 'https://test.com/source2',
         domain: 'test.com',
       },
@@ -37,7 +37,10 @@ export function createMockStory(overrides: Partial<Cluster> = {}): Cluster {
 /**
  * Create multiple mock stories for testing grids/lists
  */
-export function createMockStories(count: number, baseOverrides: Partial<Cluster> = {}): Cluster[] {
+export function createMockStories(
+  count: number,
+  baseOverrides: Partial<Cluster> = {}
+): Cluster[] {
   return Array.from({ length: count }, (_, index) =>
     createMockStory({
       id: `test-story-${index}`,
@@ -51,9 +54,12 @@ export function createMockStories(count: number, baseOverrides: Partial<Cluster>
 /**
  * Create a mock story with specific embed kind
  */
-export function createMockStoryWithKind(kind: EmbedKind, overrides: Partial<Cluster> = {}): Cluster {
+export function createMockStoryWithKind(
+  kind: EmbedKind,
+  overrides: Partial<Cluster> = {}
+): Cluster {
   const kindSpecificData: Partial<Cluster> = {};
-  
+
   if (kind === 'youtube') {
     kindSpecificData.youtubeMetadata = {
       transcriptUrl: 'https://youtube.com/transcript',
@@ -73,7 +79,10 @@ export function createMockStoryWithKind(kind: EmbedKind, overrides: Partial<Clus
 /**
  * Create a mock story with specific chili rating for hype testing
  */
-export function createMockStoryWithChili(chili: number, overrides: Partial<Cluster> = {}): Cluster {
+export function createMockStoryWithChili(
+  chili: number,
+  overrides: Partial<Cluster> = {}
+): Cluster {
   return createMockStory({
     overlays: {
       whyItMatters: 'Test story with specific chili rating',

@@ -1,13 +1,13 @@
-import { log } from "../../log.js";
-import { withRetry } from "../../utils/retry.js";
-import type { OpenAIClient } from "./openai-client.js";
-import type { EmbeddingInput, EmbeddingResult } from "./types.js";
+import { log } from '../../log.js';
+import { withRetry } from '../../utils/retry.js';
+import type { OpenAIClient } from './openai-client.js';
+import type { EmbeddingInput, EmbeddingResult } from './types.js';
 
 export async function generateEmbedding(
   client: OpenAIClient,
   story: EmbeddingInput
 ): Promise<EmbeddingResult> {
-  const content = `${story.title || ""}\n\n${story.text}`;
+  const content = `${story.title || ''}\n\n${story.text}`;
   const truncatedContent =
     content.length > client.maxEmbeddingLen
       ? `${content.substring(0, client.maxEmbeddingLen)}...[truncated]`
@@ -33,9 +33,9 @@ export async function generateEmbedding(
     return { embedding };
   } catch (error) {
     log(
-      "openai_embedding_error",
-      { comp: "analyze", error: String(error), story_title: story.title },
-      "error"
+      'openai_embedding_error',
+      { comp: 'analyze', error: String(error), story_title: story.title },
+      'error'
     );
     throw error;
   }

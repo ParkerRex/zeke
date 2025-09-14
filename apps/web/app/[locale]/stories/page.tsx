@@ -4,14 +4,13 @@
 
 import { Button } from '@zeke/design-system/components/ui/button';
 import { Input } from '@zeke/design-system/components/ui/input';
-import { listStories } from '@zeke/supabase/queries';
 import { getDictionary } from '@zeke/internationalization';
 import { createMetadata } from '@zeke/seo/metadata';
+import { listStories } from '@zeke/supabase/queries';
+import { FileText, Search } from 'lucide-react';
 import type { Metadata } from 'next';
-import { Search, FileText } from 'lucide-react';
 import { Suspense } from 'react';
-import { StoriesGrid } from '../../../components/stories/stories-grid';
-import { PageHeader, EmptyState } from '../../../components/layout';
+import { EmptyState, PageHeader } from '../../../components/layout';
 
 type StoriesPageProps = {
   params: Promise<{
@@ -27,22 +26,24 @@ export const generateMetadata = async ({
   params,
 }: StoriesPageProps): Promise<Metadata> => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return createMetadata({
     title: 'Stories - ZEKE Research Intelligence',
-    description: 'Browse the latest AI research stories, compressed from hours of content into verified insights with receipts.',
+    description:
+      'Browse the latest AI research stories, compressed from hours of content into verified insights with receipts.',
   });
 };
 
 async function StoriesGrid({ searchQuery }: { searchQuery?: string }) {
   const stories = await listStories();
-  
+
   // Simple client-side filtering for demo purposes
   const filteredStories = searchQuery
-    ? stories.filter(story => 
-        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        story.embedKind?.toLowerCase().includes(searchQuery.toLowerCase())
+    ? stories.filter(
+        (story) =>
+          story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          story.embedKind?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : stories;
 
@@ -56,19 +57,20 @@ async function StoriesGrid({ searchQuery }: { searchQuery?: string }) {
             ? `No stories match "${searchQuery}". Try a different search term.`
             : 'No stories available at the moment. Check back later!'
         }
-        action={searchQuery ? {
-          label: "Clear Search",
-          href: "/stories"
-        } : undefined}
+        action={
+          searchQuery
+            ? {
+                label: 'Clear Search',
+                href: '/stories',
+              }
+            : undefined
+        }
       />
     );
   }
 
   return (
-    <StoriesGrid
-      stories={filteredStories}
-      columns={{ sm: 2, lg: 3, xl: 4 }}
-    />
+    <StoriesGrid stories={filteredStories} columns={{ sm: 2, lg: 3, xl: 4 }} />
   );
 }
 
@@ -100,7 +102,7 @@ function StoriesGridSkeleton() {
 const StoriesPage = async ({ params, searchParams }: StoriesPageProps) => {
   const { locale } = await params;
   const { q: searchQuery } = await searchParams;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return (
     <div className="container mx-auto py-8">
@@ -113,7 +115,7 @@ const StoriesPage = async ({ params, searchParams }: StoriesPageProps) => {
       {/* Search */}
       <div className="mb-8">
         <form className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search stories..."
             defaultValue={searchQuery}

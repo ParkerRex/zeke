@@ -1,13 +1,13 @@
-"use client";
-import { Button } from "@zeke/design-system/components/ui/button";
-import type { Tab } from "@/stores/tabsStore";
+'use client';
+import type { Tab } from '@/stores/tabsStore';
+import { Button } from '@zeke/design-system/components/ui/button';
 
 const PERCENTAGE_MULTIPLIER = 100;
 
 export default function OverlayPanel({ tab }: { tab: Tab }) {
   const share = async () => {
-    const r = await fetch("/api/share", {
-      method: "POST",
+    const r = await fetch('/api/share', {
+      method: 'POST',
       body: JSON.stringify({ clusterId: tab.clusterId }),
     });
     const { url } = await r.json();
@@ -23,9 +23,9 @@ export default function OverlayPanel({ tab }: { tab: Tab }) {
 
       <div className="flex items-center gap-2">
         <span className="font-medium">Hype</span>
-        <span>{Array.from({ length: tab.overlays.chili }).map(() => "🌶")}</span>
+        <span>{Array.from({ length: tab.overlays.chili }).map(() => '🌶')}</span>
         <span className="text-muted-foreground text-xs">
-          confidence{" "}
+          confidence{' '}
           {(tab.overlays.confidence * PERCENTAGE_MULTIPLIER).toFixed(0)}%
         </span>
       </div>
@@ -42,7 +42,7 @@ export default function OverlayPanel({ tab }: { tab: Tab }) {
                 target="_blank"
               >
                 {s.title}
-              </a>{" "}
+              </a>{' '}
               <span className="text-muted-foreground text-xs">
                 ({s.domain})
               </span>

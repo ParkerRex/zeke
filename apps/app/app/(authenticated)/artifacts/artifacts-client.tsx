@@ -71,14 +71,20 @@ export default function ArtifactsClient() {
   // Dismiss the selection prompt on Escape or clicking elsewhere
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSelectionUI(null);
+      if (e.key === 'Escape') {
+        setSelectionUI(null);
+      }
     };
     const onClick = (e: MouseEvent) => {
       const ui = selectionUI;
-      if (!ui) return;
+      if (!ui) {
+        return;
+      }
       const target = e.target as Node | null;
       const within = containerRef.current?.contains(target as Node) ?? false;
-      if (!within) setSelectionUI(null);
+      if (!within) {
+        setSelectionUI(null);
+      }
     };
     window.addEventListener('keydown', onKey);
     window.addEventListener('mousedown', onClick);
@@ -89,7 +95,7 @@ export default function ArtifactsClient() {
   }, [selectionUI]);
 
   // Detect text selection release within a story content block
-  const handleMouseUp: React.MouseEventHandler<HTMLDivElement> = (e) => {
+  const handleMouseUp: React.MouseEventHandler<HTMLDivElement> = (_e) => {
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed) {
       setSelectionUI(null);
@@ -100,7 +106,9 @@ export default function ArtifactsClient() {
     const anchor = sel.anchorNode as Node | null;
     const focus = sel.focusNode as Node | null;
     const root = containerRef.current;
-    if (!(anchor && focus && root)) return;
+    if (!(anchor && focus && root)) {
+      return;
+    }
 
     const toElement = (n: Node | null): Element | null =>
       n instanceof Element
@@ -112,10 +120,14 @@ export default function ArtifactsClient() {
     const contentEl2 = toElement(focus)?.closest(
       '[data-story-id]'
     ) as HTMLElement | null;
-    if (!(contentEl && contentEl2) || contentEl !== contentEl2) return;
+    if (!(contentEl && contentEl2) || contentEl !== contentEl2) {
+      return;
+    }
 
     const storyId = contentEl.getAttribute('data-story-id') || '';
-    if (!storyId) return;
+    if (!storyId) {
+      return;
+    }
 
     // Position a small prompt near the selection
     const range = sel.getRangeAt(0);
@@ -126,7 +138,9 @@ export default function ArtifactsClient() {
   };
 
   const addSelectionToNotes = () => {
-    if (!selectionUI) return;
+    if (!selectionUI) {
+      return;
+    }
     const { range, storyId } = selectionUI;
     const text = range.cloneContents().textContent?.trim() || '';
     if (!text) {
@@ -136,7 +150,7 @@ export default function ArtifactsClient() {
     const story = stories.find((s) => s.id === storyId);
     setNotes((prev) => [
       {
-        id: 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        id: `n_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         text,
         citation: story ? { title: story.title, url: story.url } : undefined,
         showCitation: true,
@@ -150,7 +164,7 @@ export default function ArtifactsClient() {
       mark.style.background = 'rgba(250, 204, 21, 0.6)'; // amber-300-ish
       mark.style.padding = '0 2px';
       range.surroundContents(mark);
-    } catch (err) {
+    } catch (_err) {
       // If surround fails (split nodes), skip highlighting.
     }
 
@@ -160,9 +174,11 @@ export default function ArtifactsClient() {
 
   const addDraftNote = () => {
     const text = draft.trim();
-    if (!text) return;
+    if (!text) {
+      return;
+    }
     setNotes((prev) => [
-      { id: 'n_' + Date.now(), text, showCitation: false },
+      { id: `n_${Date.now()}`, text, showCitation: false },
       ...prev,
     ]);
     setDraft('');
@@ -209,7 +225,7 @@ export default function ArtifactsClient() {
                             : s.kind === 'youtube'
                               ? 'YouTube'
                               : 'Podcast'}
-                          {s.url ? ' • ' + s.url : ''}
+                          {s.url ? ` • ${s.url}` : ''}
                         </div>
                       </div>
                       <div className="text-muted-foreground text-xs">

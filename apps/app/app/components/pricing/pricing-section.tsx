@@ -1,7 +1,7 @@
-import { getProducts } from "@zeke/supabase/queries";
-import Image from "next/image";
-import { createCheckoutSession } from "@/actions/pricing/create-checkout-session";
-import { PricingCard } from "./price-card";
+import { createCheckoutSession } from '@/actions/pricing/create-checkout-session';
+import { getProducts } from '@zeke/supabase/queries';
+import Image from 'next/image';
+import { PricingCard } from './price-card';
 
 export async function PricingSection({
   isPricingPage,
@@ -9,7 +9,7 @@ export async function PricingSection({
   isPricingPage?: boolean;
 }) {
   const products = await getProducts();
-  const HeadingLevel = isPricingPage ? "h1" : "h2";
+  const HeadingLevel = isPricingPage ? 'h1' : 'h2';
   return (
     <section className="relative overflow-hidden rounded-lg bg-white">
       <div className="relative h-[180px] sm:h-[220px] lg:h-[300px]">

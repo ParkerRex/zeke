@@ -1,7 +1,7 @@
-import { XMLParser } from "fast-xml-parser";
+import { XMLParser } from 'fast-xml-parser';
 
 export type RssItem = {
-  guid?: string | { "#text"?: string };
+  guid?: string | { '#text'?: string };
   id?: string; // atom
   link?: string | { href?: string };
   title?: string;
@@ -12,7 +12,7 @@ export type RssItem = {
 export function parseRssFeed(xml: string): RssItem[] {
   const parser = new XMLParser({
     ignoreAttributes: false,
-    attributeNamePrefix: "",
+    attributeNamePrefix: '',
   });
   const doc = parser.parse(xml);
   const items: RssItem[] = asArray(doc?.rss?.channel?.item).concat(

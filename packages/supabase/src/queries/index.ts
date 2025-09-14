@@ -234,12 +234,29 @@ function buildYoutubeMetadata(
   };
 }
 
-export async function listStories(): Promise<Cluster[]> {
+export interface StoriesFilter {
+  limit?: number;
+  offset?: number;
+  kind?: 'all' | 'youtube' | 'arxiv' | 'podcast' | 'reddit' | 'hn' | 'article';
+  search?: string;
+  userId?: string; // For user-specific filtering in the future
+}
+
+export interface StoriesResult {
+  stories: Cluster[];
+  totalCount: number;
+  hasMore: boolean;
+}
+
+export async function listStories(
+  filter: StoriesFilter = {}
+): Promise<StoriesResult> {
   try {
-    const { data: stories, error } = await supabaseAdminClient
-      .from('stories')
-      .select(
-        `
+    const { limit = STORIES_LIMIT, offset = 0, kind = 'all', search } = filter;
+
+    // Build the query
+    let query = supabaseAdminClient.from('stories').select(
+      `
         *,
         story_overlays (
           why_it_matters,
@@ -253,24 +270,66 @@ export async function listStories(): Promise<Cluster[]> {
           duration_seconds,
           view_count
         )
-      `
-      )
+      `,
+      { count: 'exact' }
+    );
+
+    // Apply kind filter
+    if (kind !== 'all') {
+      query = query.eq('kind', kind);
+    }
+
+    // Apply search filter
+    if (search?.trim()) {
+      const searchTerm = search.trim();
+      query = query.or(
+        `title.ilike.%${searchTerm}%,primary_url.ilike.%${searchTerm}%`
+      );
+    }
+
+    // Apply ordering and pagination
+    query = query
       .order('created_at', { ascending: false })
-      .limit(STORIES_LIMIT);
+      .range(offset, offset + limit - 1);
+
+    const { data: stories, error, count } = await query;
 
     if (error) {
-      // Log error silently and return fallback data
-      return sampleClusters;
+      return {
+        stories: sampleClusters,
+        totalCount: 0,
+        hasMore: false,
+      };
     }
+
     if (!stories || stories.length === 0) {
-      return sampleClusters;
+      return {
+        stories: sampleClusters,
+        totalCount: count ?? 0,
+        hasMore: false,
+      };
     }
 
     const clusters: Cluster[] = stories.map(mapStoryToCluster);
+    const totalCount = count ?? 0;
+    const hasMore = offset + stories.length < totalCount;
 
-    return clusters;
-  } catch {
-    // Return fallback data on error
-    return sampleClusters;
+    return {
+      stories: clusters,
+      totalCount,
+      hasMore,
+    };
+  } catch (_error) {
+    return {
+      stories: sampleClusters,
+      totalCount: 0,
+      hasMore: false,
+    };
   }
+}
+
+// Backward compatibility - keep the old function signature
+export async function listStoriesLegacy(): Promise<Cluster[]> {
+  const result = await listStories({ limit: STORIES_LIMIT });
+  return result.stories;
 }

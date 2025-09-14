@@ -1,7 +1,6 @@
 {
   "version": "0.2.0",
   "configurations": [
-    // === FULL STACK DEVELOPMENT ===
     {
       "name": "🚀 ZEKE: Full Stack (All Services)",
       "type": "node-terminal",
@@ -26,8 +25,6 @@
         "order": 2
       }
     },
-
-    // === INDIVIDUAL SERVICES ===
     {
       "name": "📱 Dashboard App (port 3000)",
       "type": "node-terminal",
@@ -49,7 +46,7 @@
       }
     },
     {
-      "name": "⚙️ Worker (Node.js)",
+      "name": "⚙️ Worker (Node.js - New Architecture)",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/apps/worker/src/worker.ts",
@@ -68,13 +65,32 @@
       }
     },
     {
+      "name": "⚙️ Worker (Legacy Architecture)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/worker/src/worker-old.ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": ["watch"],
+      "cwd": "${workspaceFolder}/apps/worker",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "8081"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": {
+        "group": "services",
+        "order": 4
+      }
+    },
+    {
       "name": "📧 Email Templates (port 3003)",
       "type": "node-terminal",
       "request": "launch",
       "command": "turbo dev --filter=email",
       "presentation": {
         "group": "services",
-        "order": 4
+        "order": 5
       }
     },
     {
@@ -84,13 +100,11 @@
       "command": "npx supabase start",
       "presentation": {
         "group": "services",
-        "order": 5
+        "order": 6
       }
     },
-
-    // === WORKER DEBUGGING ===
     {
-      "name": "🔍 Worker: Debug with Breakpoints",
+      "name": "🔍 Worker: Debug with Breakpoints (New Architecture)",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/apps/worker/dist/worker.js",
@@ -108,6 +122,24 @@
       }
     },
     {
+      "name": "🔍 Worker: Debug Legacy Architecture",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/worker/dist/worker-old.js",
+      "preLaunchTask": "build-worker",
+      "cwd": "${workspaceFolder}/apps/worker",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "8081"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": {
+        "group": "worker",
+        "order": 2
+      }
+    },
+    {
       "name": "🔄 Worker: Docker Container",
       "type": "node-terminal",
       "request": "launch",
@@ -118,11 +150,20 @@
       },
       "presentation": {
         "group": "worker",
-        "order": 2
+        "order": 3
       }
     },
-
-    // === CLIENT-SIDE DEBUGGING ===
+    {
+      "name": "🧪 Worker: Run Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm run test:unit && pnpm run test:integration",
+      "cwd": "${workspaceFolder}/apps/worker",
+      "presentation": {
+        "group": "worker",
+        "order": 4
+      }
+    },
     {
       "name": "🌐 Chrome: Dashboard App",
       "type": "chrome",
@@ -166,8 +207,6 @@
         "order": 4
       }
     },
-
-    // === ADVANCED DEBUGGING ===
     {
       "name": "🔧 Dashboard: Full Stack Debug",
       "type": "node",

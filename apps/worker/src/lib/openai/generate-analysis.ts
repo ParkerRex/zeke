@@ -1,6 +1,6 @@
-import { log } from "../../log.js";
-import { withRetry } from "../../utils/retry.js";
-import { cleanAndParseJSON } from "./clean-json-response.js";
+import { log } from '../../log.js';
+import { withRetry } from '../../utils/retry.js';
+import { cleanAndParseJSON } from './clean-json-response.js';
 import {
   CHILI_DEFAULT,
   CHILI_MAX,
@@ -8,9 +8,9 @@ import {
   CONFIDENCE_DEFAULT,
   CONFIDENCE_MAX,
   CONFIDENCE_MIN,
-} from "./constants.js";
-import type { OpenAIClient } from "./openai-client.js";
-import type { AnalysisInput, AnalysisResult } from "./types.js";
+} from './constants.js';
+import type { OpenAIClient } from './openai-client.js';
+import type { AnalysisInput, AnalysisResult } from './types.js';
 
 export async function generateAnalysis(
   client: OpenAIClient,
@@ -18,7 +18,7 @@ export async function generateAnalysis(
 ): Promise<AnalysisResult> {
   const domain = story.canonical_url
     ? new URL(story.canonical_url).hostname
-    : "unknown";
+    : 'unknown';
   const truncatedText =
     story.text.length > client.maxAnalysisLen
       ? `${story.text.substring(0, client.maxAnalysisLen)}...[truncated]`
@@ -26,7 +26,7 @@ export async function generateAnalysis(
 
   const prompt = `Analyze this news article and provide insights in JSON format.
 
-Title: ${story.title || "No title"}
+Title: ${story.title || 'No title'}
 Source: ${domain}
 Content: ${truncatedText}
 
@@ -49,7 +49,7 @@ Respond only with valid JSON, no other text.`;
       () =>
         client.openai.chat.completions.create({
           model: client.chatModel,
-          messages: [{ role: "user", content: prompt }],
+          messages: [{ role: 'user', content: prompt }],
           temperature: 0.3,
           max_tokens: 500,
         }),
@@ -58,7 +58,7 @@ Respond only with valid JSON, no other text.`;
 
     const responseText = completion.choices[0]?.message?.content?.trim();
     if (!responseText) {
-      throw new Error("Empty response from OpenAI");
+      throw new Error('Empty response from OpenAI');
     }
 
     type LLMAnalysisJSON = {
@@ -71,10 +71,10 @@ Respond only with valid JSON, no other text.`;
     const raw = cleanAndParseJSON(responseText) as LLMAnalysisJSON;
 
     const toNumber = (v: unknown): number | null => {
-      if (typeof v === "number") {
+      if (typeof v === 'number') {
         return v;
       }
-      if (typeof v === "string") {
+      if (typeof v === 'string') {
         return Number(v);
       }
       return null;
@@ -83,9 +83,9 @@ Respond only with valid JSON, no other text.`;
       Math.max(min, Math.min(max, n));
 
     const why =
-      typeof raw.why_it_matters === "string" && raw.why_it_matters.trim()
+      typeof raw.why_it_matters === 'string' && raw.why_it_matters.trim()
         ? raw.why_it_matters
-        : "• Analysis not available";
+        : '• Analysis not available';
 
     const chiliVal = clamp(
       Math.round(toNumber(raw.chili) ?? CHILI_DEFAULT),
@@ -100,7 +100,7 @@ Respond only with valid JSON, no other text.`;
     );
 
     const citationsVal =
-      typeof raw.citations === "object" &&
+      typeof raw.citations === 'object' &&
       raw.citations !== null &&
       !Array.isArray(raw.citations)
         ? (raw.citations as Record<string, unknown>)
@@ -114,9 +114,9 @@ Respond only with valid JSON, no other text.`;
     };
   } catch (error) {
     log(
-      "openai_analysis_error",
-      { comp: "analyze", error: String(error), story_title: story.title },
-      "error"
+      'openai_analysis_error',
+      { comp: 'analyze', error: String(error), story_title: story.title },
+      'error'
     );
     throw error;
   }

@@ -1,8 +1,8 @@
-import { promises as fs } from "node:fs";
-import { dirname, join } from "node:path";
-import { log } from "../log.js";
+import { promises as fs } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { log } from '../log.js';
 
-const TEMP_BASE_DIR = "/tmp/youtube-processing";
+const TEMP_BASE_DIR = '/tmp/youtube-processing';
 
 // Constants for byte conversions
 const BYTES_PER_KB = 1024;
@@ -30,7 +30,7 @@ export type TempFileInfo = {
  */
 export function createTempPath(videoId: string, extension: string): string {
   // Sanitize videoId to prevent path traversal
-  const sanitizedVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const sanitizedVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, '_');
   const filename = `${sanitizedVideoId}.${extension}`;
   return join(TEMP_BASE_DIR, filename);
 }
@@ -42,18 +42,18 @@ export async function ensureTempDirectory(): Promise<void> {
   try {
     await fs.mkdir(TEMP_BASE_DIR, { recursive: true, mode: 0o755 });
 
-    log("temp_directory_created", {
+    log('temp_directory_created', {
       path: TEMP_BASE_DIR,
-      permissions: "755",
+      permissions: '755',
     });
   } catch (error) {
     log(
-      "temp_directory_creation_error",
+      'temp_directory_creation_error',
       {
         path: TEMP_BASE_DIR,
         error: String(error),
       },
-      "error"
+      'error'
     );
     throw error;
   }
@@ -79,7 +79,7 @@ export async function cleanupTempFiles(filePaths: string[]): Promise<void> {
       await fs.unlink(filePath);
       results.cleaned++;
 
-      log("temp_file_cleaned", {
+      log('temp_file_cleaned', {
         path: filePath,
         sizeBytes: stats.size,
         sizeMB:
@@ -90,17 +90,17 @@ export async function cleanupTempFiles(filePaths: string[]): Promise<void> {
       results.errors++;
 
       log(
-        "temp_file_cleanup_error",
+        'temp_file_cleanup_error',
         {
           path: filePath,
           error: String(error),
         },
-        "warn"
+        'warn'
       );
     }
   }
 
-  log("temp_files_cleanup_complete", {
+  log('temp_files_cleanup_complete', {
     filesRequested: filePaths.length,
     filesCleaned: results.cleaned,
     errors: results.errors,
@@ -115,7 +115,7 @@ export async function cleanupTempFiles(filePaths: string[]): Promise<void> {
  */
 export async function cleanupVideoTempFiles(videoId: string): Promise<void> {
   try {
-    const sanitizedVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const sanitizedVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const files = await fs.readdir(TEMP_BASE_DIR);
 
     const videoFiles = files
@@ -127,12 +127,12 @@ export async function cleanupVideoTempFiles(videoId: string): Promise<void> {
     }
   } catch (error) {
     log(
-      "video_temp_cleanup_error",
+      'video_temp_cleanup_error',
       {
         videoId,
         error: String(error),
       },
-      "warn"
+      'warn'
     );
   }
 }
@@ -163,7 +163,7 @@ export async function cleanupOldTempFiles(
     }
 
     if (oldFiles.length > 0) {
-      log("cleaning_old_temp_files", {
+      log('cleaning_old_temp_files', {
         count: oldFiles.length,
         maxAgeHours,
       });
@@ -172,12 +172,12 @@ export async function cleanupOldTempFiles(
     }
   } catch (error) {
     log(
-      "old_temp_cleanup_error",
+      'old_temp_cleanup_error',
       {
         maxAgeHours,
         error: String(error),
       },
-      "error"
+      'error'
     );
   }
 }
@@ -195,9 +195,9 @@ export async function getTempFileInfo(): Promise<TempFileInfo[]> {
 
       try {
         const stats = await fs.stat(filePath);
-        const parts = file.split(".");
-        const extension = parts.pop() || "";
-        const videoId = parts.join(".");
+        const parts = file.split('.');
+        const extension = parts.pop() || '';
+        const videoId = parts.join('.');
 
         fileInfos.push({
           path: filePath,
@@ -216,11 +216,11 @@ export async function getTempFileInfo(): Promise<TempFileInfo[]> {
     );
   } catch (error) {
     log(
-      "temp_file_info_error",
+      'temp_file_info_error',
       {
         error: String(error),
       },
-      "error"
+      'error'
     );
     return [];
   }
@@ -262,11 +262,11 @@ export async function getTempDiskUsage(): Promise<{
     };
   } catch (error) {
     log(
-      "temp_disk_usage_error",
+      'temp_disk_usage_error',
       {
         error: String(error),
       },
-      "error"
+      'error'
     );
 
     return {
@@ -289,7 +289,7 @@ export async function checkTempDiskSpace(
 
     const hasSpace = availableBytes > requiredBytes;
 
-    log("temp_disk_space_check", {
+    log('temp_disk_space_check', {
       requiredMB:
         Math.round((requiredBytes / BYTES_PER_MB) * ROUNDING_FACTOR) /
         ROUNDING_FACTOR,
@@ -302,11 +302,11 @@ export async function checkTempDiskSpace(
     return hasSpace;
   } catch (error) {
     log(
-      "temp_disk_space_check_error",
+      'temp_disk_space_check_error',
       {
         error: String(error),
       },
-      "warn"
+      'warn'
     );
 
     // Assume we have space if we can't check
@@ -333,7 +333,7 @@ export async function createTempFile(
 
     const stats = await fs.stat(filePath);
 
-    log("temp_file_created", {
+    log('temp_file_created', {
       path: filePath,
       videoId,
       extension,
@@ -343,14 +343,14 @@ export async function createTempFile(
     return filePath;
   } catch (error) {
     log(
-      "temp_file_creation_error",
+      'temp_file_creation_error',
       {
         path: filePath,
         videoId,
         extension,
         error: String(error),
       },
-      "error"
+      'error'
     );
     throw error;
   }

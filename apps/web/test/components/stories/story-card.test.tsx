@@ -1,15 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { StoryCard } from '../../../components/stories/story-card';
-import { createMockStory, createMockStoryWithKind, createMockStoryWithChili } from '../../utils';
+import {
+  createMockStory,
+  createMockStoryWithChili,
+  createMockStoryWithKind,
+} from '../../utils';
 
 // Mock the stories-utils functions
 vi.mock('../../../lib/stories-utils', () => ({
   deterministicPercent: vi.fn(() => 75),
   domainFromUrl: vi.fn(() => 'example.com'),
   getKindLabel: vi.fn((kind) => {
-    if (kind === 'youtube') return 'Video';
-    if (kind === 'arxiv') return 'Research';
+    if (kind === 'youtube') {
+      return 'Video';
+    }
+    if (kind === 'arxiv') {
+      return 'Research';
+    }
     return 'AI';
   }),
   hypePercent: vi.fn(() => 60),
@@ -34,13 +42,13 @@ describe('StoryCard', () => {
     const story = createMockStory();
 
     const { rerender } = render(<StoryCard story={story} variant="default" />);
-    
+
     // Default variant should have larger text
     let titleElement = screen.getByText(story.title);
     expect(titleElement).toHaveClass('text-base');
 
     rerender(<StoryCard story={story} variant="compact" />);
-    
+
     // Compact variant should have smaller text
     titleElement = screen.getByText(story.title);
     expect(titleElement).toHaveClass('text-sm');
@@ -76,7 +84,13 @@ describe('StoryCard', () => {
         whyItMatters: 'Test',
         chili: 3,
         confidence: 85,
-        sources: [{ title: 'Source 1', url: 'https://example.com', domain: 'example.com' }],
+        sources: [
+          {
+            title: 'Source 1',
+            url: 'https://example.com',
+            domain: 'example.com',
+          },
+        ],
       },
     });
 
@@ -111,7 +125,9 @@ describe('StoryCard', () => {
   it('conditionally renders timestamp based on showTimestamp prop', () => {
     const story = createMockStory();
 
-    const { rerender } = render(<StoryCard story={story} showTimestamp={true} />);
+    const { rerender } = render(
+      <StoryCard story={story} showTimestamp={true} />
+    );
     expect(screen.getByText('1 hour ago')).toBeInTheDocument();
 
     rerender(<StoryCard story={story} showTimestamp={false} />);

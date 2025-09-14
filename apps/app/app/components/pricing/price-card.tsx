@@ -4,18 +4,18 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { IoCheckmark } from 'react-icons/io5';
 
-import type {
-  BillingInterval,
-  Price,
-  ProductWithPrices,
-} from '@zeke/supabase/types';
-import { productMetadataSchema } from '@zeke/supabase/types';
 import { Button } from '@zeke/design-system/components/ui/button';
 import {
   Tabs,
   TabsList,
   TabsTrigger,
 } from '@zeke/design-system/components/ui/tabs';
+import type {
+  BillingInterval,
+  Price,
+  ProductWithPrices,
+} from '@zeke/supabase/types';
+import { productMetadataSchema } from '@zeke/supabase/types';
 
 const CENTS_PER_DOLLAR = 100;
 

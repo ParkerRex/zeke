@@ -1,13 +1,13 @@
-import { getShareSnapshot, getStoryById } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
+import { getShareSnapshot, getStoryById } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 export async function GET(req: Request): Promise<Response> {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const id = searchParams.get('id');
   if (!id) {
     const HTTP_BAD_REQUEST = 400;
     return NextResponse.json(
-      { error: "Missing id" },
+      { error: 'Missing id' },
       { status: HTTP_BAD_REQUEST }
     );
   }
@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<Response> {
   if (!snapshot) {
     const HTTP_NOT_FOUND = 404;
     return NextResponse.json(
-      { error: "Not found" },
+      { error: 'Not found' },
       { status: HTTP_NOT_FOUND }
     );
   }
@@ -25,7 +25,7 @@ export async function GET(req: Request): Promise<Response> {
 export function POST(_req: Request): Response {
   // Prototype: ignore payload and return a fake share id
   const RADIX = 36;
-  const ID_PREFIX = "shr_";
+  const ID_PREFIX = 'shr_';
   const START_INDEX = 2; // skip '0.' from Math.random().toString(36)
   const ID_LENGTH = 6;
   const rand = Math.random()

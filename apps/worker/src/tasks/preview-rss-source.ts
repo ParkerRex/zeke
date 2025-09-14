@@ -1,6 +1,6 @@
-import { normalizeRssItem } from "../extract/normalize-rss-item.js";
-import { parseRssFeed } from "../extract/parse-rss-feed.js";
-import { fetchWithTimeout } from "../utils/http.js";
+import { normalizeRssItem } from '../extract/normalize-rss-item.js';
+import { parseRssFeed } from '../extract/parse-rss-feed.js';
+import { fetchWithTimeout } from '../utils/http.js';
 
 const FETCH_TIMEOUT_MS = 15_000;
 
@@ -13,7 +13,7 @@ export async function previewRssSourceAction(
 }> {
   const res = await fetchWithTimeout(
     src.url,
-    { redirect: "follow" },
+    { redirect: 'follow' },
     FETCH_TIMEOUT_MS
   );
   if (!res.ok) {

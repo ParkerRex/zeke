@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { StoriesGrid } from '../../../components/stories/stories-grid';
 import { createMockStories, createMockStory } from '../../utils';
 
 // Mock the StoryCard component since we're testing the grid layout, not the card itself
 vi.mock('../../../components/stories/story-card', () => ({
   StoryCard: ({ story, variant, showHype, showImage, showTimestamp }: any) => (
-    <div 
+    <div
       data-testid={`story-card-${story.id}`}
       data-variant={variant}
       data-show-hype={showHype}
@@ -21,7 +21,7 @@ vi.mock('../../../components/stories/story-card', () => ({
 describe('StoriesGrid', () => {
   it('renders empty grid when no stories provided', () => {
     render(<StoriesGrid stories={[]} />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toBeInTheDocument();
     expect(grid?.children).toHaveLength(0);
@@ -30,7 +30,7 @@ describe('StoriesGrid', () => {
   it('renders single story in grid', () => {
     const stories = createMockStories(1);
     render(<StoriesGrid stories={stories} />);
-    
+
     expect(screen.getByTestId('story-card-test-story-0')).toBeInTheDocument();
     expect(screen.getByText('Test Story 1')).toBeInTheDocument();
   });
@@ -38,7 +38,7 @@ describe('StoriesGrid', () => {
   it('renders multiple stories in grid', () => {
     const stories = createMockStories(3);
     render(<StoriesGrid stories={stories} />);
-    
+
     expect(screen.getByTestId('story-card-test-story-0')).toBeInTheDocument();
     expect(screen.getByTestId('story-card-test-story-1')).toBeInTheDocument();
     expect(screen.getByTestId('story-card-test-story-2')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('StoriesGrid', () => {
   it('applies default grid classes', () => {
     const stories = createMockStories(2);
     render(<StoriesGrid stories={stories} />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toHaveClass(
       'grid',
@@ -63,9 +63,9 @@ describe('StoriesGrid', () => {
   it('applies custom column configuration', () => {
     const stories = createMockStories(2);
     const customColumns = { sm: 1, md: 3, lg: 4, xl: 5 };
-    
+
     render(<StoriesGrid stories={stories} columns={customColumns} />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toHaveClass(
       'sm:grid-cols-1',
@@ -78,7 +78,7 @@ describe('StoriesGrid', () => {
   it('applies custom className', () => {
     const stories = createMockStories(1);
     render(<StoriesGrid stories={stories} className="custom-grid-class" />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toHaveClass('custom-grid-class');
   });
@@ -86,9 +86,9 @@ describe('StoriesGrid', () => {
   it('passes variant prop to StoryCard components', () => {
     const stories = createMockStories(2);
     render(<StoriesGrid stories={stories} variant="compact" />);
-    
+
     const cards = screen.getAllByTestId(/story-card-/);
-    cards.forEach(card => {
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-variant', 'compact');
     });
   });
@@ -96,9 +96,9 @@ describe('StoriesGrid', () => {
   it('passes showHype prop to StoryCard components', () => {
     const stories = createMockStories(2);
     render(<StoriesGrid stories={stories} showHype={true} />);
-    
+
     const cards = screen.getAllByTestId(/story-card-/);
-    cards.forEach(card => {
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-show-hype', 'true');
     });
   });
@@ -106,9 +106,9 @@ describe('StoriesGrid', () => {
   it('passes showImage prop to StoryCard components', () => {
     const stories = createMockStories(2);
     render(<StoriesGrid stories={stories} showImage={false} />);
-    
+
     const cards = screen.getAllByTestId(/story-card-/);
-    cards.forEach(card => {
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-show-image', 'false');
     });
   });
@@ -116,9 +116,9 @@ describe('StoriesGrid', () => {
   it('passes showTimestamp prop to StoryCard components', () => {
     const stories = createMockStories(2);
     render(<StoriesGrid stories={stories} showTimestamp={false} />);
-    
+
     const cards = screen.getAllByTestId(/story-card-/);
-    cards.forEach(card => {
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-show-timestamp', 'false');
     });
   });
@@ -126,7 +126,7 @@ describe('StoriesGrid', () => {
   it('uses default props when not specified', () => {
     const stories = createMockStories(1);
     render(<StoriesGrid stories={stories} />);
-    
+
     const card = screen.getByTestId('story-card-test-story-0');
     expect(card).toHaveAttribute('data-variant', 'default');
     expect(card).toHaveAttribute('data-show-hype', 'false');
@@ -137,9 +137,9 @@ describe('StoriesGrid', () => {
   it('handles partial column configuration', () => {
     const stories = createMockStories(1);
     const partialColumns = { md: 4, xl: 6 };
-    
+
     render(<StoriesGrid stories={stories} columns={partialColumns} />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toHaveClass('md:grid-cols-4', 'xl:grid-cols-6');
     // Should not have sm or lg classes when not specified
@@ -153,9 +153,9 @@ describe('StoriesGrid', () => {
       createMockStory({ id: 'story-2', title: 'Second Story' }),
       createMockStory({ id: 'story-3', title: 'Third Story' }),
     ];
-    
+
     render(<StoriesGrid stories={stories} />);
-    
+
     expect(screen.getByTestId('story-card-story-1')).toBeInTheDocument();
     expect(screen.getByTestId('story-card-story-2')).toBeInTheDocument();
     expect(screen.getByTestId('story-card-story-3')).toBeInTheDocument();
@@ -164,7 +164,7 @@ describe('StoriesGrid', () => {
   it('handles large number of stories', () => {
     const stories = createMockStories(20);
     render(<StoriesGrid stories={stories} />);
-    
+
     const cards = screen.getAllByTestId(/story-card-/);
     expect(cards).toHaveLength(20);
   });
@@ -172,12 +172,15 @@ describe('StoriesGrid', () => {
   it('maintains grid structure with mixed content', () => {
     const stories = [
       createMockStory({ id: 'short', title: 'Short' }),
-      createMockStory({ id: 'long', title: 'Very Long Story Title That Might Wrap' }),
+      createMockStory({
+        id: 'long',
+        title: 'Very Long Story Title That Might Wrap',
+      }),
       createMockStory({ id: 'medium', title: 'Medium Length Title' }),
     ];
-    
+
     render(<StoriesGrid stories={stories} />);
-    
+
     const grid = document.querySelector('.grid');
     expect(grid).toHaveClass('grid', 'gap-4');
     expect(grid?.children).toHaveLength(3);

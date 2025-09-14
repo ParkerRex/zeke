@@ -9,13 +9,6 @@ import {
   CollapsibleTrigger,
 } from '@zeke/design-system/components/ui/collapsible';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@zeke/design-system/components/ui/dropdown-menu';
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -36,21 +29,13 @@ import {
 import { cn } from '@zeke/design-system/lib/utils';
 import { NotificationsTrigger } from '@zeke/notifications/components/trigger';
 import {
-  AnchorIcon,
   BookOpenIcon,
-  BotIcon,
   ChevronRightIcon,
   FolderIcon,
-  FrameIcon,
   LifeBuoyIcon,
-  MapIcon,
-  MoreHorizontalIcon,
-  PieChartIcon,
   SendIcon,
   Settings2Icon,
-  ShareIcon,
   SquareTerminalIcon,
-  Trash2Icon,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -211,11 +196,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                 <UserButton />
                 <div className="flex shrink-0 items-center gap-px">
                   <ModeToggle />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0"
-                  >
+                  <Button variant="ghost" size="icon" className="shrink-0">
                     <div className="h-4 w-4">
                       <NotificationsTrigger />
                     </div>

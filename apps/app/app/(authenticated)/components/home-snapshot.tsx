@@ -1,8 +1,7 @@
 'use client';
-import { StoryKindIcon } from './story-kind-icon';
-import type { Cluster } from '@zeke/supabase/types';
 import { Button } from '@zeke/design-system/components/ui/button';
 import { Input } from '@zeke/design-system/components/ui/input';
+import type { Cluster } from '@zeke/supabase/types';
 import { useEffect, useState } from 'react';
 import { GiHorseHead } from 'react-icons/gi';
 import {
@@ -13,6 +12,7 @@ import {
   IoSearch,
   IoTrendingUp,
 } from 'react-icons/io5';
+import { StoryKindIcon } from './story-kind-icon';
 
 export default function HomeSnapshot() {
   const [clusters, setClusters] = useState<Cluster[]>([]);

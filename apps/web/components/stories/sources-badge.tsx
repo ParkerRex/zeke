@@ -12,10 +12,7 @@ interface SourcesBadgeProps {
 
 export function SourcesBadge({ count, className }: SourcesBadgeProps) {
   return (
-    <Badge 
-      variant="secondary" 
-      className={cn("text-xs font-medium", className)}
-    >
+    <Badge variant="secondary" className={cn('font-medium text-xs', className)}>
       {count} source{count !== 1 ? 's' : ''}
     </Badge>
   );

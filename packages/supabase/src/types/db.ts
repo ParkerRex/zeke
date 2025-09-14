@@ -728,7 +728,7 @@ export type Database = {
       };
       l2_normalize: {
         Args: { '': string } | { '': unknown } | { '': unknown };
-        Returns: string;
+        Returns: unknown;
       };
       refresh_source_metrics: {
         Args: { _source_id?: string };

@@ -1,45 +1,45 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react';
 import {
-	ToggleGroup,
-	ToggleGroupItem,
-} from "@zeke/design-system/components/ui/toggle-group";
-import { Bold, Italic, Underline } from "lucide-react";
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@zeke/design-system/components/ui/toggle-group';
+import { Bold, Italic, Underline } from 'lucide-react';
 
 /**
  * A set of two-state buttons that can be toggled on or off.
  */
 const meta = {
-	title: "ui/ToggleGroup",
-	component: ToggleGroup,
-	tags: ["autodocs"],
-	argTypes: {
-		type: {
-			options: ["multiple", "single"],
-			control: { type: "radio" },
-		},
-	},
-	args: {
-		variant: "default",
-		size: "default",
-		type: "multiple",
-		disabled: false,
-	},
-	render: (args) => (
-		<ToggleGroup {...args}>
-			<ToggleGroupItem value="bold" aria-label="Toggle bold">
-				<Bold className="h-4 w-4" />
-			</ToggleGroupItem>
-			<ToggleGroupItem value="italic" aria-label="Toggle italic">
-				<Italic className="h-4 w-4" />
-			</ToggleGroupItem>
-			<ToggleGroupItem value="underline" aria-label="Toggle underline">
-				<Underline className="h-4 w-4" />
-			</ToggleGroupItem>
-		</ToggleGroup>
-	),
-	parameters: {
-		layout: "centered",
-	},
+  title: 'ui/ToggleGroup',
+  component: ToggleGroup,
+  tags: ['autodocs'],
+  argTypes: {
+    type: {
+      options: ['multiple', 'single'],
+      control: { type: 'radio' },
+    },
+  },
+  args: {
+    variant: 'default',
+    size: 'default',
+    type: 'multiple',
+    disabled: false,
+  },
+  render: (args) => (
+    <ToggleGroup {...args}>
+      <ToggleGroupItem value="bold" aria-label="Toggle bold">
+        <Bold className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="italic" aria-label="Toggle italic">
+        <Italic className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="underline" aria-label="Toggle underline">
+        <Underline className="h-4 w-4" />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  ),
+  parameters: {
+    layout: 'centered',
+  },
 } satisfies Meta<typeof ToggleGroup>;
 
 export default meta;
@@ -56,9 +56,9 @@ export const Default: Story = {};
  * while keeping them visually cohesive.
  */
 export const Outline: Story = {
-	args: {
-		variant: "outline",
-	},
+  args: {
+    variant: 'outline',
+  },
 };
 
 /**
@@ -66,9 +66,9 @@ export const Outline: Story = {
  * group, allowing only one button to be active at a time.
  */
 export const Single: Story = {
-	args: {
-		type: "single",
-	},
+  args: {
+    type: 'single',
+  },
 };
 
 /**
@@ -76,9 +76,9 @@ export const Single: Story = {
  * smaller buttons for spaces with limited real estate.
  */
 export const Small: Story = {
-	args: {
-		size: "sm",
-	},
+  args: {
+    size: 'sm',
+  },
 };
 
 /**
@@ -86,16 +86,16 @@ export const Small: Story = {
  * larger buttons for emphasis.
  */
 export const Large: Story = {
-	args: {
-		size: "lg",
-	},
+  args: {
+    size: 'lg',
+  },
 };
 
 /**
  * Add the `disabled` prop to a button to prevent interactions.
  */
 export const Disabled: Story = {
-	args: {
-		disabled: true,
-	},
+  args: {
+    disabled: true,
+  },
 };

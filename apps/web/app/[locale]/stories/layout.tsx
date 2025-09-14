@@ -17,23 +17,20 @@ export const generateMetadata = async ({
   params,
 }: StoriesLayoutProps): Promise<Metadata> => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return createMetadata({
     title: 'Stories - ZEKE Research Intelligence',
-    description: 'Browse AI research stories compressed from hours of content into verified insights with receipts.',
+    description:
+      'Browse AI research stories compressed from hours of content into verified insights with receipts.',
   });
 };
 
 const StoriesLayout = async ({ children, params }: StoriesLayoutProps) => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
 
 export default StoriesLayout;

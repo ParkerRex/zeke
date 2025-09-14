@@ -176,8 +176,8 @@
   --color-link-hover: var(--color-blue-600);
 
   /* Typography */
-  --font-heading:
-    "Mozilla Headline", "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "Mozilla Headline", "Inter", system-ui, -apple-system,
+    sans-serif;
   --font-body: "Mozilla Text", "Inter", system-ui, -apple-system, sans-serif;
   --font-firefox: "Metropolis", "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "Consolas", "Monaco", "Andale Mono", "Ubuntu Mono", monospace;
@@ -492,22 +492,16 @@
 
 /* Mozilla-specific shadow styles */
 .shadow-mozilla-sm {
-  box-shadow:
-    0 8px 12px 1px rgba(29, 17, 51, 0.04),
-    0 3px 16px 2px rgba(9, 32, 77, 0.12),
-    0 5px 10px -3px rgba(29, 17, 51, 0.12);
+  box-shadow: 0 8px 12px 1px rgba(29, 17, 51, 0.04), 0 3px 16px 2px
+    rgba(9, 32, 77, 0.12), 0 5px 10px -3px rgba(29, 17, 51, 0.12);
 }
 
 .shadow-mozilla-md {
-  box-shadow:
-    0 16px 24px 2px rgba(29, 17, 51, 0.04),
-    0 6px 32px 4px rgba(9, 32, 77, 0.12),
-    0 8px 12px -5px rgba(29, 17, 51, 0.12);
+  box-shadow: 0 16px 24px 2px rgba(29, 17, 51, 0.04), 0 6px 32px 4px
+    rgba(9, 32, 77, 0.12), 0 8px 12px -5px rgba(29, 17, 51, 0.12);
 }
 
 .shadow-mozilla-lg {
-  box-shadow:
-    0 24px 38px 3px rgba(29, 17, 51, 0.04),
-    0 10px 48px 8px rgba(9, 32, 77, 0.12),
-    0 12px 16px -6px rgba(29, 17, 51, 0.12);
+  box-shadow: 0 24px 38px 3px rgba(29, 17, 51, 0.04), 0 10px 48px 8px
+    rgba(9, 32, 77, 0.12), 0 12px 16px -6px rgba(29, 17, 51, 0.12);
 }

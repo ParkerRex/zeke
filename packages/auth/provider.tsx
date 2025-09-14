@@ -46,7 +46,7 @@ export const AuthProvider = ({
   }, []);
 
   // Store URLs for potential use in auth flows
-  const authConfig = {
+  const _authConfig = {
     privacyUrl,
     termsUrl,
     helpUrl,

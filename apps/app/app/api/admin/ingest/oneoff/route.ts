@@ -1,5 +1,5 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 type WorkerOneOffResponse = {
   ok: boolean;
@@ -7,7 +7,7 @@ type WorkerOneOffResponse = {
 };
 
 async function postWorkerOneOff(urls: string[]): Promise<WorkerOneOffResponse> {
-  const DEFAULT_LOCAL_PORTS = ["8082", "8081", "8080"] as const;
+  const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
     process.env.WORKER_HTTP_PORT,
@@ -20,8 +20,8 @@ async function postWorkerOneOff(urls: string[]): Promise<WorkerOneOffResponse> {
       const TIMEOUT_MS = 5000;
       const t = setTimeout(() => ac.abort(), TIMEOUT_MS);
       const res = await fetch(`http://127.0.0.1:${port}/debug/ingest-oneoff`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ urls }),
         signal: ac.signal,
       });
@@ -45,7 +45,7 @@ export async function POST(req: Request): Promise<Response> {
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
@@ -57,13 +57,13 @@ export async function POST(req: Request): Promise<Response> {
     const rawUrls = body?.urls as unknown;
     const urls = Array.isArray(rawUrls)
       ? rawUrls.filter(
-          (x): x is string => typeof x === "string" && x.trim().length > 0
+          (x): x is string => typeof x === 'string' && x.trim().length > 0
         )
       : [];
     if (urls.length === 0) {
       const HTTP_BAD_REQUEST = 400;
       return NextResponse.json(
-        { ok: false, error: "no_urls" },
+        { ok: false, error: 'no_urls' },
         { status: HTTP_BAD_REQUEST }
       );
     }

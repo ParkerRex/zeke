@@ -7,31 +7,31 @@ import {
   IoLogoYoutube,
   IoNewspaper,
   IoShieldCheckmark,
-} from "react-icons/io5";
+} from 'react-icons/io5';
 
-import { cn } from "@zeke/design-system/lib/utils";
+import { cn } from '@zeke/design-system/lib/utils';
 
 export function WorkspacePreview({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative rounded-lg border border-gray-200 bg-white/80 p-4 lg:p-6",
+        'relative rounded-lg border border-gray-200 bg-white/80 p-4 lg:p-6',
         className
       )}
     >
       {/* Top Tabs */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {[
-          "OpenAI safety update",
-          "Meta releases Llama 3.2",
-          "Anthropic Claude 3.5",
+          'OpenAI safety update',
+          'Meta releases Llama 3.2',
+          'Anthropic Claude 3.5',
         ].map((t, i) => (
           <div
             className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
+              'rounded-md border px-3 py-1.5 text-sm',
               i === 1
-                ? "border-cyan-500/40 bg-cyan-500/10 text-black"
-                : "border-gray-200 text-gray-700"
+                ? 'border-cyan-500/40 bg-cyan-500/10 text-black'
+                : 'border-gray-200 text-gray-700'
             )}
             key={t}
           >
@@ -64,16 +64,16 @@ export function WorkspacePreview({ className }: { className?: string }) {
         <aside className="col-span-12 h-full min-h-[120px] rounded-md border border-gray-200 bg-gray-50 p-3 sm:col-span-2">
           <nav className="flex flex-col gap-2 text-sm">
             {[
-              { label: "Today", icon: IoList },
-              { label: "Sector", icon: IoShieldCheckmark },
-              { label: "Company", icon: IoAlbums },
-              { label: "Tools", icon: IoNewspaper },
-              { label: "Leaderboards", icon: IoFlame },
+              { label: 'Today', icon: IoList },
+              { label: 'Sector', icon: IoShieldCheckmark },
+              { label: 'Company', icon: IoAlbums },
+              { label: 'Tools', icon: IoNewspaper },
+              { label: 'Leaderboards', icon: IoFlame },
             ].map(({ label, icon: Icon }, idx) => (
               <span
                 className={cn(
-                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-gray-700 transition-all duration-150 hover:bg-gray-100",
-                  idx === 0 && "bg-gray-100 text-black"
+                  'flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-gray-700 transition-all duration-150 hover:bg-gray-100',
+                  idx === 0 && 'bg-gray-100 text-black'
                 )}
                 key={label}
               >

@@ -1,8 +1,8 @@
-import z from "zod";
+import z from 'zod';
 
 // Accept either 'pro' or 'Pro' in metadata; normalize to 'pro' for UI mapping.
-const rawPriceCardVariantSchema = z.enum(["pro", "Pro"]);
-export const priceCardVariantSchema = z.enum(["pro"]);
+const rawPriceCardVariantSchema = z.enum(['pro', 'Pro']);
+export const priceCardVariantSchema = z.enum(['pro']);
 
 // Product metadata now focuses on: price (optional, if provided in metadata),
 // the card variant, and support level which we standardize to 'founder chat'.
@@ -16,20 +16,20 @@ export const productMetadataSchema = z
   })
   .transform((data) => {
     const normalizedVariant = (
-      typeof data.price_card_variant === "string"
+      typeof data.price_card_variant === 'string'
         ? data.price_card_variant.toLowerCase()
         : data.price_card_variant
     ) as z.infer<typeof priceCardVariantSchema>;
 
     const price =
-      typeof data.price === "string"
+      typeof data.price === 'string'
         ? Number.parseFloat(data.price)
         : data.price;
 
     return {
       priceCardVariant: normalizedVariant,
       price, // in whatever unit provided (recommend USD dollars)
-      supportLevel: "founder chat" as const,
+      supportLevel: 'founder chat' as const,
     };
   });
 

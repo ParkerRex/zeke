@@ -3,18 +3,22 @@
  */
 
 import { Badge } from '@zeke/design-system/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@zeke/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from '@zeke/design-system/components/ui/card';
 import { cn } from '@zeke/design-system/lib/utils';
 import type { Cluster } from '@zeke/supabase/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  deterministicPercent, 
-  domainFromUrl, 
-  getKindLabel, 
-  hypePercent, 
+import {
+  MIN_SOURCES_COUNT,
+  deterministicPercent,
+  domainFromUrl,
+  getKindLabel,
+  hypePercent,
   imageFor,
-  MIN_SOURCES_COUNT 
 } from '../../lib/stories-utils';
 import { CoverageBar } from './coverage-bar';
 import { HypeBar } from './hype-bar';
@@ -35,7 +39,7 @@ export function StoryCard({
   showHype = false,
   showImage = true,
   showTimestamp = true,
-  className
+  className,
 }: StoryCardProps) {
   const img = imageFor(story);
   const coverage = deterministicPercent(story.id);
@@ -47,12 +51,14 @@ export function StoryCard({
   const isCompact = variant === 'compact';
 
   return (
-    <Card className={cn(
-      "overflow-hidden transition-all duration-200 hover:shadow-md",
-      isCompact && "h-fit",
-      className
-    )}>
-      <CardContent className={cn("p-3", isCompact && "p-2")}>
+    <Card
+      className={cn(
+        'overflow-hidden transition-all duration-200 hover:shadow-md',
+        isCompact && 'h-fit',
+        className
+      )}
+    >
+      <CardContent className={cn('p-3', isCompact && 'p-2')}>
         {/* Header with metadata */}
         <div className="mb-2 flex items-start justify-between">
           <Badge variant="outline" className="text-xs">
@@ -63,10 +69,12 @@ export function StoryCard({
 
         {/* Title */}
         <CardHeader className="p-0 pb-2">
-          <h3 className={cn(
-            "font-semibold leading-snug",
-            isCompact ? "text-sm" : "text-base"
-          )}>
+          <h3
+            className={cn(
+              'font-semibold leading-snug',
+              isCompact ? 'text-sm' : 'text-base'
+            )}
+          >
             <Link
               className="hover:underline"
               href={`/stories/${encodeURIComponent(story.id)}`}
@@ -88,18 +96,15 @@ export function StoryCard({
 
         {/* Image */}
         {showImage && (
-          <div className={cn(
-            "relative overflow-hidden rounded",
-            isCompact ? "h-[100px]" : "h-[150px]"
-          )}>
-            <Image
-              alt={story.title}
-              className="object-cover"
-              fill
-              src={img}
-            />
+          <div
+            className={cn(
+              'relative overflow-hidden rounded',
+              isCompact ? 'h-[100px]' : 'h-[150px]'
+            )}
+          >
+            <Image alt={story.title} className="object-cover" fill src={img} />
             {showTimestamp && (
-              <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-xs text-white">
+              <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-white text-xs">
                 1 hour ago
               </div>
             )}

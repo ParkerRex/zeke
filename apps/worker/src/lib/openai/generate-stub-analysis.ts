@@ -11,8 +11,8 @@ import {
   TEXT_LENGTH_THRESHOLD,
   TEXT_MIN_LENGTH,
   TITLE_MIN_LENGTH,
-} from "./constants.js";
-import type { AnalysisInput, AnalysisResult } from "./types.js";
+} from './constants.js';
+import type { AnalysisInput, AnalysisResult } from './types.js';
 
 const WORD_SPLIT_PATTERN = /\s+/;
 
@@ -20,40 +20,40 @@ export function generateStubAnalysis(
   story: AnalysisInput
 ): Promise<AnalysisResult> {
   const textLength = story.text.length;
-  const titleWords = (story.title || "")
+  const titleWords = (story.title || '')
     .toLowerCase()
     .split(WORD_SPLIT_PATTERN);
 
   const hasImportantKeywords = titleWords.some((word) =>
     [
-      "ai",
-      "artificial",
-      "intelligence",
-      "breakthrough",
-      "security",
-      "privacy",
-      "data",
+      'ai',
+      'artificial',
+      'intelligence',
+      'breakthrough',
+      'security',
+      'privacy',
+      'data',
     ].includes(word)
   );
 
   const domain = story.canonical_url
     ? new URL(story.canonical_url).hostname
-    : "unknown";
-  const isReliableSource = ["arstechnica.com", "news.ycombinator.com"].includes(
+    : 'unknown';
+  const isReliableSource = ['arstechnica.com', 'news.ycombinator.com'].includes(
     domain
   );
 
-  let why_it_matters = "";
+  let why_it_matters = '';
   if (hasImportantKeywords) {
     why_it_matters =
-      "• This story covers emerging technology trends that could impact how we work and live\n" +
-      "• The developments discussed may influence industry standards and practices\n" +
-      "• Understanding these changes helps stay informed about technological progress";
+      '• This story covers emerging technology trends that could impact how we work and live\n' +
+      '• The developments discussed may influence industry standards and practices\n' +
+      '• Understanding these changes helps stay informed about technological progress';
   } else {
     why_it_matters =
-      "• This story provides insights into current industry developments\n" +
-      "• The information may be relevant for understanding market trends\n" +
-      "• Staying informed about these topics helps with professional awareness";
+      '• This story provides insights into current industry developments\n' +
+      '• The information may be relevant for understanding market trends\n' +
+      '• Staying informed about these topics helps with professional awareness';
   }
 
   let chili = CHILI_DEFAULT;

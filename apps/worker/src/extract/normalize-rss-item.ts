@@ -1,13 +1,13 @@
-import { canonicalizeUrl } from "../util.js";
+import { canonicalizeUrl } from '../util.js';
 
 export type ParsedText =
   | string
-  | { "#text"?: string; href?: string }
+  | { '#text'?: string; href?: string }
   | null
   | undefined;
 
 export type RssItem = {
-  guid?: string | { "#text"?: string };
+  guid?: string | { '#text'?: string };
   id?: string;
   link?: string | { href?: string };
   title?: string;
@@ -26,9 +26,9 @@ export function normalizeRssItem(
   item: RssItem,
   _sourceUrl: string
 ): NormalizedRssItem | null {
-  const guid = getText(item.guid) || item.id || getText(item.link) || "";
-  const link = canonicalizeUrl(getText(item.link) || "");
-  if (guid === "" && link === "") {
+  const guid = getText(item.guid) || item.id || getText(item.link) || '';
+  const link = canonicalizeUrl(getText(item.link) || '');
+  if (guid === '' && link === '') {
     return null;
   }
 
@@ -46,13 +46,13 @@ function getText(v: ParsedText): string | undefined {
   if (v == null) {
     return;
   }
-  if (typeof v === "string") {
+  if (typeof v === 'string') {
     return v;
   }
-  if (typeof v === "object" && "#text" in v) {
-    return v["#text"] as string;
+  if (typeof v === 'object' && '#text' in v) {
+    return v['#text'] as string;
   }
-  if (typeof v === "object" && "href" in v) {
+  if (typeof v === 'object' && 'href' in v) {
     return v.href as string;
   }
   return;

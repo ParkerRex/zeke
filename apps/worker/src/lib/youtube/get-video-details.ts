@@ -1,8 +1,8 @@
-import type { youtube_v3 } from "googleapis";
-import { log } from "../../log.js";
-import { withRetry } from "../../utils/retry.js";
-import type { YouTubeVideo } from "./types.js";
-import type { YouTubeClient } from "./youtube-client.js";
+import type { youtube_v3 } from 'googleapis';
+import { log } from '../../log.js';
+import { withRetry } from '../../utils/retry.js';
+import type { YouTubeVideo } from './types.js';
+import type { YouTubeClient } from './youtube-client.js';
 
 const VIDEO_DETAILS_QUOTA_COST = 1;
 const MAX_VIDEOS_PER_REQUEST = 50;
@@ -23,11 +23,11 @@ function parseVideoItem(item: youtube_v3.Schema$Video): YouTubeVideo | null {
 
   return {
     videoId: item.id,
-    title: item.snippet.title || "",
-    description: item.snippet.description || "",
-    publishedAt: item.snippet.publishedAt || "",
-    channelId: item.snippet.channelId || "",
-    channelTitle: item.snippet.channelTitle || "",
+    title: item.snippet.title || '',
+    description: item.snippet.description || '',
+    publishedAt: item.snippet.publishedAt || '',
+    channelId: item.snippet.channelId || '',
+    channelTitle: item.snippet.channelTitle || '',
     thumbnailUrl: item.snippet.thumbnails?.medium?.url || undefined,
     duration: item.contentDetails?.duration || undefined,
     viewCount: item.statistics?.viewCount
@@ -45,7 +45,7 @@ async function fetchVideoChunk(
 ): Promise<YouTubeVideo[]> {
   const response = await withRetry(() =>
     client.youtube.videos.list({
-      part: ["snippet", "statistics", "contentDetails"],
+      part: ['snippet', 'statistics', 'contentDetails'],
       id: chunk,
     })
   );
@@ -69,7 +69,7 @@ export async function getVideoDetails(
   }
 
   try {
-    log("youtube_get_video_details_start", {
+    log('youtube_get_video_details_start', {
       videoCount: videoIds.length,
       videoIds: videoIds.slice(0, SAMPLE_VIDEO_IDS_COUNT),
     });
@@ -82,7 +82,7 @@ export async function getVideoDetails(
       allVideos.push(...videos);
     }
 
-    log("youtube_get_video_details_complete", {
+    log('youtube_get_video_details_complete', {
       requestedCount: videoIds.length,
       foundCount: allVideos.length,
       quotaUsed: chunks.length * VIDEO_DETAILS_QUOTA_COST,
@@ -91,12 +91,12 @@ export async function getVideoDetails(
     return allVideos;
   } catch (error) {
     log(
-      "youtube_get_video_details_error",
+      'youtube_get_video_details_error',
       {
         videoCount: videoIds.length,
         error: String(error),
       },
-      "error"
+      'error'
     );
     throw error;
   }

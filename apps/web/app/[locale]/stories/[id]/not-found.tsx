@@ -3,8 +3,14 @@
  */
 
 import { Button } from '@zeke/design-system/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@zeke/design-system/components/ui/card';
-import { FileQuestion, ArrowLeft, Search } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@zeke/design-system/components/ui/card';
+import { ArrowLeft, FileQuestion, Search } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NotFound() {
@@ -20,14 +26,14 @@ export default function NotFound() {
             The story you're looking for doesn't exist or may have been removed.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4 text-center">
-          <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="space-y-2 text-muted-foreground text-sm">
             <p>• The story ID might be incorrect</p>
             <p>• The story may have been archived</p>
             <p>• Try searching for similar content</p>
           </div>
-          
+
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Button asChild>
               <Link href="/stories" className="flex items-center gap-2">

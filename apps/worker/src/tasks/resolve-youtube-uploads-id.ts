@@ -1,7 +1,7 @@
-import { updateSourceMetadata } from "../db.js";
-import { searchChannels } from "../lib/youtube/search-channels.js";
-import { createYouTubeClient } from "../lib/youtube/youtube-client.js";
-import { log } from "../log.js";
+import { updateSourceMetadata } from '../db.js';
+import { searchChannels } from '../lib/youtube/search-channels.js';
+import { createYouTubeClient } from '../lib/youtube/youtube-client.js';
+import { log } from '../log.js';
 
 const YOUTUBE_HANDLE_REGEX = /@([A-Za-z0-9_\-.]+)/;
 
@@ -17,18 +17,18 @@ export async function resolveYouTubeUploadsId(input: {
   }
 
   const client = createYouTubeClient();
-  let query = "";
-  if (typeof input.url === "string" && input.url.includes("youtube.com/")) {
+  let query = '';
+  if (typeof input.url === 'string' && input.url.includes('youtube.com/')) {
     const match = input.url.match(YOUTUBE_HANDLE_REGEX);
     if (match) {
       query = match[1];
     }
   }
-  if (!query && typeof input.name === "string") {
+  if (!query && typeof input.name === 'string') {
     query = input.name;
   }
 
-  log("youtube_derive_uploads_id_start", { source_id: input.sourceId, query });
+  log('youtube_derive_uploads_id_start', { source_id: input.sourceId, query });
   const candidates = await searchChannels(client, query);
   const chosen = candidates[0];
   if (!chosen?.uploadsPlaylistId) {
@@ -44,13 +44,13 @@ export async function resolveYouTubeUploadsId(input: {
     });
   } catch (e) {
     log(
-      "youtube_derive_uploads_id_persist_error",
+      'youtube_derive_uploads_id_persist_error',
       { source_id: input.sourceId, err: String(e) },
-      "warn"
+      'warn'
     );
   }
 
-  log("youtube_derive_uploads_id_success", {
+  log('youtube_derive_uploads_id_success', {
     source_id: input.sourceId,
     uploadsPlaylistId: chosen.uploadsPlaylistId,
   });

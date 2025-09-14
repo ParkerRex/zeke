@@ -18,7 +18,7 @@ interface TopStoriesSectionProps {
 }
 
 export async function TopStoriesSection({
-  title = "Top Stories",
+  title = 'Top Stories',
   limit = DEFAULT_STORIES_LIMIT,
   showDate = true,
   stories,
@@ -36,26 +36,24 @@ export async function TopStoriesSection({
           </div>
         )}
       </div>
-      
+
       {/* Decorative multi-rule under heading */}
       <div className="mb-4 space-y-[2px]">
         <div className="h-[2px] bg-foreground" />
         <div className="h-[2px] bg-foreground" />
         <div className="h-[1px] bg-foreground" />
       </div>
-      
+
       <StoriesGrid
         stories={grid}
         variant="featured"
         showHype={true}
         columns={{ sm: 2, lg: 3 }}
       />
-      
+
       <div className="mt-4">
         <Button variant="outline" asChild>
-          <Link href="/stories">
-            Show More
-          </Link>
+          <Link href="/stories">Show More</Link>
         </Button>
       </div>
     </section>

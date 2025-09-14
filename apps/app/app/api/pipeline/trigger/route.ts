@@ -1,10 +1,10 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 type WorkerTriggerResponse = { ok: boolean; port?: string };
 
 async function postWorker(path: string): Promise<WorkerTriggerResponse> {
-  const DEFAULT_LOCAL_PORTS = ["8082", "8081", "8080"] as const;
+  const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
     process.env.WORKER_HTTP_PORT,
@@ -17,7 +17,7 @@ async function postWorker(path: string): Promise<WorkerTriggerResponse> {
       const TIMEOUT_MS = 2000;
       const t = setTimeout(() => ac.abort(), TIMEOUT_MS);
       const res = await fetch(`http://127.0.0.1:${port}${path}`, {
-        method: "POST",
+        method: 'POST',
         signal: ac.signal,
       });
       clearTimeout(t);
@@ -36,16 +36,16 @@ export async function POST(req: Request): Promise<Response> {
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
   try {
-    const { kind } = (await req.json().catch(() => ({ kind: "rss" }))) as {
+    const { kind } = (await req.json().catch(() => ({ kind: 'rss' }))) as {
       kind?: unknown;
     };
     const path =
-      kind === "youtube" ? "/debug/ingest-youtube" : "/debug/ingest-now";
+      kind === 'youtube' ? '/debug/ingest-youtube' : '/debug/ingest-now';
     const result = await postWorker(path);
     const HTTP_OK = 200;
     const HTTP_SERVICE_UNAVAILABLE = 503;

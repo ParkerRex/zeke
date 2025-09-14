@@ -3,9 +3,9 @@
  * Promotional card with image and call-to-action
  */
 
+import { env } from '@/env';
 import { Button } from '@zeke/design-system/components/ui/button';
 import { Card, CardContent } from '@zeke/design-system/components/ui/card';
-import { env } from '@/env';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,14 +13,14 @@ export function PromoCard() {
   return (
     <Card className="overflow-hidden">
       <div className="relative h-[180px]">
-        <Image 
-          alt="Promotional background" 
-          className="object-cover" 
-          fill 
-          src="/hero-shape.png" 
+        <Image
+          alt="Promotional background"
+          className="object-cover"
+          fill
+          src="/hero-shape.png"
         />
       </div>
-      
+
       <CardContent className="p-4">
         <h3 className="font-semibold text-xl">First 100 Days</h3>
         <p className="mt-1 text-muted-foreground text-sm">

@@ -1,6 +1,6 @@
 import 'server-only';
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient, getUser as getUserFromClient } from './clients/server';
+import { getUser as getUserFromClient } from './clients/server';
 
 /**
  * Get the current authenticated user
@@ -19,7 +19,7 @@ export async function currentUser() {
  */
 export async function auth() {
   const user = await currentUser();
-  
+
   return {
     user,
     redirectToSignIn: () => {

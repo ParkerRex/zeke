@@ -15,7 +15,7 @@ interface LatestStoriesSectionProps {
 }
 
 export async function LatestStoriesSection({
-  title = "Latest Stories",
+  title = 'Latest Stories',
   stories,
   limit = DEFAULT_STORIES_LIMIT,
 }: LatestStoriesSectionProps) {
@@ -25,18 +25,15 @@ export async function LatestStoriesSection({
   return (
     <section className="mt-8">
       <h2 className="mb-2 font-bold text-2xl">{title}</h2>
-      
+
       {/* Decorative multi-rule under heading */}
       <div className="mb-4 space-y-[2px]">
         <div className="h-[2px] bg-foreground" />
         <div className="h-[2px] bg-foreground" />
         <div className="h-[1px] bg-foreground" />
       </div>
-      
-      <StoriesGrid
-        stories={grid}
-        columns={{ sm: 2, lg: 2, xl: 3 }}
-      />
+
+      <StoriesGrid stories={grid} columns={{ sm: 2, lg: 2, xl: 3 }} />
     </section>
   );
 }

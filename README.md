@@ -141,6 +141,88 @@ Tests:
 - Type checking
 - Build processes
 
+## VS Code Debugging
+
+ZEKE includes comprehensive VS Code debugging configurations optimized for the multi-service architecture. The setup supports debugging across Next.js apps, Node.js worker processes, and client-side code.
+
+### Quick Start
+
+1. **Open VS Code** in the project root
+2. **Press F5** or go to Run & Debug panel (Ctrl/Cmd+Shift+D)
+3. **Choose your debugging scenario** from the dropdown
+
+### Debug Configurations
+
+#### 🚀 **Full Stack Development**
+- **ZEKE: Full Stack (All Services)** - Starts all services with `pnpm dev`
+- **ZEKE: Full Pipeline Debug** - Adds debug logging with `DEBUG=zeke:*`
+
+#### 📱 **Individual Services**
+- **Dashboard App (port 3000)** - Main user interface
+- **Marketing Web (port 3001)** - Landing/marketing site
+- **Worker (Node.js)** - Background processing with tsx watch
+- **Email Templates (port 3003)** - React Email development
+- **Supabase Local** - Database services
+
+#### ⚙️ **Worker Debugging** (News Intelligence Pipeline)
+- **Worker: Debug with Breakpoints** - Direct Node.js debugging with breakpoints
+- **Worker: Docker Container** - Production-like container debugging
+
+#### 🌐 **Browser Debugging**
+- **Chrome: Dashboard App** - Client-side debugging at localhost:3000
+- **Chrome: Marketing Site** - Client-side debugging at localhost:3001
+- **Chrome: Email Templates** - Email template preview at localhost:3003
+- **Chrome: Supabase Studio** - Database management at localhost:54323
+
+#### 🔧 **Advanced Full-Stack**
+- **Dashboard: Full Stack Debug** - Server + client debugging with Edge runtime
+- **Marketing: Full Stack Debug** - Complete marketing site debugging
+
+### Debugging Workflows
+
+#### **News Pipeline Debugging**
+Perfect for debugging RSS ingestion, content extraction, and LLM analysis:
+
+1. Set breakpoints in worker code (`apps/worker/src/`)
+2. Launch **"🔍 Worker: Debug with Breakpoints"**
+3. Trigger ingestion via dashboard or API calls
+4. Step through the entire pipeline from source to analysis
+
+#### **Full-Stack Feature Development**
+Debug interactions between frontend, API routes, and background processing:
+
+1. Launch **"🔧 Dashboard: Full Stack Debug"**
+2. Set breakpoints in both client and server code
+3. Debug user actions that trigger background jobs
+4. Monitor real-time data flow from UI to worker to database
+
+#### **Multi-Service Coordination**
+Debug complex interactions across services:
+
+1. Launch **"🚀 ZEKE: Full Pipeline Debug"** for logging
+2. Use individual service debuggers for specific breakpoints
+3. Monitor logs and breakpoints across all services simultaneously
+
+### Debugging Features
+
+- **Organized configurations** grouped by purpose and service
+- **Proper working directories** for each service
+- **Environment variables** configured for development
+- **Source maps** enabled for TypeScript debugging
+- **Skip node internals** for cleaner debugging experience
+- **Integrated terminal** support for background processes
+
+### Supporting Tasks
+
+The setup includes VS Code tasks for common operations:
+- **build-worker** - Compile worker TypeScript
+- **dev-setup** - Run full development setup
+- **test-pipeline** - Validate entire pipeline
+- **supabase-start/stop** - Database service management
+- **worker-logs** - View Docker container logs
+
+Access tasks via **Ctrl/Cmd+Shift+P** → "Tasks: Run Task"
+
 ## Stripe Integration (Optional)
 
 For payment features, set up Stripe webhooks:

@@ -1,11 +1,11 @@
-import { getAdminFlag } from "@zeke/supabase/queries";
-import { NextResponse } from "next/server";
-import { supabaseAdminClient } from "@zeke/supabase/admin";
+import { supabaseAdminClient } from '@zeke/supabase/admin';
+import { getAdminFlag } from '@zeke/supabase/queries';
+import { NextResponse } from 'next/server';
 
 type WorkerStatus = Record<string, unknown> & { port?: string };
 
 async function fetchWorkerStatus(): Promise<WorkerStatus | null> {
-  const DEFAULT_LOCAL_PORTS = ["8082", "8081", "8080"] as const;
+  const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
     process.env.WORKER_HTTP_PORT,
@@ -29,7 +29,7 @@ async function fetchWorkerStatus(): Promise<WorkerStatus | null> {
       const t = setTimeout(() => ac.abort(), TIMEOUT_MS);
       const res = await fetch(`http://127.0.0.1:${port}/debug/status`, {
         signal: ac.signal,
-        cache: "no-store",
+        cache: 'no-store',
       });
       clearTimeout(t);
       if (!res.ok) {
@@ -49,7 +49,7 @@ export async function GET(): Promise<Response> {
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(
-      { ok: false, error: "forbidden" },
+      { ok: false, error: 'forbidden' },
       { status: HTTP_FORBIDDEN }
     );
   }
@@ -57,14 +57,14 @@ export async function GET(): Promise<Response> {
     const [worker, rawItems, contents, stories] = await Promise.all([
       fetchWorkerStatus(),
       supabaseAdminClient
-        .from("raw_items")
-        .select("id", { count: "exact", head: true }),
+        .from('raw_items')
+        .select('id', { count: 'exact', head: true }),
       supabaseAdminClient
-        .from("contents")
-        .select("id", { count: "exact", head: true }),
+        .from('contents')
+        .select('id', { count: 'exact', head: true }),
       supabaseAdminClient
-        .from("stories")
-        .select("id", { count: "exact", head: true }),
+        .from('stories')
+        .select('id', { count: 'exact', head: true }),
     ]);
 
     return NextResponse.json({

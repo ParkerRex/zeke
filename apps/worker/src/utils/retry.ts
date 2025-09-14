@@ -11,21 +11,30 @@ const SERVER_ERROR_MAX = 600;
 export function isRetryableDefault(error: unknown): boolean {
   const err = error as { code?: string; message?: string; status?: number };
   // Common transient network errors
-  if (err?.code === "ECONNRESET" || err?.code === "ETIMEDOUT") return true;
+  if (err?.code === 'ECONNRESET' || err?.code === 'ETIMEDOUT') {
+    return true;
+  }
 
   // HTTP 429 and 5xx
-  if (typeof err?.status === "number") {
-    if (err.status === 429) return true;
-    if (err.status >= SERVER_ERROR_MIN && err.status < SERVER_ERROR_MAX)
+  if (typeof err?.status === 'number') {
+    if (err.status === 429) {
       return true;
+    }
+    if (err.status >= SERVER_ERROR_MIN && err.status < SERVER_ERROR_MAX) {
+      return true;
+    }
   }
 
   // Generic hints in error message
-  const msg = String(err?.message || "");
-  if (msg.includes("rateLimitExceeded")) return true;
+  const msg = String(err?.message || '');
+  if (msg.includes('rateLimitExceeded')) {
+    return true;
+  }
 
   // Known non-retryable hints
-  if (msg.includes("quotaExceeded")) return false;
+  if (msg.includes('quotaExceeded')) {
+    return false;
+  }
 
   return false;
 }
@@ -46,7 +55,9 @@ export async function withRetry<T>(
       return await operation();
     } catch (error) {
       const last = attempt === maxRetries;
-      if (!isRetryable(error) || last) throw error;
+      if (!isRetryable(error) || last) {
+        throw error;
+      }
 
       const backoff = baseDelayMs * 2 ** (attempt - 1);
       const delay = jitter
@@ -58,5 +69,5 @@ export async function withRetry<T>(
 
   // Unreachable due to early returns/throws
   // but required for type completeness
-  throw new Error("Max retries exceeded");
+  throw new Error('Max retries exceeded');
 }

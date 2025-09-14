@@ -1,8 +1,8 @@
-import { getSession } from "@zeke/supabase/queries";
-import Link from "next/link";
-import { IoLockClosed, IoSettingsSharp } from "react-icons/io5";
-import { Button } from "@zeke/design-system/components/ui/button";
-import LatestNewsSection from "./latest-news-section";
+import { Button } from '@zeke/design-system/components/ui/button';
+import { getSession } from '@zeke/supabase/queries';
+import Link from 'next/link';
+import { IoLockClosed, IoSettingsSharp } from 'react-icons/io5';
+import LatestNewsSection from './latest-news-section';
 
 export default async function PersonalizedNewsFeed() {
   const session = await getSession();

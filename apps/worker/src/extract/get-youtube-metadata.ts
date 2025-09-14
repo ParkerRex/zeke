@@ -1,5 +1,5 @@
-import { spawn } from "node:child_process";
-import { log } from "../log.js";
+import { spawn } from 'node:child_process';
+import { log } from '../log.js';
 
 export type VideoMetadata = {
   videoId: string;
@@ -25,34 +25,34 @@ export async function getVideoMetadata(
 ): Promise<VideoMetadata> {
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
   try {
-    log("youtube_metadata_extraction_start", { videoId });
+    log('youtube_metadata_extraction_start', { videoId });
 
     const ytDlpArgs = [
       videoUrl,
-      "--dump-json",
-      "--no-playlist",
-      "--socket-timeout",
-      "30",
+      '--dump-json',
+      '--no-playlist',
+      '--socket-timeout',
+      '30',
     ];
 
     const metadataPromise = new Promise<string>((resolve, reject) => {
-      const ytDlp = spawn("yt-dlp", ytDlpArgs);
-      let stdout = "";
-      let stderr = "";
-      ytDlp.stdout.on("data", (d) => {
+      const ytDlp = spawn('yt-dlp', ytDlpArgs);
+      let stdout = '';
+      let stderr = '';
+      ytDlp.stdout.on('data', (d) => {
         stdout += d.toString();
       });
-      ytDlp.stderr.on("data", (d) => {
+      ytDlp.stderr.on('data', (d) => {
         stderr += d.toString();
       });
-      ytDlp.on("close", (code) =>
+      ytDlp.on('close', (code) =>
         code === 0
           ? resolve(stdout)
           : reject(
               new Error(`yt-dlp metadata failed with code ${code}: ${stderr}`)
             )
       );
-      ytDlp.on("error", (error) =>
+      ytDlp.on('error', (error) =>
         reject(
           new Error(`Failed to spawn yt-dlp for metadata: ${error.message}`)
         )
@@ -61,7 +61,7 @@ export async function getVideoMetadata(
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
-        () => reject(new Error("Metadata extraction timeout")),
+        () => reject(new Error('Metadata extraction timeout')),
         METADATA_EXTRACTION_TIMEOUT_MS
       );
     });
@@ -71,19 +71,19 @@ export async function getVideoMetadata(
 
     const result: VideoMetadata = {
       videoId,
-      title: metadata.title || "",
+      title: metadata.title || '',
       duration: metadata.duration || 0,
       viewCount: metadata.view_count,
       likeCount: metadata.like_count,
-      uploadDate: metadata.upload_date || "",
-      uploader: metadata.uploader || metadata.channel || "",
-      description: metadata.description || "",
+      uploadDate: metadata.upload_date || '',
+      uploader: metadata.uploader || metadata.channel || '',
+      description: metadata.description || '',
       thumbnailUrl: metadata.thumbnail,
-      format: metadata.ext || "m4a",
+      format: metadata.ext || 'm4a',
       filesize: metadata.filesize,
     };
 
-    log("youtube_metadata_extraction_complete", {
+    log('youtube_metadata_extraction_complete', {
       videoId,
       title: result.title,
       duration: result.duration,
@@ -93,18 +93,18 @@ export async function getVideoMetadata(
     return result;
   } catch (error) {
     log(
-      "youtube_metadata_extraction_error",
+      'youtube_metadata_extraction_error',
       { videoId, error: String(error) },
-      "error"
+      'error'
     );
     return {
       videoId,
       title: `Video ${videoId}`,
       duration: 0,
-      uploadDate: new Date().toISOString().split("T")[0].replace(/-/g, ""),
-      uploader: "Unknown",
-      description: "",
-      format: "m4a",
+      uploadDate: new Date().toISOString().split('T')[0].replace(/-/g, ''),
+      uploader: 'Unknown',
+      description: '',
+      format: 'm4a',
     };
   }
 }

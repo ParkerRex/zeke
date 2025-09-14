@@ -36,7 +36,7 @@ export function TopicsStrip() {
           ))}
         </div>
       </section>
-      
+
       {/* Decorative multi‑rule */}
       <div className="bg-background dark:bg-slate-900">
         <div className="px-4">
@@ -45,7 +45,7 @@ export function TopicsStrip() {
           <div className="h-px bg-border/50" />
         </div>
       </div>
-      
+
       {/* Light spacer */}
       <div className="h-4 bg-muted/30" />
     </div>

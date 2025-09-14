@@ -1,9 +1,9 @@
 'use client';
-import { StoryKindIcon } from './story-kind-icon';
 import { useTabs } from '@/stores/tabsStore';
-import type { Cluster } from '@zeke/supabase/types';
 import { domainFromUrl } from '@/utils/url';
+import type { Cluster } from '@zeke/supabase/types';
 import { useRouter } from 'next/navigation';
+import { StoryKindIcon } from './story-kind-icon';
 
 export default function StoryRow({ cluster }: { cluster: Cluster }) {
   const { openTab } = useTabs();

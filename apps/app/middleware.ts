@@ -1,10 +1,18 @@
-import type { NextRequest } from 'next/server';
-
+import { env } from '@/env';
+import { logSecurityEvent } from '@/lib/monitoring/sentry-config';
 import { updateSession } from '@zeke/auth/middleware';
-
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
-}
+import { parseError } from '@zeke/observability/error';
+import { secure } from '@zeke/security';
+import {
+  noseconeMiddleware,
+  noseconeOptions,
+  noseconeOptionsWithToolbar,
+} from '@zeke/security/middleware';
+import {
+  type NextMiddleware,
+  type NextRequest,
+  NextResponse,
+} from 'next/server';
 
 export const config = {
   matcher: [
@@ -13,8 +21,52 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * - api/webhooks (Stripe webhooks need raw body)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
+
+const securityHeaders = env.ARCJET_KEY
+  ? noseconeMiddleware(noseconeOptionsWithToolbar)
+  : noseconeMiddleware(noseconeOptions);
+
+const middleware = updateSession(async (request: NextRequest) => {
+  // Skip Arcjet for webhook endpoints that need raw body
+  if (request.nextUrl.pathname.startsWith('/api/webhooks')) {
+    return securityHeaders();
+  }
+
+  if (!env.ARCJET_KEY) {
+    return securityHeaders();
+  }
+
+  try {
+    // Different bot policies for different routes
+    const allowedBots = request.nextUrl.pathname.startsWith('/api/')
+      ? [] // Strict for API routes
+      : [
+          'CATEGORY:SEARCH_ENGINE', // Allow search engines for pages
+          'CATEGORY:PREVIEW', // Allow preview links
+          'CATEGORY:MONITOR', // Allow uptime monitoring
+        ];
+
+    await secure(allowedBots, request);
+    return securityHeaders();
+  } catch (error) {
+    const message = parseError(error);
+
+    // Log security event
+    logSecurityEvent('suspicious_activity', {
+      path: request.nextUrl.pathname,
+      ip: request.ip || request.headers.get('x-forwarded-for'),
+      userAgent: request.headers.get('user-agent'),
+      reason: message,
+      timestamp: new Date().toISOString(),
+    });
+
+    return NextResponse.json({ error: message }, { status: 403 });
+  }
+}) as unknown as NextMiddleware;
+
+export default middleware;

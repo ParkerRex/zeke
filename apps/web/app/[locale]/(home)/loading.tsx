@@ -2,7 +2,11 @@
  * Loading state for the homepage
  */
 
-import { Card, CardContent, CardHeader } from '@zeke/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from '@zeke/design-system/components/ui/card';
 import { Skeleton } from '@zeke/design-system/components/ui/skeleton';
 
 export default function Loading() {

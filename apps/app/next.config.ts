@@ -1,16 +1,16 @@
-import { config, withAnalyzer } from "@zeke/next-config";
-import { withLogging, withSentry } from "@zeke/observability/next-config";
-import type { NextConfig } from "next";
-import { env } from "@/env";
+import { env } from '@/env';
+import { config, withAnalyzer } from '@zeke/next-config';
+import { withLogging, withSentry } from '@zeke/observability/next-config';
+import type { NextConfig } from 'next';
 
 let nextConfig: NextConfig = withLogging(config);
 
 if (env.VERCEL) {
-	nextConfig = withSentry(nextConfig);
+  nextConfig = withSentry(nextConfig);
 }
 
-if (env.ANALYZE === "true") {
-	nextConfig = withAnalyzer(nextConfig);
+if (env.ANALYZE === 'true') {
+  nextConfig = withAnalyzer(nextConfig);
 }
 
 export default nextConfig;

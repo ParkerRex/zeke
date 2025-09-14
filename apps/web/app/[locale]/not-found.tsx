@@ -13,8 +13,8 @@ export default function NotFound() {
         title="Page Not Found"
         description="The page you're looking for doesn't exist or may have been moved."
         action={{
-          label: "Go Home",
-          href: "/"
+          label: 'Go Home',
+          href: '/',
         }}
       />
     </div>

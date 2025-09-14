@@ -13,10 +13,7 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Stories error:', error);
-  }, [error]);
+  useEffect(() => {}, [error]);
 
   return (
     <div className="container mx-auto">
@@ -27,7 +24,7 @@ export default function Error({ error, reset }: ErrorProps) {
       >
         {process.env.NODE_ENV === 'development' && (
           <details className="mt-4 text-left">
-            <summary className="cursor-pointer text-sm font-medium">
+            <summary className="cursor-pointer font-medium text-sm">
               Error Details (Development)
             </summary>
             <pre className="mt-2 overflow-auto rounded bg-muted p-2 text-xs">

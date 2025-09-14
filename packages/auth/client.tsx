@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@zeke/design-system/components/ui/avatar';
 import { Button } from '@zeke/design-system/components/ui/button';
 import {
   DropdownMenu,
@@ -8,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@zeke/design-system/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@zeke/design-system/components/ui/avatar';
 import { LogOut, Settings, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './provider';
@@ -17,7 +21,9 @@ export function UserButton() {
   const { user } = useAuth();
   const router = useRouter();
 
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   const handleSignOut = async () => {
     // For now, just redirect to login. In a real app, you'd call a sign out action
@@ -37,7 +43,10 @@ export function UserButton() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name || user.email} />
+            <AvatarImage
+              src={user.user_metadata?.avatar_url}
+              alt={user.user_metadata?.full_name || user.email}
+            />
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
         </Button>
@@ -48,7 +57,7 @@ export function UserButton() {
             {user.user_metadata?.full_name && (
               <p className="font-medium">{user.user_metadata.full_name}</p>
             )}
-            <p className="w-[200px] truncate text-sm text-muted-foreground">
+            <p className="w-[200px] truncate text-muted-foreground text-sm">
               {user.email}
             </p>
           </div>
@@ -72,17 +81,17 @@ export function UserButton() {
   );
 }
 
-export function OrganizationSwitcher({ 
-  hidePersonal = false, 
-  afterSelectOrganizationUrl = '/' 
-}: { 
-  hidePersonal?: boolean; 
-  afterSelectOrganizationUrl?: string; 
+export function OrganizationSwitcher({
+  hidePersonal = false,
+  afterSelectOrganizationUrl = '/',
+}: {
+  hidePersonal?: boolean;
+  afterSelectOrganizationUrl?: string;
 }) {
   // For now, this is a placeholder. In a real app, you'd implement organization switching logic
   return (
     <div className="flex items-center gap-2 px-2 py-1">
-      <div className="flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground text-xs font-medium">
+      <div className="flex h-6 w-6 items-center justify-center rounded bg-primary font-medium text-primary-foreground text-xs">
         Z
       </div>
       <span className="font-medium">ZEKE</span>

@@ -1,19 +1,19 @@
-import { getSession } from "@zeke/supabase/queries";
-import Image from "next/image";
-import Link from "next/link";
-import { IoMenu, IoPerson } from "react-icons/io5";
-import { signOut } from "@/actions/auth/sign-out";
-import { AccountMenu } from "@/app/components/account-menu";
-import { Logo } from "@/app/components/logo";
-import SignOutButton from "@/app/components/sign-out-button";
-import { Button } from "@zeke/design-system/components/ui/button";
+import { signOut } from '@/actions/auth/sign-out';
+import { AccountMenu } from '@/app/components/account-menu';
+import { Logo } from '@/app/components/logo';
+import SignOutButton from '@/app/components/sign-out-button';
+import { Button } from '@zeke/design-system/components/ui/button';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTrigger,
-} from "@zeke/design-system/components/ui/sheet";
+} from '@zeke/design-system/components/ui/sheet';
+import { getSession } from '@zeke/supabase/queries';
+import Image from 'next/image';
+import Link from 'next/link';
+import { IoMenu, IoPerson } from 'react-icons/io5';
 
 export async function Navigation() {
   const session = await getSession();
@@ -55,7 +55,7 @@ export async function Navigation() {
                     {/* Inline avatar/initials */}
                     {avatarUrl ? (
                       <Image
-                        alt={session.user?.email ?? "Account"}
+                        alt={session.user?.email ?? 'Account'}
                         className="h-9 w-9 rounded-full object-cover"
                         height={36}
                         src={avatarUrl}
@@ -64,7 +64,7 @@ export async function Navigation() {
                       />
                     ) : (
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700 text-sm">
-                        {(session.user?.email?.[0] ?? "").toUpperCase()}
+                        {(session.user?.email?.[0] ?? '').toUpperCase()}
                       </div>
                     )}
                     {session.user?.email && (

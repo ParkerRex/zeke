@@ -1,6 +1,6 @@
-import { getSession } from '@zeke/supabase/queries';
 import { getDictionary } from '@zeke/internationalization';
 import { createMetadata } from '@zeke/seo/metadata';
+import { getSession } from '@zeke/supabase/queries';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import {
@@ -9,9 +9,9 @@ import {
   LatestStoriesSection,
   PersonalizedStoriesFeed,
   PromoCard,
-  TopicsStrip,
   TopStoriesSection,
   TopTopicsSidebar,
+  TopicsStrip,
 } from '../../../components/stories';
 
 type HomeProps = {
@@ -25,11 +25,12 @@ export const generateMetadata = async ({
   params,
 }: HomeProps): Promise<Metadata> => {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const _dictionary = await getDictionary(locale);
 
   return createMetadata({
     title: 'ZEKE - AI Research Intelligence',
-    description: 'Stay ahead with AI-powered research analysis and insights. Turn 10 hours of research into 5 minutes of verified insights.',
+    description:
+      'Stay ahead with AI-powered research analysis and insights. Turn 10 hours of research into 5 minutes of verified insights.',
   });
 };
 

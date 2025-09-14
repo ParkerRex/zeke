@@ -5,7 +5,12 @@
 
 import { Badge } from '@zeke/design-system/components/ui/badge';
 import { Button } from '@zeke/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@zeke/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@zeke/design-system/components/ui/card';
 import { Input } from '@zeke/design-system/components/ui/input';
 import { askZekeQuestions } from '../../lib/stories-utils';
 
@@ -22,27 +27,27 @@ export function AskZekeCard() {
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Ask ZEKE</CardTitle>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         {/* View Story Summary section */}
         <div className="space-y-3">
           <div className="text-muted-foreground text-xs uppercase tracking-wide">
             View Story Summary
           </div>
-          
+
           {/* Time frame selector */}
           <div className="flex flex-wrap gap-2">
             {timeframes.map((timeframe, i) => (
               <Badge
                 key={timeframe}
-                variant={i === 0 ? "default" : "secondary"}
+                variant={i === 0 ? 'default' : 'secondary'}
                 className="cursor-pointer text-xs"
               >
                 {timeframe}
               </Badge>
             ))}
           </div>
-          
+
           {/* Summary points */}
           <ul className="list-disc space-y-2 pl-5 text-muted-foreground text-sm">
             {summaryPoints.map((point, i) => (
@@ -50,10 +55,10 @@ export function AskZekeCard() {
             ))}
           </ul>
         </div>
-        
+
         {/* Separator */}
         <div className="h-px bg-border" />
-        
+
         {/* Quick questions */}
         <div className="space-y-2">
           {askZekeQuestions.map((question) => (
@@ -61,18 +66,15 @@ export function AskZekeCard() {
               key={question}
               variant="outline"
               size="sm"
-              className="w-full justify-start text-left text-sm h-auto py-2 px-3"
+              className="h-auto w-full justify-start px-3 py-2 text-left text-sm"
             >
               {question}
             </Button>
           ))}
         </div>
-        
+
         {/* Question input */}
-        <Input
-          placeholder="Ask a question"
-          className="text-sm"
-        />
+        <Input placeholder="Ask a question" className="text-sm" />
       </CardContent>
     </Card>
   );

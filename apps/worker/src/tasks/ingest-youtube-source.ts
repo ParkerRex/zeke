@@ -1,12 +1,12 @@
-import type PgBoss from "pg-boss";
-import { upsertRawItem, upsertSourceHealth } from "../db.js";
-import { buildRawItemYouTube } from "../extract/build-raw-item-youtube.js";
-import type { YouTubeVideo } from "../lib/youtube/types.js";
-import { log } from "../log.js";
-import type { SourceBase } from "../types/sources.js";
-import { fetchYouTubeChannelVideos } from "./fetch-youtube-channel-videos.js";
-import { fetchYouTubeSearchVideos } from "./fetch-youtube-search-videos.js";
-import { resolveYouTubeUploadsId } from "./resolve-youtube-uploads-id.js";
+import type PgBoss from 'pg-boss';
+import { upsertRawItem, upsertSourceHealth } from '../db.js';
+import { buildRawItemYouTube } from '../extract/build-raw-item-youtube.js';
+import type { YouTubeVideo } from '../lib/youtube/types.js';
+import { log } from '../log.js';
+import type { SourceBase } from '../types/sources.js';
+import { fetchYouTubeChannelVideos } from './fetch-youtube-channel-videos.js';
+import { fetchYouTubeSearchVideos } from './fetch-youtube-search-videos.js';
+import { resolveYouTubeUploadsId } from './resolve-youtube-uploads-id.js';
 
 const DEFAULT_MAX_VIDEOS = 10;
 const DAYS_LOOKBACK = 7;
@@ -19,8 +19,8 @@ const MS_PER_DAY =
 
 export async function ingestYouTubeSource(boss: PgBoss, src: SourceBase) {
   const t0 = Date.now();
-  log("ingest_source_start", {
-    comp: "ingest",
+  log('ingest_source_start', {
+    comp: 'ingest',
     kind: src.kind,
     source_id: src.id,
     url: src.url,
@@ -37,8 +37,8 @@ export async function ingestYouTubeSource(boss: PgBoss, src: SourceBase) {
     seen = result.seen;
     newCount = result.newCount;
 
-    log("ingest_source_done", {
-      comp: "ingest",
+    log('ingest_source_done', {
+      comp: 'ingest',
       kind: src.kind,
       source_id: src.id,
       videos_seen: seen,
@@ -48,32 +48,32 @@ export async function ingestYouTubeSource(boss: PgBoss, src: SourceBase) {
   } catch (err) {
     errorMessage = String(err);
     log(
-      "ingest_source_error",
+      'ingest_source_error',
       {
-        comp: "ingest",
+        comp: 'ingest',
         kind: src.kind,
         source_id: src.id,
         url: src.url,
         err: errorMessage,
       },
-      "error"
+      'error'
     );
   } finally {
     try {
       await upsertSourceHealth(
         src.id,
-        errorMessage ? "error" : "ok",
+        errorMessage ? 'error' : 'ok',
         errorMessage
       );
     } catch (error) {
-      log("source_health_update_error", { error: String(error) }, "error");
+      log('source_health_update_error', { error: String(error) }, 'error');
     }
   }
 }
 
 async function getVideosForSource(src: SourceBase): Promise<YouTubeVideo[]> {
   const metadata = (src.metadata ?? {}) as Record<string, unknown>;
-  if (src.kind === "youtube_channel") {
+  if (src.kind === 'youtube_channel') {
     const uploadsPlaylistId = await resolveYouTubeUploadsId({
       sourceId: src.id,
       url: src.url || undefined,
@@ -95,7 +95,7 @@ async function getVideosForSource(src: SourceBase): Promise<YouTubeVideo[]> {
     });
   }
 
-  if (src.kind === "youtube_search") {
+  if (src.kind === 'youtube_search') {
     const maxResults = parsePositiveInt(
       metadata.max_results,
       DEFAULT_MAX_VIDEOS
@@ -105,9 +105,9 @@ async function getVideosForSource(src: SourceBase): Promise<YouTubeVideo[]> {
       new Date(Date.now() - DAYS_LOOKBACK * MS_PER_DAY).toISOString();
     const order = parseOrder(metadata.order);
     const duration = parseDuration(metadata.duration);
-    const query = typeof metadata.query === "string" ? metadata.query : "";
+    const query = typeof metadata.query === 'string' ? metadata.query : '';
     if (!query) {
-      throw new Error("No query in metadata");
+      throw new Error('No query in metadata');
     }
     return fetchYouTubeSearchVideos({
       query,
@@ -132,7 +132,7 @@ async function processVideos(
     seen++;
     const id = await upsertRawItem(buildRawItemYouTube(v, src));
     if (id) {
-      await boss.send("ingest:fetch-youtube-content", {
+      await boss.send('ingest:fetch-youtube-content', {
         rawItemIds: [id],
         videoId: v.videoId,
         sourceKind: src.kind,
@@ -143,28 +143,28 @@ async function processVideos(
   return { seen, newCount };
 }
 
-type SearchOrder = "date" | "relevance" | "viewCount";
-type SearchDuration = "short" | "medium" | "long" | "any" | undefined;
+type SearchOrder = 'date' | 'relevance' | 'viewCount';
+type SearchDuration = 'short' | 'medium' | 'long' | 'any' | undefined;
 
 function parseOrder(value: unknown): SearchOrder {
-  const allowed: SearchOrder[] = ["date", "relevance", "viewCount"];
-  return typeof value === "string" && (allowed as string[]).includes(value)
+  const allowed: SearchOrder[] = ['date', 'relevance', 'viewCount'];
+  return typeof value === 'string' && (allowed as string[]).includes(value)
     ? (value as SearchOrder)
-    : "relevance";
+    : 'relevance';
 }
 
 function parseDuration(value: unknown): SearchDuration {
-  const allowed = new Set(["short", "medium", "long", "any"]);
-  return typeof value === "string" && allowed.has(value)
+  const allowed = new Set(['short', 'medium', 'long', 'any']);
+  return typeof value === 'string' && allowed.has(value)
     ? (value as SearchDuration)
     : undefined;
 }
 
 function parsePositiveInt(value: unknown, fallback: number): number {
-  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
     return Math.floor(value);
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const n = Number.parseInt(value, 10);
     if (Number.isFinite(n) && n > 0) {
       return n;
@@ -174,5 +174,5 @@ function parsePositiveInt(value: unknown, fallback: number): number {
 }
 
 function parseOptionalString(value: unknown): string | undefined {
-  return typeof value === "string" && value ? value : undefined;
+  return typeof value === 'string' && value ? value : undefined;
 }
