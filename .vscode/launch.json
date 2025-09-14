@@ -165,6 +165,62 @@
       }
     },
     {
+      "name": "🧪 App: Run All Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx vitest run",
+      "cwd": "${workspaceFolder}/apps/app",
+      "presentation": {
+        "group": "testing",
+        "order": 1
+      }
+    },
+    {
+      "name": "🧪 App: Watch Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx vitest",
+      "cwd": "${workspaceFolder}/apps/app",
+      "presentation": {
+        "group": "testing",
+        "order": 2
+      }
+    },
+    {
+      "name": "🔍 App: Debug Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/app/node_modules/.bin/vitest",
+      "args": ["run", "--no-coverage"],
+      "cwd": "${workspaceFolder}/apps/app",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "presentation": {
+        "group": "testing",
+        "order": 3
+      }
+    },
+    {
+      "name": "🔍 App: Debug Single Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/app/node_modules/.bin/vitest",
+      "args": ["run", "${relativeFile}", "--no-coverage"],
+      "cwd": "${workspaceFolder}/apps/app",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "presentation": {
+        "group": "testing",
+        "order": 4
+      }
+    },
+    {
       "name": "🌐 Chrome: Dashboard App",
       "type": "chrome",
       "request": "launch",

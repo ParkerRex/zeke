@@ -22,5 +22,8 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
-  }
+  },
+  "vitest.enable": true,
+  "vitest.commandLine": "npx vitest",
+  "testing.automaticallyOpenPeekView": "never"
 }

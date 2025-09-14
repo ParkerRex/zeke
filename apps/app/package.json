@@ -26,7 +26,9 @@
     "start": "next start",
     "stop": "bash scripts/dev-stop.sh",
     "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks --project-name=default",
-    "test": "pnpm run typecheck && pnpm run test:db && pnpm run test:worker",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:db": "echo 'Database tests not implemented yet'",
     "test:worker": "echo 'Worker tests not implemented yet'",
     "typecheck": "tsc --noEmit && cd ../worker && tsc --noEmit",
@@ -94,7 +96,14 @@
     "prettier-plugin-tailwindcss": "^0.3.0",
     "supabase": "^2.39.2",
     "typescript": "^5.9.2",
-    "ultracite": "5.3.3"
+    "ultracite": "5.3.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@vitejs/plugin-react": "^4.5.0",
+    "@zeke/testing": "workspace:*",
+    "jsdom": "^26.0.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=20.0.0"

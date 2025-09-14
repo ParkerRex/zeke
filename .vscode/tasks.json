@@ -204,6 +204,83 @@
         "focus": false,
         "panel": "shared"
       }
+    },
+    {
+      "label": "🧪 App: Run All Tests",
+      "type": "shell",
+      "command": "npx",
+      "args": ["vitest", "run"],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/app"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 App: Watch Tests",
+      "type": "shell",
+      "command": "npx",
+      "args": ["vitest"],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/app"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "🧪 App: Test Coverage",
+      "type": "shell",
+      "command": "npx",
+      "args": ["vitest", "run", "--coverage"],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/app"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 App: Test Current File",
+      "type": "shell",
+      "command": "npx",
+      "args": ["vitest", "run", "${relativeFile}"],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/app"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
     }
   ]
 }
