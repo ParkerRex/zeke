@@ -1,5 +1,5 @@
-// Note: We'll test the API route through HTTP requests instead of direct imports
-// import { GET } from '@/app/api/stories/route';
+import { GET } from '@/app/api/stories/route';
+import type { EmbedKind, Overlays } from '@zeke/supabase/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies
@@ -82,16 +82,29 @@ describe('/api/stories Integration Tests', () => {
       };
       vi.mocked(createRateLimiter).mockReturnValue(mockRateLimiter as any);
 
-      // Mock stories data
+      // Mock stories data with proper types
+      const mockOverlays: Overlays = {
+        whyItMatters: 'This is a test story for integration testing',
+        chili: 3,
+        confidence: 85,
+        sources: [
+          {
+            title: 'Test Source',
+            url: 'https://example.com/source',
+            domain: 'example.com',
+          },
+        ],
+      };
+
       const mockStoriesResult = {
         stories: [
           {
             id: 'story-1',
             title: 'Test Story',
             primaryUrl: 'https://example.com',
-            embedKind: 'article',
+            embedKind: 'article' as EmbedKind,
             embedUrl: 'https://example.com',
-            overlays: null,
+            overlays: mockOverlays,
           },
         ],
         totalCount: 1,

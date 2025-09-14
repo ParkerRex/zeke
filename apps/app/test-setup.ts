@@ -50,6 +50,19 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/test',
 }));
 
+// Mock Sentry
+vi.mock('@sentry/nextjs', () => ({
+  init: vi.fn(),
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
+  withSentry: (handler: any) => handler,
+  Severity: {
+    Error: 'error',
+    Warning: 'warning',
+    Info: 'info',
+  },
+}));
+
 // Mock environment variables
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';

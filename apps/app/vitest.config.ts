@@ -23,16 +23,30 @@ export default defineConfig({
         '.next/**',
       ],
     },
+    server: {
+      deps: {
+        external: ['@sentry/nextjs'],
+      },
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './'),
+      '@zeke/analytics': resolve(__dirname, '../../packages/analytics'),
       '@zeke/auth': resolve(__dirname, '../../packages/auth'),
-      '@zeke/supabase': resolve(__dirname, '../../packages/supabase'),
-      '@zeke/rate-limit': resolve(__dirname, '../../packages/rate-limit'),
-      '@zeke/design-system': resolve(__dirname, '../../packages/design-system'),
+      '@zeke/cms': resolve(__dirname, '../../packages/cms'),
+      '@zeke/email': resolve(__dirname, '../../packages/email'),
+      '@zeke/next-config': resolve(__dirname, '../../packages/next-config'),
       '@zeke/observability': resolve(__dirname, '../../packages/observability'),
+      '@zeke/rate-limit': resolve(__dirname, '../../packages/rate-limit'),
       '@zeke/security': resolve(__dirname, '../../packages/security'),
+      '@zeke/supabase': resolve(__dirname, '../../packages/supabase/src'),
+      '@zeke/supabase/keys': resolve(__dirname, '../../packages/supabase/keys.ts'),
+      '@zeke/supabase/queries': resolve(__dirname, '../../packages/supabase/src/queries'),
+      '@zeke/supabase/types': resolve(__dirname, '../../packages/supabase/src/types'),
+      '@zeke/design-system': resolve(__dirname, '../../packages/design-system'),
+      '@sentry/nextjs': resolve(__dirname, './__mocks__/@sentry/nextjs.ts'),
+      '@t3-oss/env-nextjs': resolve(__dirname, './__mocks__/@t3-oss/env-nextjs.ts'),
     },
   },
 });
