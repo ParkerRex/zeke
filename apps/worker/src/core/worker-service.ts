@@ -12,7 +12,12 @@
  * - Coordinate all subsystems
  */
 
-import 'dotenv/config';
+import { config } from 'dotenv';
+
+// Load environment variables from .env.development if it exists
+config({ path: '.env.development' });
+config({ path: '.env.local' });
+config({ path: '.env' });
 import type { ConnectionOptions as TlsConnectionOptions } from 'node:tls';
 import express from 'express';
 import PgBoss from 'pg-boss';
@@ -62,7 +67,16 @@ export class WorkerService {
    * Start the worker service
    */
   async start(): Promise<void> {
-    log('worker_service_starting', {});
+    log('worker_service_starting', {
+      nodeEnv: process.env.NODE_ENV,
+      port: this.getPort(),
+      databaseUrl: DATABASE_URL ? 'configured' : 'missing',
+      bossSchema: BOSS_SCHEMA,
+      bossMigrate: BOSS_MIGRATE,
+    });
+
+    // Validate environment variables
+    await this.validateEnvironment();
 
     // Start HTTP server first for health checks
     await this.startHttpServer();
@@ -73,7 +87,10 @@ export class WorkerService {
     // Start metrics collection
     this.startMetricsCollection();
 
-    log('worker_service_ready', { port: this.getPort() });
+    log('worker_service_ready', {
+      port: this.getPort(),
+      message: 'All systems operational'
+    });
   }
 
   /**
@@ -101,6 +118,76 @@ export class WorkerService {
    */
   private getPort(): number {
     return Number(process.env.PORT || DEFAULT_PORT);
+  }
+
+  /**
+   * Validate required environment variables
+   */
+  private async validateEnvironment(): Promise<void> {
+    log('env_validation_starting', {});
+
+    const requiredVars = ['DATABASE_URL'];
+    const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+    if (missingVars.length > 0) {
+      log('env_validation_failed', {
+        missingVars,
+        message: 'Required environment variables are missing'
+      }, 'error');
+      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    }
+
+    const optionalVars = ['OPENAI_API_KEY', 'YOUTUBE_API_KEY'];
+    const presentOptional = optionalVars.filter(varName => process.env[varName]);
+    const missingOptional = optionalVars.filter(varName => !process.env[varName]);
+
+    log('env_validation_complete', {
+      requiredVars: requiredVars.length,
+      optionalPresent: presentOptional,
+      optionalMissing: missingOptional,
+      message: 'Environment validation passed'
+    });
+  }
+
+  /**
+   * Test database connection before initializing pg-boss
+   */
+  private async testDatabaseConnection(): Promise<void> {
+    log('db_connection_testing', {
+      message: 'Testing database connectivity'
+    });
+
+    try {
+      // Import pg client for connection test
+      const { Client } = await import('pg');
+
+      const client = new Client({
+        connectionString: DATABASE_URL,
+        ssl: USE_SSL ? { rejectUnauthorized: false } : false,
+      });
+
+      await client.connect();
+      log('db_connection_established', { message: 'Database connection successful' });
+
+      // Test basic query
+      const result = await client.query('SELECT version() as version, current_database() as database');
+      log('db_connection_verified', {
+        version: result.rows[0]?.version?.split(' ')[0] || 'unknown',
+        database: result.rows[0]?.database || 'unknown',
+        message: 'Database query test successful'
+      });
+
+      await client.end();
+      log('db_connection_closed', { message: 'Test connection closed' });
+
+    } catch (error) {
+      log('db_connection_failed', {
+        error: String(error),
+        databaseUrl: DATABASE_URL.replace(/:[^:@]*@/, ':***@'), // Hide password
+        message: 'Database connection test failed'
+      }, 'error');
+      throw new Error(`Database connection failed: ${String(error)}`);
+    }
   }
 
   /**
@@ -149,11 +236,36 @@ export class WorkerService {
    * Initialize pg-boss with retry logic
    */
   private async initializeBossWithRetry(): Promise<void> {
+    let attemptCount = 0;
+    const maxAttempts = 5;
+
     const attempt = async (): Promise<void> => {
+      attemptCount++;
       try {
+        log('boss_init_attempt', {
+          attempt: attemptCount,
+          maxAttempts,
+          databaseUrl: DATABASE_URL.replace(/:[^:@]*@/, ':***@') // Hide password
+        });
+
         await this.initializeBoss();
       } catch (err) {
-        log('boss_init_error', { err: String(err) }, 'error');
+        log('boss_init_error', {
+          attempt: attemptCount,
+          maxAttempts,
+          err: String(err),
+          willRetry: attemptCount < maxAttempts
+        }, 'error');
+
+        if (attemptCount >= maxAttempts) {
+          throw new Error(`Failed to initialize pg-boss after ${maxAttempts} attempts: ${String(err)}`);
+        }
+
+        log('boss_init_retry', {
+          retryIn: RETRY_DELAY_MS / 1000,
+          nextAttempt: attemptCount + 1
+        });
+
         setTimeout(() => {
           attempt();
         }, RETRY_DELAY_MS);
@@ -171,7 +283,15 @@ export class WorkerService {
       throw new Error('DATABASE_URL is required');
     }
 
-    log('boss_initializing', { schema: BOSS_SCHEMA });
+    log('boss_initializing', {
+      schema: BOSS_SCHEMA,
+      ssl: USE_SSL,
+      migrate: BOSS_MIGRATE,
+      connectionPoolSize: 2
+    });
+
+    // Test database connectivity first
+    await this.testDatabaseConnection();
 
     // Create pg-boss instance
     this.boss = new PgBoss({
@@ -190,25 +310,39 @@ export class WorkerService {
     );
 
     // Start pg-boss
+    log('boss_starting', { message: 'Starting pg-boss instance' });
     await this.boss.start();
     log('boss_started', { schema: BOSS_SCHEMA });
 
     // Create job orchestrator
+    log('boss_setup_orchestrator', { message: 'Creating job orchestrator' });
     const orchestrator = createJobOrchestrator(this.boss);
 
     // Set up all job infrastructure
+    log('boss_setup_queues', { message: 'Creating job queues' });
     await createJobQueues(this.boss);
+
+    log('boss_setup_recurring', { message: 'Scheduling recurring jobs' });
     await scheduleRecurringJobs(this.boss);
+
+    log('boss_setup_workers', { message: 'Setting up job workers' });
     await setupJobWorkers(this.boss, orchestrator);
+
+    log('boss_setup_startup', { message: 'Triggering startup jobs' });
     await triggerStartupJobs(this.boss);
 
     // Set up HTTP routes (now that orchestrator is ready)
+    log('boss_setup_routes', { message: 'Setting up HTTP routes' });
     setupRoutes(this.app, orchestrator);
 
     // Store global reference for compatibility
     bossRef = this.boss;
 
-    log('boss_ready', { queues: 'all queues and workers active' });
+    log('boss_ready', {
+      queues: 'all queues and workers active',
+      schema: BOSS_SCHEMA,
+      message: 'pg-boss fully initialized'
+    });
   }
 
   /**

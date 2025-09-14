@@ -1,9 +1,13 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
+import { getDevConfig } from './dev-config';
 
 const otelRegex = /@opentelemetry\/instrumentation/;
 
 export const config: NextConfig = {
+  // Apply development-specific optimizations
+  ...getDevConfig(),
+
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -44,10 +48,12 @@ export const config: NextConfig = {
     ];
   },
 
-  webpack(config) {
-    config.ignoreWarnings = [{ module: otelRegex }];
-
-    return config;
+  // Production webpack configuration
+  ...(!process.env.NODE_ENV || process.env.NODE_ENV === 'production') && {
+    webpack(config) {
+      config.ignoreWarnings = [{ module: otelRegex }];
+      return config;
+    },
   },
 
   // This is required to support PostHog trailing slash API requests

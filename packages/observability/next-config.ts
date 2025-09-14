@@ -47,5 +47,11 @@ export const withSentry = (sourceConfig: object): object => {
 };
 
 export const withLogging = (config: object): object => {
-  return withLogtail(config);
+  // Only enable Logtail in production to prevent memory leaks in development
+  if (process.env.NODE_ENV === 'production') {
+    return withLogtail(config);
+  }
+
+  // Return config unchanged in development
+  return config;
 };

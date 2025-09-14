@@ -23,17 +23,41 @@ import { log } from './log.js';
  */
 async function main(): Promise<void> {
   try {
-    log('worker_starting', { version: '2.0-modular' });
+    log('worker_starting', {
+      version: '2.0-modular',
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      pid: process.pid,
+      timestamp: new Date().toISOString()
+    });
 
-    const _service = await startWorkerService();
+    const service = await startWorkerService();
 
     log('worker_ready', {
       message: 'Worker service is running. Check /healthz for status.',
+      healthEndpoint: `http://localhost:${process.env.PORT || 8080}/healthz`,
+      statusEndpoint: `http://localhost:${process.env.PORT || 8080}/debug/status`
     });
 
     // Service will run until process is terminated
+    // Keep the service reference to prevent garbage collection
+    process.on('SIGTERM', () => {
+      log('worker_shutdown_signal', { signal: 'SIGTERM' });
+      service.stop().finally(() => process.exit(0));
+    });
+
+    process.on('SIGINT', () => {
+      log('worker_shutdown_signal', { signal: 'SIGINT' });
+      service.stop().finally(() => process.exit(0));
+    });
+
   } catch (error) {
-    log('worker_startup_failed', { error: String(error) }, 'error');
+    log('worker_startup_failed', {
+      error: String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    }, 'error');
     process.exit(1);
   }
 }

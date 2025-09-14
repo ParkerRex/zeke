@@ -65,24 +65,7 @@ This roadmap outlines the development plan for the ZEKE marketing web applicatio
   - [ ] `PersonalizedStoriesFeed` auth-aware behavior
 - [ ] Achieve 90%+ test coverage for all components
 
-#### 5.2 Storybook Stories Creation
-- [ ] Set up Storybook integration for `apps/web` components
-- [ ] Create stories for story components:
-  - [ ] `StoryCard` - default, featured, compact variants
-  - [ ] `StoriesGrid` - different column configurations
-  - [ ] `CoverageBar` - various percentage values
-  - [ ] `HypeBar` - different hype levels and colors
-  - [ ] `SourcesBadge` - singular and plural forms
-- [ ] Create stories for sidebar components:
-  - [ ] `DailyIndexCard` - different sentiment scores
-  - [ ] `AskZekeCard` - interactive states
-  - [ ] `TopTopicsSidebar` - with and without topics
-  - [ ] `PromoCard` - different promotional content
-- [ ] Create stories for layout components:
-  - [ ] `PageHeader` - with and without actions
-  - [ ] `ErrorState` - different error scenarios
-  - [ ] `EmptyState` - various empty states
-- [ ] Document component APIs and usage patterns
+
 
 #### 5.3 Integration Testing
 - [ ] Test page-level functionality:

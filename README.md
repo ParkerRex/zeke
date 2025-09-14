@@ -9,8 +9,7 @@ ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers sto
 **Turborepo Monorepo Structure:**
 
 - **Main App** (`apps/app`) – Primary user interface and API routes
-- **Marketing Site** (`apps/web`) – Public marketing website  
-- **Storybook** (`apps/storybook`) – Component development and documentation
+- **Marketing Site** (`apps/web`) – Public marketing website
 - **Background Worker** (`apps/worker`) – pg-boss pipeline for ingestion, extraction, analysis
 - **Supabase/PostgreSQL** – Database with pgvector for storage and embeddings
 - **Shared Packages** (`packages/`) – Reusable utilities, design system, and configurations
@@ -59,8 +58,7 @@ pnpm stop                  # Stop all services gracefully
 
 # Individual services (Turborepo filtering)
 pnpm dev --filter=app      # Main app only
-pnpm dev --filter=web      # Marketing site only  
-pnpm dev --filter=storybook # Storybook only
+pnpm dev --filter=web      # Marketing site only
 pnpm dev:worker            # Worker service only
 
 # Build and validation
@@ -119,11 +117,8 @@ Use Turborepo filtering for individual services:
 # Work on main app only
 pnpm dev --filter=app
 
-# Work on marketing site only  
+# Work on marketing site only
 pnpm dev --filter=web
-
-# Component development
-pnpm dev --filter=storybook
 ```
 
 ### 4. Pipeline Testing

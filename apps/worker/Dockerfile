@@ -5,7 +5,9 @@ FROM node:20-slim AS builder
 WORKDIR /app
 
 # Copy package files and install ALL dependencies (including dev)
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
+# Note: pnpm-lock.yaml is copied from repo root by deploy script
+COPY pnpm-lock.yaml ./
 RUN npm i -g pnpm && pnpm i
 
 # Copy source and build
@@ -40,7 +42,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Copy package files and install ONLY production dependencies
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
+# Note: pnpm-lock.yaml is copied from repo root by deploy script
+COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm \
     npm i -g pnpm && pnpm i --prod
 

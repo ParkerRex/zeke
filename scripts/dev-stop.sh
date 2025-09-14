@@ -14,13 +14,13 @@ echo -e "${BLUE}🛑 Stopping ZEKE development services...${NC}"
 stop_port() {
     local port="$1"
     local service_name="$2"
-    
+
     local pids=$(lsof -ti :$port 2>/dev/null || true)
     if [ -n "$pids" ]; then
         echo -e "${YELLOW}🔄 Stopping $service_name on port $port...${NC}"
         echo "$pids" | xargs kill -TERM 2>/dev/null || true
         sleep 2
-        
+
         # Force kill if still running
         local remaining_pids=$(lsof -ti :$port 2>/dev/null || true)
         if [ -n "$remaining_pids" ]; then
@@ -36,7 +36,6 @@ stop_port() {
 # Stop Next.js development servers
 stop_port 3000 "Main App (Next.js)"
 stop_port 3001 "Marketing Site (Next.js)"
-stop_port 6006 "Storybook"
 
 # Stop worker containers
 echo -e "${YELLOW}🔄 Stopping worker containers...${NC}"
@@ -64,7 +63,6 @@ fi
 echo -e "${YELLOW}🔄 Cleaning up turbo processes...${NC}"
 pkill -f "turbo dev" 2>/dev/null || true
 pkill -f "next dev" 2>/dev/null || true
-pkill -f "storybook dev" 2>/dev/null || true
 
 echo -e "\n${GREEN}🎉 All development services stopped!${NC}"
 echo -e "${BLUE}📝 Note: Supabase is still running to preserve your data${NC}"

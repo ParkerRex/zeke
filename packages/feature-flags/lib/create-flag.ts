@@ -1,5 +1,5 @@
-import { analytics } from '@repo/analytics/posthog/server';
-import { auth } from '@repo/auth/server';
+import { analytics } from '@zeke/analytics/posthog/server';
+import { auth } from '@zeke/auth/server';
 import { flag } from 'flags/next';
 
 export const createFlag = (key: string) =>

@@ -13,6 +13,11 @@ export const secure = async (
   allow: (ArcjetWellKnownBot | ArcjetBotCategory)[],
   sourceRequest?: Request
 ) => {
+  // Skip Arcjet processing in development to reduce memory overhead
+  if (process.env.NODE_ENV === 'development') {
+    return;
+  }
+
   if (!arcjetKey) {
     return;
   }

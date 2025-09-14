@@ -1,0 +1,89 @@
+{
+  "folders": [
+    {
+      "name": "🌐 Marketing Site",
+      "path": "../apps/web"
+    },
+    {
+      "name": "📝 CMS",
+      "path": "../packages/cms"
+    },
+    {
+      "name": "🎨 Design System",
+      "path": "../packages/design-system"
+    },
+    {
+      "name": "📧 Email",
+      "path": "../packages/email"
+    },
+    {
+      "name": "🔐 Auth",
+      "path": "../packages/auth"
+    },
+    {
+      "name": "⚙️ Root",
+      "path": "../"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/.cache": true,
+      "apps/app": true,
+      "apps/worker": true,
+
+      "packages/supabase": true,
+      "packages/analytics": true,
+      "packages/next-config": true,
+      "packages/observability": true,
+      "packages/rate-limit": true,
+      "packages/security": true,
+      "packages/testing": true,
+      "packages/typescript-config": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "apps/app/**": true,
+      "apps/worker/**": true,
+
+      "packages/supabase/**": true,
+      "packages/analytics/**": true,
+      "packages/next-config/**": true,
+      "packages/observability/**": true,
+      "packages/rate-limit/**": true,
+      "packages/security/**": true,
+      "packages/testing/**": true,
+      "packages/typescript-config/**": true
+    },
+    "terminal.integrated.cwd": "../apps/web"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Dev: Marketing Site",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev:web"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        },
+        "group": "build"
+      },
+      {
+        "label": "Build: Marketing Site",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["build"],
+        "options": {
+          "cwd": "${workspaceFolder:🌐 Marketing Site}"
+        }
+      }
+    ]
+  }
+}

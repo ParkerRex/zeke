@@ -14,7 +14,6 @@ ZEKE is an AI‑powered news intelligence platform that:
 
 - **Main App** (`apps/app`) – Primary user interface and API routes (port 3000)
 - **Marketing Site** (`apps/web`) – Public marketing website (port 3001)
-- **Storybook** (`apps/storybook`) – Component development and documentation (port 6006)
 - **Background Worker** (`apps/worker`) – pg-boss pipeline for ingestion, extraction, analysis (port 8082)
 - **Supabase/PostgreSQL** – Database with pgvector for storage and embeddings
 - **Shared Packages** (`packages/`) – Reusable code across applications
@@ -45,7 +44,6 @@ pnpm stop
 - `pnpm dev:setup` – One-time environment setup and validation
 - `pnpm dev:next` – Start main app only (`--filter=app`)
 - `pnpm dev:web` – Start marketing site only (`--filter=web`)
-- `pnpm dev:storybook` – Start Storybook only (`--filter=storybook`)
 - `pnpm dev:worker` – Start worker service only
 - `pnpm stop` – Gracefully stop all development services
 - `pnpm test:pipeline` – Comprehensive pipeline health check
@@ -67,7 +65,6 @@ pnpm stop
 When running `pnpm dev`, services are available at:
 - **Main App:** http://localhost:3000
 - **Marketing Site:** http://localhost:3001
-- **Storybook:** http://localhost:6006
 - **Supabase Studio:** http://127.0.0.1:54323
 - **Worker API:** http://localhost:8082
 
@@ -87,7 +84,6 @@ When running `pnpm dev`, services are available at:
    ```bash
    pnpm dev --filter=app        # Main app only
    pnpm dev --filter=web        # Marketing site only
-   pnpm dev --filter=storybook  # Component development only
    ```
 
 4. **Pipeline Testing:**
@@ -417,7 +413,7 @@ export async function getOrCreateCustomer({ userId, email }: { userId: string; e
 We use a layer‑first (aka by‑type) structure, with domain (area) subfolders for clarity. This keeps “all X in one place” easy to find and grep.
 
 **Monorepo Structure:**
-- Apps: `apps/<app-name>/` (app, web, storybook, worker)
+- Apps: `apps/<app-name>/` (app, web, worker)
 - Packages: `packages/<package-name>/` (shared utilities, design system)
 - Database: `packages/supabase/` (queries, mutations, types)
 

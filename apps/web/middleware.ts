@@ -23,7 +23,15 @@ const securityHeaders = env.ARCJET_KEY
   ? noseconeMiddleware(noseconeOptionsWithToolbar)
   : noseconeMiddleware(noseconeOptions);
 
-const middleware = updateSession(async (request: NextRequest) => {
+const middleware: NextMiddleware = async (request: NextRequest) => {
+  // First, update the session
+  const sessionResponse = await updateSession(request);
+
+  // Skip Arcjet processing in development to reduce memory overhead
+  if (process.env.NODE_ENV === 'development') {
+    return securityHeaders();
+  }
+
   if (!env.ARCJET_KEY) {
     return securityHeaders();
   }
@@ -45,6 +53,6 @@ const middleware = updateSession(async (request: NextRequest) => {
 
     return NextResponse.json({ error: message }, { status: 403 });
   }
-}) as unknown as NextMiddleware;
+};
 
 export default middleware;

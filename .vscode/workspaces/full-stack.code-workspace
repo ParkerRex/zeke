@@ -1,0 +1,83 @@
+{
+  "folders": [
+    {
+      "name": "🚀 Main App",
+      "path": "../apps/app"
+    },
+    {
+      "name": "🌐 Marketing Site",
+      "path": "../apps/web"
+    },
+    {
+      "name": "⚙️ Worker",
+      "path": "../apps/worker"
+    },
+
+    {
+      "name": "🗄️ Database",
+      "path": "../packages/supabase"
+    },
+    {
+      "name": "🎨 Design System",
+      "path": "../packages/design-system"
+    },
+    {
+      "name": "🔐 Auth",
+      "path": "../packages/auth"
+    },
+    {
+      "name": "⚙️ Root",
+      "path": "../"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/.cache": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/.cache": true
+    },
+    "terminal.integrated.cwd": "../"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Dev: All Services",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        },
+        "group": "build"
+      },
+      {
+        "label": "Dev: Main App Only",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev:next"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        }
+      },
+      {
+        "label": "Dev: Marketing Site Only",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev:web"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        }
+      }
+    ]
+  }
+}

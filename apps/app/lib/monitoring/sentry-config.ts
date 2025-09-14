@@ -68,8 +68,8 @@ export const initSentry = () => {
     // Release tracking
     release: process.env.VERCEL_GIT_COMMIT_SHA,
 
-    // Debug mode for development
-    debug: env.VERCEL_ENV === 'development',
+    // Debug mode for development - disabled to reduce memory usage
+    debug: false,
   });
 };
 

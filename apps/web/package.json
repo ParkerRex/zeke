@@ -2,7 +2,7 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001 --turbopack",
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096 --max-semi-space-size=128' next dev -p 3001 --turbopack",
     "build": "next build",
     "start": "next start",
     "analyze": "ANALYZE=true npm run build",

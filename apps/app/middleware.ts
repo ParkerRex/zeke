@@ -40,6 +40,11 @@ const middleware: NextMiddleware = async (request: NextRequest) => {
     return securityHeaders();
   }
 
+  // Skip Arcjet processing in development to reduce memory overhead
+  if (process.env.NODE_ENV === 'development') {
+    return securityHeaders();
+  }
+
   if (!env.ARCJET_KEY) {
     return securityHeaders();
   }

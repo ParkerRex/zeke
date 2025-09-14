@@ -5,7 +5,7 @@ set -euo pipefail
 # Uses worker/.env for env vars (expects a Direct DB URL for local dev).
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPO_ROOT="$(cd "$ROOT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$ROOT_DIR/../.." && pwd)"
 ENV_FILE_DEV="$ROOT_DIR/.env.development"
 ENV_FILE_LOCAL="$ROOT_DIR/.env.local"
 ENV_FILE="$ROOT_DIR/.env"
@@ -94,7 +94,13 @@ if command -v psql >/dev/null 2>&1; then
 fi
 
 echo "[info] Building Docker image $IMAGE_TAG (full deps)"
+# Copy pnpm-lock.yaml to worker directory temporarily
+echo "[info] Copying pnpm-lock.yaml from $REPO_ROOT to $ROOT_DIR"
+cp "$REPO_ROOT/pnpm-lock.yaml" "$ROOT_DIR/pnpm-lock.yaml"
+# Build from worker directory
 docker build -t "$IMAGE_TAG" "$ROOT_DIR"
+# Clean up temporary file
+rm -f "$ROOT_DIR/pnpm-lock.yaml"
 
 echo "[info] Starting container ${CONTAINER_NAME} on http://localhost:$PORT"
 docker run -d \

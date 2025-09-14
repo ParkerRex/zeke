@@ -1,0 +1,89 @@
+{
+  "folders": [
+    {
+      "name": "🚀 Main App",
+      "path": "../apps/app"
+    },
+    {
+      "name": "🗄️ Database",
+      "path": "../packages/supabase"
+    },
+    {
+      "name": "🎨 Design System",
+      "path": "../packages/design-system"
+    },
+    {
+      "name": "🔐 Auth",
+      "path": "../packages/auth"
+    },
+    {
+      "name": "📊 Analytics",
+      "path": "../packages/analytics"
+    },
+    {
+      "name": "⚙️ Root",
+      "path": "../"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/.cache": true,
+      "apps/web": true,
+      "apps/worker": true,
+
+      "packages/cms": true,
+      "packages/email": true,
+      "packages/next-config": true,
+      "packages/observability": true,
+      "packages/rate-limit": true,
+      "packages/security": true,
+      "packages/testing": true,
+      "packages/typescript-config": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "apps/web/**": true,
+      "apps/worker/**": true,
+
+      "packages/cms/**": true,
+      "packages/email/**": true,
+      "packages/next-config/**": true,
+      "packages/observability/**": true,
+      "packages/rate-limit/**": true,
+      "packages/security/**": true,
+      "packages/testing/**": true,
+      "packages/typescript-config/**": true
+    },
+    "terminal.integrated.cwd": "../apps/app"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Dev: Main App",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev:next"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        },
+        "group": "build"
+      },
+      {
+        "label": "Generate DB Types",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["types:generate"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        }
+      }
+    ]
+  }
+}

@@ -6,6 +6,11 @@ const opts = {
 };
 
 export const initializeSentry = () => {
+  // Skip Sentry initialization in development to reduce memory overhead
+  if (process.env.NODE_ENV === 'development') {
+    return;
+  }
+
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     init(opts);
   }

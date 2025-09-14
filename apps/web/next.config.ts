@@ -11,6 +11,23 @@ nextConfig.images?.remotePatterns?.push({
   hostname: 'assets.basehub.com',
 });
 
+// Development-specific optimizations
+if (process.env.NODE_ENV === 'development') {
+  nextConfig = {
+    ...nextConfig,
+    // Disable source maps in development to reduce memory usage
+    productionBrowserSourceMaps: false,
+    // Optimize for faster builds
+    swcMinify: false,
+    // Reduce memory usage
+    experimental: {
+      ...nextConfig.experimental,
+      // Disable memory-intensive features in development
+      optimizeCss: false,
+    },
+  };
+}
+
 if (process.env.NODE_ENV === 'production') {
   const redirects: NextConfig['redirects'] = async () => [
     {
@@ -23,7 +40,8 @@ if (process.env.NODE_ENV === 'production') {
   nextConfig.redirects = redirects;
 }
 
-if (env.VERCEL) {
+// Only enable Sentry in production or when explicitly requested
+if (env.VERCEL && process.env.NODE_ENV === 'production') {
   nextConfig = withSentry(nextConfig);
 }
 

@@ -1,0 +1,89 @@
+{
+  "folders": [
+    {
+      "name": "⚙️ Worker",
+      "path": "../apps/worker"
+    },
+    {
+      "name": "🗄️ Database",
+      "path": "../packages/supabase"
+    },
+    {
+      "name": "🔐 Auth",
+      "path": "../packages/auth"
+    },
+    {
+      "name": "📊 Observability",
+      "path": "../packages/observability"
+    },
+    {
+      "name": "🛡️ Security",
+      "path": "../packages/security"
+    },
+    {
+      "name": "⚙️ Root",
+      "path": "../"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "**/dist": true,
+      "**/.cache": true,
+      "apps/app": true,
+      "apps/web": true,
+
+      "packages/cms": true,
+      "packages/design-system": true,
+      "packages/email": true,
+      "packages/analytics": true,
+      "packages/next-config": true,
+      "packages/rate-limit": true,
+      "packages/testing": true,
+      "packages/typescript-config": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true,
+      "apps/app/**": true,
+      "apps/web/**": true,
+
+      "packages/cms/**": true,
+      "packages/design-system/**": true,
+      "packages/email/**": true,
+      "packages/analytics/**": true,
+      "packages/next-config/**": true,
+      "packages/rate-limit/**": true,
+      "packages/testing/**": true,
+      "packages/typescript-config/**": true
+    },
+    "terminal.integrated.cwd": "../apps/worker"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Dev: Worker",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["dev:worker"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        },
+        "group": "build"
+      },
+      {
+        "label": "Worker: Logs",
+        "type": "shell",
+        "command": "pnpm",
+        "args": ["worker:logs"],
+        "options": {
+          "cwd": "${workspaceFolder:⚙️ Root}"
+        }
+      }
+    ]
+  }
+}
