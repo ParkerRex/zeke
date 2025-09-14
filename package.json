@@ -40,9 +40,13 @@
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "migration:new": "supabase migration new",
     "migration:squash": "supabase migration squash --linked",
+    "migration:up:remote": "cd apps/api && supabase migration up --linked",
     "db:migrate": "supabase migration up --local && turbo run types:generate --filter=app",
     "db:reset": "supabase db reset --local",
-    "types:generate": "turbo run types:generate --filter=app"
+    "types:generate": "turbo run types:generate --filter=app",
+    "types:generate:remote": "cd apps/api && supabase gen types typescript --project-id hblelrtwdpukaymtpchv --schema public > ../../packages/supabase/src/types/db.ts",
+    "deploy:schema": "./scripts/deploy-schema-changes.sh",
+    "deploy:schema:prod": "./scripts/deploy-schema-changes.sh production"
   },
   "devDependencies": {
     "@auto-it/first-time-contributor": "^11.3.0",

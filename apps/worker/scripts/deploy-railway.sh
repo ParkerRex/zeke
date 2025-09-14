@@ -46,6 +46,24 @@ cd "$ROOT_DIR"
 echo -e "${YELLOW}📋 Copying pnpm-lock.yaml...${NC}"
 cp "$REPO_ROOT/pnpm-lock.yaml" "$ROOT_DIR/pnpm-lock.yaml"
 
+# Check for updated database types
+echo -e "${YELLOW}🔍 Checking database types...${NC}"
+TYPES_FILE="$REPO_ROOT/packages/supabase/src/types/db.ts"
+if [[ -f "$TYPES_FILE" ]]; then
+    echo -e "${GREEN}✅ Database types found${NC}"
+    # Check if types are recent (modified within last hour)
+    if [[ $(find "$TYPES_FILE" -mmin -60 2>/dev/null) ]]; then
+        echo -e "${GREEN}✅ Types are recent (modified within last hour)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Database types may be outdated${NC}"
+        echo -e "${YELLOW}💡 Run 'pnpm run types:generate' to update${NC}"
+    fi
+else
+    echo -e "${RED}❌ Database types not found${NC}"
+    echo -e "${YELLOW}💡 Generate types first: cd apps/api && supabase gen types typescript --local --schema public > ../../packages/supabase/src/types/db.ts${NC}"
+    exit 1
+fi
+
 # Build TypeScript
 echo -e "${YELLOW}🔧 Building TypeScript...${NC}"
 npm run build

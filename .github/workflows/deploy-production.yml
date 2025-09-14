@@ -1,0 +1,176 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_migration:
+        description: 'Skip database migration'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  # Step 1: Database Migration & Type Generation
+  database-migration:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    outputs:
+      types-changed: ${{ steps.check-types.outputs.changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Need previous commit for diff
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.18.1
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Create Supabase config
+        run: |
+          mkdir -p apps/api/.supabase
+          echo "${{ secrets.SUPABASE_ACCESS_TOKEN }}" > apps/api/.supabase/access-token
+
+      - name: Apply database migrations
+        if: ${{ !inputs.skip_migration }}
+        run: |
+          cd apps/api
+          supabase migration up --linked --project-id ${{ secrets.SUPABASE_PROJECT_ID }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Generate TypeScript types from remote
+        run: |
+          cd apps/api
+          supabase gen types typescript --project-id ${{ secrets.SUPABASE_PROJECT_ID }} --schema public > ../../packages/supabase/src/types/db.ts
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Check if types changed
+        id: check-types
+        run: |
+          if git diff --quiet packages/supabase/src/types/db.ts; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit updated types
+        if: steps.check-types.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add packages/supabase/src/types/db.ts
+          git commit -m "chore: update database types [ci skip]"
+          git push
+
+      - name: Upload types artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-types
+          path: packages/supabase/src/types/db.ts
+
+  # Step 2: Build and Deploy Worker Service
+  deploy-worker:
+    runs-on: ubuntu-latest
+    needs: database-migration
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main # Get latest commit with updated types
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.18.1
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Download types artifact
+        if: needs.database-migration.outputs.types-changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: database-types
+          path: packages/supabase/src/types/
+
+      - name: Build worker
+        run: |
+          cd apps/worker
+          pnpm run build
+
+      - name: Deploy to Railway
+        run: |
+          cd apps/worker
+          npm install -g @railway/cli
+          railway login --token ${{ secrets.RAILWAY_TOKEN }}
+          railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  # Step 3: Deploy Main Application
+  deploy-app:
+    runs-on: ubuntu-latest
+    needs: [database-migration, deploy-worker]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main # Get latest commit with updated types
+
+      - name: Download types artifact
+        if: needs.database-migration.outputs.types-changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: database-types
+          path: packages/supabase/src/types/
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: apps/app
+
+  # Step 4: Post-deployment validation
+  validate-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-worker, deploy-app]
+    steps:
+      - name: Health check worker
+        run: |
+          curl -f ${{ secrets.WORKER_URL }}/healthz || exit 1
+
+      - name: Health check main app
+        run: |
+          curl -f ${{ secrets.APP_URL }}/api/health || exit 1
+
+      - name: Validate database connectivity
+        run: |
+          curl -f ${{ secrets.WORKER_URL }}/debug/status || exit 1
