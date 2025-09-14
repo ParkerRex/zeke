@@ -63,7 +63,7 @@
     "@zeke/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.7",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "^22.15.21",
+    "@types/node": "^24.3.3",
     "@types/react": "^19.1.5",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7",

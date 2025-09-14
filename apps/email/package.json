@@ -16,7 +16,7 @@
     "react-email": "4.0.15"
   },
   "devDependencies": {
-    "@types/node": "22.15.21",
+    "@types/node": "24.3.3",
     "@types/react": "19.1.5",
     "@zeke/typescript-config": "workspace:*",
     "next": "15.5.3",
