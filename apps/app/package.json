@@ -27,6 +27,8 @@
     "stop": "bash scripts/dev-stop.sh",
     "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks --project-name=default",
     "test": "pnpm run typecheck && pnpm run test:db && pnpm run test:worker",
+    "test:db": "echo 'Database tests not implemented yet'",
+    "test:worker": "echo 'Worker tests not implemented yet'",
     "typecheck": "tsc --noEmit && cd ../worker && tsc --noEmit",
     "types:generate": "pnpm supabase gen types typescript --local --schema public > ../../packages/supabase/src/types/db.ts",
     "types:generate:remote": "env-cmd -f ./.env.production pnpm supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > ../../packages/supabase/src/types/db.ts",
