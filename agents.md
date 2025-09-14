@@ -148,6 +148,166 @@ Goal: Prefer URL as the source of truth for shareable UI state and use `nuqs` fo
   - Store shareable state only in `localStorage`; use URL first (keep localStorage as a fallback)
 - SSR notes: `useQueryState` is client‑side; keep `nuqs` usage in client components.
 
+## Tab State Management Architecture
+
+The ZEKE main app (`apps/app`) uses a URL-first architecture for tab state management, powered by nuqs. This system was migrated from Zustand to eliminate state synchronization complexity and provide native URL shareability.
+
+### Core Principles
+
+- **URL as Single Source of Truth**: All tab state lives in URL parameters
+- **No State Synchronization**: Eliminates the complexity of keeping Zustand and URL in sync
+- **Native Browser Support**: Back/forward navigation works automatically
+- **Shareable by Default**: Every tab configuration has a unique, shareable URL
+
+### Implementation Details
+
+**Location**: `apps/app/hooks/use-tabs.ts` (replaces `stores/tabsStore.ts`)
+
+**nuqs Parsers** (`apps/app/lib/nuqs.ts`):
+```typescript
+export const tabsParser = parseAsArrayOf(parseAsString).withDefault([]);
+export const activeTabParser = parseAsString.withDefault('');
+export const panelStatesParser = parseAsJson<Record<string, boolean>>().withDefault({});
+export const globalPanelParser = parseAsBoolean.withDefault(true);
+export const tabMetadataParser = parseAsJson<Record<string, {
+  title?: string;
+  pinned?: boolean;
+  preview?: boolean;
+  clusterId?: string;
+  embedKind?: string;
+  embedUrl?: string;
+}>>().withDefault({});
+```
+
+**Hook Usage**:
+```typescript
+import { useTabs } from '@/hooks/use-tabs';
+
+const { tabs, activeId, active, openTab, closeTab, setActive } = useTabs();
+```
+
+### URL Parameter Schema
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `tabs` | `string[]` | Array of tab IDs | `?tabs=story1,story2,story3` |
+| `active` | `string` | Active tab ID | `?active=story1` |
+| `panelStates` | `Record<string, boolean>` | Per-tab panel visibility | `?panelStates={"story1":true}` |
+| `globalPanel` | `boolean` | Global panel fallback | `?globalPanel=true` |
+| `metadata` | `Record<string, TabMeta>` | Tab metadata (titles, settings) | `?metadata={"story1":{"title":"News"}}` |
+
+### useTabs Hook API
+
+**State Properties**:
+```typescript
+tabs: Tab[]              // Array of current tabs
+activeId: string         // ID of active tab
+active: Tab | undefined  // Active tab object
+sidePanelOpen: boolean   // Panel visibility for active tab
+panelOpenById: Record<string, boolean> // All panel states
+```
+
+**Core Operations**:
+```typescript
+openTab(tab: Tab): void                    // Open new tab
+closeTab(id: string): void                 // Close specific tab
+setActive(id: string): void                // Switch active tab
+pinTab(id: string, pinned?: boolean): void // Pin/unpin tab
+promoteTab(id: string): void               // Convert preview to permanent
+setSidePanelOpen(open: boolean): void      // Toggle active tab panel
+```
+
+**Batch Operations**:
+```typescript
+batch(fn: (tabs: Tab[]) => Tab[]): void    // Apply multiple changes
+closeOthers(id: string): void              // Close all except specified
+closeToRight(id: string): void             // Close tabs to the right
+resetPanelState(): void                    // Reset all panel states
+```
+
+**URL Integration**:
+```typescript
+restoreFromUrl(id: string, isShare?: boolean): Promise<void>
+// Fetches tab data from API and opens tab
+```
+
+### Tab Type Definition
+
+```typescript
+export type Tab = {
+  id: string;                    // clusterId or "share:abc123"
+  title: string;                 // Display title
+  embedKind: EmbedKind;         // 'article' | 'video' | etc.
+  embedUrl: string;             // Content URL
+  clusterId?: string;           // Story cluster ID
+  shareId?: string;             // Share ID if shared content
+  overlays: Overlays;           // AI analysis data
+  context?: Record<string, unknown>; // Contextual data
+  preview?: boolean;            // Preview tab (shown in italics)
+  pinned?: boolean;             // Pinned tab (stays at front)
+};
+```
+
+### Migration Notes
+
+**Removed**:
+- `apps/app/stores/tabsStore.ts` (Zustand store)
+- `zustand` dependency from `apps/app/package.json`
+- Manual URL synchronization logic
+
+**Added**:
+- `apps/app/hooks/use-tabs.ts` (nuqs-based hook)
+- Enhanced parsers in `apps/app/lib/nuqs.ts`
+- `NuqsAdapter` in `apps/app/app/layout.tsx`
+
+**Updated Components**:
+All components importing from `@/stores/tabsStore` now import from `@/hooks/use-tabs`:
+- `tabs-content-viewport.tsx`
+- `story-tab.tsx`
+- `stories-grid-client.tsx`
+- `story-client.tsx`
+- `company-tab.tsx`
+- `industry-tab.tsx`
+- `story-row.tsx`
+- `share-client.tsx`
+- `overlay-panel.tsx`
+
+### Coding Guidelines
+
+**When to use which methods**:
+- Use `openTab()` for user-initiated tab creation
+- Use `restoreFromUrl()` for URL-driven tab restoration
+- Use `batch()` for multiple simultaneous changes
+- Use `setActive()` for simple tab switching
+
+**State Management Patterns**:
+- Never manipulate URL parameters directly; always use the hook
+- Prefer `useQueryStates` over multiple `useQueryState` calls for related state
+- Keep tab metadata minimal to avoid URL bloat
+- Use `preview: true` for tentative tabs that may be closed automatically
+
+**Component Integration**:
+- Import hook at component level: `const { tabs, openTab } = useTabs()`
+- Avoid prop drilling; components can access hook directly
+- Use `active` object for current tab data instead of finding by ID
+- Check `activeId` existence before operations that require an active tab
+
+### URL Examples
+
+```
+# Single story
+/stories/tech-news-123?active=tech-news-123
+
+# Multiple tabs
+/?tabs=story1,story2&active=story1
+
+# With panel states
+/?tabs=story1,story2&active=story1&panelStates={"story1":true,"story2":false}
+
+# Complete configuration
+/?tabs=story1,story2&active=story1&panelStates={"story1":true}&metadata={"story1":{"title":"Tech News","pinned":true}}
+```
+
 ## Supabase Client Architecture
 
 ### Overview

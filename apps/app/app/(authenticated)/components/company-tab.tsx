@@ -1,6 +1,6 @@
 'use client';
 import { companyViewParser } from '@/lib/nuqs';
-import type { Tab } from '@/stores/tabsStore';
+import type { Tab } from '@/hooks/use-tabs';
 import type { Cluster } from '@zeke/supabase/types';
 import Image from 'next/image';
 import { useQueryState } from 'nuqs';

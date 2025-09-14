@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.4"
+  }
   public: {
     Tables: {
       clusters: {
@@ -413,9 +418,7 @@ export type Database = {
       }
       sources: {
         Row: {
-          active: boolean
           authority_score: number | null
-          created_at: string
           domain: string | null
           id: string
           kind: string
@@ -423,13 +426,10 @@ export type Database = {
           last_cursor: Json | null
           metadata: Json | null
           name: string | null
-          updated_at: string
           url: string | null
         }
         Insert: {
-          active?: boolean
           authority_score?: number | null
-          created_at?: string
           domain?: string | null
           id?: string
           kind: string
@@ -437,13 +437,10 @@ export type Database = {
           last_cursor?: Json | null
           metadata?: Json | null
           name?: string | null
-          updated_at?: string
           url?: string | null
         }
         Update: {
-          active?: boolean
           authority_score?: number | null
-          created_at?: string
           domain?: string | null
           id?: string
           kind?: string
@@ -451,7 +448,6 @@ export type Database = {
           last_cursor?: Json | null
           metadata?: Json | null
           name?: string | null
-          updated_at?: string
           url?: string | null
         }
         Relationships: []
@@ -724,7 +720,7 @@ export type Database = {
       }
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
+        Returns: string
       }
       refresh_source_metrics: {
         Args: { _source_id?: string }
@@ -923,4 +919,3 @@ export const Constants = {
     },
   },
 } as const
-

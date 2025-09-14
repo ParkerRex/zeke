@@ -1,5 +1,5 @@
 'use client';
-import type { Tab } from '@/stores/tabsStore';
+import type { Tab } from '@/hooks/use-tabs';
 import { Button } from '@zeke/design-system/components/ui/button';
 
 const PERCENTAGE_MULTIPLIER = 100;

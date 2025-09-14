@@ -1,5 +1,5 @@
 'use client';
-import { type Tab, useTabs } from '@/stores/tabsStore';
+import { type Tab, useTabs } from '@/hooks/use-tabs';
 import CompanyTab from './company-tab';
 import IndustryTab from './industry-tab';
 import OverlayPanel from './overlay-panel';

@@ -1,5 +1,5 @@
 'use client';
-import { useTabs } from '@/stores/tabsStore';
+import { useTabs } from '@/hooks/use-tabs';
 import { domainFromUrl } from '@/utils/url';
 import type { Cluster } from '@zeke/supabase/types';
 import { useRouter } from 'next/navigation';

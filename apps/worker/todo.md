@@ -1,35 +1,144 @@
 # ZEKE Worker TODO
 
-## 🎉 Recently Completed (Migration to Modular Architecture)
+## 🎉 Recently Completed (December 2024)
 
+### Architecture & Startup Fixes
 - ✅ **Restructured monolithic worker** (797 lines → 5 focused modules)
 - ✅ **Created Job Orchestrator** for consistent job triggering
 - ✅ **Separated HTTP routes** from job processing logic
+- ✅ **Fixed Docker build issues** (pnpm-lock.yaml, TypeScript config)
+- ✅ **Improved startup logging** with detailed initialization steps
+- ✅ **Fixed container networking** (separate worker container)
+- ✅ **Fixed worker role setup** and database permissions
+- ✅ **Enhanced error handling** and retry logic
+- ✅ **Added environment validation** and database connection testing
+- ✅ **Updated deployment scripts** for reliable container startup
+
+### Documentation & Testing
 - ✅ **Added comprehensive documentation** (ARCHITECTURE.md, README-NEW.md)
 - ✅ **Created unit tests** for core modules
 - ✅ **Created integration tests** for end-to-end verification
 - ✅ **Made new architecture the primary implementation**
 - ✅ **Maintained backward compatibility** with old system
 
-## 🚀 Immediate Priorities
+## 🚀 Critical Next Steps (January 2025)
 
-### 1. Production Deployment
-- [ ] **Update deployment scripts** to use new architecture
-- [ ] **Test in staging environment** with real data
-- [ ] **Monitor performance** compared to old system
-- [ ] **Update CI/CD pipelines** to run new tests
+### 1. Railway Deployment Preparation 🚂
+- [ ] **Create Railway deployment configuration**
+  - [ ] Set up `railway.toml` configuration file
+  - [ ] Configure environment variables for Railway
+  - [ ] Set up database connection for Railway Postgres
+  - [ ] Configure Docker deployment for Railway platform
+- [ ] **Update deployment scripts for Railway**
+  - [ ] Create `scripts/deploy-railway.sh` script
+  - [ ] Test Railway deployment in staging
+  - [ ] Configure Railway secrets and environment variables
+  - [ ] Set up Railway monitoring and logging
+- [ ] **Railway-specific optimizations**
+  - [ ] Optimize Docker image size for Railway
+  - [ ] Configure Railway health checks
+  - [ ] Set up Railway auto-scaling policies
+  - [ ] Test Railway database migrations
 
-### 2. Documentation & Training
-- [ ] **Create video walkthrough** of new architecture
-- [ ] **Update team documentation** with new patterns
-- [ ] **Create troubleshooting guide** for common issues
-- [ ] **Document deployment procedures** for new system
+### 2. Unit Testing & Test Coverage 🧪
+- [ ] **Expand unit test coverage**
+  - [ ] Add tests for all job handlers (`src/tasks/`)
+  - [ ] Add tests for HTTP routes (`src/http/`)
+  - [ ] Add tests for database operations (`src/db.ts`)
+  - [ ] Add tests for utility functions (`src/utils/`)
+  - [ ] Target: 90%+ code coverage
+- [ ] **Improve test infrastructure**
+  - [ ] Set up test database with proper fixtures
+  - [ ] Add test helpers for common operations
+  - [ ] Create mock services for external APIs
+  - [ ] Add performance benchmarks in tests
+- [ ] **Test automation**
+  - [ ] Set up automated test runs on code changes
+  - [ ] Add test coverage reporting
+  - [ ] Create test data factories
+  - [ ] Add property-based testing for complex logic
 
-### 3. Monitoring & Observability
-- [ ] **Add structured logging** with correlation IDs
-- [ ] **Implement metrics collection** (job success rates, processing times)
-- [ ] **Create health check dashboard** for operations team
-- [ ] **Add alerting** for job failures and system issues
+### 3. CI/CD Pipeline Setup 🔄
+- [ ] **GitHub Actions workflow**
+  - [ ] Create `.github/workflows/worker-ci.yml`
+  - [ ] Set up automated testing on PR/push
+  - [ ] Add code quality checks (linting, formatting)
+  - [ ] Add security scanning for dependencies
+- [ ] **Deployment automation**
+  - [ ] Set up automated deployment to Railway on main branch
+  - [ ] Create staging deployment pipeline
+  - [ ] Add rollback capabilities
+  - [ ] Set up deployment notifications
+- [ ] **Quality gates**
+  - [ ] Require tests to pass before merge
+  - [ ] Add code coverage thresholds
+  - [ ] Set up automated dependency updates
+  - [ ] Add performance regression testing
+
+### 4. Integration Testing 🔗
+- [ ] **End-to-end test suite**
+  - [ ] Test complete ingestion pipeline (RSS → Analysis)
+  - [ ] Test YouTube content processing pipeline
+  - [ ] Test job orchestration and dependencies
+  - [ ] Test error handling and recovery scenarios
+- [ ] **External service integration tests**
+  - [ ] Test OpenAI API integration
+  - [ ] Test YouTube API integration
+  - [ ] Test database operations under load
+  - [ ] Test container networking and communication
+- [ ] **Performance testing**
+  - [ ] Load testing for high-volume ingestion
+  - [ ] Memory usage testing under sustained load
+  - [ ] Database connection pool testing
+  - [ ] API response time testing
+
+### 5. Logging & Monitoring Improvements 📊
+- [ ] **Enhanced Supabase logging integration**
+  - [ ] Set up Supabase log forwarding to external service
+  - [ ] Create alerts for worker role permission issues
+  - [ ] Monitor database connection health
+  - [ ] Track pg-boss job queue metrics
+- [ ] **Structured logging improvements**
+  - [ ] Add correlation IDs to all log entries
+  - [ ] Implement log levels and filtering
+  - [ ] Add request tracing for debugging
+  - [ ] Create log aggregation dashboard
+- [ ] **Worker role monitoring**
+  - [ ] Monitor worker role connection attempts
+  - [ ] Alert on worker role permission failures
+  - [ ] Track worker role query performance
+  - [ ] Log worker role setup and maintenance operations
+
+## 🔧 Infrastructure & Operations
+
+### Supabase Logging & Error Detection 🔍
+- [ ] **Set up centralized logging for worker role issues**
+  - [ ] Configure Supabase to forward worker-related logs to external service (e.g., LogTail, DataDog)
+  - [ ] Create alerts for worker role authentication failures
+  - [ ] Monitor worker role permission denied errors
+  - [ ] Track worker role connection pool exhaustion
+- [ ] **Database monitoring dashboard**
+  - [ ] Create Grafana/similar dashboard for worker database metrics
+  - [ ] Monitor worker role query performance
+  - [ ] Track pg-boss schema health and job queue depth
+  - [ ] Alert on worker role setup script failures
+- [ ] **Automated worker role maintenance**
+  - [ ] Create health check script for worker role permissions
+  - [ ] Set up automated worker role password rotation
+  - [ ] Monitor worker role privilege escalation attempts
+  - [ ] Create worker role backup and recovery procedures
+
+### Development & Debugging Tools 🛠️
+- [ ] **Enhanced debugging capabilities**
+  - [ ] Add debug mode with verbose logging
+  - [ ] Create worker role connection testing tool
+  - [ ] Add database query profiling tools
+  - [ ] Create job replay functionality for debugging
+- [ ] **Local development improvements**
+  - [ ] Improve local worker startup reliability
+  - [ ] Add hot-reload for worker development
+  - [ ] Create worker development environment reset script
+  - [ ] Add worker configuration validation tools
 
 ## 🔧 Technical Improvements
 
@@ -245,5 +354,59 @@
 
 ---
 
-*Last updated: 2024-12-19*
-*Next review: 2025-01-19*
+## 🚀 Quick Start Commands
+
+### Root Package.json Scripts (Updated)
+```bash
+# Start worker service (recommended)
+pnpm dev:worker
+
+# View worker logs
+pnpm logs:worker
+pnpm logs:worker:errors
+
+# Check worker status
+pnpm status:worker
+
+# View Supabase database logs
+pnpm logs:supabase
+
+# Run worker tests
+pnpm test:worker
+```
+
+### Worker-Specific Scripts
+```bash
+# In apps/worker directory
+pnpm dev:docker          # Start worker in Docker container
+pnpm start               # Start built worker
+pnpm dev                 # Start worker with hot reload
+pnpm build               # Build worker TypeScript
+pnpm test:unit           # Run unit tests
+pnpm test:integration    # Run integration tests
+pnpm logs                # View worker container logs
+pnpm status              # Check worker health
+```
+
+### Debugging Commands
+```bash
+# Check worker role in database
+PGPASSWORD=postgres psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "SELECT rolname, rolcanlogin FROM pg_roles WHERE rolname = 'worker';"
+
+# Test worker role connection
+PGPASSWORD=worker_password psql "postgresql://worker:worker_password@127.0.0.1:54322/postgres" -c "SELECT current_user, current_database();"
+
+# View worker container logs in real-time
+docker logs -f zeke-worker-local-8082
+
+# Check worker health endpoint
+curl http://localhost:8082/healthz
+
+# Check worker status endpoint
+curl http://localhost:8082/debug/status | jq
+```
+
+---
+
+*Last updated: 2025-01-14*
+*Next review: 2025-02-14*

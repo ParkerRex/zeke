@@ -2,7 +2,7 @@
 import { STRINGS } from '@/constants/strings';
 import { useStories } from '@/hooks/use-stories';
 import { kindParser, qParser } from '@/lib/nuqs';
-import { useTabs } from '@/stores/tabsStore';
+import { useTabs } from '@/hooks/use-tabs';
 import { domainFromUrl } from '@/utils/url';
 import { Button } from '@zeke/design-system/components/ui/button';
 import { Input } from '@zeke/design-system/components/ui/input';

@@ -1,5 +1,5 @@
 'use client';
-import type { Tab } from '@/stores/tabsStore';
+import type { Tab } from '@/hooks/use-tabs';
 import type { Cluster } from '@zeke/supabase/types';
 import { useEffect, useMemo, useState } from 'react';
 import StoryRow from './story-row';
