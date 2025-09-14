@@ -63,17 +63,4 @@ global.fetch = vi.fn();
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
-beforeEach(() => {
-  // Mock console methods to reduce noise in tests
-  console.error = vi.fn();
-  console.warn = vi.fn();
-});
-
-afterEach(() => {
-  // Restore console methods
-  console.error = originalConsoleError;
-  console.warn = originalConsoleWarn;
-
-  // Clear all mocks
-  vi.clearAllMocks();
-});
+// Test utilities are available globally through vitest

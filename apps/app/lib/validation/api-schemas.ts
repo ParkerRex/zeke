@@ -28,7 +28,7 @@ export const sourceKindSchema = z.enum(
   { errorMap: () => ({ message: 'Invalid source kind' }) }
 );
 
-export const sourceMetadataSchema = z.record(z.unknown()).optional();
+export const sourceMetadataSchema = z.any().optional();
 
 export const createSourceSchema = z
   .object({

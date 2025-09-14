@@ -4,9 +4,12 @@
   "bin": {
     "zeke": "dist/index.js"
   },
-  "files": ["dist/index.js"],
+  "files": [
+    "dist/index.js"
+  ],
   "scripts": {
     "build": "turbo build",
+    "clean": "git clean -xdf node_modules",
     "dev": "bash scripts/dev-start.sh && turbo dev",
     "dev:setup": "bash scripts/dev-setup.sh",
     "dev:next": "turbo dev --filter=app",
@@ -28,24 +31,27 @@
     "migration:squash": "supabase migration squash --linked",
     "db:migrate": "supabase migration up --local && turbo run types:generate --filter=app",
     "db:reset": "supabase db reset --local",
-    "types:generate": "turbo run types:generate --filter=app",
-    "clean": "git clean -xdf node_modules"
+    "types:generate": "turbo run types:generate --filter=app"
   },
   "devDependencies": {
     "@auto-it/first-time-contributor": "^11.3.0",
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.2.4",
+    "@turbo/gen": "^2.5.6",
+    "@types/node": "^24.3.3",
     "@zeke/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.5.3",
-    "@types/node": "^22.15.21",
     "tsup": "^8.5.0",
     "turbo": "^2.5.3",
     "typescript": "^5.9.2",
-    "ultracite": "^4.2.5",
-    "vitest": "^3.1.4"
+    "ultracite": "^5.3.4",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18"
   },
   "packageManager": "pnpm@10.11.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  }
 }

@@ -333,3 +333,9 @@ export async function listStoriesLegacy(): Promise<Cluster[]> {
   const result = await listStories({ limit: STORIES_LIMIT });
   return result.stories;
 }
+
+// For components that expect the old return type
+export async function listStoriesOld(): Promise<Cluster[]> {
+  const result = await listStories({ limit: STORIES_LIMIT });
+  return result.stories;
+}

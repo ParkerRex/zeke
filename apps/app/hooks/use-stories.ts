@@ -167,6 +167,7 @@ export function useStories(filter: StoriesFilter = {}) {
 
   return {
     stories: data?.stories ?? [],
+    clusters: data?.stories ?? [], // Backward compatibility
     pagination: data?.pagination,
     loading,
     error,

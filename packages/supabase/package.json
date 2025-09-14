@@ -15,15 +15,15 @@
     "server-only": "^0.0.1",
     "stripe": "18.5.0",
     "supabase": "^2.40.7",
-    "zod": "^3.25.28",
-    "@t3-oss/env-nextjs": "^0.13.4"
+    "zod": "^4.1.8",
+    "@t3-oss/env-nextjs": "0.13.8"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "@zeke/typescript-config": "workspace:*",
-    "@types/node": "22.15.21",
-    "@types/react": "19.1.5",
-    "@types/react-dom": "^19.1.5",
+    "@types/node": "^24.3.3",
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9",
     "typescript": "^5.9.2"
   },
   "exports": {

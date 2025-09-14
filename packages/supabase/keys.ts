@@ -4,7 +4,10 @@ import { z } from 'zod';
 export const keys = () =>
   createEnv({
     server: {
-      SUPABASE_SERVICE_ROLE_KEY: z.string().startsWith('sbp_'),
+      SUPABASE_SERVICE_ROLE_KEY: z.string().refine(
+        (val) => val.startsWith('sbp_') || val.startsWith('eyJ'),
+        'Must start with "sbp_" (production) or "eyJ" (local development)'
+      ),
       SUPABASE_WEBHOOK_SECRET: z.string().optional(),
     },
     client: {
@@ -13,7 +16,7 @@ export const keys = () =>
     },
     runtimeEnv: {
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      SUPABASE_WEBHOOK_SECRET: process.env.SUPABASE_WEBHOOK_SECRET,
+      SUPABASE_WEBHOOK_SECRET: process.env.SUPABASE_WEBHOOK_SECRET || undefined,
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     },

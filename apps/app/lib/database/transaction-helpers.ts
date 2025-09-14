@@ -153,15 +153,15 @@ export async function updateUserSubscription(
       // Step 2: Upsert subscription
       const { data: subscription, error: subscriptionError } = await client
         .from('subscriptions')
-        .upsert([{
+        .upsert({
           id: subscriptionData.subscription_id,
           user_id: userId,
-          status: subscriptionData.status,
-          price_id: subscriptionData.price_id,
-          current_period_start: subscriptionData.current_period_start,
-          current_period_end: subscriptionData.current_period_end,
-          cancel_at_period_end: subscriptionData.cancel_at_period_end,
-        }])
+          status: subscriptionData.status as any, // Cast to match DB enum
+          price_id: subscriptionData.price_id || null,
+          current_period_start: subscriptionData.current_period_start || null,
+          current_period_end: subscriptionData.current_period_end || null,
+          cancel_at_period_end: subscriptionData.cancel_at_period_end || null,
+        })
         .select('id')
         .single();
 

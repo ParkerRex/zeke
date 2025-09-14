@@ -4,9 +4,9 @@ import { z } from 'zod';
 export const keys = () =>
   createEnv({
     server: {
-      BASEHUB_TOKEN: z.string().startsWith('bshb_pk_'),
+      BASEHUB_TOKEN: z.string().startsWith('bshb_pk_').optional(),
     },
     runtimeEnv: {
-      BASEHUB_TOKEN: process.env.BASEHUB_TOKEN,
+      BASEHUB_TOKEN: process.env.BASEHUB_TOKEN || undefined,
     },
   });

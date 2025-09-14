@@ -26,7 +26,7 @@ export const GET = withAuthAndRateLimit(
             'id, kind, name, url, domain, active, last_checked, metadata, source_metrics:source_metrics(*), source_health:source_health(*)'
           )
           .order('updated_at', { ascending: false, nullsFirst: true })
-          .range(offset, offset + limit - 1);
+          .range(offset, offset + (limit || 50) - 1);
 
         if (error) {
           return NextResponse.json(

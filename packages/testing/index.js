@@ -10,7 +10,7 @@ const config = defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './'),
-      '@zeke': path.resolve(__dirname, '../../packages'),
+      '@repo': path.resolve(__dirname, '../../packages'),
     },
   },
 });

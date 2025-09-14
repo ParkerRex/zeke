@@ -16,10 +16,10 @@ export const keys = () =>
       NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
     },
     runtimeEnv: {
-      BETTERSTACK_API_KEY: process.env.BETTERSTACK_API_KEY,
-      BETTERSTACK_URL: process.env.BETTERSTACK_URL,
-      SENTRY_ORG: process.env.SENTRY_ORG,
-      SENTRY_PROJECT: process.env.SENTRY_PROJECT,
-      NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+      BETTERSTACK_API_KEY: process.env.BETTERSTACK_API_KEY || undefined,
+      BETTERSTACK_URL: process.env.BETTERSTACK_URL || undefined,
+      SENTRY_ORG: process.env.SENTRY_ORG || undefined,
+      SENTRY_PROJECT: process.env.SENTRY_PROJECT || undefined,
+      NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || undefined,
     },
   });

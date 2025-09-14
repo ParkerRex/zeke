@@ -31,7 +31,10 @@ const securityHeaders = env.ARCJET_KEY
   ? noseconeMiddleware(noseconeOptionsWithToolbar)
   : noseconeMiddleware(noseconeOptions);
 
-const middleware = updateSession(async (request: NextRequest) => {
+const middleware: NextMiddleware = async (request: NextRequest) => {
+  // First, update the session
+  const sessionResponse = await updateSession(request);
+
   // Skip Arcjet for webhook endpoints that need raw body
   if (request.nextUrl.pathname.startsWith('/api/webhooks')) {
     return securityHeaders();
@@ -51,7 +54,7 @@ const middleware = updateSession(async (request: NextRequest) => {
           'CATEGORY:MONITOR', // Allow uptime monitoring
         ];
 
-    await secure(allowedBots, request);
+    await secure(allowedBots as any, request);
     return securityHeaders();
   } catch (error) {
     const message = parseError(error);
@@ -59,7 +62,7 @@ const middleware = updateSession(async (request: NextRequest) => {
     // Log security event
     logSecurityEvent('suspicious_activity', {
       path: request.nextUrl.pathname,
-      ip: request.ip || request.headers.get('x-forwarded-for'),
+      ip: request.headers.get('x-forwarded-for') || 'unknown',
       userAgent: request.headers.get('user-agent'),
       reason: message,
       timestamp: new Date().toISOString(),
@@ -67,6 +70,6 @@ const middleware = updateSession(async (request: NextRequest) => {
 
     return NextResponse.json({ error: message }, { status: 403 });
   }
-}) as unknown as NextMiddleware;
+};
 
 export default middleware;

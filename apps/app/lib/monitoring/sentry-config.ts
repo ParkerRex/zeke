@@ -1,5 +1,6 @@
 import { env } from '@/env';
 import * as Sentry from '@sentry/nextjs';
+import React from 'react';
 
 export const initSentry = () => {
   if (!env.NEXT_PUBLIC_SENTRY_DSN) {
@@ -207,29 +208,32 @@ export const collectUserFeedback = (
 };
 
 // Error boundary helper
-export const createErrorBoundary = (fallback: React.ComponentType<any>) => {
-  return Sentry.withErrorBoundary(fallback, {
-    fallback: ({ error, resetError }) => (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className=Something<"mb-4 text-2xl font-bold" went wrong</h2>
-          <_p _className="mb-4 text-gray-600">
-            We've been notified about this error and will fix it soon.
-          </_p>
-          <_button
-            _onClick={resetError}
-            _className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          >
-            Try again
-          </_button>
-        </_div>
-      </div>
+export const createErrorBoundary = (
+  Component: React.ComponentType<any>,
+  fallbackComponent?: React.ComponentType<{ error: Error; resetError: () => void }>
+) => {
+  return Sentry.withErrorBoundary(Component, {
+    fallback: fallbackComponent || (({ error, resetError }) =>
+      React.createElement('div', {
+        className: 'flex min-h-screen items-center justify-center'
+      },
+        React.createElement('div', { className: 'text-center' },
+          React.createElement('h2', {
+            className: 'mb-4 text-2xl font-bold'
+          }, 'Something went wrong'),
+          React.createElement('p', {
+            className: 'mb-4 text-gray-600'
+          }, 'We\'ve been notified about this error and will fix it soon.'),
+          React.createElement('button', {
+            onClick: resetError,
+            className: 'rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+          }, 'Try again')
+        )
+      )
     ),
-    beforeCapture
-  : (scope, error, errorInfo) => 
-      scope.setTag('error_boundary', true)
-  scope.setContext('error_info', errorInfo)
-  ,
+    beforeCapture: (scope, error, errorInfo) => {
+      scope.setTag('error_boundary', true);
+      scope.setContext('error_info', errorInfo);
+    },
+  });
 };
-)
-}
