@@ -340,7 +340,7 @@ export async function upsertSourceHealth(
 ) {
   await pool.query(
     `insert into public.source_health (source_id, status, last_success_at, last_error_at, message, updated_at)
-     values ($1, $2, case when $2='ok' then now() else null end, case when $2='error' then now() else null end, $3, now())
+     values ($1, $2::public.health_status, case when $2::public.health_status = 'ok' then now() else null end, case when $2::public.health_status = 'error' then now() else null end, $3, now())
      on conflict (source_id) do update set
        status = excluded.status,
        last_success_at = coalesce(excluded.last_success_at, public.source_health.last_success_at),
