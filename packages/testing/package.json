@@ -3,13 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "main": "./index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.5.0",
     "vitest": "^3.2.4",
     "typescript": "^5.9.2"
   }

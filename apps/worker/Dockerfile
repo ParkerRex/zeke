@@ -1,55 +1,43 @@
-# syntax=docker/dockerfile:1
+# Railway-compatible Dockerfile for ZEKE Worker (Core RSS Processing)
+# YouTube processing is optional and will be skipped if YOUTUBE_API_KEY is not provided
+# Cache bust: 2025-09-15-v3-clean-build
+FROM node:20-alpine
 
-# Build stage
-FROM node:20-slim AS builder
 WORKDIR /app
 
-# Copy package files and install ALL dependencies (including dev)
-COPY package.json ./
-# Note: pnpm-lock.yaml is copied from repo root by deploy script
-COPY pnpm-lock.yaml ./
-RUN npm i -g pnpm && pnpm i
+# Install minimal system dependencies for core functionality (Alpine)
+RUN apk add --no-cache \
+    curl \
+    ca-certificates
 
-# Copy source and build
+# Copy package files
+COPY package.json ./
+
+# Install ALL dependencies (including dev dependencies for build)
+RUN npm install
+
+# Copy TypeScript configuration and source code
 COPY tsconfig.json ./
 COPY src ./src
+
+# Build TypeScript
 RUN npx tsc -p tsconfig.json
 
-# Production stage
-FROM node:20-slim AS production
-WORKDIR /app
+# Remove dev dependencies to reduce image size
+RUN npm prune --production
 
-# Install system dependencies for YouTube processing
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    ffmpeg \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create and activate virtual environment for Python packages
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Install Python packages with caching
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir yt-dlp openai-whisper
-
-# Install PyTorch CPU version separately with correct index
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir \
-    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
-# Copy package files and install ONLY production dependencies
-COPY package.json ./
-# Note: pnpm-lock.yaml is copied from repo root by deploy script
-COPY pnpm-lock.yaml ./
-RUN --mount=type=cache,target=/root/.local/share/pnpm \
-    npm i -g pnpm && pnpm i --prod
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-
+# Set production environment
 ENV NODE_ENV=production
+
+# Disable YouTube processing by default (can be enabled by setting YOUTUBE_API_KEY)
+ENV YOUTUBE_PROCESSING_ENABLED=false
+
+# Expose port (Railway will set PORT env var)
+EXPOSE 8080
+
+# Health check - Railway-optimized
+HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=5 \
+    CMD curl -f http://localhost:${PORT:-8080}/healthz || exit 1
+
+# Start the application
 CMD ["node", "dist/worker.js"]

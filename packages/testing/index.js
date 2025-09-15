@@ -1,11 +1,17 @@
-const path = require('node:path');
-const react = require('@vitejs/plugin-react');
-const { defineConfig } = require('vitest/config');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
-const config = defineConfig({
-  plugins: [react()],
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default defineConfig({
   test: {
     environment: 'jsdom',
+  },
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react',
   },
   resolve: {
     alias: {
@@ -14,5 +20,3 @@ const config = defineConfig({
     },
   },
 });
-
-module.exports = config;

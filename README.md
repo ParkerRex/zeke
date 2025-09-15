@@ -4,6 +4,17 @@
 
 ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers stories and insights through modern web applications.
 
+## 🚀 **PRODUCTION READY STATUS**
+
+**✅ READY FOR PRODUCTION DEPLOYMENT**
+
+- **Database**: 12 migrations synchronized with Supabase Cloud (hblelrtwdpukaymtpchv)
+- **Worker Permissions**: Comprehensive database access configured and tested (29/29 tests passing)
+- **Deployment Automation**: Complete workflow with validation and rollback procedures
+- **Documentation**: Comprehensive guides including [Go-Live Checklist](go-live-checklist.md) and [Production Deployment Guide](docs/PRODUCTION-DEPLOYMENT-GUIDE.md)
+
+**Quick Deploy**: `./scripts/deploy-workflow.sh` | **Full Guide**: [Production Deployment](docs/PRODUCTION-DEPLOYMENT-GUIDE.md)
+
 ## Table of Contents
 
 - [Architecture](#architecture)
@@ -148,6 +159,54 @@ pnpm migration:up:remote    # Apply migrations to remote Supabase
 pnpm types:generate:remote  # Generate types from remote schema
 pnpm deploy:schema         # Full schema deployment (local)
 pnpm deploy:schema:prod    # Full schema deployment (production)
+```
+
+### Worker Role Database Permissions
+
+The worker service requires specific database permissions to function properly. These are automatically configured during development setup, but may need manual setup in production.
+
+#### Automatic Setup (Development)
+
+The development setup automatically configures worker permissions:
+
+```bash
+pnpm dev:setup  # Includes worker role setup
+# OR manually:
+bash scripts/fix-worker-role.sh
+```
+
+#### Manual Setup (Production)
+
+For production Supabase/PostgreSQL instances:
+
+```bash
+# Set up worker role with proper permissions
+ADMIN_DB_URL="postgresql://postgres:password@host:port/db" \
+WORKER_PASSWORD="secure-password" \
+bash scripts/setup-production-worker.sh
+
+# Verify permissions are correct
+DB_URL="postgresql://postgres:password@host:port/db" \
+bash scripts/verify-worker-permissions.sh
+```
+
+#### Required Permissions
+
+The worker role needs access to these tables:
+
+- **READ**: `sources`, `raw_items`, `contents`, `stories`
+- **WRITE**: `raw_items`, `contents`, `stories`, `job_metrics`, `source_health`, `platform_quota`
+
+#### Troubleshooting Permission Issues
+
+If you see "permission denied" errors:
+
+```bash
+# Check current permissions
+DB_URL="your-db-url" bash scripts/verify-worker-permissions.sh
+
+# Fix permissions
+DB_URL="your-admin-db-url" WORKER_PASS="your-password" bash scripts/fix-worker-role.sh
 ```
 
 ### Type Synchronization Across Services

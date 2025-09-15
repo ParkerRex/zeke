@@ -56,6 +56,7 @@ export class WorkerService {
   private boss: PgBoss | null = null;
   private app: express.Express;
   private server: any = null;
+  private isReady: boolean = false;
 
   constructor() {
     this.app = express();
@@ -73,24 +74,49 @@ export class WorkerService {
       databaseUrl: DATABASE_URL ? 'configured' : 'missing',
       bossSchema: BOSS_SCHEMA,
       bossMigrate: BOSS_MIGRATE,
+      platform: process.platform,
+      nodeVersion: process.version,
+      pid: process.pid,
+      railway: process.env.RAILWAY_ENVIRONMENT || 'not_detected'
     });
 
-    // Validate environment variables
-    await this.validateEnvironment();
+    try {
+      // Validate environment variables
+      await this.validateEnvironment();
+      log('worker_service_env_validated', { message: 'Environment validation passed' });
 
-    // Start HTTP server first for health checks
-    await this.startHttpServer();
+      // Start HTTP server first for health checks
+      await this.startHttpServer();
+      log('worker_service_http_started', { port: this.getPort(), message: 'HTTP server ready for health checks' });
 
-    // Initialize pg-boss with retry logic
-    await this.initializeBossWithRetry();
+      // Initialize pg-boss with retry logic
+      await this.initializeBossWithRetry();
+      log('worker_service_boss_initialized', { message: 'pg-boss initialization completed' });
 
-    // Start metrics collection
-    this.startMetricsCollection();
+      // Start metrics collection
+      this.startMetricsCollection();
+      log('worker_service_metrics_started', { message: 'Metrics collection started' });
 
-    log('worker_service_ready', {
-      port: this.getPort(),
-      message: 'All systems operational'
-    });
+      // Mark service as ready
+      this.isReady = true;
+
+      log('worker_service_ready', {
+        port: this.getPort(),
+        message: 'All systems operational',
+        healthEndpoint: `/healthz`,
+        readyEndpoint: `/ready`,
+        statusEndpoint: `/debug/status`
+      });
+    } catch (error) {
+      log('worker_service_startup_failed', {
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        port: this.getPort(),
+        databaseConfigured: !!DATABASE_URL,
+        message: 'Worker service startup failed'
+      }, 'error');
+      throw error;
+    }
   }
 
   /**
@@ -196,9 +222,26 @@ export class WorkerService {
   private setupExpress(): void {
     this.app.use(express.json());
 
-    // Basic health check (available immediately)
+    // Basic health check (available immediately for Railway)
     this.app.get('/healthz', (_req, res) => {
       res.status(200).send('ok');
+    });
+
+    // Readiness check (only available after full initialization)
+    this.app.get('/ready', (_req, res) => {
+      if (this.isReady && this.boss) {
+        res.status(200).json({
+          status: 'ready',
+          timestamp: new Date().toISOString(),
+          boss: 'connected'
+        });
+      } else {
+        res.status(503).json({
+          status: 'not_ready',
+          timestamp: new Date().toISOString(),
+          boss: this.boss ? 'connected' : 'disconnected'
+        });
+      }
     });
   }
 
@@ -245,30 +288,51 @@ export class WorkerService {
         log('boss_init_attempt', {
           attempt: attemptCount,
           maxAttempts,
-          databaseUrl: DATABASE_URL.replace(/:[^:@]*@/, ':***@') // Hide password
+          databaseUrl: DATABASE_URL.replace(/:[^:@]*@/, ':***@'), // Hide password
+          railway: process.env.RAILWAY_ENVIRONMENT || 'not_detected',
+          ssl: USE_SSL
         });
 
         await this.initializeBoss();
       } catch (err) {
+        const errorMessage = String(err);
+        const isConnectionError = errorMessage.includes('ECONNREFUSED') ||
+                                 errorMessage.includes('ENOTFOUND') ||
+                                 errorMessage.includes('timeout');
+
         log('boss_init_error', {
           attempt: attemptCount,
           maxAttempts,
-          err: String(err),
-          willRetry: attemptCount < maxAttempts
+          err: errorMessage,
+          errorType: isConnectionError ? 'connection' : 'other',
+          willRetry: attemptCount < maxAttempts,
+          railway: process.env.RAILWAY_ENVIRONMENT || 'not_detected'
         }, 'error');
 
         if (attemptCount >= maxAttempts) {
-          throw new Error(`Failed to initialize pg-boss after ${maxAttempts} attempts: ${String(err)}`);
+          const finalError = new Error(`Failed to initialize pg-boss after ${maxAttempts} attempts: ${errorMessage}`);
+          log('boss_init_final_failure', {
+            attempts: maxAttempts,
+            lastError: errorMessage,
+            databaseUrl: DATABASE_URL.replace(/:[^:@]*@/, ':***@'),
+            suggestions: [
+              'Check DATABASE_URL is correct',
+              'Verify database is accessible',
+              'Check worker role permissions',
+              'Verify SSL configuration'
+            ]
+          }, 'error');
+          throw finalError;
         }
 
         log('boss_init_retry', {
           retryIn: RETRY_DELAY_MS / 1000,
-          nextAttempt: attemptCount + 1
+          nextAttempt: attemptCount + 1,
+          errorType: isConnectionError ? 'connection' : 'other'
         });
 
-        setTimeout(() => {
-          attempt();
-        }, RETRY_DELAY_MS);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        await attempt();
       }
     };
 

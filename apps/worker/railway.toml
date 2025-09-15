@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/healthz"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
@@ -28,18 +28,13 @@ BOSS_SCHEMA = "pgboss"
 BOSS_MIGRATE = "false"  # Schema already exists in Supabase
 USE_SSL = "true"
 
+# YouTube processing is optional - will be skipped if YOUTUBE_API_KEY is not set
+YOUTUBE_PROCESSING_ENABLED = "false"
+
 # Railway-specific optimizations
 [build.env]
 NODE_ENV = "production"
 PNPM_FLAGS = "--prod --frozen-lockfile"
-
-# Health check configuration
-[healthcheck]
-path = "/healthz"
-interval = 30
-timeout = 10
-retries = 3
-start_period = 60
 
 # Resource limits (adjust based on needs)
 [resources]
