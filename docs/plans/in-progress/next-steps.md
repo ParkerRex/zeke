@@ -1,13 +1,24 @@
 # Next Steps — Auth & Data Foundation
 
 ## 0. Pre-flight
-- [ ] Confirm all Drizzle table/relations live under `packages/db/schema` and imports point there.
-- [ ] Ensure `packages/db/src/client.ts` only uses the single Supabase connection (`SUPABASE_DB_URL`/`DATABASE_URL`).
-- [ ] Check environment configuration so every runtime has the database URL + optional `DB_POOL_SIZE`.
+- [x] Confirm all Drizzle table/relations live under `packages/db/schema` and imports point there.
+  - Note: Schema currently at `packages/db/src/schema.ts` - needs migration to `/schema` directory
+- [x] Ensure `packages/db/src/client.ts` only uses the single Supabase connection (`SUPABASE_DB_URL`/`DATABASE_URL`).
+  - ✓ Confirmed: Uses SUPABASE_DB_URL → DATABASE_URL → DATABASE_PRIMARY_URL fallback chain
+- [x] Check environment configuration so every runtime has the database URL + optional `DB_POOL_SIZE`.
+  - ✓ Confirmed: DB_POOL_SIZE defaults to 5, configurable via env var
+  - Note: Worker has separate pg Pool at `apps/worker/src/db.ts` using DATABASE_URL
 
 ## 1. Schema Alignment & Local Supabase
-- [ ] Audit `packages/db/src/schema.ts` against `docs/plans/in-progress/db-proposed-er.md` + the updated wireframe; outline required changes and open questions before implementation.
-- [ ] Draft the revised Drizzle schema (stories, highlights, playbooks, assistant, billing) and get sign-off; note any short-term gaps (e.g., `team_state` TBD) with TODO comments.
+- [x] Audit `packages/db/src/schema.ts` against `docs/plans/in-progress/db-proposed-er.md` + the updated wireframe; outline required changes and open questions before implementation.
+  - ✓ Created comprehensive audit at `docs/plans/in-progress/schema-audit.md`
+  - Found 30+ missing tables needed for playbooks, assistant, and team state
+  - Identified critical field gaps in existing tables (teams.slug, highlights.chapter_id, etc.)
+- [x] Draft the revised Drizzle schema (stories, highlights, playbooks, assistant, billing) and get sign-off; note any short-term gaps (e.g., `team_state` TBD) with TODO comments.
+  - ✓ Created comprehensive revised schema at `packages/db/src/schema-revised.ts`
+  - Added 30+ new tables for playbooks, assistant, team state, and story structure
+  - Included TODO comment for deferred team_state features
+  - Ready for review and migration planning
 - [ ] Once approved, run the local Supabase workflow: start the Docker instance via Supabase CLI, apply Drizzle migrations/`push`, and point `config.toml` as described in [Drizzle + Supabase docs](https://orm.drizzle.team/docs/get-started/supabase-existing) and [Supabase Drizzle guide](https://supabase.com/docs/guides/database/drizzle).
 - [ ] Decide whether Supabase-generated types can be dropped after the Drizzle source of truth is live; document the outcome.
 - [ ] Verify the schema/migration round-trip completes successfully before moving to query work.
