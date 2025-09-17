@@ -75,8 +75,8 @@ graph TB
 
 ### Prerequisites
 
-- **Node.js 20+** (current requirement)
-- **pnpm** (package manager)
+- **Node.js 22+** (`v22.11.0` via `.nvmrc`)
+- **pnpm** (package manager; enable with `corepack prepare pnpm@10.11.0 --activate`)
 - **Docker** (for Supabase and worker containers)
 - **Supabase CLI** (`npm install -g supabase`)
 
@@ -110,6 +110,12 @@ pnpm dev:aggressive
 # Debug mode - Full features for debugging production issues
 pnpm dev:debug
 ```
+
+### Environment Variables
+
+- Copy `apps/app/.env.example` to `.env.local` (and `.env.production` as needed) with real credentials before running builds.
+- Copy `apps/web/.env.example` to `.env.local` for the marketing site.
+- Resend credentials and Sentry DSN are required for production builds; BetterStack and other observability keys can remain empty until provisioned.
 
 **Memory Optimization Philosophy**: "Disable everything not essential for coding" - monitoring, security middleware, and build optimizations are disabled in development for better performance.
 
@@ -346,7 +352,6 @@ TURBOPACK_MEMORY_LIMIT=2048
 
 # Disable memory-intensive features in development
 DISABLE_SENTRY=true
-DISABLE_ARCJET=true
 DISABLE_LOGTAIL=true
 DISABLE_ANALYTICS=true
 
@@ -629,7 +634,7 @@ If you experience memory issues during development:
 
 2. **Verify Optimizations Are Applied:**
    - Check console for "Development optimizations applied" message
-   - Verify Sentry/Arcjet are disabled in development
+   - Verify Sentry is disabled in development
 
 3. **Increase Memory Limits:**
    ```bash
@@ -739,7 +744,7 @@ cd apps/worker && pnpm run lint
 
 ✅ **What Should Be Disabled in Dev:**
 - **Monitoring**: Sentry, BetterStack, analytics
-- **Security**: Arcjet, rate limiting, bot protection
+- **Security**: Rate limiting, bot protection
 - **Optimizations**: Source maps, minification, image optimization
 - **External Services**: Email sending, payment processing
 - **Build Features**: Type checking, linting (run separately)

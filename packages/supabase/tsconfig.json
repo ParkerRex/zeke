@@ -1,8 +1,10 @@
 {
-  "extends": "@zeke/typescript-config/nextjs.json",
-  "compilerOptions": {
-    "baseUrl": "."
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "extends": "@zeke/tsconfig/base.json",
+  "include": [
+    "src",
+    "."
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

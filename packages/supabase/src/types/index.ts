@@ -1,8 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './db.js';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../types/db";
 
 export type Client = SupabaseClient<Database>;
 
-export * from './db.js';
-export * from './stories.js';
-export * from './pricing.js';
+export * from "./db";

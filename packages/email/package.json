@@ -1,24 +1,32 @@
 {
   "name": "@zeke/email",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
+  "main": "index.ts",
+  "exports": {
+    "./emails/*": "./emails/*.tsx",
+    "./render": "./render.ts"
+  },
   "scripts": {
-    "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "dev": "email dev -p 3003",
+    "build": "email build",
+    "start": "email start"
   },
   "dependencies": {
-    "@react-email/components": "0.0.41",
-    "@t3-oss/env-nextjs": "0.13.8",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "resend": "^4.5.1",
-    "zod": "^4.1.8"
+    "@zeke/ui": "workspace:*",
+    "@zeke/utils": "workspace:*",
+    "@react-email/components": "0.0.42",
+    "@react-email/render": "1.1.2",
+    "@react-email/tailwind": "1.0.5",
+    "date-fns": "^4.1.0",
+    "react-email": "4.0.16",
+    "responsive-react-email": "^0.0.5"
   },
   "devDependencies": {
-    "@zeke/typescript-config": "workspace:*",
-    "@types/node": "^24.3.3",
-    "@types/react": "19.1.13",
-    "@types/react-dom": "19.1.9",
     "typescript": "^5.9.2"
   }
 }

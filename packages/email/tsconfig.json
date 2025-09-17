@@ -1,8 +1,12 @@
 {
-  "extends": "@zeke/typescript-config/nextjs.json",
+  "extends": "@zeke/tsconfig/base.json",
+  "include": ["emails", "components"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
-    "baseUrl": "."
-  },
-  "include": ["./*.ts", "./*.tsx"],
-  "exclude": ["node_modules"]
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
 }

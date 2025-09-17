@@ -1,0 +1,22 @@
+{
+	"name": "@zeke/utils",
+	"version": "1.0.0",
+	"main": "src/index.ts",
+	"private": true,
+	"sideEffects": false,
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"typescript": "^5.9.2"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./envs": "./src/envs.ts",
+		"./format": "./src/format.ts",
+		"./tax": "./src/tax.ts"
+	}
+}

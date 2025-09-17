@@ -1,8 +1,8 @@
-# Midday Engine Architecture
+# zeke Engine Architecture
 
 ## Overview
 
-The Midday Engine is a sophisticated financial data aggregation and processing system that connects to multiple banking providers, processes financial transactions, and maintains a centralized database. It's built using a modern, event-driven architecture with robust error handling and scalable background processing.
+The zeke Engine is a sophisticated financial data aggregation and processing system that connects to multiple banking providers, processes financial transactions, and maintains a centralized database. It's built using a modern, event-driven architecture with robust error handling and scalable background processing.
 
 ## System Architecture
 
@@ -78,8 +78,8 @@ The Engine API is deployed as a Cloudflare Worker and provides RESTful endpoints
 - Multi-provider abstraction
 
 **Deployment:**
-- Production: `engine.midday.ai`
-- Staging: `engine-staging.midday.ai`
+- Production: `engine.zeke.ai`
+- Staging: `engine-staging.zeke.ai`
 - Uses Cloudflare KV for caching and mTLS certificates for secure banking connections
 
 ### 2. Provider System
@@ -532,7 +532,7 @@ This architecture ensures reliable, scalable, and secure financial data processi
 try {
   const transactions = await engine.transactions.list(params);
 } catch (error) {
-  if (error instanceof Midday.APIError) {
+  if (error instanceof zeke.APIError) {
     const parsedError = parseAPIError(error);
 
     // Update connection status
@@ -649,7 +649,7 @@ Strategic cache invalidation on data updates:
 4. Coordinate with application deployments
 5. Monitor performance impact
 
-This comprehensive architecture documentation provides a complete understanding of how the Midday Engine operates, from high-level architecture to implementation details.
+This comprehensive architecture documentation provides a complete understanding of how the zeke Engine operates, from high-level architecture to implementation details.
 
 ## Technical Implementation Details
 
@@ -664,10 +664,9 @@ This comprehensive architecture documentation provides a complete understanding 
   "styling": "Tailwind CSS with @todesktop/tailwind-variants",
   "state_management": "Zustand 4.5.5",
   "forms": "React Hook Form 7.53.0 + Zod validation",
-  "ui_components": "@midday/ui (custom component library)",
+  "ui_components": "@zeke/ui (custom component library)",
   "animations": "Framer Motion 11.5.4",
   "charts": "Recharts 2.12.7",
-  "internationalization": "next-international 1.2.4",
   "themes": "next-themes 0.3.0"
 }
 ```
@@ -1046,15 +1045,15 @@ export async function getBurnRateQuery(
 **Engine API Client (Jobs System)**:
 ```typescript
 // packages/jobs/src/utils/engine.ts
-import Midday from "@midday-ai/engine";
+import zeke from "@zeke-ai/engine";
 
-export const engine = new Midday({
-  environment: process.env.MIDDAY_ENGINE_ENVIRONMENT as
+export const engine = new zeke({
+  environment: process.env.zeke_ENGINE_ENVIRONMENT as
     | "production"
     | "staging"
     | "development"
     | undefined,
-  bearerToken: process.env.MIDDAY_ENGINE_API_KEY ?? "",
+  bearerToken: process.env.zeke_ENGINE_API_KEY ?? "",
 });
 
 // Usage in jobs
@@ -1175,7 +1174,7 @@ export async function getTeamUserQuery(
 **Server Action to Job Event**:
 ```typescript
 // apps/dashboard/src/actions/transactions/manual-sync-transactions-action.ts
-import { Events, client } from "@midday/jobs";
+import { Events, client } from "@zeke/jobs";
 
 export const manualSyncTransactionsAction = authActionClient
   .schema(manualSyncTransactionsSchema)
@@ -1320,7 +1319,7 @@ export function parseAPIError(error: unknown) {
 try {
   const transactions = await engine.transactions.list(params);
 } catch (error) {
-  if (error instanceof Midday.APIError) {
+  if (error instanceof zeke.APIError) {
     const parsedError = parseAPIError(error);
 
     // Update connection status in database
@@ -1578,7 +1577,7 @@ logpush = true
 
 [env.production]
 name = "engine"
-route = { pattern = "engine.midday.ai/*", zone_name = "midday.ai" }
+route = { pattern = "engine.zeke.ai/*", zone_name = "zeke.ai" }
 
 kv_namespaces = [
   { binding = "KV", id = "1ce9f0355d854a569f72bfccbfbea369" }
@@ -1594,7 +1593,7 @@ r2_buckets = [
 
 [env.staging]
 name = "engine-staging"
-route = { pattern = "engine-staging.midday.ai/*", zone_name = "midday.ai" }
+route = { pattern = "engine-staging.zeke.ai/*", zone_name = "zeke.ai" }
 ```
 
 #### 2. Next.js Application Configuration
@@ -1606,7 +1605,7 @@ route = { pattern = "engine-staging.midday.ai/*", zone_name = "midday.ai" }
   "scripts": {
     "build": "NODE_ENV=production next build",
     "start": "next start",
-    "jobs": "bunx @trigger.dev/cli@latest dev -p 3001 --client-id=midday-G6Yq"
+    "jobs": "bunx @trigger.dev/cli@latest dev -p 3001 --client-id=zeke-G6Yq"
   },
   "dependencies": {
     "next": "14.2.1",
@@ -1680,7 +1679,7 @@ enable_signup = true
 ```json
 // package.json
 {
-  "name": "midday",
+  "name": "zeke",
   "private": true,
   "workspaces": ["packages/*", "apps/*", "packages/email/*"],
   "packageManager": "bun@1.1.27",
@@ -1699,7 +1698,7 @@ enable_signup = true
 **Error Tracking Setup**:
 ```typescript
 // apps/dashboard/sentry.server.config.ts
-import { createClient } from "@midday/supabase/client";
+import { createClient } from "@zeke/supabase/client";
 import * as Sentry from "@sentry/nextjs";
 import { supabaseIntegration } from "@supabase/sentry-js-integration";
 
@@ -1763,6 +1762,6 @@ export const setupAnalytics = async (options?: Props) => {
 };
 ```
 
-This comprehensive technical documentation provides concrete, working code examples that demonstrate the sophisticated architecture and implementation patterns used in the Midday Engine system.
+This comprehensive technical documentation provides concrete, working code examples that demonstrate the sophisticated architecture and implementation patterns used in the zeke Engine system.
 ```
 ```

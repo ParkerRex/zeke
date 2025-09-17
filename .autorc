@@ -1,7 +1,0 @@
-{
-  "plugins": ["npm", "first-time-contributor", "released"],
-  "owner": "Parker Rex",
-  "repo": "Zeke",
-  "name": "Parker Rex",
-  "email": "me@parkerrex.com"
-}

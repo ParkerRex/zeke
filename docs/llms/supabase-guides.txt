@@ -15592,7 +15592,7 @@ Return these only if your hook processed the input without errors.
 
 Use a custom email provider to send authentication messages
 
-The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
+The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or tailor messages for different audiences.
 
 
 ## Email sending behavior
@@ -16167,8 +16167,8 @@ If only one token/hash pair is present, send a single email. In non-secure mode,
         ```
       </TabPanel>
 
-      <TabPanel id="http-internationalization-for-emails" label="Add Internationalization for Email Templates">
-        Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
+      <TabPanel id="http-localized-emails" label="Add Localized Email Templates">
+        Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver localized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
         ```javascript
         import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'

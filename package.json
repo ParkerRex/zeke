@@ -1,73 +1,33 @@
 {
-  "name": "zeke",
-  "version": "1.0.0",
-  "bin": {
-    "zeke": "dist/index.js"
-  },
-  "files": [
-    "dist/index.js"
-  ],
-  "scripts": {
-    "build": "turbo build",
-    "clean": "git clean -xdf node_modules",
-    "dev": "bash scripts/dev-start.sh && turbo dev",
-    "dev:setup": "bash scripts/dev-setup.sh",
-    "dev:next": "turbo dev --filter=app",
-    "dev:web": "turbo dev --filter=web",
-    "dev:worker": "bash scripts/dev-worker.sh",
-    "dev:fast": "bash scripts/dev-modes.sh fast && bash scripts/dev-start.sh && turbo dev",
-    "dev:aggressive": "bash scripts/dev-modes.sh aggressive && bash scripts/dev-start.sh && turbo dev",
-    "dev:debug": "bash scripts/dev-modes.sh debug && bash scripts/dev-start.sh && turbo dev",
-    "stop": "bash scripts/dev-stop.sh",
-    "lint": "ultracite lint",
-    "format": "ultracite format",
-    "test": "turbo test",
-    "test:pipeline": "bash scripts/test-pipeline.sh",
-    "test:worker": "cd apps/worker && pnpm run test:unit && pnpm run test:integration",
-    "test:worker:setup": "bash scripts/test-worker-setup.sh",
-    "verify:worker:permissions": "bash scripts/verify-worker-permissions.sh",
-    "logs:worker": "cd apps/worker && pnpm run logs",
-    "logs:worker:errors": "cd apps/worker && pnpm run logs:errors",
-    "logs:supabase": "docker logs supabase_db_zeke",
-    "status:worker": "cd apps/worker && pnpm run status",
-    "monitor:worker": "bash scripts/monitor-worker-logs.sh",
-    "monitor:worker:check": "bash scripts/monitor-worker-logs.sh check",
-    "deploy:worker:railway": "cd apps/worker && pnpm run deploy:railway",
-    "setup:worker:railway": "cd apps/worker && pnpm run setup:railway",
-    "analyze": "turbo analyze",
-    "translate": "turbo translate",
-    "boundaries": "turbo boundaries",
-    "bump-deps": "npx npm-check-updates --deep -u -x react-day-picker",
-    "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
-    "migration:new": "cd apps/api && supabase migration new",
-    "migration:squash": "cd apps/api && supabase migration squash --linked",
-    "migration:up:remote": "cd apps/api && supabase migration up --linked",
-    "db:migrate": "cd apps/api && supabase migration up --local && turbo run types:generate --filter=app",
-    "db:reset": "cd apps/api && supabase db reset --local",
-    "types:generate": "turbo run types:generate --filter=app",
-    "types:generate:remote": "cd apps/api && supabase gen types typescript --project-id hblelrtwdpukaymtpchv --schema public > ../../packages/supabase/src/types/db.ts",
-    "deploy:schema": "./scripts/deploy-schema-changes.sh",
-    "deploy:schema:prod": "./scripts/deploy-schema-changes.sh production"
-  },
-  "devDependencies": {
-    "@auto-it/first-time-contributor": "^11.3.0",
-    "@biomejs/biome": "2.2.4",
-    "@turbo/gen": "^2.5.6",
-    "@types/node": "^24.3.3",
-    "@zeke/typescript-config": "workspace:*",
-    "tsup": "^8.5.0",
-    "turbo": "^2.5.3",
-    "typescript": "^5.9.2",
-    "ultracite": "^5.3.4",
-    "vitest": "^3.2.4"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "pnpm@10.11.0",
-  "type": "module",
-  "dependencies": {
-    "react": "19.1.1",
-    "react-dom": "19.1.1"
-  }
+	"name": "zeke",
+	"private": true,
+	"workspaces": [
+		"packages/*",
+		"apps/*",
+		"packages/email/*"
+	],
+	"scripts": {
+		"build": "turbo build",
+		"clean": "git clean -xdf node_modules",
+		"clean:workspaces": "turbo clean",
+		"dev": "turbo dev --parallel",
+		"test": "turbo test --parallel",
+		"start:dashboard": "turbo start --filter=@zeke/dashboard",
+		"start:website": "turbo start --filter=@zeke/website",
+		"dev:api": "turbo dev --filter=@zeke/api",
+		"dev:dashboard": "turbo dev --filter=@zeke/dashboard",
+		"build:dashboard": "turbo build --filter=@zeke/dashboard",
+		"dev:website": "turbo dev --filter=@zeke/website ",
+		"dev:desktop": "turbo dev --filter=@zeke/desktop",
+		"format": "biome format --write .",
+		"lint": "turbo lint && manypkg check",
+		"typecheck": "turbo typecheck"
+	},
+	"dependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@manypkg/cli": "^0.24.0",
+		"turbo": "2.5.6",
+		"typescript": "^5.9.2"
+	},
+	"packageManager": "bun@1.2.21"
 }
