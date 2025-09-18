@@ -80,6 +80,20 @@ export const highlightKind = pgEnum("highlight_kind", [
 	"action",
 	"question",
 ]);
+export const highlightOrigin = pgEnum("highlight_origin", [
+	"user",
+	"assistant",
+	"system",
+]);
+export const highlightCollaboratorRole = pgEnum(
+	"highlight_collaborator_role",
+	["viewer", "editor"],
+);
+export const highlightShareScope = pgEnum("highlight_share_scope", [
+	"private",
+	"team",
+	"public",
+]);
 export const playbookStatus = pgEnum("playbook_status", [
 	"draft",
 	"active",
@@ -769,6 +783,8 @@ export const highlights = pgTable(
 			onDelete: "set null",
 		}),
 		kind: highlightKind("kind").notNull().default("insight"),
+		origin: highlightOrigin("origin").notNull().default("user"),
+		assistant_thread_id: uuid("assistant_thread_id"),
 		title: text("title"),
 		summary: text("summary"),
 		quote: text("quote"),
@@ -777,6 +793,7 @@ export const highlights = pgTable(
 		confidence: numeric("confidence", { precision: 3, scale: 2 }),
 		is_generated: boolean("is_generated").default(false),
 		metadata: jsonb("metadata"),
+		origin_metadata: jsonb("origin_metadata"),
 		created_at: timestamp("created_at", {
 			withTimezone: true,
 			mode: "string",
@@ -790,6 +807,7 @@ export const highlights = pgTable(
 		index("highlights_story_idx").using("btree", table.story_id),
 		index("highlights_team_idx").using("btree", table.team_id),
 		index("highlights_chapter_idx").using("btree", table.chapter_id),
+		index("highlights_origin_idx").using("btree", table.origin),
 	],
 );
 
@@ -826,6 +844,36 @@ export const highlightTags = pgTable(
 	],
 );
 
+export const highlightCollaborators = pgTable(
+	"highlight_collaborators",
+	{
+		id: uuid("id").primaryKey().notNull().defaultRandom(),
+		highlight_id: uuid("highlight_id")
+			.notNull()
+			.references(() => highlights.id, { onDelete: "cascade" }),
+		user_id: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		role: highlightCollaboratorRole("role").notNull().default("viewer"),
+		created_at: timestamp("created_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+		updated_at: timestamp("updated_at", {
+			withTimezone: true,
+			mode: "string",
+		}).defaultNow(),
+	},
+	(table) => [
+		uniqueIndex("highlight_collaborators_unique").using(
+			"btree",
+			table.highlight_id,
+			table.user_id,
+		),
+		index("highlight_collaborators_user_idx").using("btree", table.user_id),
+	],
+);
+
 // ============================================================================
 // TEAM STATE TABLES
 // ============================================================================
@@ -844,6 +892,14 @@ export const teamHighlightStates = pgTable(
 		pinned_by: uuid("pinned_by").references(() => users.id, {
 			onDelete: "set null",
 		}),
+		shared_scope: highlightShareScope("shared_scope").notNull().default("private"),
+		shared_by: uuid("shared_by").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		shared_at: timestamp("shared_at", {
+			withTimezone: true,
+			mode: "string",
+		}),
 		updated_at: timestamp("updated_at", {
 			withTimezone: true,
 			mode: "string",
@@ -854,6 +910,10 @@ export const teamHighlightStates = pgTable(
 			"btree",
 			table.team_id,
 			table.highlight_id,
+		),
+		index("team_highlight_states_scope_idx").using(
+			"btree",
+			table.shared_scope,
 		),
 	],
 );
@@ -1118,6 +1178,12 @@ export const assistantThreads = pgTable(
 		index("assistant_threads_status_idx").using("btree", table.status),
 	],
 );
+
+export const highlightAssistantThreadFk = foreignKey({
+	columns: [highlights.assistant_thread_id],
+	foreignColumns: [assistantThreads.id],
+	name: "highlights_assistant_thread_id_fkey",
+}).onDelete("set null");
 
 export const assistantThreadSources = pgTable(
 	"assistant_thread_sources",

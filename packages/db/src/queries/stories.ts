@@ -4,23 +4,55 @@ import {
 	contents,
 	stories,
 	storyEmbeddings,
+	storyKind,
 	storyOverlays,
 } from "@db/schema";
+
+export type StoryKindValue = (typeof storyKind.enumValues)[number];
+
+export type InsertStoryParams = {
+	content_id: string;
+	title?: string | null;
+	summary?: string | null;
+	primary_url?: string | null;
+	kind?: string | null;
+	published_at?: Date | string | null;
+	primary_source_id?: string | null;
+};
+
+export type UpsertStoryOverlayParams = {
+	story_id: string;
+	why_it_matters?: string | null;
+	confidence?: number | null;
+	citations?: Record<string, unknown> | null;
+	analysis_state?: string | null;
+};
+
+export type UpsertStoryEmbeddingParams = {
+	story_id: string;
+	embedding: number[];
+	model_version?: string | null;
+};
+
+const DEFAULT_STORY_KIND: StoryKindValue = "article";
+
+function normalizeStoryKind(kind?: string | null): StoryKindValue {
+	if (!kind) {
+		return DEFAULT_STORY_KIND;
+	}
+
+	const maybeKind = kind as StoryKindValue;
+	return storyKind.enumValues.includes(maybeKind)
+		? maybeKind
+		: DEFAULT_STORY_KIND;
+}
 
 export function createStoryQueries(db: Database) {
 	return {
 		/**
-		 * Insert a new story
+		 * Insert a new story record linked to existing content.
 		 */
-		async insertStory(params: {
-			content_id: string;
-			title?: string | null;
-			summary?: string | null;
-			primary_url?: string | null;
-			kind?: string | null;
-			published_at?: Date | string | null;
-			primary_source_id?: string | null;
-		}): Promise<string> {
+		async insertStory(params: InsertStoryParams): Promise<string> {
 			const {
 				content_id,
 				title,
@@ -31,14 +63,14 @@ export function createStoryQueries(db: Database) {
 				primary_source_id,
 			} = params;
 
-			const result = await db
+			const [row] = await db
 				.insert(stories)
 				.values({
 					content_id,
 					title: title ?? undefined,
 					summary: summary ?? undefined,
 					primary_url: primary_url ?? undefined,
-					kind: (kind as any) ?? "article",
+					kind: normalizeStoryKind(kind),
 					published_at: published_at
 						? new Date(published_at).toISOString()
 						: undefined,
@@ -46,7 +78,11 @@ export function createStoryQueries(db: Database) {
 				})
 				.returning({ id: stories.id });
 
-			return result[0].id;
+			if (!row) {
+				throw new Error("Failed to insert story: no row returned");
+			}
+
+			return row.id;
 		},
 
 		/**
@@ -86,15 +122,11 @@ export function createStoryQueries(db: Database) {
 		},
 
 		/**
-		 * Upsert story overlay
+		 * Upsert overlay metadata captured during analysis.
 		 */
-		async upsertStoryOverlay(params: {
-			story_id: string;
-			why_it_matters?: string | null;
-			confidence?: number | null;
-			citations?: Record<string, unknown>;
-			analysis_state?: string | null;
-		}) {
+		async upsertStoryOverlay(
+			params: UpsertStoryOverlayParams,
+		): Promise<void> {
 			const {
 				story_id,
 				why_it_matters,
@@ -108,7 +140,8 @@ export function createStoryQueries(db: Database) {
 				.values({
 					story_id,
 					why_it_matters: why_it_matters ?? undefined,
-					confidence: confidence?.toString() ?? undefined,
+					confidence:
+						confidence != null ? confidence.toString() : undefined,
 					citations: citations ?? undefined,
 					analysis_state: analysis_state ?? "pending",
 					analyzed_at: sql`now()`,
@@ -117,7 +150,10 @@ export function createStoryQueries(db: Database) {
 					target: storyOverlays.story_id,
 					set: {
 						why_it_matters: why_it_matters ?? undefined,
-						confidence: confidence?.toString() ?? undefined,
+						confidence:
+							confidence != null
+								? confidence.toString()
+								: undefined,
 						citations: citations ?? undefined,
 						analysis_state: analysis_state ?? undefined,
 						analyzed_at: sql`now()`,
@@ -126,13 +162,11 @@ export function createStoryQueries(db: Database) {
 		},
 
 		/**
-		 * Upsert story embedding
+		 * Upsert vector embedding metadata for semantic search.
 		 */
-		async upsertStoryEmbedding(params: {
-			story_id: string;
-			embedding: number[];
-			model_version?: string | null;
-		}) {
+		async upsertStoryEmbedding(
+			params: UpsertStoryEmbeddingParams,
+		): Promise<void> {
 			const { story_id, embedding, model_version } = params;
 
 			await db
