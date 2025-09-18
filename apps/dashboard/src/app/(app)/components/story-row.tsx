@@ -1,11 +1,11 @@
 'use client';
 import { useTabs } from '@/src/hooks/use-tabs';
 import { domainFromUrl } from '@/src/utils/url';
-import type { Cluster } from '@zeke/supabase/types';
+import type { StoryClusterView } from '@/lib/stories';
 import { useRouter } from 'next/navigation';
 import { StoryKindIcon } from './story-kind-icon';
 
-export default function StoryRow({ cluster }: { cluster: Cluster }) {
+export default function StoryRow({ cluster }: { cluster: StoryClusterView }) {
   const { openTab } = useTabs();
   const router = useRouter();
   const openPreview = () =>

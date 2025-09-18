@@ -1,5 +1,5 @@
 "use client";
-import type { Cluster } from "@zeke/supabase/types";
+import type { StoryClusterView } from "@/lib/stories";
 import { Button } from "@zeke/ui/button";
 import { Input } from "@zeke/ui/input";
 import { useRouter } from "next/navigation";
@@ -86,7 +86,7 @@ export default function StoriesGridClient({
 	// No client-side filtering needed - all done server-side
 	const filtered = items;
 
-	const openPreview = (c: Cluster) =>
+	const openPreview = (c: StoryClusterView) =>
 		openTab({
 			id: c.id,
 			title: c.title,
@@ -96,7 +96,7 @@ export default function StoriesGridClient({
 			overlays: c.overlays,
 			preview: true,
 		});
-	const openPermanent = (c: Cluster) => {
+	const openPermanent = (c: StoryClusterView) => {
 		router.push(`/stories/${encodeURIComponent(c.id)}`);
 	};
 

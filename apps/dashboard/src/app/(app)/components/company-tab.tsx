@@ -1,7 +1,7 @@
 'use client';
+import type { StoryClusterView } from '@/lib/stories';
 import { companyViewParser } from '@/src/utils/nuqs';
 import type { Tab } from '@/src/hooks/use-tabs';
-import type { Cluster } from '@zeke/supabase/types';
 import Image from 'next/image';
 import { useQueryState } from 'nuqs';
 import { useEffect, useMemo, useState } from 'react';
@@ -24,7 +24,7 @@ const COMPANY_KEYWORDS: Record<string, { company: string[]; ceo: string[] }> = {
 };
 
 function useFetchClusters() {
-  const [clusters, setClusters] = useState<Cluster[]>([]);
+  const [clusters, setClusters] = useState<StoryClusterView[]>([]);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -34,7 +34,7 @@ function useFetchClusters() {
           x.json()
         );
         if (!ac.signal.aborted) {
-          setClusters(r.clusters ?? []);
+          setClusters(r.stories ?? []);
         }
       } catch (e: unknown) {
         const { isAbortError } = await import('@/src/utils/errors');
@@ -50,9 +50,9 @@ function useFetchClusters() {
   return clusters;
 }
 
-function filterClusters(clusters: Cluster[], slug: string, ceo: string) {
+function filterClusters(clusters: StoryClusterView[], slug: string, ceo: string) {
   const keys = COMPANY_KEYWORDS[slug] ?? { company: [slug], ceo: [ceo] };
-  const inText = (c: Cluster, arr: string[]) =>
+  const inText = (c: StoryClusterView, arr: string[]) =>
     arr.some((k) => `${c.title} ${c.primaryUrl}`.toLowerCase().includes(k));
   return {
     news: clusters.filter((c) => inText(c, keys.company)),
@@ -62,9 +62,9 @@ function filterClusters(clusters: Cluster[], slug: string, ceo: string) {
 
 function selectPrimaryItems(
   isCEOView: boolean,
-  ceoNews: Cluster[],
-  news: Cluster[],
-  clusters: Cluster[]
+  ceoNews: StoryClusterView[],
+  news: StoryClusterView[],
+  clusters: StoryClusterView[]
 ) {
   if (isCEOView) {
     return ceoNews.length ? ceoNews : clusters;
@@ -74,9 +74,9 @@ function selectPrimaryItems(
 
 function selectSecondaryItems(
   isCEOView: boolean,
-  ceoNews: Cluster[],
-  news: Cluster[],
-  clusters: Cluster[]
+  ceoNews: StoryClusterView[],
+  news: StoryClusterView[],
+  clusters: StoryClusterView[]
 ) {
   if (isCEOView) {
     return news.length ? news : clusters;
@@ -189,8 +189,8 @@ function CompanySections({
 }: {
   primaryTitle: string;
   secondaryTitle: string;
-  primaryItems: Cluster[];
-  secondaryItems: Cluster[];
+  primaryItems: StoryClusterView[];
+  secondaryItems: StoryClusterView[];
 }) {
   return (
     <div className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-2">

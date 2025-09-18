@@ -1,10 +1,9 @@
-import { listStories } from '@zeke/supabase/queries';
+import { fetchStoriesForDashboard } from '@/lib/stories';
 
 import StoryRow from './feed/story-row';
 
 export default async function FeedList() {
-  // Server component: fetch clusters (placeholder from in-memory util)
-  const clusters = await listStories();
+  const { stories: clusters } = await fetchStoriesForDashboard();
   return (
     <div className="divide-y">
       {clusters.map((c) => (

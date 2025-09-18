@@ -1,4 +1,4 @@
-import { getShareSnapshot, getStoryById } from '@zeke/supabase/queries';
+import { fetchStoryForDashboard } from '@/lib/stories';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request): Promise<Response> {
@@ -11,15 +11,23 @@ export async function GET(req: Request): Promise<Response> {
       { status: HTTP_BAD_REQUEST }
     );
   }
-  const snapshot = (await getShareSnapshot(id)) || (await getStoryById(id));
-  if (!snapshot) {
+  const detail = await fetchStoryForDashboard(id);
+  if (!detail) {
     const HTTP_NOT_FOUND = 404;
     return NextResponse.json(
       { error: 'Not found' },
       { status: HTTP_NOT_FOUND }
     );
   }
-  return NextResponse.json(snapshot);
+  return NextResponse.json({
+    title: detail.story.title,
+    embedKind: detail.story.embedKind,
+    embedUrl: detail.story.embedUrl,
+    overlays: detail.story.overlays,
+    story: detail.story,
+    cluster: detail.cluster,
+    metrics: detail.metrics,
+  });
 }
 
 export function POST(_req: Request): Response {

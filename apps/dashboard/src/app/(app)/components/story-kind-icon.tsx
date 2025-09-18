@@ -9,13 +9,13 @@ import {
   IoNewspaper,
 } from 'react-icons/io5';
 
-import type { EmbedKind } from '@zeke/supabase/types';
+import type { StoryEmbedKind } from '@/lib/stories';
 
 export function StoryKindIcon({
   kind,
   className,
 }: {
-  kind: EmbedKind | string;
+  kind: StoryEmbedKind | string;
   className?: string;
 }) {
   const common = className ?? 'h-4 w-4';

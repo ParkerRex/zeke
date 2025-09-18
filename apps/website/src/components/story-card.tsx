@@ -1,4 +1,4 @@
-import type { Cluster } from "@zeke/supabase/types";
+import type { StoryClusterView } from "../lib/stories";
 import { Badge } from "@zeke/ui/badge";
 import { Card, CardContent, CardHeader } from "@zeke/ui/card";
 import { cn } from "@zeke/ui/cn";
@@ -17,7 +17,7 @@ import { HypeBar } from "./hype-bar";
 import { SourcesBadge } from "./sources-badge";
 
 interface StoryCardProps {
-	story: Cluster;
+	story: StoryClusterView;
 	variant?: "default" | "featured" | "compact";
 	showHype?: boolean;
 	showImage?: boolean;

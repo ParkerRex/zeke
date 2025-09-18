@@ -1,5 +1,5 @@
+import { fetchStoriesForDashboard } from '@/lib/stories';
 import { storyQuerySchema, withValidation } from '@/src/utils/api-schemas';
-import { listStories } from '@zeke/supabase/queries';
 import { createClient } from '@zeke/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -24,21 +24,20 @@ export const GET = withValidation(
 
       const { limit, offset, kind, q: search } = validatedQuery!;
 
-      const result = await listStories({
+      const { stories, totalCount, hasMore } = await fetchStoriesForDashboard({
         limit,
         offset,
         kind,
         search,
-        userId, // For future user-specific filtering
       });
 
       return NextResponse.json({
-        stories: result.stories,
+        stories,
         pagination: {
           limit,
           offset,
-          totalCount: result.totalCount,
-          hasMore: result.hasMore,
+          totalCount,
+          hasMore,
         },
       });
     } catch (_error) {

@@ -1,5 +1,5 @@
 "use client";
-import type { Cluster } from "@zeke/supabase/types";
+import type { StoryClusterView } from "@/lib/stories";
 import { Button } from "@zeke/ui/button";
 import { Input } from "@zeke/ui/input";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ import {
 import { StoryKindIcon } from "./story-kind-icon";
 
 export default function HomeSnapshot() {
-	const [clusters, setClusters] = useState<Cluster[]>([]);
+	const [clusters, setClusters] = useState<StoryClusterView[]>([]);
 	useEffect(() => {
 		const ac = new AbortController();
 		(async () => {
@@ -23,7 +23,7 @@ export default function HomeSnapshot() {
 				const res = await fetch("/api/stories", { signal: ac.signal });
 				const json = await res.json();
 				if (!ac.signal.aborted) {
-					setClusters(json.clusters ?? []);
+					setClusters(json.stories ?? []);
 				}
 			} catch (e: unknown) {
 				const { isAbortError } = await import("@/src/utils/errors");
@@ -253,7 +253,13 @@ function Card({
 	);
 }
 
-function SimpleList({ items, empty }: { items: Cluster[]; empty: string }) {
+function SimpleList({
+  items,
+  empty,
+}: {
+  items: StoryClusterView[];
+  empty: string;
+}) {
 	if (!items.length) {
 		return <div className="text-gray-500 text-xs">{empty}</div>;
 	}
@@ -269,7 +275,13 @@ function SimpleList({ items, empty }: { items: Cluster[]; empty: string }) {
 	);
 }
 
-function MiniList({ label, items }: { label: string; items: Cluster[] }) {
+function MiniList({
+  label,
+  items,
+}: {
+  label: string;
+  items: StoryClusterView[];
+}) {
 	return (
 		<div className="rounded-md border border-gray-200 bg-gray-50 p-3">
 			<div className="mb-2 font-medium text-gray-600 text-xs uppercase tracking-wide">

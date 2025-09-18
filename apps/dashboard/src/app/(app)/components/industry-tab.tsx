@@ -1,6 +1,6 @@
 'use client';
+import type { StoryClusterView } from '@/lib/stories';
 import type { Tab } from '@/src/hooks/use-tabs';
-import type { Cluster } from '@zeke/supabase/types';
 import { useEffect, useMemo, useState } from 'react';
 import StoryRow from './story-row';
 
@@ -8,7 +8,7 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
   const industry = (tab.context?.industry as string | undefined) ?? 'All';
   const sub = tab.context?.subindustry as string | undefined;
 
-  const [clusters, setClusters] = useState<Cluster[]>([]);
+  const [clusters, setClusters] = useState<StoryClusterView[]>([]);
   useEffect(() => {
     const ac = new AbortController();
     (async () => {
@@ -16,7 +16,7 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
         const res = await fetch('/api/stories', { signal: ac.signal });
         const json = await res.json();
         if (!ac.signal.aborted) {
-          setClusters(json.clusters ?? []);
+          setClusters(json.stories ?? []);
         }
       } catch (e: unknown) {
         const { isAbortError } = await import('@/src/utils/errors');
@@ -52,7 +52,11 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
   );
 }
 
-function filterByIndustry(list: Cluster[], industry?: string, sub?: string) {
+function filterByIndustry(
+  list: StoryClusterView[],
+  industry?: string,
+  sub?: string
+) {
   if (!industry || industry === 'All') {
     return list;
   }

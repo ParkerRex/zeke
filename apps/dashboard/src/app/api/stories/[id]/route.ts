@@ -1,5 +1,5 @@
 import { withAuth } from '@/lib/auth/middleware-helpers';
-import { getStoryById } from '@zeke/supabase/queries';
+import { fetchStoryForDashboard } from '@/lib/stories';
 import { NextResponse } from 'next/server';
 
 export const GET = withAuth(
@@ -22,12 +22,20 @@ export const GET = withAuth(
         );
       }
 
-      const cluster = await getStoryById(id);
-      if (!cluster) {
+      const detail = await fetchStoryForDashboard(id);
+      if (!detail) {
         return NextResponse.json({ error: 'Story not found' }, { status: 404 });
       }
 
-      return NextResponse.json(cluster);
+      return NextResponse.json({
+        title: detail.story.title,
+        embedKind: detail.story.embedKind,
+        embedUrl: detail.story.embedUrl,
+        overlays: detail.story.overlays,
+        story: detail.story,
+        cluster: detail.cluster,
+        metrics: detail.metrics,
+      });
     } catch (_error) {
       return NextResponse.json(
         { error: 'Failed to fetch story' },

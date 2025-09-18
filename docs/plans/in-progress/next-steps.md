@@ -30,9 +30,32 @@
   - ✓ Core modules already cover most surfaces (`users`, `teams`, `stories`, `highlights`, `sources`, `story-analytics`, etc.); keep the README in sync when adding more.
   - [ ] Fill the gaps from the schema audit: add `billing.ts` (Stripe prices/subscriptions), `story-clusters.ts` (cluster + overlays + transcripts), `pipeline.ts` (queue counts + recent activity), and `assistant/playbooks` once their tables stabilize.
     - [x] Added `billing.ts`, `story-clusters.ts`, and `pipeline.ts` under `packages/db/src/queries/` (see README bump).
-    - [ ] Assistant/playbooks query surface pending until table shapes settle.
-    - ➡️ Next unblock: gather playbook/assistant requirements and translate to query module once schema updates land.
+    - [x] Assistant/playbooks query surface implemented via `packages/db/src/queries/assistant.ts` and `packages/db/src/queries/playbooks.ts`.
+    - ➡️ Next unblock: wire the new query helpers into Supabase cached fetchers + safe actions so the dashboard can consume them.
   - [x] Document return payloads with exported types + JSDoc in each module so server actions can reuse the shapes without ad-hoc `Pick<>`s.
+  - [ ] Replace remaining `@zeke/supabase/queries` call sites with Drizzle-backed server actions + helpers.
+    - [x] Stories (dashboard + marketing):
+      - Replaced all `listStories`/`getStoryById` imports with Drizzle-backed helpers exposed via `@/lib/stories` (dashboard) and `apps/website/src/lib/stories.ts`.
+      - Added view-model transformers in `packages/db/src/utils/story-view.ts` + `packages/db/src/queries/story-display.ts`, removing the dependency on `@zeke/supabase/types/Cluster` at call sites.
+      - Updated server components, API routes, and client hooks to consume the new helpers (`/api/stories`, `/api/share`, dashboard feed widgets, marketing pages, tabs, etc.).
+      - TODO follow-up: delete the legacy `Cluster` definition from `@zeke/supabase/types` once pricing/admin refactors are complete.
+    - [ ] Pipeline widgets:
+      - Add `apps/dashboard/src/actions/pipeline/get-pipeline-status-action.ts` and `get-pipeline-activity-action.ts` (schemas in `actions/schemas/pipeline.ts`) that wrap `getPipelineCounts` and `getRecentPipelineActivity`.
+      - Swap `/api/pipeline/status` + `/api/pipeline/recent` routes and dashboard widgets to use the new actions so zero code references the Supabase REST helpers.
+    - [ ] Pricing & subscriptions:
+      - Introduce `apps/dashboard/src/actions/billing/get-products-action.ts` and `get-team-subscription-action.ts` (schemas in `actions/schemas/billing.ts`) which call `getActiveProductsWithPrices` and `getTeamActiveSubscription`.
+      - Update `PricingSection`, checkout flow, and manage-subscription route to call those actions; remove imports from `@zeke/supabase/queries`.
+      - Ensure `apps/dashboard/src/components/pricing/price-card.tsx` consumes the Drizzle-derived TypeScript types instead of `@zeke/supabase/types`.
+    - [ ] Notifications / current user:
+      - Add `apps/dashboard/src/actions/users/get-current-user-action.ts` (schema in `actions/schemas/users.ts`) that returns the cached `getUserById` payload.
+      - Refactor `use-notifications` to invoke the action (or a new `/api/users/me` route) instead of reaching through Supabase client-side.
+    - [ ] Stripe customer lookup:
+      - Implement `packages/db/src/queries/billing.ts#getTeamStripeCustomerId` (or similar) and a matching safe action so `manage-subscription` can read the team’s `stripe_customer_id` without the legacy helper.
+    - [ ] Sources admin (blocked):
+      - Design new read/write helpers for `sources` + `source_connections` + `source_health`; once available, add `apps/dashboard/src/actions/admin/sources/*.ts` to back the admin API routes and remove `getAdminFlag` usage.
+    - [ ] Cleanup:
+      - Remove unused exports from `packages/supabase` (leave only `cached-queries/getSession`, storage utilities, and client factories).
+      - Update the package export map + documentation to reflect the new action entry points.
 - [ ] Implement domain mutations (setActiveTeam, acceptInvite, createHighlight, etc.).
   - [x] Keep write helpers inside the relevant `packages/db/src/queries/*` module for now; switched dashboard safe actions to import from the query barrel instead of the deleted `mutations` path.
   - [ ] Extract mutating helpers currently co-located with queries (`stories.insertStory`, `stories.upsertStoryOverlay`, notification settings upserts`, etc.) into dedicated write-focused modules once the surface stabilizes.
@@ -40,9 +63,9 @@
   - [ ] Scaffold `packages/db/src/mutations/index.ts` (or equivalent) once we unwrap more than teams/highlights so everything accepts the shared `Database` type from `connectDb()`.
   - [x] Add transactional helpers for multi-table flows: `setActiveTeam` now verifies membership, toggles `team_members.status` flags, and invite `accept/decline` paths provision memberships then clear pending invites.
 - [ ] Build highlights CRUD + sharing layer.
-  - Implement `listStoryHighlights`, `listSharedHighlights`, `getHighlightById` with transcript/turn joins in `packages/db/src/queries/highlights.ts`.
-  - Add mutation helpers (`createHighlight`, `updateHighlight`, `deleteHighlight`, `shareHighlight`, `revokeHighlightShare`) that respect origin metadata and collaborator rules.
-  - Introduce utility mappers for transcript snippets + citation payloads under `packages/db/src/utils/highlights.ts`.
+  - [x] Implement story/highlight queries (`getStoryHighlights`, `getSharedHighlights`, `getHighlightById`) with transcript + turn joins in `packages/db/src/queries/highlights.ts`.
+  - [x] Add mutation helpers (`createHighlight`, `updateHighlight`, `deleteHighlight`, `shareHighlight`, `revokeHighlightShare`) that respect origin metadata and collaborator rules.
+  - [x] Introduce utility mappers for transcript snippets + citation payloads under `packages/db/src/utils/highlights.ts`.
   - Write unit tests covering CRUD + sharing permutations (user/assistant/system origins).
 
 ## Sprint 2 — Cached Access & Automated Highlight Generation

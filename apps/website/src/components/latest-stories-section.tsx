@@ -3,14 +3,13 @@
  * Displays a grid of latest stories
  */
 
-import { listStories } from '@zeke/supabase/queries';
-import type { Cluster } from '@zeke/supabase/types';
+import { fetchStoriesForWebsite, type StoryClusterView } from '../../lib/stories';
 import { DEFAULT_STORIES_LIMIT } from '../../lib/stories-utils';
 import { StoriesGrid } from './stories-grid';
 
 interface LatestStoriesSectionProps {
   title?: string;
-  stories?: Cluster[];
+  stories?: StoryClusterView[];
   limit?: number;
 }
 
@@ -19,7 +18,8 @@ export async function LatestStoriesSection({
   stories,
   limit = DEFAULT_STORIES_LIMIT,
 }: LatestStoriesSectionProps) {
-  const items = stories ?? (await listStories());
+  const items =
+    stories ?? (await fetchStoriesForWebsite({ limit })).stories;
   const grid = items.slice(0, limit);
 
   return (

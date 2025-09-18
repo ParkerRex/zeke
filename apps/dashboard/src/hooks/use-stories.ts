@@ -1,6 +1,6 @@
 'use client';
 import { isAbortError, safeErrorMessage } from '@/src/utils/errors';
-import type { Cluster } from '@zeke/supabase/types';
+import type { StoryClusterView } from '@/lib/stories';
 import { useCallback, useEffect, useState } from 'react';
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -13,7 +13,7 @@ export interface StoriesFilter {
 }
 
 export interface StoriesResponse {
-  stories: Cluster[];
+  stories: StoryClusterView[];
   pagination: {
     limit: number;
     offset: number;

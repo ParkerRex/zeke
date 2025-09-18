@@ -1,22 +1,21 @@
-import { domainFromUrl } from '@/src/utils/url';
-import { listStories } from '@zeke/supabase/queries';
-import type { Cluster } from '@zeke/supabase/types';
-import Image from 'next/image';
-import Link from 'next/link';
-import { IoCalendarClear } from 'react-icons/io5';
+import { fetchStoriesForDashboard, type StoryClusterView } from "@/lib/stories";
+import { domainFromUrl } from "@/src/utils/url";
+import Image from "next/image";
+import Link from "next/link";
+import { IoCalendarClear } from "react-icons/io5";
 
 type Props = {
   title?: string;
   limit?: number;
   showDate?: boolean;
-  stories?: Cluster[];
+  stories?: StoryClusterView[];
 };
 
-function imageFor(_story?: Cluster) {
-  return '/hero-shape.png';
+function imageFor(_story?: StoryClusterView) {
+  return "/hero-shape.png";
 }
 
-function hypePercent(c: Cluster) {
+function hypePercent(c: StoryClusterView) {
   const chili = Number(c?.overlays?.chili ?? 0);
   const pct = Math.max(0, Math.min(5, chili)) * 20; // map 0..5 → 0..100
   return pct;
@@ -45,7 +44,7 @@ function SourcesBadge({ count }: { count: number }) {
   );
 }
 
-function TopNewsCard({ story }: { story: Cluster }) {
+function TopNewsCard({ story }: { story: StoryClusterView }) {
   const img = imageFor(story);
   const sources = story.overlays?.sources?.length ?? 0;
   const hype = hypePercent(story);
@@ -53,7 +52,7 @@ function TopNewsCard({ story }: { story: Cluster }) {
   return (
     <article className="rounded-md border bg-white p-3 shadow-sm">
       <div className="mb-2 flex items-start justify-between text-[11px] text-gray-500">
-        <span>• {domain || 'AI'}</span>
+        <span>• {domain || "AI"}</span>
         {/* Placeholder for bookmark icon */}
       </div>
       <h3 className="mb-2 font-semibold leading-snug">
@@ -79,12 +78,13 @@ function TopNewsCard({ story }: { story: Cluster }) {
 }
 
 export default async function TopNewsSection({
-  title = 'Top News',
+  title = "Top News",
   limit = 6,
   showDate = true,
   stories,
 }: Props) {
-  const items = stories ?? (await listStories());
+  const items =
+    stories ?? (await fetchStoriesForDashboard({ limit })).stories;
   const grid = items.slice(0, limit);
   return (
     <section>
@@ -96,10 +96,10 @@ export default async function TopNewsSection({
             <IoCalendarClear className="opacity-70" />
             <span>
               {new Date().toLocaleDateString(undefined, {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </span>
           </div>
@@ -120,7 +120,7 @@ export default async function TopNewsSection({
           className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm hover:bg-gray-50"
           href="/stories"
         >
-          Show More{' '}
+          Show More{" "}
           <span aria-hidden className="text-lg leading-none">
             +
           </span>

@@ -2,12 +2,12 @@
  * Reusable stories grid component
  */
 
+import type { StoryClusterView } from '../lib/stories';
 import { cn } from '@zeke/ui/lib/utils';
-import type { Cluster } from '@zeke/supabase/types';
 import { StoryCard } from './story-card';
 
 interface StoriesGridProps {
-  stories: Cluster[];
+  stories: StoryClusterView[];
   variant?: 'default' | 'featured' | 'compact';
   showHype?: boolean;
   showImage?: boolean;

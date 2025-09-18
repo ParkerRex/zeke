@@ -8,16 +8,16 @@ import {
   globalPanelParser,
   tabMetadataParser
 } from '@/src/utils/nuqs';
-import type { EmbedKind, Overlays } from '@zeke/supabase/types';
+import type { StoryEmbedKind, StoryOverlaySummary } from '@/lib/stories';
 
 export type Tab = {
   id: string; // clusterId or "share:abc123"
   title: string;
-  embedKind: EmbedKind;
+  embedKind: StoryEmbedKind;
   embedUrl: string;
   clusterId?: string;
   shareId?: string;
-  overlays: Overlays;
+  overlays: StoryOverlaySummary;
   // Optional contextual data for non-story tabs (e.g., industry selection)
   context?: Record<string, unknown>;
   // Preview tabs are shown in italics until promoted (e.g., one-click open)
@@ -37,9 +37,9 @@ function sortTabs(tabs: Tab[]): Tab[] {
 function createTabFromResponse(
   res: {
     title: string;
-    embedKind: EmbedKind;
+    embedKind: StoryEmbedKind;
     embedUrl: string;
-    overlays: Overlays;
+    overlays: StoryOverlaySummary;
   },
   optimisticId: string,
   isShare: boolean,
@@ -96,7 +96,7 @@ export function useTabs() {
       return {
         id,
         title: meta?.title || `Tab ${id}`,
-        embedKind: (meta?.embedKind as EmbedKind) || 'article',
+        embedKind: (meta?.embedKind as StoryEmbedKind) || 'article',
         embedUrl: meta?.embedUrl || 'about:blank',
         clusterId: meta?.clusterId,
         shareId: id.startsWith('share:') ? id.replace('share:', '') : undefined,

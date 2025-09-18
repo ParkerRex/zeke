@@ -3,7 +3,6 @@
  */
 
 import { createMetadata } from "@zeke/seo/metadata";
-import { listStories } from "@zeke/supabase/queries";
 import { Button } from "@zeke/ui/button";
 import { Input } from "@zeke/ui/input";
 import { Icons } from "@zeke/ui/icons";
@@ -12,6 +11,7 @@ import { Suspense } from "react";
 
 import { EmptyState, PageHeader } from "@/components/layout";
 import { StoriesGrid as StoriesGridComponent } from "@/components/stories";
+import { fetchStoriesForWebsite } from "@/lib/stories";
 
 interface StoriesPageProps {
 	searchParams: Promise<{
@@ -27,7 +27,7 @@ export const metadata: Metadata = createMetadata({
 });
 
 async function StoriesList({ searchQuery }: { searchQuery?: string }) {
-	const stories = await listStories();
+	const { stories } = await fetchStoriesForWebsite();
 
 	const filteredStories = searchQuery
 		? stories.filter((story) => {

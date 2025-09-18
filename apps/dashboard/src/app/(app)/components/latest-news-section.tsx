@@ -1,6 +1,5 @@
+import { fetchStoriesForDashboard, type StoryClusterView } from '@/lib/stories';
 import { domainFromUrl } from '@/src/utils/url';
-import { listStories } from '@zeke/supabase/queries';
-import type { Cluster } from '@zeke/supabase/types';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,11 +12,11 @@ const DEFAULT_STORIES_LIMIT = 6;
 
 type Props = {
   title?: string;
-  stories?: Cluster[];
+  stories?: StoryClusterView[];
   limit?: number;
 };
 
-function imageFor(_story?: Cluster) {
+function imageFor(_story?: StoryClusterView) {
   // Placeholder imagery for now; wire real thumbnails later.
   return '/hero-shape.png';
 }
@@ -63,7 +62,7 @@ function SourcesBadge({ count }: { count: number }) {
   );
 }
 
-function NewsCard({ story }: { story: Cluster }) {
+function NewsCard({ story }: { story: StoryClusterView }) {
   const img = imageFor(story);
   const coverage = deterministicPercent(story.id);
   const sources = story.overlays?.sources?.length ?? 0;
@@ -115,7 +114,8 @@ export async function LatestNewsSection({
   stories,
   limit = DEFAULT_STORIES_LIMIT,
 }: Props) {
-  const items = stories ?? (await listStories());
+  const items =
+    stories ?? (await fetchStoriesForDashboard({ limit })).stories;
   const grid = items.slice(0, limit);
   return (
     <section className="mt-8">
