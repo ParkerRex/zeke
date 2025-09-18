@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { connectDb } from "@zeke/db/src/client";
-import { setActiveTeam } from "@zeke/db/src/mutations";
+import { setActiveTeam } from "@zeke/db/queries";
 import { authActionClient } from "../safe-action";
 import { setActiveTeamSchema } from "../schema";
 

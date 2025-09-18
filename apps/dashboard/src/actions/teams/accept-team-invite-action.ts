@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { acceptTeamInvite } from "@zeke/db/queries";
 import { connectDb } from "@zeke/db/src/client";
-import { acceptTeamInvite } from "@zeke/db/src/mutations";
 import { getSession } from "@zeke/supabase/queries/cached-queries";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { authActionClient } from "../safe-action";
 import { respondTeamInviteSchema } from "../schema";
 
@@ -22,7 +22,7 @@ export const acceptTeamInviteAction = authActionClient
 
     const db = await connectDb();
     const result = await acceptTeamInvite(db, {
-      inviteId,
+      id: inviteId,
       userId: user.id,
       email,
     });

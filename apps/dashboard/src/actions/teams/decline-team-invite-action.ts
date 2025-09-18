@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { connectDb } from "@zeke/db/src/client";
-import { declineTeamInvite } from "@zeke/db/src/mutations";
+import { declineTeamInvite } from "@zeke/db/queries";
 import { getSession } from "@zeke/supabase/queries/cached-queries";
 import { authActionClient } from "../safe-action";
 import { respondTeamInviteSchema } from "../schema";
@@ -22,7 +22,7 @@ export const declineTeamInviteAction = authActionClient
 
     const db = await connectDb();
     const result = await declineTeamInvite(db, {
-      inviteId,
+      id: inviteId,
       email,
     });
 

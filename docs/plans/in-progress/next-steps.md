@@ -33,11 +33,12 @@
     - [ ] Assistant/playbooks query surface pending until table shapes settle.
     - ➡️ Next unblock: gather playbook/assistant requirements and translate to query module once schema updates land.
   - [x] Document return payloads with exported types + JSDoc in each module so server actions can reuse the shapes without ad-hoc `Pick<>`s.
-- [ ] Implement domain mutations under `packages/db/src/mutations` (setActiveTeam, acceptInvite, createHighlight, etc.).
-  - [ ] Extract mutating helpers currently co-located with queries (`stories.insertStory`, `stories.upsertStoryOverlay`, notification settings upserts`, etc.) into dedicated mutation modules (`stories.ts`, `teams.ts`, `highlights.ts`).
+- [ ] Implement domain mutations (setActiveTeam, acceptInvite, createHighlight, etc.).
+  - [x] Keep write helpers inside the relevant `packages/db/src/queries/*` module for now; switched dashboard safe actions to import from the query barrel instead of the deleted `mutations` path.
+  - [ ] Extract mutating helpers currently co-located with queries (`stories.insertStory`, `stories.upsertStoryOverlay`, notification settings upserts`, etc.) into dedicated write-focused modules once the surface stabilizes.
     - [ ] Decision: keep story writes inside `packages/db/src/queries/stories.ts` until broader mutation surface is defined.
-  - [ ] Scaffold `packages/db/src/mutations/index.ts` to mirror the query export surface and ensure every helper accepts the shared `Database` type from `connectDb()`.
-  - [ ] Add transactional helpers for multi-table flows (activate team, accept invite, create highlight + overlay) so server actions can call one mutation per user interaction.
+  - [ ] Scaffold `packages/db/src/mutations/index.ts` (or equivalent) once we unwrap more than teams/highlights so everything accepts the shared `Database` type from `connectDb()`.
+  - [x] Add transactional helpers for multi-table flows: `setActiveTeam` now verifies membership, toggles `team_members.status` flags, and invite `accept/decline` paths provision memberships then clear pending invites.
 - [ ] Build highlights CRUD + sharing layer.
   - Implement `listStoryHighlights`, `listSharedHighlights`, `getHighlightById` with transcript/turn joins in `packages/db/src/queries/highlights.ts`.
   - Add mutation helpers (`createHighlight`, `updateHighlight`, `deleteHighlight`, `shareHighlight`, `revokeHighlightShare`) that respect origin metadata and collaborator rules.
