@@ -29,7 +29,7 @@ export type SourceRow = {
   metadata: Json | null;
 };
 
-export type RawItemRow = {
+export type DiscoveryRow = {
   id: string;
   source_id: string;
   external_id: string | null;
@@ -44,7 +44,7 @@ export type RawItemRow = {
 
 export type ContentRow = {
   id: string;
-  raw_item_id: string;
+  discovery_id: string;
   content_hash: string;
   text: string | null;
   html_url: string | null;

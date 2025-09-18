@@ -1,4 +1,4 @@
-export function buildRawItemArticle(
+export function buildDiscoveryArticle(
   norm: {
     externalId: string;
     url: string;

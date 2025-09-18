@@ -6,7 +6,7 @@ type SourceWithMetadata = {
   metadata?: { query?: string } | null;
 };
 
-export function buildRawItemYouTube(
+export function buildDiscoveryYouTube(
   video: YouTubeVideo,
   src: SourceWithMetadata
 ) {
@@ -17,6 +17,7 @@ export function buildRawItemYouTube(
     channelId: video.channelId,
     channelTitle: video.channelTitle,
     publishedAt: video.publishedAt,
+    description: video.description,
     duration: video.duration,
     viewCount: video.viewCount,
     likeCount: video.likeCount,

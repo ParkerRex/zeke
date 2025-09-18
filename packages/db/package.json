@@ -9,7 +9,9 @@
 		"test:golden": "bun test src/test/transaction-matching.golden.test.ts",
 		"test:all-matching": "bun test src/test/transaction-matching*.test.ts",
 		"test:watch": "bun test --watch",
-		"validate-golden": "bun run src/test/validate-golden-dataset.ts"
+		"validate-golden": "bun run src/test/validate-golden-dataset.ts",
+		"db:generate": "bunx --bun drizzle-kit generate --config ./drizzle.config.ts",
+		"db:push": "bunx --bun drizzle-kit push --config ./drizzle.config.ts"
 	},
 	"exports": {
 		"./client": "./src/client.ts",

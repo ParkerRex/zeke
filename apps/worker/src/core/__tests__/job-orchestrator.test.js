@@ -137,7 +137,7 @@ describe('Job Orchestrator', () => {
       if (path === '../db.js') {
         return {
           getOrCreateManualSource: mock.fn(async () => 'mock-source-id'),
-          upsertRawItem: mock.fn(async () => 'mock-raw-id'),
+          upsertDiscovery: mock.fn(async () => 'mock-raw-item-id'),
         };
       }
       return originalImport(path);
@@ -156,6 +156,8 @@ describe('Job Orchestrator', () => {
     assert.strictEqual(results.length, 2);
     assert.strictEqual(results[0].type, 'article');
     assert.strictEqual(results[1].type, 'youtube');
+    assert.strictEqual(results[0].raw_item_id, 'mock-raw-item-id');
+    assert.strictEqual(results[1].raw_item_id, 'mock-raw-item-id');
 
     // Should have sent jobs for both items
     assert.strictEqual(mockBoss.sendCalls.length, 2);

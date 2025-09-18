@@ -32,7 +32,7 @@ describe('HTTP Routes', () => {
     const statusData = JSON.parse(statusResponse.text);
     assert.strictEqual(statusData.ok, true);
     assert.ok('sources' in statusData);
-    assert.ok('raw' in statusData);
+    assert.ok('raw_items' in statusData);
     assert.ok('contents' in statusData);
     assert.ok('jobs' in statusData);
   });
@@ -68,7 +68,7 @@ describe('HTTP Routes', () => {
 
     // Mock database query for source type
     mockDatabaseImport({
-      queryResult: [{ kind: 'rss' }],
+      queryResult: [{ type: 'rss' }],
     });
 
     const response = await makeRequest(
@@ -94,7 +94,7 @@ describe('HTTP Routes', () => {
 
     // Mock database query for YouTube source
     mockDatabaseImport({
-      queryResult: [{ kind: 'youtube_channel' }],
+      queryResult: [{ type: 'youtube_channel' }],
     });
 
     const response = await makeRequest(

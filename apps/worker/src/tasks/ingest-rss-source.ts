@@ -1,6 +1,6 @@
 import type PgBoss from 'pg-boss';
-import { upsertRawItem, upsertSourceHealth } from '../db.js';
-import { buildRawItemArticle } from '../extract/build-raw-item-article.js';
+import { upsertDiscovery, upsertSourceHealth } from '../db.js';
+import { buildDiscoveryArticle } from '../extract/build-discovery-article.js';
 import { normalizeRssItem } from '../extract/normalize-rss-item.js';
 import { parseRssFeed } from '../extract/parse-rss-feed.js';
 import { log } from '../log.js';
@@ -40,8 +40,8 @@ export async function ingestRssSource(
       continue;
     }
     seen++;
-    const payload = buildRawItemArticle(norm, src.id);
-    const id = await upsertRawItem(payload);
+    const payload = buildDiscoveryArticle(norm, src.id);
+    const id = await upsertDiscovery(payload);
     if (id) {
       await boss.send('ingest:fetch-content', { rawItemIds: [id] });
       newCount++;

@@ -1,6 +1,6 @@
 import type PgBoss from 'pg-boss';
-import { upsertRawItem, upsertSourceHealth } from '../db.js';
-import { buildRawItemYouTube } from '../extract/build-raw-item-youtube.js';
+import { upsertDiscovery, upsertSourceHealth } from '../db.js';
+import { buildDiscoveryYouTube } from '../extract/build-discovery-youtube.js';
 import type { YouTubeVideo } from '../lib/youtube/types.js';
 import { log } from '../log.js';
 import type { SourceBase } from '../types/sources.js';
@@ -130,7 +130,7 @@ async function processVideos(
   let newCount = 0;
   for (const v of videos) {
     seen++;
-    const id = await upsertRawItem(buildRawItemYouTube(v, src));
+    const id = await upsertDiscovery(buildDiscoveryYouTube(v, src));
     if (id) {
       await boss.send('ingest:fetch-youtube-content', {
         rawItemIds: [id],

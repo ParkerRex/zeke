@@ -15,7 +15,7 @@
   - Found 30+ missing tables needed for playbooks, assistant, and team state
   - Identified critical field gaps in existing tables (teams.slug, highlights.chapter_id, etc.)
 - [x] Draft the revised Drizzle schema (stories, highlights, playbooks, assistant, billing) and get sign-off; note any short-term gaps (e.g., `team_state` TBD) with TODO comments.
-  - ✓ Created comprehensive revised schema at `packages/db/src/schema-revised.ts`
+  - ✓ Created comprehensive revised schema at `packages/db/src/schema.ts`
   - Added 30+ new tables for playbooks, assistant, team state, and story structure
   - Included TODO comment for deferred team_state features
   - Ready for review and migration planning

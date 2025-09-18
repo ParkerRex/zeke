@@ -9,8 +9,6 @@ max_rows = 1000000
 
 [db]
 port = 54322
-schema = ""
-seed = ""
 
 [realtime]
 enabled = true

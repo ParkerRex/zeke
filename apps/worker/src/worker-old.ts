@@ -44,16 +44,16 @@ if (!DATABASE_URL) {
 
 let bossRef: PgBoss | null = null;
 
-type FetchContentJobData = { rawItemIds: string[] };
+type FetchContentJobData = { discoveryIds: string[] };
 type AnalyzeJobData = { storyId?: string };
 
 // Discriminated results for one-off ingest endpoint
 type YouTubeIngestResult =
-  | { url: string; ok: true; raw_item_id: string; type: 'youtube' }
+  | { url: string; ok: true; discovery_id: string; type: 'youtube' }
   | { url: string; ok: false; error: string; type: 'youtube' };
 
 type ArticleIngestResult =
-  | { url: string; ok: true; raw_item_id: string; type: 'article' }
+  | { url: string; ok: true; discovery_id: string; type: 'article' }
   | { url: string; ok: false; error: string; type: 'article' };
 
 // Helper: handle one ingest:pull job (reduces route complexity)
@@ -317,12 +317,12 @@ function registerPreviewSource(app: express.Express) {
   ) {
     try {
       const sourceId = (req.query.sourceId as string) || '';
-      const rawLimit = Number.parseInt(
+      const discoveryLimit = Number.parseInt(
         String(req.query.limit ?? DEFAULT_PREVIEW_LIMIT),
         10
       );
       const limit = Math.min(
-        Number.isNaN(rawLimit) ? DEFAULT_PREVIEW_LIMIT : rawLimit,
+        Number.isNaN(discoveryLimit) ? DEFAULT_PREVIEW_LIMIT : discoveryLimit,
         MAX_PREVIEW_LIMIT
       );
       if (!sourceId) {
@@ -581,7 +581,7 @@ async function processYoutubeUrl(
   u: string,
   boss: PgBoss
 ): Promise<YouTubeIngestResult> {
-  const { getOrCreateManualSource, upsertRawItem } = await import('./db.js');
+  const { getOrCreateManualSource, upsertDiscovery } = await import('./db.js');
   const videoId = extractYouTubeVideoId(u);
   if (!videoId) {
     return { url: u, ok: false, error: 'no_video_id', type: 'youtube' };
@@ -592,7 +592,7 @@ async function processYoutubeUrl(
     'YouTube Manual',
     null
   );
-  const rawId = await upsertRawItem({
+  const discoveryId = await upsertDiscovery({
     source_id: sourceId,
     external_id: videoId,
     url: u,
@@ -600,13 +600,13 @@ async function processYoutubeUrl(
     kind: 'youtube',
     metadata: { src: 'manual' },
   });
-  if (rawId) {
+  if (discoveryId) {
     await boss.send('ingest:fetch-youtube-content', {
-      rawItemIds: [rawId],
+      discoveryIds: [discoveryId],
       videoId,
       sourceKind: 'youtube_manual',
     });
-    return { url: u, ok: true, raw_item_id: rawId, type: 'youtube' };
+    return { url: u, ok: true, discovery_id: discoveryId, type: 'youtube' };
   }
   return { url: u, ok: false, error: 'duplicate', type: 'youtube' };
 }
@@ -615,7 +615,7 @@ async function processArticleUrl(
   u: string,
   boss: PgBoss
 ): Promise<ArticleIngestResult> {
-  const { getOrCreateManualSource, upsertRawItem } = await import('./db.js');
+  const { getOrCreateManualSource, upsertDiscovery } = await import('./db.js');
   let domain: string | null = null;
   try {
     domain = new URL(u).hostname || null;
@@ -628,7 +628,7 @@ async function processArticleUrl(
     domain,
     null
   );
-  const rawId = await upsertRawItem({
+  const discoveryId = await upsertDiscovery({
     source_id: sourceId,
     external_id: u,
     url: u,
@@ -636,9 +636,9 @@ async function processArticleUrl(
     kind: 'article',
     metadata: { src: 'manual' },
   });
-  if (rawId) {
-    await boss.send('ingest:fetch-content', { rawItemIds: [rawId] });
-    return { url: u, ok: true, raw_item_id: rawId, type: 'article' };
+  if (discoveryId) {
+    await boss.send('ingest:fetch-content', { discoveryIds: [discoveryId] });
+    return { url: u, ok: true, discovery_id: discoveryId, type: 'article' };
   }
   return { url: u, ok: false, error: 'duplicate', type: 'article' };
 }
@@ -661,7 +661,7 @@ function registerIngestOneoff(app: express.Express) {
         | {
             url: string;
             ok: true;
-            raw_item_id: string;
+            discovery_id: string;
             type: 'youtube' | 'article';
           }
         | { url: string; ok: false; error: string; type: 'youtube' | 'article' }
@@ -690,7 +690,7 @@ function registerDebugStatus(app: express.Express) {
       const pg = (await import('./db.js')).default;
       const [
         { rows: sources },
-        { rows: rawCounts },
+        { rows: discoveryCounts },
         { rows: contentCounts },
         { rows: jobStats },
       ] = await Promise.all([
@@ -698,7 +698,7 @@ function registerDebugStatus(app: express.Express) {
           "select count(*)::int as sources_rss from public.sources where kind = 'rss' and url is not null"
         ),
         pg.query(
-          "select count(*)::int as raw_total, count(*) filter (where discovered_at > now() - interval '24 hours')::int as raw_24h from public.raw_items"
+          "select count(*)::int as discoveries_total, count(*) filter (where discovered_at > now() - interval '24 hours')::int as discoveries_24h from public.discoveries"
         ),
         pg.query('select count(*)::int as contents_total from public.contents'),
         pg.query(
@@ -708,7 +708,7 @@ function registerDebugStatus(app: express.Express) {
       res.json({
         ok: true,
         sources: sources[0],
-        raw: rawCounts[0],
+        discoveries: discoveryCounts[0],
         contents: contentCounts[0],
         jobs: jobStats,
       });

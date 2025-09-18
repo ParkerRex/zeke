@@ -11,8 +11,8 @@
  * - No business logic duplication
  */
 
-import type PgBoss from 'pg-boss';
-import { log } from '../log.js';
+import type PgBoss from "pg-boss";
+import { log } from "../log.js";
 
 export interface JobOrchestrator {
   // RSS Operations
@@ -45,7 +45,7 @@ export interface OneOffIngestResult {
   ok: boolean;
   raw_item_id?: string;
   error?: string;
-  type: 'youtube' | 'article';
+  type: "youtube" | "article";
 }
 
 /**
@@ -54,64 +54,64 @@ export interface OneOffIngestResult {
 export function createJobOrchestrator(boss: PgBoss): JobOrchestrator {
   return {
     async triggerRssIngest(): Promise<void> {
-      log('orchestrator_trigger', { job: 'rss_ingest', trigger: 'manual' });
-      await boss.send('ingest:pull', { source: 'rss' });
+      log("orchestrator_trigger", { job: "rss_ingest", trigger: "manual" });
+      await boss.send("ingest:pull", { source: "rss" });
     },
 
     async triggerRssSourceIngest(sourceId: string): Promise<void> {
-      log('orchestrator_trigger', {
-        job: 'rss_source_ingest',
+      log("orchestrator_trigger", {
+        job: "rss_source_ingest",
         sourceId,
-        trigger: 'manual',
+        trigger: "manual",
       });
-      await boss.send('ingest:source', { sourceId, kind: 'rss' });
+      await boss.send("ingest:source", { sourceId, kind: "rss" });
     },
 
     async triggerYouTubeIngest(): Promise<void> {
-      log('orchestrator_trigger', { job: 'youtube_ingest', trigger: 'manual' });
-      await boss.send('ingest:pull', { source: 'youtube' });
+      log("orchestrator_trigger", { job: "youtube_ingest", trigger: "manual" });
+      await boss.send("ingest:pull", { source: "youtube" });
     },
 
     async triggerYouTubeSourceIngest(sourceId: string): Promise<void> {
-      log('orchestrator_trigger', {
-        job: 'youtube_source_ingest',
+      log("orchestrator_trigger", {
+        job: "youtube_source_ingest",
         sourceId,
-        trigger: 'manual',
+        trigger: "manual",
       });
-      await boss.send('ingest:source', { sourceId, kind: 'youtube' });
+      await boss.send("ingest:source", { sourceId, kind: "youtube" });
     },
 
     async triggerContentExtraction(rawItemIds: string[]): Promise<void> {
-      log('orchestrator_trigger', {
-        job: 'content_extraction',
+      log("orchestrator_trigger", {
+        job: "content_extraction",
         count: rawItemIds.length,
       });
-      await boss.send('ingest:fetch-content', { rawItemIds });
+      await boss.send("ingest:fetch-content", { rawItemIds });
     },
 
     async triggerYouTubeContentExtraction(
-      data: YouTubeExtractionData
+      data: YouTubeExtractionData,
     ): Promise<void> {
-      log('orchestrator_trigger', {
-        job: 'youtube_content_extraction',
+      log("orchestrator_trigger", {
+        job: "youtube_content_extraction",
         videoId: data.videoId,
       });
-      await boss.send('ingest:fetch-youtube-content', data);
+      await boss.send("ingest:fetch-youtube-content", data);
     },
 
     async triggerStoryAnalysis(storyId: string): Promise<void> {
-      log('orchestrator_trigger', { job: 'story_analysis', storyId });
-      await boss.send('analyze:llm', { storyId });
+      log("orchestrator_trigger", { job: "story_analysis", storyId });
+      await boss.send("analyze:llm", { storyId });
     },
 
     async triggerOneOffIngest(urls: string[]): Promise<OneOffIngestResult[]> {
-      log('orchestrator_trigger', { job: 'oneoff_ingest', count: urls.length });
+      log("orchestrator_trigger", { job: "oneoff_ingest", count: urls.length });
 
       const results: OneOffIngestResult[] = [];
 
       for (const url of urls) {
         const kind = classifyUrl(url);
-        if (kind === 'youtube') {
+        if (kind === "youtube") {
           results.push(await processYouTubeUrl(url, boss));
         } else {
           results.push(await processArticleUrl(url, boss));
@@ -124,78 +124,78 @@ export function createJobOrchestrator(boss: PgBoss): JobOrchestrator {
 }
 
 // Helper functions (moved from worker.ts)
-function classifyUrl(url: string): 'youtube' | 'article' {
+function classifyUrl(url: string): "youtube" | "article" {
   try {
     const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname || '';
-    if (hostname.includes('youtube.com') || hostname.includes('youtu.be')) {
-      return 'youtube';
+    const hostname = parsedUrl.hostname || "";
+    if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+      return "youtube";
     }
-    return 'article';
+    return "article";
   } catch {
-    return 'article';
+    return "article";
   }
 }
 
 function extractYouTubeVideoId(url: string): string {
   try {
     const parsedUrl = new URL(url);
-    if (parsedUrl.hostname.includes('youtu.be')) {
-      return parsedUrl.pathname.replace('/', '');
+    if (parsedUrl.hostname.includes("youtu.be")) {
+      return parsedUrl.pathname.replace("/", "");
     }
-    if (parsedUrl.pathname.startsWith('/shorts/')) {
-      return parsedUrl.pathname.split('/')[2] || '';
+    if (parsedUrl.pathname.startsWith("/shorts/")) {
+      return parsedUrl.pathname.split("/")[2] || "";
     }
-    return parsedUrl.searchParams.get('v') || '';
+    return parsedUrl.searchParams.get("v") || "";
   } catch {
-    return '';
+    return "";
   }
 }
 
 async function processYouTubeUrl(
   url: string,
-  boss: PgBoss
+  boss: PgBoss,
 ): Promise<OneOffIngestResult> {
-  const { getOrCreateManualSource, upsertRawItem } = await import('../db.js');
+  const { getOrCreateManualSource, upsertDiscovery } = await import("../db.js");
 
   const videoId = extractYouTubeVideoId(url);
   if (!videoId) {
-    return { url, ok: false, error: 'no_video_id', type: 'youtube' };
+    return { url, ok: false, error: "no_video_id", type: "youtube" };
   }
 
   const sourceId = await getOrCreateManualSource(
-    'youtube_manual',
-    'youtube.com',
-    'YouTube Manual',
-    null
+    "youtube_manual",
+    "youtube.com",
+    "YouTube Manual",
+    null,
   );
 
-  const rawId = await upsertRawItem({
+  const rawItemId = await upsertDiscovery({
     source_id: sourceId,
     external_id: videoId,
     url,
     title: null,
-    kind: 'youtube',
-    metadata: { src: 'manual' },
+    kind: "youtube",
+    metadata: { src: "manual" },
   });
 
-  if (rawId) {
-    await boss.send('ingest:fetch-youtube-content', {
-      rawItemIds: [rawId],
+  if (rawItemId) {
+    await boss.send("ingest:fetch-youtube-content", {
+      rawItemIds: [rawItemId],
       videoId,
-      sourceKind: 'youtube_manual',
+      sourceKind: "youtube_manual",
     });
-    return { url, ok: true, raw_item_id: rawId, type: 'youtube' };
+    return { url, ok: true, raw_item_id: rawItemId, type: "youtube" };
   }
 
-  return { url, ok: false, error: 'duplicate', type: 'youtube' };
+  return { url, ok: false, error: "duplicate", type: "youtube" };
 }
 
 async function processArticleUrl(
   url: string,
-  boss: PgBoss
+  boss: PgBoss,
 ): Promise<OneOffIngestResult> {
-  const { getOrCreateManualSource, upsertRawItem } = await import('../db.js');
+  const { getOrCreateManualSource, upsertDiscovery } = await import("../db.js");
 
   let domain: string | null = null;
   try {
@@ -205,25 +205,25 @@ async function processArticleUrl(
   }
 
   const sourceId = await getOrCreateManualSource(
-    'manual',
+    "manual",
     domain,
     domain,
-    null
+    null,
   );
 
-  const rawId = await upsertRawItem({
+  const rawItemId = await upsertDiscovery({
     source_id: sourceId,
     external_id: url,
     url,
     title: null,
-    kind: 'article',
-    metadata: { src: 'manual' },
+    kind: "article",
+    metadata: { src: "manual" },
   });
 
-  if (rawId) {
-    await boss.send('ingest:fetch-content', { rawItemIds: [rawId] });
-    return { url, ok: true, raw_item_id: rawId, type: 'article' };
+  if (rawItemId) {
+    await boss.send("ingest:fetch-content", { rawItemIds: [rawItemId] });
+    return { url, ok: true, raw_item_id: rawItemId, type: "article" };
   }
 
-  return { url, ok: false, error: 'duplicate', type: 'article' };
+  return { url, ok: false, error: "duplicate", type: "article" };
 }

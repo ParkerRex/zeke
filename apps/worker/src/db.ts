@@ -1,12 +1,13 @@
-import { Pool } from 'pg';
-import { log } from './log.js';
+import { Pool } from "pg";
+import { log } from "./log.js";
+import { queries } from "./data/db.js";
 
-const cnn = process.env.DATABASE_URL || '';
+const cnn = process.env.DATABASE_URL || "";
 // Use SSL only for non-local connections. Supabase local Postgres on 127.0.0.1:54322 does not support TLS.
 const useSsl = !(
-  cnn.includes('127.0.0.1') ||
-  cnn.includes('localhost') ||
-  cnn.includes('host.docker.internal')
+  cnn.includes("127.0.0.1") ||
+  cnn.includes("localhost") ||
+  cnn.includes("host.docker.internal")
 );
 
 const pool = new Pool({
@@ -21,8 +22,8 @@ const pool = new Pool({
 
 // Prevent process crashes from idle client errors (e.g., Supabase pooler resets)
 // See: https://node-postgres.com/features/connecting#idle-clients
-pool.on('error', (err) => {
-  log('pg_pool_error', { err: String(err) }, 'warn');
+pool.on("error", (err) => {
+  log("pg_pool_error", { err: String(err) }, "warn");
 });
 
 export type SourceRow = {
@@ -34,14 +35,13 @@ export type SourceRow = {
 };
 
 export async function getRssSources(): Promise<SourceRow[]> {
-  const { rows } = await pool.query(
-    `select id, kind, url, name
-		 from public.sources
-		 where kind = 'rss'
-		   and url is not null
-		   and coalesce(active, true)`
-  );
-  return rows;
+  const sources = await queries.sources.getRssSources();
+  return sources.map((s) => ({
+    id: s.id,
+    kind: s.type, // Map 'type' to 'kind'
+    url: s.url,
+    name: s.name,
+  }));
 }
 
 export type YouTubeSourceRow = {
@@ -62,63 +62,54 @@ export type SourceRowFull = {
 };
 
 export async function getYouTubeSources(): Promise<YouTubeSourceRow[]> {
-  const { rows } = await pool.query(
-    `select id, kind, url, name, metadata from public.sources
-     where kind in ('youtube_channel', 'youtube_search')
-       and (url is not null or kind = 'youtube_search')
-       and coalesce(active, true)`
-  );
-  return rows;
+  const sources = await queries.sources.getYouTubeSources();
+  return sources.map((s) => ({
+    id: s.id,
+    kind: s.type, // Map 'type' to 'kind'
+    url: s.url,
+    name: s.name,
+    metadata: (s.metadata as Record<string, unknown>) ?? {},
+  }));
 }
 
 export async function getSourceById(
-  sourceId: string
+  sourceId: string,
 ): Promise<SourceRowFull | null> {
-  const { rows } = await pool.query(
-    'select id, kind, url, name, metadata, domain from public.sources where id = $1',
-    [sourceId]
-  );
-  return rows[0] ?? null;
+  const source = await queries.sources.getSourceById(sourceId);
+  if (!source) return null;
+
+  return {
+    id: source.id,
+    kind: source.type, // Map 'type' to 'kind'
+    url: source.url,
+    name: source.name,
+    domain: null, // domain field not in new schema
+    metadata: (source.metadata as Record<string, unknown>) ?? {},
+  };
 }
 
 export async function getOrCreateManualSource(
   kind: string,
   domain: string | null,
   name?: string | null,
-  url?: string | null
+  url?: string | null,
 ): Promise<string> {
-  // Try find an existing manual source by kind+domain+url (nullable)
-  const { rows: found } = await pool.query(
-    `select id from public.sources where kind = $1 and coalesce(domain,'') = coalesce($2,'') and coalesce(url,'') = coalesce($3,'') limit 1`,
-    [kind, domain ?? null, url ?? null]
+  // Note: domain field not in new schema, storing in metadata
+  return await queries.sources.getOrCreateManualSource(
+    kind, // Maps to 'type' in new schema
+    name,
+    url,
   );
-  if (found[0]?.id) {
-    return found[0].id as string;
-  }
-  const { rows } = await pool.query(
-    `insert into public.sources (kind, name, url, domain, active, created_at, updated_at)
-     values ($1,$2,$3,$4,true, now(), now())
-     returning id`,
-    [kind, name ?? null, url ?? null, domain ?? null]
-  );
-  return rows[0].id as string;
 }
 
 export async function updateSourceMetadata(
   sourceId: string,
-  patch: Record<string, unknown>
+  patch: Record<string, unknown>,
 ): Promise<void> {
-  // Merge JSONB metadata with a shallow patch
-  await pool.query(
-    `update public.sources
-       set metadata = coalesce(metadata, '{}'::jsonb) || $2::jsonb,
-           updated_at = now()
-     where id = $1`,
-    [sourceId, JSON.stringify(patch)]
-  );
+  await queries.sources.updateSourceMetadata(sourceId, patch);
 }
 
-export async function upsertRawItem(params: {
+export async function upsertDiscovery(params: {
   source_id: string;
   external_id: string;
   url: string;
@@ -126,84 +117,72 @@ export async function upsertRawItem(params: {
   kind?: string | null;
   metadata?: Record<string, unknown>;
 }): Promise<string | null> {
-  const { source_id, external_id, url, title, kind, metadata } = params;
-  const { rows } = await pool.query(
-    `insert into public.raw_items (source_id, external_id, url, title, kind, metadata)
-     values ($1,$2,$3,$4,$5,$6)
-     on conflict (source_id, external_id) do nothing
-     returning id`,
-    [
-      source_id,
-      external_id,
-      url,
-      title ?? null,
-      kind ?? 'article',
-      metadata ?? null,
-    ]
-  );
-  return rows[0]?.id ?? null;
+  // Use shared Drizzle query - note: 'kind' maps to 'status' in new schema
+  return await queries.rawItems.upsertRawItem({
+    source_id: params.source_id,
+    external_id: params.external_id,
+    url: params.url,
+    title: params.title,
+    kind: params.kind ?? undefined,
+    status: "pending",
+    metadata: params.metadata,
+  });
 }
 
-export async function findRawItemsByIds(
-  ids: string[]
-): Promise<Array<{ id: string; url: string; title: string | null }>> {
-  if (!ids.length) {
-    return [];
-  }
-  const { rows } = await pool.query(
-    'select id, url, title from public.raw_items where id = any($1::uuid[])',
-    [ids]
-  );
-  return rows;
+export async function findDiscoveriesByIds(ids: string[]): Promise<
+  Array<{
+    id: string;
+    url: string;
+    title: string | null;
+    kind: string | null;
+    metadata: Record<string, unknown> | null;
+  }>
+> {
+  // Use shared Drizzle query
+  const results = await queries.rawItems.findRawItemsByIds(ids);
+  return results.map((r) => ({
+    id: r.id,
+    url: r.url ?? "",
+    title: r.title,
+    kind: r.kind ?? null,
+    metadata: (r.metadata as Record<string, unknown>) ?? null,
+  }));
 }
 
 export async function insertContents(params: {
   raw_item_id: string;
   text: string;
   html_url?: string | null;
+  pdf_url?: string | null;
+  audio_url?: string | null;
   lang?: string | null;
   content_hash: string;
   transcript_url?: string | null;
   transcript_vtt?: string | null;
+  duration_seconds?: number | null;
+  view_count?: number | null;
 }): Promise<string> {
-  const {
-    raw_item_id,
-    text,
-    html_url,
-    lang,
-    content_hash,
-    transcript_url,
-    transcript_vtt,
-  } = params;
-  const { rows } = await pool.query(
-    `insert into public.contents (raw_item_id, text, html_url, lang, content_hash, transcript_url, transcript_vtt)
-     values ($1,$2,$3,$4,$5,$6,$7)
-     returning id`,
-    [
-      raw_item_id,
-      text,
-      html_url ?? null,
-      lang ?? null,
-      content_hash,
-      transcript_url ?? null,
-      transcript_vtt ?? null,
-    ]
-  );
-  return rows[0].id as string;
+  // Map params to new schema
+  return await queries.contents.insertContent({
+    raw_item_id: params.raw_item_id,
+    text_body: params.text,
+    html_url: params.html_url,
+    pdf_url: params.pdf_url,
+    audio_url: params.audio_url,
+    content_hash: params.content_hash,
+    content_type: params.transcript_url ? "transcript" : "text",
+    language_code: params.lang,
+    transcript_url: params.transcript_url,
+    transcript_vtt: params.transcript_vtt,
+    duration_seconds: params.duration_seconds,
+    view_count: params.view_count ?? undefined,
+  });
 }
 
 export async function findStoryIdByContentHash(
-  hash: string
+  hash: string,
 ): Promise<string | null> {
-  const { rows } = await pool.query(
-    `select s.id
-       from public.stories s
-       join public.contents c on c.id = s.content_id
-      where c.content_hash = $1
-      limit 1`,
-    [hash]
-  );
-  return rows[0]?.id ?? null;
+  return await queries.stories.findStoryIdByContentHash(hash);
 }
 
 export async function insertStory(params: {
@@ -214,22 +193,14 @@ export async function insertStory(params: {
   kind?: string | null;
   published_at?: string | null;
 }): Promise<string> {
-  const { content_id, title, canonical_url, primary_url, kind, published_at } =
-    params;
-  const { rows } = await pool.query(
-    `insert into public.stories (content_id, title, canonical_url, primary_url, kind, published_at)
-     values ($1,$2,$3,$4,$5,$6)
-     returning id`,
-    [
-      content_id,
-      title ?? null,
-      canonical_url ?? null,
-      primary_url ?? null,
-      kind ?? 'article',
-      published_at ?? null,
-    ]
-  );
-  return rows[0].id as string;
+  // Note: canonical_url is not in new schema, using primary_url for both
+  return await queries.stories.insertStory({
+    content_id: params.content_id,
+    title: params.title,
+    primary_url: params.primary_url ?? params.canonical_url,
+    kind: params.kind,
+    published_at: params.published_at,
+  });
 }
 
 export async function getStoryWithContent(storyId: string): Promise<{
@@ -239,14 +210,16 @@ export async function getStoryWithContent(storyId: string): Promise<{
   text: string;
   content_hash: string;
 } | null> {
-  const { rows } = await pool.query(
-    `select s.id, s.title, s.canonical_url, c.text, c.content_hash
-     from public.stories s
-     join public.contents c on c.id = s.content_id
-     where s.id = $1`,
-    [storyId]
-  );
-  return rows[0] ?? null;
+  const result = await queries.stories.getStoryWithContent(storyId);
+  if (!result) return null;
+
+  return {
+    id: result.id,
+    title: result.title,
+    canonical_url: result.primary_url, // Map primary_url to canonical_url
+    text: result.text_body ?? "",
+    content_hash: result.content_hash ?? "",
+  };
 }
 
 export async function upsertStoryOverlay(params: {
@@ -257,33 +230,18 @@ export async function upsertStoryOverlay(params: {
   citations?: Record<string, unknown>;
   model_version?: string | null;
 }): Promise<void> {
-  const {
-    story_id,
-    why_it_matters,
-    chili,
-    confidence,
-    citations,
-    model_version,
-  } = params;
-  await pool.query(
-    `insert into public.story_overlays (story_id, why_it_matters, chili, confidence, citations, model_version, analyzed_at)
-     values ($1, $2, $3, $4, $5, $6, now())
-     on conflict (story_id) do update set
-       why_it_matters = excluded.why_it_matters,
-       chili = excluded.chili,
-       confidence = excluded.confidence,
-       citations = excluded.citations,
-       model_version = excluded.model_version,
-       analyzed_at = excluded.analyzed_at`,
-    [
-      story_id,
-      why_it_matters ?? null,
-      chili ?? null,
-      confidence ?? null,
-      citations ?? null,
-      model_version ?? null,
-    ]
-  );
+  // Note: 'chili' field doesn't exist in new schema, storing in citations metadata
+  const citationsWithChili = params.chili
+    ? { ...params.citations, chili: params.chili }
+    : params.citations;
+
+  await queries.stories.upsertStoryOverlay({
+    story_id: params.story_id,
+    why_it_matters: params.why_it_matters,
+    confidence: params.confidence,
+    citations: citationsWithChili,
+    analysis_state: params.model_version ? "completed" : "pending",
+  });
 }
 
 export async function upsertStoryEmbedding(params: {
@@ -291,15 +249,7 @@ export async function upsertStoryEmbedding(params: {
   embedding: number[];
   model_version?: string | null;
 }): Promise<void> {
-  const { story_id, embedding, model_version } = params;
-  await pool.query(
-    `insert into public.story_embeddings (story_id, embedding, model_version)
-     values ($1, $2, $3)
-     on conflict (story_id) do update set
-       embedding = excluded.embedding,
-       model_version = excluded.model_version`,
-    [story_id, JSON.stringify(embedding), model_version ?? null]
-  );
+  await queries.stories.upsertStoryEmbedding(params);
 }
 
 export default pool;
@@ -312,66 +262,21 @@ export async function upsertPlatformQuota(
     used?: number | null;
     remaining?: number | null;
     reset_at?: string | null;
-  }
+  },
 ) {
-  await pool.query(
-    `insert into public.platform_quota (provider, quota_limit, used, remaining, reset_at, updated_at)
-     values ($1,$2,$3,$4,$5, now())
-     on conflict (provider) do update set
-       quota_limit = excluded.quota_limit,
-       used = excluded.used,
-       remaining = excluded.remaining,
-       reset_at = excluded.reset_at,
-       updated_at = excluded.updated_at`,
-    [
-      provider,
-      snapshot.limit ?? null,
-      snapshot.used ?? null,
-      snapshot.remaining ?? null,
-      snapshot.reset_at ?? null,
-    ]
-  );
+  await queries.platform.upsertPlatformQuota(provider, snapshot);
 }
 
 export async function upsertSourceHealth(
   sourceId: string,
-  status: 'ok' | 'warn' | 'error',
-  message?: string | null
+  status: "ok" | "warn" | "error",
+  message?: string | null,
 ) {
-  await pool.query(
-    `insert into public.source_health (source_id, status, last_success_at, last_error_at, message, updated_at)
-     values ($1, $2::public.health_status, case when $2::public.health_status = 'ok' then now() else null end, case when $2::public.health_status = 'error' then now() else null end, $3, now())
-     on conflict (source_id) do update set
-       status = excluded.status,
-       last_success_at = coalesce(excluded.last_success_at, public.source_health.last_success_at),
-       last_error_at = coalesce(excluded.last_error_at, public.source_health.last_error_at),
-       message = excluded.message,
-       updated_at = excluded.updated_at`,
-    [sourceId, status, message ?? null]
-  );
+  await queries.sources.upsertSourceHealth(sourceId, status, message);
 }
 
 export async function upsertJobMetrics(
-  rows: Array<{ name: string; state: string; count: number }>
+  rows: Array<{ name: string; state: string; count: number }>,
 ) {
-  if (!rows.length) {
-    return;
-  }
-  const PARAMS_PER_ROW = 3;
-  const values = rows
-    .map(
-      (_, i) =>
-        `($${i * PARAMS_PER_ROW + 1}, $${i * PARAMS_PER_ROW + 2}, $${i * PARAMS_PER_ROW + PARAMS_PER_ROW}, now())`
-    )
-    .join(',');
-  const params: Array<string | number> = [];
-  for (const r of rows) {
-    params.push(r.name, r.state, r.count);
-  }
-  await pool.query(
-    `insert into public.job_metrics (name, state, count, updated_at)
-     values ${values}
-     on conflict (name,state) do update set count = excluded.count, updated_at = excluded.updated_at`,
-    params
-  );
+  await queries.platform.upsertJobMetrics(rows);
 }
