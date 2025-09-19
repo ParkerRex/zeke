@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TRPCProvider } from "@/trpc/client";
 
 type ProviderProps = {
 	locale: string;
@@ -10,13 +11,15 @@ type ProviderProps = {
 
 export function Providers({ locale, children }: ProviderProps) {
 	return (
-		<ThemeProvider
-			attribute="class"
-			defaultTheme="system"
-			enableSystem
-			disableTransitionOnChange
-		>
-			{children}
-		</ThemeProvider>
+		<TRPCProvider>
+			<ThemeProvider
+				attribute="class"
+				defaultTheme="system"
+				enableSystem
+				disableTransitionOnChange
+			>
+				{children}
+			</ThemeProvider>
+		</TRPCProvider>
 	);
 }

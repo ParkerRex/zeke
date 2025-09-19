@@ -1,7 +1,6 @@
 "use client";
 
-import { useUserQuery } from "@/hooks/use-user";
-import { useTRPC } from "@/trpc/client";
+import { useUserQuery } from "@/hooks/hooks-use-user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,25 +22,13 @@ import {
 } from "@zeke/ui/card";
 import { Input } from "@zeke/ui/input";
 import { Label } from "@zeke/ui/label";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function DeleteTeam() {
   const [value, setValue] = useState("");
-  const trpc = useTRPC();
   const { data: user } = useUserQuery();
-  const router = useRouter();
 
-  const deleteTeamMutation = useMutation(
-    trpc.team.delete.mutationOptions({
-      onSuccess: async () => {
-        // Revalidate server state and redirect
-        router.push("/teams");
-      },
-    }),
-  );
+  const [value, setValue] = useState("");
 
   return (
     <Card className="border-destructive">
@@ -74,7 +61,7 @@ export function DeleteTeam() {
               </AlertDialogDescription>
             </AlertDialogHeader>
 
-            <div className="flex flex-col gap-2 mt-2">
+            <div className="mt-2 flex flex-col gap-2">
               <Label htmlFor="confirm-delete">
                 Type <span className="font-medium">DELETE</span> to confirm.
               </Label>
@@ -87,17 +74,8 @@ export function DeleteTeam() {
 
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() =>
-                  deleteTeamMutation.mutate({ teamId: user?.teamId! })
-                }
-                disabled={value !== "DELETE"}
-              >
-                {deleteTeamMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Confirm"
-                )}
+              <AlertDialogAction disabled>
+                Coming Soon
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import { useUserMutation, useUserQuery } from "@/hooks/hooks-use-user";
 import { useEffect, useRef } from "react";
 
 export function TimezoneDetector() {
