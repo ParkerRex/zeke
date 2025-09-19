@@ -4,18 +4,34 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ],
-      "@zeke/*": [
-        "../../packages/*"
+      "@api/*": [
+        "../api/src/*"
+      ],
+      "@engine/*": [
+        "../engine/src/*"
+      ],
+      "@jobs/*": [
+        "../../packages/jobs/src/*"
+      ],
+      "@db/*": [
+        "../../packages/db/src/*"
       ]
-    }
+    },
+    "strict": true
   },
   "include": [
-    "next-env.d.ts",
-    "next.config.mjs",
     "**/*.ts",
     "**/*.tsx",
+    "../../types",
+    "next-env.d.ts",
+    "next.config.js",
+    "tailwind.config.ts",
     ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next"
   ]
 }
