@@ -61,7 +61,7 @@
 1. ✅ Stories router + schemas.
 2. ✅ Highlights router + schemas.
 3. ✅ Assistant router + schemas (blocks chat tools).
-4. Team router for account switching.
+4. ✅ Team router for account switching.
 5. Additional supporting endpoints (search, tags) on demand.
 
 At each step:

@@ -1,236 +1,141 @@
 import { z } from "@hono/zod-openapi";
 
-export const teamResponseSchema = z.object({
-  id: z.string().uuid().openapi({
-    description: "Unique identifier of the team",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-  name: z.string().openapi({
-    description: "Name of the team or organization",
-    example: "Acme Corporation",
-  }),
-  logoUrl: z.string().url().nullable().openapi({
-    description: "URL to the team's logo image",
-    example: "https://cdn.zeke.ai/logos/acme-corp.png",
-  }),
-  plan: z.enum(["trial", "starter", "pro"]).openapi({
-    description: "Current subscription plan of the team",
-    example: "pro",
-  }),
-  // subscriptionStatus: z
-  //   .enum([
-  //     "active",
-  //     "canceled",
-  //     "past_due",
-  //     "unpaid",
-  //     "trialing",
-  //     "incomplete",
-  //     "incomplete_expired",
-  //   ])
-  //   .nullable()
-  //   .openapi({
-  //     description: "Current subscription status of the team",
-  //     example: "active",
-  //   }),
-});
-
-export const teamsResponseSchema = z.object({
-  data: z.array(teamResponseSchema).openapi({
-    description: "Array of teams that the user has access to",
-  }),
-});
-
-export const getTeamByIdSchema = z.object({
-  id: z
-    .string()
-    .uuid()
-    .openapi({
-      description: "Unique identifier of the team",
-      example: "123e4567-e89b-12d3-a456-426614174000",
-      param: {
-        in: "path",
-        name: "id",
-        required: true,
-      },
-    })
-    .openapi({
-      description: "Unique identifier of the team",
-      example: "123e4567-e89b-12d3-a456-426614174000",
-    }),
-});
-
-export const updateTeamByIdSchema = z.object({
-  name: z.string().min(2).max(32).optional().openapi({
-    description:
-      "Name of the team or organization. Must be between 2 and 32 characters",
-    example: "Acme Corporation",
-  }),
-  email: z.string().email().optional().openapi({
-    description: "Primary contact email address for the team",
-    example: "team@acme.com",
-  }),
-  logoUrl: z
-    .string()
-    .url()
-    .refine((url) => url.includes("zeke.ai"), {
-      message: "logoUrl must be a zeke.ai domain URL",
-    })
-    .optional()
-    .openapi({
-      description:
-        "URL to the team's logo image. Must be hosted on zeke.ai domain",
-      example: "https://cdn.zeke.ai/logos/acme-corp.png",
-    }),
-  baseCurrency: z.string().optional().openapi({
-    description:
-      "Base currency for the team in ISO 4217 format (3-letter currency code)",
-    example: "USD",
-  }),
-  countryCode: z.string().optional().openapi({
-    description: "Country code for the team",
-    example: "US",
-  }),
-});
-
-export const createTeamSchema = z.object({
-  name: z.string().openapi({
-    description: "Name of the team or organization",
-    example: "Acme Corporation",
-  }),
-  baseCurrency: z.string().openapi({
-    description:
-      "Base currency for the team in ISO 4217 format (3-letter currency code)",
-    example: "USD",
-  }),
-  countryCode: z.string().optional().openapi({
-    description: "Country code for the team",
-    example: "US",
-  }),
-  logoUrl: z.string().url().optional().openapi({
-    description: "URL to the team's logo image",
-    example: "https://cdn.zeke.ai/logos/acme-corp.png",
-  }),
-  switchTeam: z.boolean().optional().default(false).openapi({
-    description:
-      "Whether to automatically switch the user to the newly created team",
-    example: true,
-  }),
-});
-
-export const leaveTeamSchema = z.object({
-  teamId: z.string().openapi({
-    description: "Unique identifier of the team to leave",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-});
-
-export const acceptTeamInviteSchema = z.object({
-  id: z.string().openapi({
-    description: "Unique identifier of the team invitation to accept",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-});
-
-export const declineTeamInviteSchema = z.object({
-  id: z.string().openapi({
-    description: "Unique identifier of the team invitation to decline",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-});
-
-export const deleteTeamSchema = z.object({
-  teamId: z.string().openapi({
-    description: "Unique identifier of the team to delete",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-});
-
-export const deleteTeamMemberSchema = z.object({
-  teamId: z.string().openapi({
-    description: "Unique identifier of the team",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-  userId: z.string().openapi({
-    description: "Unique identifier of the user to remove from the team",
-    example: "456e7890-f12a-34b5-c678-901234567890",
-  }),
-});
-
-export const updateTeamMemberSchema = z.object({
-  teamId: z.string().openapi({
-    description: "Unique identifier of the team",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-  userId: z.string().openapi({
-    description: "Unique identifier of the user whose role to update",
-    example: "456e7890-f12a-34b5-c678-901234567890",
-  }),
-  role: z.enum(["owner", "member"]).openapi({
-    description:
-      "New role for the team member. 'owner' has full permissions, 'member' has limited permissions",
-    example: "member",
-  }),
-});
-
-export const inviteTeamMembersSchema = z
-  .array(
-    z.object({
-      email: z.string().openapi({
-        description: "Email address of the person to invite",
-        example: "john.doe@acme.com",
-      }),
-      role: z.enum(["owner", "member"]).openapi({
-        description:
-          "Role to assign to the invited member. 'owner' has full permissions, 'member' has limited permissions",
-        example: "member",
-      }),
-    }),
-  )
+export const teamPlanSchema = z
+  .enum(["trial", "starter", "pro", "enterprise"])
   .openapi({
-    description: "Array of team member invitations to send",
-    example: [
-      { email: "john.doe@acme.com", role: "member" },
-      { email: "jane.smith@acme.com", role: "owner" },
-    ],
+    description: "Subscription tier for a team",
+    example: "pro",
   });
 
-export const deleteTeamInviteSchema = z.object({
-  id: z.string().openapi({
-    description: "Unique identifier of the team invitation to delete",
-    example: "invite-123abc456def",
-  }),
-});
+export const teamSummarySchema = z
+  .object({
+    id: z.string().uuid().openapi({
+      description: "Team identifier",
+      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
+    }),
+    name: z.string().openapi({
+      description: "Team display name",
+      example: "Zeke Intelligence",
+    }),
+    slug: z.string().nullable().openapi({
+      description: "URL-friendly slug",
+      example: "zeke-intel",
+    }),
+    logoUrl: z.string().url().nullable().openapi({
+      description: "Team logo URL",
+      example: "https://cdn.zeke.ai/logos/zeke.png",
+    }),
+    planCode: teamPlanSchema.nullable(),
+  })
+  .openapi({
+    description: "Summary information for a team",
+  });
 
-export const updateBaseCurrencySchema = z.object({
-  baseCurrency: z.string().openapi({
-    description:
-      "New base currency for the team in ISO 4217 format (3-letter currency code)",
-    example: "EUR",
-  }),
-});
+export const teamDetailSchema = teamSummarySchema
+  .extend({
+    metadata: z.record(z.unknown()).nullable().openapi({
+      description: "Custom metadata stored for the team",
+    }),
+    createdAt: z.string().openapi({
+      description: "Creation timestamp",
+      example: "2024-01-04T10:00:00Z",
+    }),
+    updatedAt: z.string().openapi({
+      description: "Last update timestamp",
+      example: "2024-05-16T12:23:00Z",
+    }),
+  })
+  .openapi({
+    description: "Detailed team record returned to the dashboard",
+  });
 
-export const teamMemberResponseSchema = z.object({
-  id: z.string().uuid().openapi({
-    description: "Unique identifier of the user",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-  role: z.enum(["owner", "member"]).openapi({
-    description:
-      "Role of the team member. 'owner' has full permissions, 'member' has limited permissions",
-    example: "owner",
-  }),
-  fullName: z.string().openapi({
-    description: "Full name of the team member",
-    example: "John Doe",
-  }),
-  avatarUrl: z.string().url().nullable().openapi({
-    description: "URL to the team member's avatar image",
-    example: "https://cdn.zeke.ai/avatars/john-doe.png",
-  }),
-});
+export const teamMemberSchema = z
+  .object({
+    id: z.string().uuid().openapi({
+      description: "Membership record identifier",
+      example: "0f1e2d3c-4b5a-6789-0123-abcdef456789",
+    }),
+    userId: z.string().uuid().openapi({
+      description: "User identifier",
+      example: "123e4567-e89b-12d3-a456-426614174000",
+    }),
+    email: z.string().email().openapi({
+      description: "User email",
+      example: "alex@zeke.ai",
+    }),
+    fullName: z.string().nullable().openapi({
+      description: "Full name",
+      example: "Alex Parker",
+    }),
+    role: z.enum(["owner", "admin", "member", "viewer"]).openapi({
+      description: "Role within the team",
+      example: "admin",
+    }),
+    joinedAt: z.string().nullable().openapi({
+      description: "When the user joined",
+      example: "2024-01-03T10:00:00Z",
+    }),
+  })
+  .openapi({
+    description: "Membership information for a teammate",
+  });
 
-export const teamMembersResponseSchema = z.object({
-  data: z.array(teamMemberResponseSchema).openapi({
-    description: "Array of team members with their roles and information",
-  }),
-});
+export const teamListResponseSchema = z
+  .array(teamSummarySchema)
+  .openapi({
+    description: "Teams available to the current user",
+  });
+
+export const teamInvitesSchema = z
+  .object({
+    id: z.string().uuid().openapi({
+      description: "Invite identifier",
+      example: "ef12cd34-ab56-7890-1234-56789abcdef0",
+    }),
+    email: z.string().email().openapi({
+      description: "Invite recipient email",
+      example: "guest@zeke.ai",
+    }),
+    role: z.enum(["owner", "admin", "member", "viewer"]).openapi({
+      description: "Proposed team role",
+      example: "member",
+    }),
+    status: z.enum(["pending", "accepted", "expired", "revoked"]).openapi({
+      description: "Invite status",
+      example: "pending",
+    }),
+    expiresAt: z.string().nullable().openapi({
+      description: "Expiry timestamp",
+      example: "2024-06-01T00:00:00Z",
+    }),
+    team: teamSummarySchema.nullable(),
+  })
+  .openapi({
+    description: "Team invite awaiting the current user",
+  });
+
+export const teamSetActiveInputSchema = z
+  .object({
+    teamId: z.string().uuid().openapi({
+      description: "Team to set as active",
+      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
+    }),
+  })
+  .openapi({
+    description: "Payload for switching the active team",
+  });
+
+export const teamIdInputSchema = z
+  .object({
+    teamId: z.string().uuid().openapi({
+      description: "Identifier for fetching team details",
+      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
+    }),
+  })
+  .openapi({
+    description: "Input that expects a team id",
+  });
+
+export type TeamSummary = z.infer<typeof teamSummarySchema>;
+export type TeamDetail = z.infer<typeof teamDetailSchema>;
+export type TeamMember = z.infer<typeof teamMemberSchema>;

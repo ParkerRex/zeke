@@ -9,7 +9,9 @@ export type GetTeamsForUserParams = {
 export type TeamForUser = {
 	id: string;
 	name: string | null;
+	slug: string | null;
 	logoUrl: string | null;
+	planCode: string | null;
 	role: string | null;
 };
 
@@ -23,7 +25,9 @@ export async function getTeamsForUser(
 		.select({
 			id: teams.id,
 			name: teams.name,
+			slug: teams.slug,
 			logoUrl: teams.logoUrl,
+			planCode: teams.planCode,
 			role: teamMembers.role,
 		})
 		.from(teamMembers)
@@ -41,10 +45,15 @@ export type GetTeamInvitesByEmailParams = {
 export type TeamInviteWithTeam = {
 	id: string;
 	email: string;
+	role: string | null;
+	status: string | null;
+	expiresAt: string | null;
 	team: {
 		id: string;
 		name: string | null;
+		slug: string | null;
 		logoUrl: string | null;
+		planCode: string | null;
 	} | null;
 };
 
@@ -58,9 +67,14 @@ export async function getTeamInvitesByEmail(
 		.select({
 			id: teamInvites.id,
 			email: teamInvites.email,
+			role: teamInvites.role,
+			status: teamInvites.status,
+			expiresAt: teamInvites.expiresAt,
 			teamId: teams.id,
 			teamName: teams.name,
+			teamSlug: teams.slug,
 			teamLogoUrl: teams.logoUrl,
+			teamPlanCode: teams.planCode,
 		})
 		.from(teamInvites)
 		.innerJoin(teams, eq(teamInvites.teamId, teams.id))
@@ -70,12 +84,38 @@ export async function getTeamInvitesByEmail(
 	return rows.map((row) => ({
 		id: row.id,
 		email: row.email,
-		team: {
-			id: row.teamId,
-			name: row.teamName,
-			logoUrl: row.teamLogoUrl,
-		},
+		role: row.role,
+		status: row.status,
+		expiresAt: row.expiresAt,
+		team: row.teamId
+			? {
+				id: row.teamId,
+				name: row.teamName,
+				slug: row.teamSlug,
+				logoUrl: row.teamLogoUrl,
+				planCode: row.teamPlanCode,
+			}
+			: null,
 	}));
+}
+
+export async function getTeamSummaryById(db: Database, teamId: string) {
+	const [row] = await db
+		.select({
+			id: teams.id,
+			name: teams.name,
+			slug: teams.slug,
+			logoUrl: teams.logoUrl,
+			planCode: teams.planCode,
+			metadata: teams.metadata,
+			createdAt: teams.createdAt,
+			updatedAt: teams.updatedAt,
+		})
+		.from(teams)
+		.where(eq(teams.id, teamId))
+		.limit(1);
+
+	return row ?? null;
 }
 
 export type GetUserByIdParams = {
