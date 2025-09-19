@@ -1,30 +1,31 @@
-import { stripeAdmin } from '@/src/utils/stripe-admin';
-import { getURL } from '@/src/utils/get-url';
-import { getCustomerIdQuery, getSession } from '@zeke/supabase/queries';
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+import { getOrCreateCustomer } from "@/actions/account/get-or-create-customer";
+import { getURL } from "@/src/utils/get-url";
+import { stripeAdmin } from "@/src/utils/stripe-admin";
+import { createClient } from "@zeke/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  // 1. Get the user from session
-  const session = await getSession();
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   if (!session?.user?.id) {
-    throw new Error('Could not get userId');
+    throw new Error("Could not get userId");
   }
 
-  // 2. Retrieve or create the customer in Stripe
-  const customerResult = await getCustomerIdQuery({
+  if (!session.user.email) {
+    throw new Error("Could not get email");
+  }
+
+  const customer = await getOrCreateCustomer({
     userId: session.user.id,
+    email: session.user.email,
   });
 
-  if (!customerResult.success) {
-    throw new Error(customerResult.error || 'Could not get customer');
-  }
-
-  const customer = customerResult.data;
-
-  // 3. Create portal link and redirect user
   const { url } = await stripeAdmin.billingPortal.sessions.create({
     customer,
     return_url: `${getURL()}/account`,

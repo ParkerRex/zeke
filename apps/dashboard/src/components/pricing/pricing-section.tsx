@@ -1,5 +1,5 @@
+import { getBillingProductsAction } from '@/actions/billing/get-products-action';
 import { createCheckoutSession } from '@/src/actions/pricing/create-checkout-session';
-import { getProducts } from '@zeke/supabase/queries';
 import Image from 'next/image';
 import { PricingCard } from './price-card';
 
@@ -8,7 +8,12 @@ export async function PricingSection({
 }: {
   isPricingPage?: boolean;
 }) {
-  const products = await getProducts();
+  const { data: products = [], serverError } = await getBillingProductsAction({});
+
+  if (serverError) {
+    throw new Error(serverError);
+  }
+
   const HeadingLevel = isPricingPage ? 'h1' : 'h2';
   return (
     <section className="relative overflow-hidden rounded-lg bg-white">

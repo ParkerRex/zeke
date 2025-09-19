@@ -5,8 +5,8 @@ import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 type Params = {
-	input: string;
-	context?: string;
+  input: string;
+  context?: string;
 };
 
 export async function generateEditorContent({ input, context }: Params) {
@@ -57,8 +57,8 @@ export async function generateEditorContent({ input, context }: Params) {
         - Always surface novel, risky, or high-leverage insights when present.
         - End output after the Apply Now list. Do not add closing remarks.
 
-        Current date is: ${new Date().toISOString().split("T")[0]} \n
-        ${context}
+        Current date is: $new Date().toISOString().split("T")[0]\n
+        $context
       `,
 		});
 

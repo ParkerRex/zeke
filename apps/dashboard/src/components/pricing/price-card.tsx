@@ -1,16 +1,16 @@
 "use client";
 
-import type {
-	BillingInterval,
-	Price,
-	ProductWithPrices,
-} from "@zeke/supabase/types";
-import { productMetadataSchema } from "@zeke/supabase/types";
-import { Button } from "@zeke/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@zeke/ui/tabs";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { IoCheckmark } from "react-icons/io5";
+import { Button } from "@zeke/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@zeke/ui/tabs";
+import {
+	productMetadataSchema,
+	type BillingInterval,
+	type BillingPriceSummary,
+	type BillingProductWithPrices,
+} from "@/utils/billing";
 
 const CENTS_PER_DOLLAR = 100;
 
@@ -19,12 +19,16 @@ export function PricingCard({
 	price,
 	createCheckoutAction,
 }: {
-	product: ProductWithPrices;
-	price?: Price;
-	createCheckoutAction?: ({ price }: { price: Price }) => void;
+	product: BillingProductWithPrices;
+	price?: BillingPriceSummary;
+	createCheckoutAction?: ({
+		price,
+	}: {
+		price: BillingPriceSummary;
+	}) => void;
 }) {
 	const [billingInterval, setBillingInterval] = useState<BillingInterval>(
-		price ? (price.interval as BillingInterval) : "month",
+		price ? price.interval : "month",
 	);
 	const currentPrice = useMemo(() => {
 		if (price) {
@@ -36,17 +40,17 @@ export function PricingCard({
 		if (product.prices.length === 1) {
 			return product.prices[0];
 		}
-		return product.prices.find((p) => p.interval === billingInterval);
+		return product.prices.find((p) => p.interval === billingInterval) ?? null;
 	}, [billingInterval, price, product.prices]);
 
 	const monthPrice = product.prices.find(
 		(p) => p.interval === "month",
-	)?.unit_amount;
+	)?.unitAmount;
 	const yearPrice = product.prices.find(
 		(p) => p.interval === "year",
-	)?.unit_amount;
+	)?.unitAmount;
 	const isBillingIntervalYearly = billingInterval === "year";
-	const metadata = productMetadataSchema.parse(product.metadata);
+	const metadata = productMetadataSchema.parse(product.metadata ?? {});
 	const buttonVariantMap = { pro: "default" } as const;
 
 	function handleBillingIntervalChange(interval: BillingInterval) {
@@ -92,7 +96,7 @@ export function PricingCard({
 				</div>
 
 				<div className="mx-auto w-full max-w-xs flex-1 space-y-3 py-2">
-					<CheckItem text={"Unlimited research"} />
+					<CheckItem text="Unlimited research" />
 					<CheckItem text={`${metadata.supportLevel} support`} />
 				</div>
 
