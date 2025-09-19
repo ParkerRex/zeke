@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { STRINGS } from "@/src/utils/constants";
 import { Button } from "@zeke/ui/button";
-import { useStoriesList } from "@/hooks/hooks-use-stories";
+import { useStoriesList } from "@/hooks/use-stories";
 import StoryRow from "./story-row";
 
 export default function TodayFeedClient() {

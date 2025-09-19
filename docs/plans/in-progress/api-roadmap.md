@@ -79,32 +79,32 @@ At each step:
 
 ## Dashboard Hook Scaffold
 Once each TRPC router is live, mirror it with typed React Query hooks under
-`apps/dashboard/src/hooks/`. Name files in `kebab-case` (e.g.
-`hooks-use-user.ts`) and wrap `trpc.*.queryOptions()` / `.mutationOptions()` so
-cache keys stay aligned.
+`apps/dashboard/src/hooks/`. Name files in `kebab-case` following the
+`use-*.ts` convention (e.g. `use-user.ts`) and wrap
+`trpc.*.queryOptions()` / `.mutationOptions()` so cache keys stay aligned.
 
-- **Stories** (`hooks-use-stories.ts`)
+- **Stories** (`use-stories.ts`)
   - `useStoriesList(params)` → wraps `trpc.story.list.queryOptions(params)` with pagination helpers.
   - `useStoryDetail(storyId)` → suspense query for `trpc.story.get`.
   - `useStoryMetrics(storyId)` → selective metrics fetch, possibly merged into detail hook via `select`.
   - `useStoryChapters(storyId)` → uses `trpc.story.chapters`.
 
-- **Highlights** (`hooks-use-highlights.ts`)
+- **Highlights** (`use-highlights.ts`)
   - `useHighlightsByStory(storyId)` → `trpc.highlight.byStory`.
   - `useHighlightEngagement(storyId)` or `(highlightId)` → power engagement badges.
   - Mutation hooks (pin/update) once editing flows exist.
 
-- **Assistant** (`hooks-use-assistant.ts`)
+- **Assistant** (`use-assistant.ts`)
   - `useAssistantThreads(params)` → paginated list from `trpc.assistant.threads.list`.
   - `useAssistantThread(threadId)` → detail (messages + sources) via `trpc.assistant.threads.get`.
   - `useAssistantMessages(threadId)` if split from thread detail.
   - Mutations: `useCreateAssistantMessage`, `useAddAssistantSource`, `useRemoveAssistantSource`.
 
-- **Teams / Auth Context** (`hooks-use-teams.ts`)
+- **Teams / Auth Context** (`use-teams.ts`)
   - `useTeams()` → list current user’s teams via `trpc.team.list`.
   - `useActiveTeam()` → returns `trpc.team.getActive`; mutation to switch teams.
 
-- **Notifications** (`hooks-use-notifications.ts`)
+- **Notifications** (`use-notifications.ts`)
   - `useNotifications()` → wraps `trpc.notifications.list` queries (inbox + archived), handles optimistic updates.
   - `useRealtimeNotifications()` → leverage `useRealtime` helper for Supabase channel updates.
   - Mutations: `useNotificationsUpdateStatus`, `useNotificationsUpdateAllStatus` mirroring optimistic flow.
@@ -118,7 +118,7 @@ Document each hook alongside the API contracts as they are implemented so dashbo
 ## Front-End Data Access Touchpoints
 The dashboard pulls data through multiple surfaces that all ultimately rely on the API layer:
 
-- **Client hooks** – `useTRPC()` + React Query wrappers (`hooks-use-*.ts`). These are the primary consumers of the TRPC routers.
+- **Client hooks** – `useTRPC()` + React Query wrappers (`use-*.ts`). These are the primary consumers of the TRPC routers.
 - **Server components/layouts** – Use the server-side TRPC utilities in `apps/dashboard/src/trpc/server.tsx` to `fetchQuery`/`prefetch` during SSR.
 - **Server actions** – Under `apps/dashboard/src/actions/*`; they call TRPC procedures or repository helpers directly for mutations and side effects.
 - **Route handlers (`/app/api/*`)** – Custom endpoints (e.g., chat streaming) that orchestrate AI/tool flows and call TRPC/repositories internally.

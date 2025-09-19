@@ -14,7 +14,7 @@ import {
 	IoNewspaper,
 	IoSearch,
 } from "react-icons/io5";
-import { useStories } from "@/hooks/hooks-use-stories";
+import { useStories } from "@/hooks/use-stories";
 import { useTabs } from "@/src/hooks/use-tabs";
 import { STRINGS } from "@/src/utils/constants";
 import { kindParser, qParser } from "@/src/utils/nuqs";

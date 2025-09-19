@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserQuery } from "@/hooks/hooks-use-user";
+import { useUserQuery } from "@/hooks/use-user";
 import {
   AlertDialog,
   AlertDialogAction,
