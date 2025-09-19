@@ -15,13 +15,13 @@ graph LR
   U[Browser App] --> R[Next.js Routes - TODO]
   R --> DB[(Supabase Postgres + pgvector)]
   R --> ST[(Supabase Storage - TODO)]
-  DB -. pg-boss (cron/enqueue) .-> W[Cloud Run Worker ✅]
-  W -. RSS feeds .-> RSS[RSS: HN + Ars Technica ✅]
-  W --> DB
-  W -.-> LLM[LLM API - BROKEN]
-  W -.-> EMB[Embeddings API - BROKEN]
+  DB -. pg-boss (cron/enqueue) .-> E[Cloud Run Engine ✅]
+  E -. RSS feeds .-> RSS[RSS: HN + Ars Technica ✅]
+  E --> DB
+  E -.-> LLM[LLM API - BROKEN]
+  E -.-> EMB[Embeddings API - BROKEN]
 
-  style W fill:#90EE90
+  style E fill:#90EE90
   style RSS fill:#90EE90
   style DB fill:#90EE90
   style LLM fill:#FFB6C1
@@ -43,7 +43,7 @@ graph TB
     Web[Route Handlers - TODO]
   end
   subgraph GCP Cloud Run
-    Work[Queue Worker ✅]
+    Engine[Engine Service ✅]
   end
   subgraph Supabase
     PG[(Postgres + pgvector ✅)]
@@ -53,11 +53,11 @@ graph TB
   UI-->Web
   Web-->PG
   Web-->STO
-  BOSS-. schedules/enqueues .->Work
-  Work-->PG
-  Work-->STO
+  BOSS-. schedules/enqueues .->Engine
+  Engine-->PG
+  Engine-->STO
 
-  style Work fill:#90EE90
+  style Engine fill:#90EE90
   style PG fill:#90EE90
   style BOSS fill:#90EE90
   style Web fill:#FFE4B5
@@ -146,7 +146,7 @@ Shows the actual job lifecycle in pg-boss that's working.
 ```mermaid
 stateDiagram-v2
   [*] --> created: pg-boss.schedule/send
-  created --> active: worker claims
+  created --> active: engine claims
   active --> completed: success ✅
   active --> failed: error (2 in DLQ)
   failed --> retry: backoff
@@ -166,15 +166,15 @@ graph LR
   U[Browser App] --> R[Next.js Routes]
   R --> DB[(Supabase Postgres + pgvector)]
   R --> ST[(Supabase Storage)]
-  DB -. pg-boss (cron/enqueue) .-> W[Cloud Run Worker (Node/TS)]
+  DB -. pg-boss (cron/enqueue) .-> E[Cloud Run Engine (Node/TS)]
   R -. source fetch .-> Ext[External Sources: RSS, HN, Reddit, YouTube, arXiv]
   U -. Reader/Annotator .- R
-  W --> DB
-  W --> ST
-  W -.-> LLM[LLM API]
-  W -.-> EMB[Embeddings API]
-  W -.-> YTDLP[yt-dlp/Whisper]
-  W -. pdf OCR .-> OCR[[PDF Extraction Service (optional)]]
+  E --> DB
+  E --> ST
+  E -.-> LLM[LLM API]
+  E -.-> EMB[Embeddings API]
+  E -.-> YTDLP[yt-dlp/Whisper]
+  E -. pdf OCR .-> OCR[[PDF Extraction Service (optional)]]
 ```
 
 ### Trust Boundaries & RLS (Future)
@@ -187,11 +187,11 @@ graph LR
     Web[Next.js Routes]
   end
   subgraph Private Service Role
-    Work[Cloud Run Worker]
+    Engine[Cloud Run Engine]
   end
   Web-->PG[(Postgres + RLS)]
-  Work-->PG
-  Work-->STO[(Storage)]
+  Engine-->PG
+  Engine-->STO[(Storage)]
 ```
 
 ### Pipeline DAG (Full End-to-End Vision)
@@ -225,14 +225,14 @@ Walks through a single ingest run from cron to queued content fetch.
 ```mermaid
 sequenceDiagram
   participant Boss as pg-boss (cron)
-  participant Work as Worker
+  participant Engine as Engine Service
   participant API as Source API
   participant DB as Supabase
-  Boss-->>Work: enqueue ingest:pull(source,cursor)
-  Work->>API: fetch new items
-  API-->>Work: items
-  Work->>DB: upsert raw_items
-  Work-->>Boss: enqueue fetch-content
+  Boss-->>Engine: enqueue ingest:pull(source,cursor)
+  Engine->>API: fetch new items
+  API-->>Engine: items
+  Engine->>DB: upsert raw_items
+  Engine-->>Boss: enqueue fetch-content
 ```
 
 ### Content Fetch & Normalization (Future)

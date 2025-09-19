@@ -1,17 +1,19 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { DesktopProvider } from "@/components/desktop-provider";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TRPCProvider } from "@/trpc/client";
+import { TRPCReactProvider } from "@/trpc/client";
 
 type ProviderProps = {
-	locale: string;
 	children: ReactNode;
 };
 
-export function Providers({ locale, children }: ProviderProps) {
+export function Providers({ children }: ProviderProps) {
 	return (
-		<TRPCProvider>
+		<TRPCReactProvider>
+			<DesktopProvider />
+
 			<ThemeProvider
 				attribute="class"
 				defaultTheme="system"
@@ -20,6 +22,6 @@ export function Providers({ locale, children }: ProviderProps) {
 			>
 				{children}
 			</ThemeProvider>
-		</TRPCProvider>
+		</TRPCReactProvider>
 	);
 }

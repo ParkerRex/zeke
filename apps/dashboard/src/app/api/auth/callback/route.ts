@@ -15,12 +15,13 @@ export async function GET(req: NextRequest) {
   const client = requestUrl.searchParams.get("client");
   const returnTo = requestUrl.searchParams.get("return_to");
   const provider = requestUrl.searchParams.get("provider");
+  const allowedProviders = new Set(["apple", "github", "otp"]);
 
   if (client === "desktop") {
     return NextResponse.redirect(`${requestUrl.origin}/verify?code=${code}`);
   }
 
-  if (provider) {
+  if (provider && allowedProviders.has(provider)) {
     cookieStore.set(Cookies.PreferredSignInProvider, provider, {
       expires: addYears(new Date(), 1),
     });

@@ -32,7 +32,7 @@ analyzeStory (analyze:llm)
 - `public.sources` rows with `kind` (`youtube_channel` or `youtube_search`), `metadata.upload_playlist_id`, optional search `query`, and max result settings.
 - YouTube Data API responses (playlist items / search + videos.list) providing `videoId`, `title`, `description`, `publishedAt`, `channelId`, `channelTitle`, `thumbnailUrl`, ISO-8601 `duration`, `viewCount`, `likeCount`, `commentCount`, `tags`, `categoryId`, `defaultLanguage`, `defaultAudioLanguage`.
 - Caption metadata + VTT payloads from the YouTube Captions API (language, track id, `trackKind`, text segments).
-- Derived fields inside worker (e.g., `hashText(enhancedText)`, transcript URLs, normalized duration seconds).
+- Derived fields inside engine (e.g., `hashText(enhancedText)`, transcript URLs, normalized duration seconds).
 
 **What we persist today**
 - `public.discoveries`: `source_id`, `external_id` (videoId), canonical URL, title, and the metadata JSON blob above.

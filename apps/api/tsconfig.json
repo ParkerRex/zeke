@@ -26,7 +26,7 @@
         "src/*"
       ],
       "@engine/*": [
-        "../worker/src/*"
+        "../engine/src/*"
       ],
       "@jobs/*": [
         "../../packages/jobs/src/*"

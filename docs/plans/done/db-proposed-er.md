@@ -4,7 +4,7 @@
 
 - **Goal** — replace the finance-heavy schema with a research-to-action model that powers the Discover → Apply wireframe while preserving trusted multi-tenant primitives. Written materials (RSS, blogs, transcripts) live in Supabase for fast search, while large media stays remote via `story_assets.external_url`.
 - **Core Data Shape** — global content flows from `sources → raw_items → contents → stories`, augmented by clusters, chapters, and speaker turns. Team-specific interaction layers (`team_story_states`, `highlights`, `playbooks`, `assistant_threads`) capture how customers turn insights into action.
-- **Execution Plan** — finalize Drizzle tables per this ER map, upgrade workers to ingest transcripts + compute clusters, implement the query stubs (cached on the server) and matching mutations, then wire the UX with deterministic cache tags. References to each workstream appear in [How the structure maps to the UX](#how-the-structure-maps-to-the-ux), [Query Stubs](#query-stubs-needed-for-the-wireframe), and the [Execution Checklist](#execution-checklist).
+- **Execution Plan** — finalize Drizzle tables per this ER map, upgrade the engine service to ingest transcripts + compute clusters, implement the query stubs (cached on the server) and matching mutations, then wire the UX with deterministic cache tags. References to each workstream appear in [How the structure maps to the UX](#how-the-structure-maps-to-the-ux), [Query Stubs](#query-stubs-needed-for-the-wireframe), and the [Execution Checklist](#execution-checklist).
 
 This proposal reorganizes the Supabase schema around the Discover → Apply UX we diagrammed. It keeps the multi-tenant patterns we admired (teams, customers, memberships, cached queries) while replacing finance-specific tables with story intelligence, highlights, and playbooks that hand users actionable plans. Stripe remains the source of truth for billing metadata.
 
@@ -1110,7 +1110,7 @@ These stubs cover the CRUD surface for stories, highlights, playbooks, chat, and
 ## Execution Checklist & References
 
 - **Schema alignment** — update Drizzle models in `packages/db/src/schema` to match this ERD (notably `story_assets.external_url`, `story_turns`, `team_*` tables) and regenerate Supabase types. See [Entity Relationship Diagram](#entity-relationship-diagram).
-- **Worker upgrades** — extend ingestion tasks in `apps/worker/src/tasks` to fetch YouTube transcripts, slice into `story_turns`, and maintain clusters/embeddings (`analyze-story.ts`, `ingest-*`). This aligns with the content pipeline noted in [How the structure maps to the UX](#how-the-structure-maps-to-the-ux).
+- **Engine upgrades** — extend ingestion tasks in `apps/engine/src/tasks` to fetch YouTube transcripts, slice into `story_turns`, and maintain clusters/embeddings (`analyze-story.ts`, `ingest-*`). This aligns with the content pipeline noted in [How the structure maps to the UX](#how-the-structure-maps-to-the-ux).
 - **Query implementation** — implement the stubs in [Query Stubs Needed for the Wireframe](#query-stubs-needed-for-the-wireframe) under `packages/db/src/queries`, and wrap them with Supabase cached helpers (`packages/supabase/src/queries`).
 - **Timestamp sync** — ensure story queries expose `start_seconds`/`end_seconds` so the App Router components can sync the YouTube embed with dialog playback per the wireframe.
 - **Instrumentation** — create supporting views/jobs (e.g., `story_metrics_view`) referenced in [Query Stubs](#query-stubs-needed-for-the-wireframe) to power engagement reporting and future automation.

@@ -1,12 +1,12 @@
 import { getAdminFlag } from '@zeke/supabase/queries';
 import { NextResponse } from 'next/server';
 
-type WorkerOneOffResponse = {
+type EngineOneOffResponse = {
   ok: boolean;
   [key: string]: unknown;
 };
 
-async function postWorkerOneOff(urls: string[]): Promise<WorkerOneOffResponse> {
+async function postEngineOneOff(urls: string[]): Promise<EngineOneOffResponse> {
   const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
@@ -31,7 +31,7 @@ async function postWorkerOneOff(urls: string[]): Promise<WorkerOneOffResponse> {
       }
       const json = await res.json();
       if (json?.ok) {
-        return json as WorkerOneOffResponse;
+        return json as EngineOneOffResponse;
       }
     } catch {
       // try next port
@@ -67,7 +67,7 @@ export async function POST(req: Request): Promise<Response> {
         { status: HTTP_BAD_REQUEST }
       );
     }
-    const result = await postWorkerOneOff(urls);
+    const result = await postEngineOneOff(urls);
     const HTTP_OK = 200;
     const HTTP_SERVICE_UNAVAILABLE = 503;
     return NextResponse.json(result, {

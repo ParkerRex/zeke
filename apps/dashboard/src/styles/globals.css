@@ -1,3 +1,7 @@
+:root {
+  --font-serif: ui-serif;
+}
+
 html,
 body {
   height: 100%;

@@ -1,7 +1,12 @@
 {
   "extends": "@zeke/tsconfig/base.json",
-  "include": ["emails", "components"],
-  "exclude": ["node_modules"],
+  "include": [
+    "emails",
+    "components"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "module": "NodeNext",

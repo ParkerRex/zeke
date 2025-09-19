@@ -43,21 +43,21 @@
 ## Overview
 - ZEKE ingests multi-format news, analyzes it with LLM overlays, and surfaces actionable briefs across web apps and background pipelines (`README.md:1-74`).
 - The monorepo uses Turbo, pnpm, and Bun with unified workflows (`package.json:1-33`).
-- Shared packages hold design system, database access, analytics, cache, and AI utilities so UI and worker layers stay consistent.
+- Shared packages hold design system, database access, analytics, cache, and AI utilities so UI and engine layers stay consistent.
 
 ## Monorepo Layout
 - `apps/dashboard` is the primary Next.js 15 App Router experience; layout, providers, and analytics wiring live in `apps/dashboard/src/app/layout.tsx:1-100` and `apps/dashboard/src/app/providers.tsx:1-18`.
 - `apps/website` holds the marketing site (Next.js) with a lighter component surface for public pages (`README.md:36-41`).
-- `apps/worker` is the modular pg-boss service for ingesting sources, extracting content, and running analysis; entrypoint `apps/worker/src/worker.ts:1-66`, orchestrator `apps/worker/src/core/worker-service.ts:1-160`.
+- `apps/engine` is the modular pg-boss service for ingesting sources, extracting content, and running analysis; entrypoint `apps/engine/src/engine.ts:1-66`, orchestrator `apps/engine/src/core/engine-service.ts:1-160`.
 - `apps/api` contains Supabase CLI scaffolding, SQL migrations, and example TRPC code (`apps/api/migrations/0000_nasty_payback.sql:1-160`).
 - `packages/` hosts shared modules: `@zeke/ui`, `@zeke/supabase`, `@zeke/db`, `@zeke/events`, `@zeke/ai`, `@zeke/cache`, `@zeke/kv`, `@zeke/utils`, `@zeke/location`.
 
 ## Runtime Architecture & Data Flow
-- Worker queues coordinate via `pg-boss` with queue names centralized in `apps/worker/src/core/job-definitions.ts:16-78`; schedules seeded in `scheduleRecurringJobs` (`apps/worker/src/core/job-definitions.ts:88-116`).
-- RSS/article extraction uses Readability and canonical URL hashing in `apps/worker/src/tasks/extract-article.ts:1-87`; YouTube extraction and transcription mirror this pattern via `apps/worker/src/tasks/extract-youtube-content.ts` (see same folder).
-- Story analysis is LLM-driven with OpenAI fallback stubs in `apps/worker/src/tasks/analyze-story.ts:1-89`, calling `generateAnalysis` and `generateEmbedding` (`apps/worker/src/lib/openai/generate-analysis.ts:1-109`) or stub variants (`apps/worker/src/lib/openai/generate-stub-analysis.ts:1-86`).
-- HTTP endpoints for health checks, manual triggering, and previews live in `apps/worker/src/http/routes.ts:1-165` and should remain the single surface for operational tooling.
-- Worker DB access wraps shared Drizzle queries (`apps/worker/src/data/db.ts:1-63`) but exposes Pool helpers for legacy functions (`apps/worker/src/db.ts:1-120`). Use Drizzle helpers first, fall back to `pool` only when needed.
+- Engine queues coordinate via `pg-boss` with queue names centralized in `apps/engine/src/core/job-definitions.ts:16-78`; schedules seeded in `scheduleRecurringJobs` (`apps/engine/src/core/job-definitions.ts:88-116`).
+- RSS/article extraction uses Readability and canonical URL hashing in `apps/engine/src/tasks/extract-article.ts:1-87`; YouTube extraction and transcription mirror this pattern via `apps/engine/src/tasks/extract-youtube-content.ts` (see same folder).
+- Story analysis is LLM-driven with OpenAI fallback stubs in `apps/engine/src/tasks/analyze-story.ts:1-89`, calling `generateAnalysis` and `generateEmbedding` (`apps/engine/src/lib/openai/generate-analysis.ts:1-109`) or stub variants (`apps/engine/src/lib/openai/generate-stub-analysis.ts:1-86`).
+- HTTP endpoints for health checks, manual triggering, and previews live in `apps/engine/src/http/routes.ts:1-165` and should remain the single surface for operational tooling.
+- Engine DB access wraps shared Drizzle queries (`apps/engine/src/data/db.ts:1-63`) but exposes Pool helpers for legacy functions (`apps/engine/src/db.ts:1-120`). Use Drizzle helpers first, fall back to `pool` only when needed.
 
 ## Dashboard Application
 ### App Shell & Providers
@@ -80,17 +80,17 @@
 - Reuse `@zeke/ui` primitives (e.g., `Button`, `Sheet`) instead of duplicating shadcn code. The utility `cn` lives at `packages/ui/src/utils/cn.ts:1-6`, and Tailwind globals live beside it.
 - Stick to Tailwind tokens defined in shared CSS (`apps/dashboard/src/styles.css` and `packages/ui/globals.css`) to preserve the design system.
 
-## Worker Implementation Notes
-- Environment loading happens before imports (`apps/worker/src/core/worker-service.ts:15-33`); ensure new modules stay side-effect free so configuration is resolved first.
-- Use Redis-backed caches from `apps/worker/src/utils/retry.ts:1-48` and `packages/cache/src/redis-client.ts:1-133` for resilience, but reset connections on failure as already implemented.
-- All network calls must respect `fetchWithTimeout` conventions as shown in `apps/worker/src/tasks/extract-article.ts:24-33`; wire new clients through `utils/http.ts` for consistency.
-- When extending the OpenAI client, adjust defaults in `apps/worker/src/lib/openai/openai-client.ts:1-33` and ensure stub paths still work without `OPENAI_API_KEY`.
-- Queue orchestration ensures workloads remain idempotent; new jobs should follow the `QUEUES` pattern and register in `createJobQueues` plus `setupJobWorkers` (`apps/worker/src/core/job-definitions.ts:52-157`).
+## Engine Implementation Notes
+- Environment loading happens before imports (`apps/engine/src/core/engine-service.ts:15-33`); ensure new modules stay side-effect free so configuration is resolved first.
+- Use Redis-backed caches from `apps/engine/src/utils/retry.ts:1-48` and `packages/cache/src/redis-client.ts:1-133` for resilience, but reset connections on failure as already implemented.
+- All network calls must respect `fetchWithTimeout` conventions as shown in `apps/engine/src/tasks/extract-article.ts:24-33`; wire new clients through `utils/http.ts` for consistency.
+- When extending the OpenAI client, adjust defaults in `apps/engine/src/lib/openai/openai-client.ts:1-33` and ensure stub paths still work without `OPENAI_API_KEY`.
+- Queue orchestration ensures workloads remain idempotent; new jobs should follow the `QUEUES` pattern and register in `createJobQueues` plus `setupJobEngines` (`apps/engine/src/core/job-definitions.ts:52-157`).
 
 ## Shared Packages & Services
-- `@zeke/ai` re-exports `@ai-sdk` and centralizes model defaults (`packages/ai/lib/models.ts:1-16`). Use these exports for both frontend and worker coherence.
+- `@zeke/ai` re-exports `@ai-sdk` and centralizes model defaults (`packages/ai/lib/models.ts:1-16`). Use these exports for both frontend and engine coherence.
 - `@zeke/ui` contains component implementations in `packages/ui/src/components/*`; prefer composition (e.g., `Card`, `Tabs`) over bespoke Tailwind wrappers.
-- `@zeke/db` exposes Drizzle clients with snake_case mapping (`packages/db/src/client.ts:1-37`); share schema updates here so worker and dashboard stay aligned.
+- `@zeke/db` exposes Drizzle clients with snake_case mapping (`packages/db/src/client.ts:1-37`); share schema updates here so engine and dashboard stay aligned.
 - `@zeke/cache` (Node `redis`) vs `@zeke/kv` (Upstash REST) target different runtimes; dashboard/serverless code should use `@zeke/kv/src/index.ts:1-8`, while long-lived services use `packages/cache/src/redis-client.ts:1-133`.
 - `@zeke/events` provides client/server analytics wrappers (`packages/events/src/client.tsx:1-23`, `packages/events/src/server.ts:1-39`) and event names (`packages/events/src/events.ts:1-160`); route all instrumentation through these to keep taxonomy clean.
 - `@zeke/utils` gives environment helpers (`packages/utils/src/envs.ts:1-40`) and formatting helpers—use these to avoid duplicating URL logic.
@@ -99,24 +99,24 @@
 ## Database & Migrations
 - Supabase migrations sit in `apps/api/migrations`; the initial snapshot defines sources, raw items, contents, stories, overlays, embeddings, and Stripe billing tables (`apps/api/migrations/0000_nasty_payback.sql:1-160`).
 - Shared types derive from `packages/supabase/src/types/db.ts` and specific domain helpers like `types/stories.ts:1-36`; regenerate types after migrations with `pnpm types:generate` as noted in the root README (`README.md:83-118`).
-- Worker-side Drizzle query factories live in `packages/db/src/queries/*`; extend them before writing bespoke SQL so both worker and dashboard benefit.
+- Engine-side Drizzle query factories live in `packages/db/src/queries/*`; extend them before writing bespoke SQL so both engine and dashboard benefit.
 
 ## Tooling & Commands
 - Use pnpm via Turbo scripts: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck` (`README.md:85-112`, `package.json:9-24`).
-- Worker-specific scripts (connection, transcription) are declared in `apps/worker/README.md`; run `pnpm run test:connection` and `pnpm run test:transcription` before deploying worker changes.
+- Engine-specific scripts (connection, transcription) are declared in `apps/engine/README.md`; run `pnpm run test:connection` and `pnpm run test:transcription` before deploying engine changes.
 - Formatting and linting default to Biome (`package.json:22-24`); avoid adding other formatters.
 - Storybook and marketing app run alongside the dashboard via `pnpm dev` orchestrated in the root.
 
 ## Testing & Observability
 - Dashboard relies on React Query suspense and TRPC. Add cover tests where possible (React Testing Library for components, Vitest where available).
-- Worker logs must go through `log` (`apps/worker/src/log.ts`) to preserve structured output, and metrics snapshot endpoints (`/debug/status`) aid manual verification.
+- Engine logs must go through `log` (`apps/engine/src/log.ts`) to preserve structured output, and metrics snapshot endpoints (`/debug/status`) aid manual verification.
 - Analytics events use `setupAnalytics` which respects cookie consent (`packages/events/src/server.ts:9-38`); ensure new flows call `waitUntil`-based `track` to keep serverless timing safe.
 
 ## Implementation Guardrails
 - Favor server actions + streaming UI for new AI surfaces; follow the `generateEditorContent` pattern for deterministic prompts and output sections.
-- Keep business logic inside shared packages or worker tasks—avoid embedding fetch/DB calls directly in React components.
+- Keep business logic inside shared packages or engine tasks—avoid embedding fetch/DB calls directly in React components.
 - When introducing new state in the dashboard, store it in the URL via `nuqs` or colocated Zustand stores (create under `/stores/` following the stack defaults) to enable shareable workspaces.
-- Maintain consistent logging keys in the worker (component prefixes like `comp: 'extract'`) for easier filtering.
+- Maintain consistent logging keys in the engine (component prefixes like `comp: 'extract'`) for easier filtering.
 - Validate inputs at the edge of Next.js route handlers; reference existing patterns once `@/src/utils/api-schemas` is restored/extended. If you cannot find the helper, create it centrally so routes stay uniform.
 
 ## Outstanding Notes

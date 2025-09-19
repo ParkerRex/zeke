@@ -25,7 +25,7 @@ const baseUrl = getEmailUrl();
 
 export const WelcomeEmail = ({ fullName = "" }: Props) => {
 	const firstName = fullName ? fullName.split(" ").at(0) : "";
-	const text = `${firstName ? `Hi ${firstName}, ` : ""}Welcome to Zeke! You're about to transform how you discover and apply insights from the content that matters.`;
+	const text = `${firstName ? `Hi ${firstName}, ` : ""}Welcome to Midday! I'm Pontus, one of the founders. It's really important to us that you have a great experience ramping up.`;
 	const themeClasses = getEmailThemeClasses();
 	const lightStyles = getEmailInlineStyles("light");
 
@@ -48,7 +48,7 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
 						className={`text-[21px] font-normal text-center p-0 my-[30px] mx-0 ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						Welcome to Zeke
+						Welcome to Midday
 					</Heading>
 
 					<br />
@@ -63,29 +63,28 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
 						className={themeClasses.text}
 						style={{ color: lightStyles.text.color }}
 					>
-						Welcome to Zeke! You've just joined the fastest way to turn sprawling
-						content into verified insights and ready-to-use outputs.
+						Welcome to Midday! I'm Pontus, one of the founders.
 						<br />
 						<br />
-						We built Zeke because we were drowning in content—10-hour podcasts,
-						dense research papers, endless YouTube videos—and missing what
-						actually mattered. Now you can go from 10 hours to 5 minutes without
-						missing the insights that move your business forward.
+						We built Midday from over 10 years of running our own businesses,
+						knowing firsthand the challenges that come with it. Midday is built
+						together with our customers, and it's important to us that you know
+						we're here when you need us.
 						<br />
 						<br />
-						Here's what you can do right now:{" "}
+						Take your time to explore Midday at your own pace. If you ever want
+						to chat with us founders, you can schedule a time{" "}
+						<Link
+							href="https://cal.com/pontus-midday/15min"
+							className={`underline ${themeClasses.link}`}
+							style={{ color: lightStyles.text.color }}
+						>
+							here
+						</Link>
 						<br />
-						• Paste any link (podcast, YouTube, paper) and get an instant brief
 						<br />
-						• See every claim backed by timestamps and receipts
-						<br />
-						• Apply insights directly to your SOPs and goals
-						<br />
-						• Create cited content that's ready to ship
-						<br />
-						<br />
-						If there's anything we can do to help you get started, just reply.
-						We're here to make research effortless.
+						If there's anything we can do to help, just reply. We're always one
+						message away.
 					</Text>
 
 					<br />

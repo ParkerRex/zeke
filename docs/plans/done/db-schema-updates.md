@@ -223,7 +223,7 @@ Translate Bloomberg-like patterns to a modern indie stack:
 
 Goal: Propose a minimal architecture for an AI news terminal:
 - Next.js app (UI + server actions for authenticated reads).
-- Express worker(s) for ingestion and processing.
+- Express engine(s) for ingestion and processing.
 - Supabase Postgres for storage + Drizzle migrations.
 - Vector store (pgvector) for semantic clustering/search.
 - Job queue (pg-boss) for pipeline steps.
@@ -238,11 +238,11 @@ Keep to copy-paste-able SQL/TypeScript and explain trade-offs briefly.
 If you want, I can turn #4 into concrete Drizzle migrations + a minimal ERD for your Supabase instance next.
 
 You said:
-take a look at my current worker in the github repo attched. we're trying to figure out what we need to do to make the engine strong such that it can deliver on the promise outlined in docs/exec-overview.md.
+take a look at my current engine in the github repo attched. we're trying to figure out what we need to do to make the engine strong such that it can deliver on the promise outlined in docs/exec-overview.md.
 ChatGPT said:
 Could you clarify what specific aspects of the engine you're most concerned about strengthening? For example, are you looking to improve performance, accuracy of outputs, fault tolerance, scalability, or integration with external systems?
 
-Also, when you mention "the worker"—do you mean a specific file or module that handles ingestion, task processing, or something else? Let me know so I can analyze the right part of the codebase.
+Also, when you mention "the engine"—do you mean a specific file or module that handles ingestion, task processing, or something else? Let me know so I can analyze the right part of the codebase.
 
 You said:
 Bloomberg Terminal’s Early History & Lessons for Zeke’s Strategy.pdf
@@ -253,11 +253,11 @@ we want to get 100 news sources to start, and i was trying to figure out the sch
 
 the ideas that we do written, video, and audio form of content at hte top of the pipeline, then we grade it, pull insights etc and serve them to customers
 ChatGPT said:
-Got it. I’ll review your current worker implementation and identify what needs to be refactored or built to meet the strategic goals outlined in docs/exec-overview.md and the attached Bloomberg comparison PDF.
+Got it. I’ll review your current engine implementation and identify what needs to be refactored or built to meet the strategic goals outlined in docs/exec-overview.md and the attached Bloomberg comparison PDF.
 
 I’ll look at:
 
-What the current worker is doing and where it breaks down
+What the current engine is doing and where it breaks down
 
 How it needs to scale to support 100+ sources and 9,999 YouTube videos/day
 
@@ -268,24 +268,24 @@ Comparisons to Bloomberg’s early architecture for inspiration
 I’ll report back with a roadmap for strengthening the ingestion engine and schema design to deliver on Zeke’s core promise.
 
 Research completed in 9m · 21 sources · 15 searches
-Refactoring Worker to Deliver Zeke’s Ingestion and Analysis Engine
+Refactoring Engine to Deliver Zeke’s Ingestion and Analysis Engine
 
 Strengthening Zeke’s Engine to Fulfill its Vision
 Zeke’s goal is to “turn sprawling content into verified insights and ready-to-use outputs, fast”
 GitHub
  – essentially an “AI-era Bloomberg Terminal” for research and content intelligence. Achieving this requires a strong content engine that can ingest diverse sources at scale, analyze and unify that information, and produce credible, actionable insights. Below we outline the current architecture and the key enhancements needed for Zeke’s engine to deliver on the promise in the exec overview.
-Current Architecture: Modular Worker & Pipeline Foundation
-Zeke’s backend is structured as a modular worker service with a job queue (pg-boss) orchestrating ingestion and analysis tasks
+Current Architecture: Modular Engine & Pipeline Foundation
+Zeke’s backend is structured as a modular engine service with a job queue (pg-boss) orchestrating ingestion and analysis tasks
 GitHub
 . This decoupled design is a solid foundation – it replaces a previous monolith with clearer modules for different stages (ingestion, extraction, analysis)
 GitHub
-. The worker defines distinct job queues and workers for system heartbeats, source ingestion (RSS vs YouTube), content extraction, and LLM analysis
+. The engine defines distinct job queues and workers for system heartbeats, source ingestion (RSS vs YouTube), content extraction, and LLM analysis
 GitHub
 GitHub
 . These run on a schedule (e.g. RSS every 5 min, YouTube every 15 min) and on startup to continuously pull new content
 GitHub
 GitHub
-. RSS ingestion is fully implemented. For each RSS feed source, the worker fetches the feed, parses items, and upserts new entries (avoiding duplicates via a unique (source_id, external_id) index)
+. RSS ingestion is fully implemented. For each RSS feed source, the engine fetches the feed, parses items, and upserts new entries (avoiding duplicates via a unique (source_id, external_id) index)
 GitHub
 GitHub
 . New items trigger a content-fetch job to scrape the article text using Mozilla Readability, store it in the contents table, and create a story record
@@ -297,13 +297,13 @@ GitHub
 . Finally, an LLM analysis job is queued for each new story
 GitHub
 GitHub
-. This pipeline (ingest → extract → analyze) for text sources is operational. It establishes end-to-end flow from raw content to an analyzed story, with pg-boss ensuring reliability (jobs can be retried or failed gracefully) and the worker handling shutdown signals and health checks for stability
+. This pipeline (ingest → extract → analyze) for text sources is operational. It establishes end-to-end flow from raw content to an analyzed story, with pg-boss ensuring reliability (jobs can be retried or failed gracefully) and the engine handling shutdown signals and health checks for stability
 GitHub
 GitHub
 . In short, Zeke’s current engine can handle web articles end-to-end. YouTube ingestion is partially integrated: the schema and job definitions exist to support YouTube channels and search queries as sources
 GitHub
 GitHub
-. The worker will use the YouTube Data API (with a daily quota of ~10k units) to fetch recent videos for each channel or query source
+. The engine will use the YouTube Data API (with a daily quota of ~10k units) to fetch recent videos for each channel or query source
 GitHub
 GitHub
 . It upserts new videos into raw_items and queues a fetch-youtube-content job for each
@@ -313,7 +313,7 @@ GitHub
 GitHub
 . This was intentional: to deploy quickly, the team deferred the large Python/Whisper stack needed for video processing
 GitHub
-. The worker checks YOUTUBE_API_KEY and skips YouTube jobs if not configured, so the current deployment only handles RSS/text feeds
+. The engine checks YOUTUBE_API_KEY and skips YouTube jobs if not configured, so the current deployment only handles RSS/text feeds
 GitHub
 . In summary, the existing engine is modular and cloud-ready, with an efficient queue-based design. It can ingest and analyze text sources reliably, and it has stubs in place for video and audio content. This modular architecture aligns well with Zeke’s needs – as Bloomberg did for finance, Zeke is building a system to combine previously disparate functions into one interface (aggregating news, videos, podcasts, etc., plus analytics).
 Scaling Ingestion for 100+ Sources and Thousands of Videos
@@ -327,19 +327,19 @@ GitHub
 GitHub
 . Running a few in parallel (batch size tuning) can speed up throughput. The engine can safely increase concurrency given the modular tasks – e.g. allow multiple extract-content jobs to run in parallel, since each operates on independent items. The job definitions already use small batch sizes (e.g. fetch-content batch of 5)
 GitHub
- to group tasks without overwhelming memory. With careful tuning and perhaps multiple worker processes, the engine can handle large volumes without bottlenecking on one-by-one processing.
-Resource Isolation for Heavy Tasks: Videos and podcasts require downloading media and running transcription (Whisper or similar), which is CPU/GPU intensive and makes Docker images huge. The team’s two-phase deployment strategy is wise: keep the core RSS worker lightweight for fast deploy, and handle YouTube/podcast processing in a specialized service or environment
+ to group tasks without overwhelming memory. With careful tuning and perhaps multiple engine processes, the engine can handle large volumes without bottlenecking on one-by-one processing.
+Resource Isolation for Heavy Tasks: Videos and podcasts require downloading media and running transcription (Whisper or similar), which is CPU/GPU intensive and makes Docker images huge. The team’s two-phase deployment strategy is wise: keep the core RSS engine lightweight for fast deploy, and handle YouTube/podcast processing in a specialized service or environment
 GitHub
 GitHub
 . To deliver on the promise of ingesting video/audio content, we’ll need to implement Phase 2:
-Either deploy a separate “YouTube Worker” service with the full ML stack (yt-dlp, FFmpeg, Whisper/PyTorch)
+Either deploy a separate “YouTube Engine” service with the full ML stack (yt-dlp, FFmpeg, Whisper/PyTorch)
 GitHub
 GitHub
-, or migrate the worker to a platform like GCP Cloud Run that supports larger images and more memory/CPU
+, or migrate the engine to a platform like GCP Cloud Run that supports larger images and more memory/CPU
 GitHub
 . The separate service approach (microservice) has the advantage of independent scaling – e.g. it could run on a GPU-enabled instance or scale out pods to transcribe videos in parallel
 GitHub
-. The core pg-boss queue can still be shared: the heavy worker would specialize in ingest:fetch-youtube-content jobs while the main worker handles lighter jobs. This way, the system can transcribe videos without slowing down article ingestion.
+. The core pg-boss queue can still be shared: the heavy engine would specialize in ingest:fetch-youtube-content jobs while the main engine handles lighter jobs. This way, the system can transcribe videos without slowing down article ingestion.
 Implement rate limiting and batching for the YouTube API usage. The code already tracks API quota usage and stops when nearing the daily limit
 GitHub
 GitHub
@@ -349,7 +349,7 @@ GitHub
 GitHub
 GitHub
 ) and adjusting the schedule frequency can help maximize coverage within quota.
-Asynchronous transcription: For scaling, consider making the transcription step asynchronous or parallel. For example, the worker could offload audio files to a cloud transcription API (like OpenAI Whisper API or AssemblyAI) and poll for results, rather than processing entirely synchronously. Using OpenAI’s Whisper API would eliminate the need to bundle PyTorch, at the cost of API fees – a trade-off to evaluate. If local Whisper is used, leveraging concurrency (multiple processes or threads) or GPU acceleration is key. The chosen Cloud Run/VM approach should allow using all available CPU cores or a GPU for Whisper to speed up transcribing long videos.
+Asynchronous transcription: For scaling, consider making the transcription step asynchronous or parallel. For example, the engine could offload audio files to a cloud transcription API (like OpenAI Whisper API or AssemblyAI) and poll for results, rather than processing entirely synchronously. Using OpenAI’s Whisper API would eliminate the need to bundle PyTorch, at the cost of API fees – a trade-off to evaluate. If local Whisper is used, leveraging concurrency (multiple processes or threads) or GPU acceleration is key. The chosen Cloud Run/VM approach should allow using all available CPU cores or a GPU for Whisper to speed up transcribing long videos.
 Robust error handling & retries: A strong engine should be resilient to transient failures (network timeouts, API errors). The current design logs errors and marks job failures
 GitHub
 GitHub
@@ -455,7 +455,7 @@ Architecturally, these output generations could be on-demand calls to the LLM vi
 The engine should ensure that this generation is also “grounded by receipts.” That means the output should include citations (e.g., footnotes or inline references to the source material). We can enforce this by instructing the LLM to include quotes or reference the content. Our earlier step of storing citations for key points will help – the output generator can easily grab a few choice snippets that the analysis identified and compel the LLM to use those in the final text (perhaps even provide them as part of the prompt context). This aligns with the motto “no AI slop” – everything claimed in the output can be backed up by the original source.
 By integrating user goals into the pipeline, Zeke’s engine truly becomes the “missing layer that connects research to outcomes”
 GitHub
-. Instead of just dropping a summary on the user, it closes the loop and produces a result that the user can directly use (publish a blog, execute a strategy, etc.). This is a major value-add: for example, “from 10 hours of research to a 5-minute brief” – and then that brief can immediately be turned into an email or plan with one click. To implement this safely, we might want to sandbox or review outputs when needed – but given this is an AI research assistant, users likely expect and accept AI-generated drafts. From a development standpoint, this part might live in the app layer (Next.js API routes calling the OpenAI API, for instance) rather than the worker, since it’s interactive. However, the worker could handle some batch outputs for very common things (maybe a daily trend report email?). It’s worth considering a cron job that creates an “AI news brief” each morning aggregating top stories for certain categories – effectively a meta-output combining multiple stories. This would be analogous to Bloomberg’s daily news briefs but powered by our engine. With the clustering and chili scores, we can pick the top “hot” stories and have the LLM create a summary-of-summaries newsletter, with citations. This could be stored or sent to users, demonstrating the engine’s power. In summary, to fully realize the exec overview’s vision, the engine must not stop at analysis – it must facilitate creation. By handling user context and output generation, Zeke moves from being just a research tool to a productivity tool that delivers finished outputs. This capability will set it apart from generic summarizers, much like Bloomberg set itself apart by letting traders not only see data but act on it within the same terminal (messaging, trading, etc., all in one place).
+. Instead of just dropping a summary on the user, it closes the loop and produces a result that the user can directly use (publish a blog, execute a strategy, etc.). This is a major value-add: for example, “from 10 hours of research to a 5-minute brief” – and then that brief can immediately be turned into an email or plan with one click. To implement this safely, we might want to sandbox or review outputs when needed – but given this is an AI research assistant, users likely expect and accept AI-generated drafts. From a development standpoint, this part might live in the app layer (Next.js API routes calling the OpenAI API, for instance) rather than the engine, since it’s interactive. However, the engine could handle some batch outputs for very common things (maybe a daily trend report email?). It’s worth considering a cron job that creates an “AI news brief” each morning aggregating top stories for certain categories – effectively a meta-output combining multiple stories. This would be analogous to Bloomberg’s daily news briefs but powered by our engine. With the clustering and chili scores, we can pick the top “hot” stories and have the LLM create a summary-of-summaries newsletter, with citations. This could be stored or sent to users, demonstrating the engine’s power. In summary, to fully realize the exec overview’s vision, the engine must not stop at analysis – it must facilitate creation. By handling user context and output generation, Zeke moves from being just a research tool to a productivity tool that delivers finished outputs. This capability will set it apart from generic summarizers, much like Bloomberg set itself apart by letting traders not only see data but act on it within the same terminal (messaging, trading, etc., all in one place).
 Conclusion
 To deliver on Zeke’s ambitious promise, the content engine must evolve on multiple fronts. It needs to ingest a broad array of sources at scale – from dozens of RSS feeds to thousands of videos – in a scalable, modular way (using multiple workers or services as needed)
 GitHub
@@ -474,7 +474,7 @@ GitHub
  – and a feeling that this engine is like having a team of researchers plus a strategist in one. By implementing the above improvements, Zeke’s engine will be equipped to deliver on its promise: turning the deluge of content into actionable, verified insight, and doing so at a scale and speed that gives each user a “pro-level” research capability
 GitHub
 . In short, it transforms chaos into clarity – fulfilling the vision of making research effortless and effective, much as Bloomberg Terminal became the effortless window into the financial world. With a strong engine foundation and these enhancements, Zeke can truly become the must-have “intelligence platform” described in its strategy, bridging information to outcomes for its users. Sources:
-Zeke Repository – Worker architecture and job pipeline
+Zeke Repository – Engine architecture and job pipeline
 GitHub
 GitHub
 GitHub
@@ -2049,7 +2049,7 @@ Use consistent naming conventions: The schema is easier to read if naming reflec
 Group related tables in documentation or code: In your schema file, you already separate sections with comments. We’d go further by perhaps splitting the schema into multiple files or documentation sections: Content Pipeline, Team/Collaboration, Playbooks, Assistant, etc. This way, someone reading the schema can follow the content’s journey (from raw item to embedding) without being distracted by orthogonal sections like billing. In documentation, an ER diagram focusing on the content flow is helpful. For example, illustrating how raw_items → contents → stories → (overlays, embeddings, clusters) connect
 GitHub
  makes the design much easier to grasp.
-Document the data flow with examples: To match the schema to the pipeline, provide a brief narrative (like: “Ingestion: The system pulls sources and creates raw_items; Extraction: a worker fetches each raw_item’s content into contents; Story Creation: content is saved as a story for users to read; Analysis: an LLM generates a story_overlay and vector in story_embeddings
+Document the data flow with examples: To match the schema to the pipeline, provide a brief narrative (like: “Ingestion: The system pulls sources and creates raw_items; Extraction: a engine fetches each raw_item’s content into contents; Story Creation: content is saved as a story for users to read; Analysis: an LLM generates a story_overlay and vector in story_embeddings
 GitHub
 ; User Curation: users highlight passages, which get saved in highlights referencing the story’s content
 GitHub
@@ -2154,7 +2154,7 @@ Use consistent naming conventions: The schema is easier to read if naming reflec
 Group related tables in documentation or code: In your schema file, you already separate sections with comments. We’d go further by perhaps splitting the schema into multiple files or documentation sections: Content Pipeline, Team/Collaboration, Playbooks, Assistant, etc. This way, someone reading the schema can follow the content’s journey (from raw item to embedding) without being distracted by orthogonal sections like billing. In documentation, an ER diagram focusing on the content flow is helpful. For example, illustrating how raw_items → contents → stories → (overlays, embeddings, clusters) connect
 GitHub
  makes the design much easier to grasp.
-Document the data flow with examples: To match the schema to the pipeline, provide a brief narrative (like: “Ingestion: The system pulls sources and creates raw_items; Extraction: a worker fetches each raw_item’s content into contents; Story Creation: content is saved as a story for users to read; Analysis: an LLM generates a story_overlay and vector in story_embeddings
+Document the data flow with examples: To match the schema to the pipeline, provide a brief narrative (like: “Ingestion: The system pulls sources and creates raw_items; Extraction: a engine fetches each raw_item’s content into contents; Story Creation: content is saved as a story for users to read; Analysis: an LLM generates a story_overlay and vector in story_embeddings
 GitHub
 ; User Curation: users highlight passages, which get saved in highlights referencing the story’s content
 GitHub

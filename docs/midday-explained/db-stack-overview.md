@@ -12,7 +12,7 @@ Supabase still powers auth, session handoffs, and object storage. The generated 
 - React helpers like `packages/supabase/src/queries/cached-queries.ts` call `supabase.auth.getSession()` and benefit from the typed response.
 - Storage utilities in `packages/supabase/src/utils/storage.ts` accept a `SupabaseClient<Database>` so uploads/downloads throw typed errors instead of `any`.
 
-Anywhere the app imports `@zeke/supabase/*` (for example, `apps/dashboard/src/components/google-sign-in.tsx`) it receives a fully typed Supabase client.
+Anywhere the app imports `@zeke/supabase/*` (for example, `apps/dashboard/src/components/github-sign-in.tsx`) it receives a fully typed Supabase client.
 
 ## How Drizzle queries are organised
 

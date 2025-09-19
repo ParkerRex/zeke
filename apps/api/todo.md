@@ -4,7 +4,7 @@
   2. Every data need must have a TRPC procedure (and optional REST counterpart).
   3. React Query is the default client-side state layer; server components prefetch
   via TRPC helpers.
-  4. Engine (worker) interactions go through @zeke/engine-client when we land it.
+  4. Engine (engine) interactions go through @zeke/engine-client when we land it.
 
   ———
 
@@ -145,7 +145,7 @@
 
   ### 5. When to Update Engine Client
 
-  If the component currently calls the worker (e.g., hitting /debug/ingest):
+  If the component currently calls the engine (e.g., hitting /debug/ingest):
 
   1. Replace the call with @zeke/engine-client once it’s available:
 
@@ -164,7 +164,7 @@
   - Remove the direct Drizzle helper/export that route used.
   - Drop unused Supabase RPC wrappers (e.g., getAdminFlag).
   - Update README/docs noting the API endpoint is now canonical.
-  - Run lint/test to ensure no stray connectDb in dashboard/worker.
+  - Run lint/test to ensure no stray connectDb in dashboard/engine.
 
   ———
 
@@ -176,7 +176,7 @@
           Is it a server component? → Prefetch via TRPC server helper.
           Is it a client component? → Use trpc.useSuspenseQuery / useMutation.
           Is it a server action/API route? → Use TRPC caller or fetch API with auth.
-          Is it calling worker? → Go through @zeke/engine-client (once available).
+          Is it calling engine? → Go through @zeke/engine-client (once available).
   Does an API endpoint exist?
       No → create TRPC procedure (+ REST if needed) first.
       Yes → follow the component pattern above.

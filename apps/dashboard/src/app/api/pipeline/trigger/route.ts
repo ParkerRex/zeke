@@ -1,9 +1,9 @@
 import { getAdminFlag } from '@zeke/supabase/queries';
 import { NextResponse } from 'next/server';
 
-type WorkerTriggerResponse = { ok: boolean; port?: string };
+type EngineTriggerResponse = { ok: boolean; port?: string };
 
-async function postWorker(path: string): Promise<WorkerTriggerResponse> {
+async function postEngine(path: string): Promise<EngineTriggerResponse> {
   const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
@@ -22,7 +22,7 @@ async function postWorker(path: string): Promise<WorkerTriggerResponse> {
       });
       clearTimeout(t);
       if (res.ok) {
-        return { ok: true, port } as WorkerTriggerResponse;
+        return { ok: true, port } as EngineTriggerResponse;
       }
     } catch {
       // try next
@@ -46,7 +46,7 @@ export async function POST(req: Request): Promise<Response> {
     };
     const path =
       kind === 'youtube' ? '/debug/ingest-youtube' : '/debug/ingest-now';
-    const result = await postWorker(path);
+    const result = await postEngine(path);
     const HTTP_OK = 200;
     const HTTP_SERVICE_UNAVAILABLE = 503;
     return NextResponse.json(result, {

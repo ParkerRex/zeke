@@ -21,12 +21,12 @@ export function AuthUI({
 	align = "center",
 }: {
 	mode: "login" | "signup";
-	signInWithOAuth: (provider: "google") => Promise<ActionResponse>;
+	signInWithOAuth: (provider: "github" | "apple") => Promise<ActionResponse>;
 	showBrand?: boolean;
 	align?: "left" | "center";
 }) {
 	const [pending, setPending] = useState(false);
-	async function handleOAuthClick(provider: "google") {
+	async function handleOAuthClick(provider: "github" | "apple") {
 		setPending(true);
 		const response = await signInWithOAuth(provider);
 
@@ -68,13 +68,13 @@ export function AuthUI({
 				<Button
 					className="flex w-full items-center justify-center gap-2 py-4"
 					disabled={pending}
-					onClick={() => handleOAuthClick("google")}
+					onClick={() => handleOAuthClick("github")}
 					size="lg"
 					type="button"
 					variant="default"
 				>
-					<Icons.Chrome size={20} />
-					Continue with Google
+					<Icons.Github size={20} />
+					Continue with Github
 				</Button>
 			</div>
 			{mode === "signup" && (

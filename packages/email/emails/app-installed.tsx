@@ -26,7 +26,7 @@ const baseAppUrl = getAppUrl();
 
 export const AppInstalledEmail = ({
 	email = "pontus@lostisland.co",
-	teamName = "Zeke Labs AB",
+	teamName = "Midday Labs AB",
 	appName = "Raycast",
 }: Props) => {
 	const appLink = `${baseAppUrl}/apps`;
@@ -61,8 +61,8 @@ export const AppInstalledEmail = ({
 						className={`text-[14px] leading-[24px] ${themeClasses.text}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						The <strong>{appName}</strong> integration has been successfully added to your{" "}
-						<strong>{teamName}</strong> workspace on <strong>Zeke</strong>. You can now use it to enhance your research and insight discovery workflow.
+						The <strong>{appName}</strong> app has been added to your workspace{" "}
+						<strong>{teamName}</strong> on <strong>Midday</strong>.
 					</Text>
 					<Section className="mb-[42px] mt-[32px] text-center">
 						<Button href={appLink}>View installed app</Button>

@@ -285,7 +285,7 @@ readability and alignment with the data pipeline:
   makes the design much easier to grasp.
 - **Document the data flow with examples:** To match the schema to the
   pipeline, provide a brief narrative (like: “**Ingestion:** The system
-  pulls sources and creates raw_items; **Extraction:** a worker fetches
+  pulls sources and creates raw_items; **Extraction:** a engine fetches
   each raw_item’s content into contents; **Story Creation:** content is
   saved as a story for users to read; **Analysis:** an LLM generates a
   story_overlay and vector in

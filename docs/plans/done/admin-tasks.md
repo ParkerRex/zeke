@@ -1,6 +1,6 @@
 # Admin Console — Implementation Tasks
 
-Status: In progress • Owner: Web + Worker • Est: ~2–3 days
+Status: In progress • Owner: Web + Engine • Est: ~2–3 days
 
 Next Actions (high priority)
 
@@ -57,7 +57,7 @@ Progress:
 
 Acceptance:
 
-- [ ] Overview shows counts, worker status, triggers.
+- [ ] Overview shows counts, engine status, triggers.
 - [ ] Jobs shows job summary and recent lists.
 - [ ] Forecast renders playground with editable inputs.
 
@@ -89,7 +89,7 @@ Progress:
 - [x] `GET /api/admin/sources`
 - [x] `POST /api/admin/sources`
 - [x] Pause/Resume/Delete/Backfill endpoints
-- [ ] Preview endpoint and worker helper
+- [ ] Preview endpoint and engine helper
 - [x] `/api/pipeline/*` admin-gated
 
 ## Phase 5 — Sources UI
@@ -106,7 +106,7 @@ Acceptance:
 - [ ] Paused sources do not ingest on next run.
 - [ ] Backfill requests adjust next run window.
 
-## Phase 6 — Worker Hooks
+## Phase 6 — Engine Hooks
 
 - [ ] Filter inactive: update `getRssSources` and `getYouTubeSources` to add `and coalesce(active, true)`.
 - [ ] Backfill window: respect `last_cursor` or `metadata.published_after` where applicable.
@@ -120,7 +120,7 @@ Acceptance:
 
 Progress:
 
-- [x] Filter inactive sources in worker ingest queries
+- [x] Filter inactive sources in engine ingest queries
 - [x] Backfill hint respected via `metadata.published_after` (admin writes it)
 - [ ] Dry-run preview helpers (no writes; small limits)
 
@@ -147,7 +147,7 @@ Acceptance:
 
 - [ ] Unauth user → `/admin` redirects to `/login`.
 - [ ] Non-admin authed user → `/admin` redirects to `/home`.
-- [ ] Admin can: create/pause/resume/backfill/delete a source; see effects in worker logs and counts.
+- [ ] Admin can: create/pause/resume/backfill/delete a source; see effects in engine logs and counts.
 - [ ] Preview for YouTube search does not create DB rows; shows quota estimate.
 - [ ] Paused sources remain skipped across scheduled ingest.
 - [ ] Forecast tab editable inputs update totals.
@@ -164,7 +164,7 @@ Acceptance:
 - [x] Admin APIs for sources (preview pending)
 - [x] `/admin` Sources + Overview tabs
 - [x] Seeds for pg-boss version/schedules
-- [ ] Preview path (worker + API + UI)
+- [ ] Preview path (engine + API + UI)
 - [ ] Forecast inline + Admin nav + deprecations
 
 ## Phase 8 — Per‑Source Metrics (Function + Realtime)
@@ -213,7 +213,7 @@ Goal: Show platform quota status (starting with YouTube) in Overview.
 Plan
 
 - Table: `public.platform_quota` (`provider text primary key`, `quota_limit int`, `used int`, `remaining int`, `reset_at timestamptz`, `updated_at timestamptz default now()`).
-- Worker: write snapshot every 5–10 minutes and after ingest bursts (use existing YouTubeFetcher quota tracker).
+- Engine: write snapshot every 5–10 minutes and after ingest bursts (use existing YouTubeFetcher quota tracker).
 - Realtime: add table to publication; Admin subscribes for live updates.
 - UI: “Quota” card in Overview: current used/remaining and reset time; warning color when remaining < threshold.
 
@@ -229,7 +229,7 @@ Goal: Badge and details to highlight sources with recent errors.
 Plan
 
 - Table: `public.source_health` (`source_id pk`, `status enum('ok','warn','error')`, `last_success_at`, `last_error_at`, `error_24h int`, `message text`, `updated_at`).
-- Worker updates on ingest catch blocks and on success; keep payload small (last error string, timestamps). Consider rolling window counters.
+- Engine updates on ingest catch blocks and on success; keep payload small (last error string, timestamps). Consider rolling window counters.
 - Realtime: subscribe to table; Sources row shows status badge + hover tooltip with `message`.
 
 Acceptance
@@ -244,7 +244,7 @@ Goal: Replace job queue polling with realtime summaries.
 Plan
 
 - Table: `public.job_metrics` (`name text`, `state text`, `count int`, `updated_at timestamptz`, primary key (`name`,`state`)).
-- Worker: every 2–5 seconds (or after a work batch), aggregate from `pgboss.job` and upsert counts. Keep cadence light to reduce DB writes.
+- Engine: every 2–5 seconds (or after a work batch), aggregate from `pgboss.job` and upsert counts. Keep cadence light to reduce DB writes.
 - Realtime: add to publication; Admin subscribes and recomputes the map in the Overview “Job Queue” card.
 
 Acceptance
@@ -254,16 +254,16 @@ Acceptance
 
 ## Phase 12 — Bootstrap robustness (Types sync)
 
-Goal: Ensure worker sees up-to-date DB types without manual steps.
+Goal: Ensure engine sees up-to-date DB types without manual steps.
 
 Plan
 
-- Script enhancement: after `supabase gen types ... > src/lib/supabase/types.ts`, copy/sync the file to `worker/src/lib/supabase/types.ts` (or establish a shared import path if desired).
-- Optionally add a prebuild hook in worker to validate types are present.
+- Script enhancement: after `supabase gen types ... > src/lib/supabase/types.ts`, copy/sync the file to `engine/src/lib/supabase/types.ts` (or establish a shared import path if desired).
+- Optionally add a prebuild hook in engine service to validate types are present.
 
 Acceptance
 
-- [x] `pnpm run bootstrap` regenerates types for app and worker so both compile against current schema.
+- [x] `pnpm run bootstrap` regenerates types for app and engine so both compile against current schema.
 
 ## Post-Launch
 

@@ -50,7 +50,7 @@ Current state
 
 - Baseline migration includes `users.is_admin`, `sources.active/created_at/updated_at`, RLS posture, YT indexes, additional admin indexes (`contents(raw_item_id)`, `contents(extracted_at)`, `sources(last_checked)`), and pg-boss schema.
 - Realtime tables for admin: `source_metrics`, `platform_quota`, `source_health`, `job_metrics`.
-- Worker filters `active=false` sources and writes health/quota snapshots; mirrors job metrics.
+- Engine filters `active=false` sources and writes health/quota snapshots; mirrors job metrics.
 - Pipeline admin gating enforced (`/api/pipeline/*` return 403 for non-admin).
 - Admin endpoints exist (including preview, single-source ingest, one-off ingest).
 - `/admin` implemented with Tabs; “Sources” (counts, preview, backfill, seed, one-off) and “Overview” inline; “Forecast” inline.
@@ -70,7 +70,7 @@ Tabs: Overview • Sources • Forecast • Jobs (persist active tab via `nuqs`)
 
 - Overview
 
-  - Live counts (raw_items, contents, stories), worker status/port, last updated.
+  - Live counts (raw_items, contents, stories), engine status/port, last updated.
   - Actions: Trigger RSS ingest; Trigger YouTube ingest.
   - Reuse components from `src/app/testing/page.tsx`.
 
@@ -99,20 +99,20 @@ Implementation & Performance notes
 
 - Quota view (per platform)
 
-  - YouTube: expose quota snapshot from worker (`used/remaining/reset_hour`) and persist to `public.platform_quota` (`provider text pk`, `quota_limit int`, `used int`, `remaining int`, `reset_at timestamptz`, `updated_at`).
+  - YouTube: expose quota snapshot from engine (`used/remaining/reset_hour`) and persist to `public.platform_quota` (`provider text pk`, `quota_limit int`, `used int`, `remaining int`, `reset_at timestamptz`, `updated_at`).
   - RSS/Articles: no platform quota; show simple fetch error rate + last success.
   - (Podcasts later) placeholder only.
   - Realtime: add `platform_quota` to publication; update row every 5–10 minutes and after large runs.
 
 - Per-source health
   - Table: `public.source_health` (`source_id pk`, `status enum('ok','warn','error')`, `last_success_at`, `last_error_at`, `error_24h int`, `message text`, `updated_at`).
-  - Worker updates on ingest success/failure; minimal, no over-instrumentation (Sentry will come later).
+  - Engine updates on ingest success/failure; minimal, no over-instrumentation (Sentry will come later).
   - Realtime: subscribe to `source_health` for instant badge updates in the Sources table.
 
 ## Realtime Coverage
 
 - Metrics: `public.source_metrics` (implemented) replaces polling for per-source counts.
-- Job queue: `public.job_metrics` (implemented) written by worker on a short cadence.
+- Job queue: `public.job_metrics` (implemented) written by the engine on a short cadence.
   - Alternative of subscribing directly to `pgboss.job` is avoided to keep Realtime scope to public schema.
 - Quota: `public.platform_quota` (implemented) updates from YouTube ingest.
 - Recent lists: optional — keep polling for now, or subscribe to `raw_items/contents/stories` later when RLS policies are in place for admin-only reads.
@@ -123,7 +123,7 @@ Implementation & Performance notes
 - `POST /api/admin/sources` — create/update (id optional). Body includes kind, name, url, domain, metadata, active.
 - `POST /api/admin/sources/:id/pause` | `resume` | `backfill` (7/30/90) | `delete`.
 - `GET /api/admin/sources/:id/preview?limit=10` — dry-run next items + quota estimate (no DB writes).
-- `POST /api/admin/ingest/trigger` — `{ kind: 'rss'|'youtube' }` (proxy to worker). Deprecate or guard existing `/api/pipeline/trigger` to require admin.
+- `POST /api/admin/ingest/trigger` — `{ kind: 'rss'|'youtube' }` (proxy to engine). Deprecate or guard existing `/api/pipeline/trigger` to require admin.
 - Guard or replace: `/api/pipeline/status` and `/api/pipeline/recent` should be admin-only or moved under `/api/admin/pipeline/*` and the UI updated accordingly.
 
 Contracts (initial)
@@ -140,11 +140,11 @@ Contracts (initial)
 - `@db/mutations/sources/upsert-source.ts`, `delete-source.ts`, `update-source-status.ts` (pause/resume/backfill).
 - `src/actions/sources/upsert-source.ts` — validates input, admin-check, writes via mutation, triggers seed/backfill.
 
-## Worker Integration
+## Engine Integration
 
 - Respect pause: filter out `active = false` in `getRssSources` and `getYouTubeSources` queries.
 - Backfill window: read `sources.last_cursor` or `metadata.published_after` and pass to fetchers.
-- Dry-run preview: add worker helpers that call fetchers with small limits and skip `upsertRawItem`/enqueue (return items + estimated quota used).
+- Dry-run preview: add engine helpers that call fetchers with small limits and skip `upsertRawItem`/enqueue (return items + estimated quota used).
 - No change to existing queues (`ingest:pull`, `ingest:fetch-content`, `ingest:fetch-youtube-content`, `analyze:llm`).
 - Respect existing YouTube fields: `metadata.published_after` for searches; prefer `last_cursor` for generic cursors to avoid duplicating fields.
 
@@ -154,8 +154,8 @@ Contracts (initial)
 2. Guard: add `get-admin-flag`; protect `/admin` and admin APIs. (Done)
 3. UI: build `/admin` tabs; reuse diagnostics + forecast components. (In progress: Sources + Overview done; Forecast TBD)
 4. Sources CRUD: form + table, pause/resume/archive/backfill; “seed now” optional. (In progress; global triggers wired)
-5. Preview: admin API + worker dry-run helpers. (Next)
-6. Polish: per-source estimates in Forecast; ensure worker filters `active=false`; deprecate `/testing` and `/temp` public routes. (Pending)
+5. Preview: admin API + engine dry-run helpers. (Next)
+6. Polish: per-source estimates in Forecast; ensure engine filters `active=false`; deprecate `/testing` and `/temp` public routes. (Pending)
 
 ## Notes
 
@@ -180,4 +180,4 @@ Progress Snapshot
 - Pipeline APIs: `src/app/api/pipeline/*`
 - Supabase admin client: `src/lib/supabase/supabase-admin.ts`
 - Queries & mutations alias: `@db/*` resolving to `supabase/*`
-- Worker ingest + queues: `worker/src/worker.ts`, `worker/src/ingest/rss.ts`, `worker/src/ingest/youtube.ts`, `worker/src/fetch/youtube.ts`
+- Engine ingest + queues: `engine/src/engine.ts`, `engine/src/ingest/rss.ts`, `engine/src/ingest/youtube.ts`, `engine/src/fetch/youtube.ts`

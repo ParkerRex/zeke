@@ -23,7 +23,6 @@
     "@polar-sh/nextjs": "^0.4.0",
     "@polar-sh/sdk": "^0.33.1",
     "@react-email/components": "^0.0.32",
-    "@react-google-maps/api": "^2.20.6",
     "@react-pdf/renderer": "^4.3.0",
     "@sentry/nextjs": "^8",
     "@stripe/stripe-js": "^2.4.0",
@@ -41,7 +40,6 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@upstash/ratelimit": "^2.0.3",
     "@zeke/api": "workspace:*",
-    "@zeke/worker": "workspace:*",
     "@zeke/events": "workspace:*",
     "@zeke/kv": "workspace:*",
     "@zeke/location": "workspace:*",
@@ -98,7 +96,8 @@
     "usehooks-ts": "^3.1.1",
     "vaul": "^1.1.2",
     "zod": "^4.1.8",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "@zeke/engine": "workspace:*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "14.2.1",

@@ -16,10 +16,10 @@ const config = {
 		],
 	},
 	transpilePackages: [
-		"@zeke/ui",
-		"@zeke/tailwind",
-		"@zeke/invoice",
-		"@zeke/api",
+		"@midday/ui",
+		"@midday/tailwind",
+		"@midday/invoice",
+		"@midday/api",
 	],
 	serverExternalPackages: ["@react-pdf/renderer", "pdfjs-dist"],
 	eslint: {

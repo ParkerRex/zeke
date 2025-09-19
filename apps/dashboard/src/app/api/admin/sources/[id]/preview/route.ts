@@ -1,12 +1,12 @@
 import { getAdminFlag } from '@zeke/supabase/queries';
 import { NextResponse } from 'next/server';
 
-type WorkerPreviewResponse = { ok: boolean; [key: string]: unknown };
+type EnginePreviewResponse = { ok: boolean; [key: string]: unknown };
 
-async function fetchWorkerPreview(
+async function fetchEnginePreview(
   sourceId: string,
   limit: number
-): Promise<WorkerPreviewResponse> {
+): Promise<EnginePreviewResponse> {
   const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
@@ -29,7 +29,7 @@ async function fetchWorkerPreview(
       }
       const json = await res.json();
       if (json?.ok) {
-        return json as WorkerPreviewResponse;
+        return json as EnginePreviewResponse;
       }
     } catch {
       // try next
@@ -58,7 +58,7 @@ export async function GET(
     MAX_LIMIT
   );
   try {
-    const result = await fetchWorkerPreview(params.id, limit);
+    const result = await fetchEnginePreview(params.id, limit);
     const HTTP_OK = 200;
     const HTTP_SERVICE_UNAVAILABLE = 503;
     return NextResponse.json(result, {

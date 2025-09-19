@@ -16,6 +16,7 @@ import {
 	getEmailInlineStyles,
 	getEmailThemeClasses,
 } from "../components/theme";
+import { getI18n } from "../locales";
 
 interface Props {
 	email?: string;
@@ -23,6 +24,7 @@ interface Props {
 	invitedByName?: string;
 	teamName?: string;
 	ip?: string;
+	locale: string;
 }
 
 const baseAppUrl = getAppUrl();
@@ -33,14 +35,16 @@ export const InviteEmail = ({
 	email = "pontus@lostisland.co",
 	teamName = "Acme Co",
 	ip = "204.13.186.218",
+	locale = "en",
 }: Props) => {
+	const { t } = getI18n({ locale });
 	const inviteLink = `${baseAppUrl}/teams`;
 	const themeClasses = getEmailThemeClasses();
 	const lightStyles = getEmailInlineStyles("light");
 
 	return (
 		<EmailThemeProvider
-			preview={<Preview>Join {teamName} on Zeke</Preview>}
+			preview={<Preview>{t("invite.preview", { teamName })}</Preview>}
 		>
 			<Body
 				className={`my-auto mx-auto font-sans ${themeClasses.body}`}
@@ -59,7 +63,8 @@ export const InviteEmail = ({
 						className={`mx-0 my-[30px] p-0 text-[24px] font-normal text-center ${themeClasses.heading}`}
 						style={{ color: lightStyles.text.color }}
 					>
-						Join <strong>{teamName}</strong> on <strong>Zeke</strong>
+						{t("invite.title1")} <strong>{teamName}</strong>{" "}
+						{t("invite.title2")} <strong>Midday</strong>
 					</Heading>
 
 					<Text
@@ -74,18 +79,18 @@ export const InviteEmail = ({
 						>
 							{invitedByEmail}
 						</Link>
-						) has invited you to join the <strong>{teamName}</strong>{" "}
-						team on <strong>Zeke</strong> - the platform that transforms research into actionable insights.
+						) {t("invite.link1")} <strong>{teamName}</strong>{" "}
+						{t("invite.link2")} <strong>Midday</strong>.
 					</Text>
 					<Section className="mb-[42px] mt-[32px] text-center">
-						<Button href={inviteLink}>Accept Invitation</Button>
+						<Button href={inviteLink}>{t("invite.join")}</Button>
 					</Section>
 
 					<Text
 						className={`text-[14px] leading-[24px] break-all ${themeClasses.mutedText}`}
 						style={{ color: lightStyles.mutedText.color }}
 					>
-						Or copy and paste this link in your browser:{" "}
+						{t("invite.link3")}:{" "}
 						<Link
 							href={inviteLink}
 							className={`underline ${themeClasses.mutedLink}`}
@@ -101,21 +106,21 @@ export const InviteEmail = ({
 							className={`text-[12px] leading-[24px] ${themeClasses.mutedText}`}
 							style={{ color: lightStyles.mutedText.color }}
 						>
-							This invitation was sent to{" "}
+							{t("invite.footer1")}{" "}
 							<span
 								className={themeClasses.text}
 								style={{ color: lightStyles.text.color }}
 							>
 								{email}
 							</span>
-							. The invitation was requested from{" "}
+							. {t("invite.footer2")}{" "}
 							<span
 								className={themeClasses.text}
 								style={{ color: lightStyles.text.color }}
 							>
 								{ip}
-							</span>
-							. If you were not expecting this invitation, you can ignore this email.
+							</span>{" "}
+							. {t("invite.footer4")}
 						</Text>
 					</Section>
 

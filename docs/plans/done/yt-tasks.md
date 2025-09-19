@@ -1,5 +1,7 @@
 # YouTube Ingestion Pipeline Tasks
 
+> Note: Google Cloud-based YouTube ingestion has been deprecated in the codebase; checklist retained for historical reference.
+
 This checklist captures the complete implementation of YouTube video ingestion for AI-focused content sources. Tasks are organized by implementation priority and technical complexity.
 
 ## Current Status (2025-09-05)
@@ -8,7 +10,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 - **✅ Audio Extraction**: yt-dlp integration working (10.93MB audio extracted in 9s)
 - **✅ Whisper Transcription**: Full transcription with timestamps (213s video → 1,744 chars in 61s)
-- **✅ Database Integration**: Worker system integrated with YouTube job queues
+- **✅ Database Integration**: Engine system integrated with YouTube job queues
 - **✅ Error Handling**: Robust cleanup and logging throughout pipeline
 - **✅ Source Configuration**: 11 AI research channels + 3 search queries configured
 
@@ -22,21 +24,21 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 ### YouTube Data API Integration
 
-- [x] **Environment Setup**: Add YouTube API credentials to `worker/.env`
+- [x] **Environment Setup**: Add YouTube API credentials to `engine/.env`
 
   - `YOUTUBE_API_KEY=your_youtube_data_api_v3_key`
   - `YOUTUBE_QUOTA_LIMIT=10000` (daily quota limit)
   - `YOUTUBE_QUOTA_RESET_HOUR=0` (UTC reset time)
   - `YOUTUBE_RATE_LIMIT_BUFFER=500` (reserve quota buffer)
 
-- [x] **API Client Implementation**: Create `worker/src/clients/youtube-api.ts`
+- [x] **API Client Implementation**: Create `engine/src/clients/youtube-api.ts`
 
   - Implement `YouTubeAPIClient` class with rate limiting
   - Add `searchChannels()`, `getChannelUploads()`, `getVideoDetails()` methods
   - Implement quota tracking with `QuotaTracker` interface
   - Add exponential backoff for API failures
 
-- [x] **Quota Management**: Implement quota tracking in `worker/src/utils/quota-tracker.ts`
+- [x] **Quota Management**: Implement quota tracking in `engine/src/utils/quota-tracker.ts`
   - Create `checkQuotaStatus()` function for daily usage monitoring
   - Implement `reserveQuota()` and `consumeQuota()` methods
   - Add quota reset logic at midnight UTC
@@ -135,7 +137,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 ### yt-dlp Integration
 
-- [x] **Docker Dependencies**: Update `worker/Dockerfile` with yt-dlp and audio processing tools
+- [x] **Docker Dependencies**: Update `engine/Dockerfile` with yt-dlp and audio processing tools
 
   ```dockerfile
   # Install system dependencies for YouTube processing
@@ -150,7 +152,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
   RUN pip3 install --no-cache-dir yt-dlp==2024.1.7
   ```
 
-- [x] **Audio Extraction Module**: Create `worker/src/extract/youtube-audio.ts`
+- [x] **Audio Extraction Module**: Create `engine/src/extract/youtube-audio.ts`
 
   - Implement `extractAudio(videoUrl, videoId)` function
   - Use yt-dlp with m4a format, best quality settings
@@ -164,7 +166,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
   - Parse JSON output and handle malformed responses
   - Store metadata for AI analysis context
 
-- [x] **Temp File Management**: Add cleanup utilities in `worker/src/utils/temp-files.ts`
+- [x] **Temp File Management**: Add cleanup utilities in `engine/src/utils/temp-files.ts`
   - Implement `createTempPath(videoId, extension)` function
   - Add `cleanupTempFiles(filePaths)` with error handling
   - Use `/tmp/youtube-processing/` directory with proper permissions
@@ -181,7 +183,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
       torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
   ```
 
-- [x] **Transcription Module**: Create `worker/src/transcribe/whisper.ts`
+- [x] **Transcription Module**: Create `engine/src/transcribe/whisper.ts`
 
   - Implement `transcribeAudio(audioPath, videoId)` function
   - Use 'base' model by default (configurable via `WHISPER_MODEL` env var)
@@ -195,7 +197,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
   - Extract plain text transcript for AI analysis
   - Detect language from Whisper metadata
 
-- [ ] **Transcription Environment**: Add Whisper configuration to `worker/.env`
+- [ ] **Transcription Environment**: Add Whisper configuration to `engine/.env`
   ```bash
   WHISPER_MODEL=base  # Options: tiny, base, small, medium, large
   WHISPER_PATH=/usr/local/bin/whisper
@@ -226,17 +228,17 @@ This checklist captures the complete implementation of YouTube video ingestion f
   FOR SELECT USING (bucket_id = 'youtube-transcripts' AND auth.role() = 'authenticated');
   ```
 
-- [ ] **Upload Utilities**: Create `worker/src/storage/youtube-uploads.ts`
+- [ ] **Upload Utilities**: Create `engine/src/storage/youtube-uploads.ts`
   - Implement `uploadAudio(videoId, audioPath)` function
   - Implement `uploadTranscript(videoId, vttContent)` function
   - Add proper content-type headers and upsert logic
   - Return storage URLs for database storage
 
-## Phase 3: Worker Integration (Week 2-3)
+## Phase 3: Engine Integration (Week 2-3)
 
-### YouTube Ingestion Worker
+### YouTube Ingestion Engine
 
-- [x] **Ingestion Module**: Create `worker/src/ingest/youtube.ts`
+- [x] **Ingestion Module**: Create `engine/src/ingest/youtube.ts`
 
   - Implement `runIngestYouTube(boss)` main function
   - Add `processChannelSource()` and `processSearchSource()` for individual sources
@@ -263,9 +265,9 @@ This checklist captures the complete implementation of YouTube video ingestion f
   - Set `kind = 'youtube'` and `external_id = videoId`
   - Enqueue `ingest:fetch-youtube-content` jobs for new videos
 
-### Content Extraction Worker
+### Content Extraction Engine
 
-- [x] **YouTube Extraction Module**: Create `worker/src/extract/youtube.ts`
+- [x] **YouTube Extraction Module**: Create `engine/src/extract/youtube.ts`
 
   - Implement `runYouTubeFetchAndExtract(jobData, boss)` main function
   - Filter raw items by `kind = 'youtube'` for processing
@@ -301,9 +303,9 @@ This checklist captures the complete implementation of YouTube video ingestion f
   - Pass YouTube-specific context (channel authority, view count, duration)
   - Enable video-specific AI analysis prompts
 
-### Worker Scheduling Integration
+### Engine Scheduling Integration
 
-- [x] **YouTube Scheduling**: Add YouTube ingestion to worker cron schedule
+- [x] **YouTube Scheduling**: Add YouTube ingestion to engine cron schedule
 
   ```typescript
   // Add YouTube scheduling (every 15 minutes, offset from RSS)
@@ -315,21 +317,21 @@ This checklist captures the complete implementation of YouTube video ingestion f
   );
   ```
 
-- [x] **Ingest Worker Updates**: Update `worker/src/worker.ts` ingest:pull handler
+- [x] **Ingest Engine Updates**: Update `engine/src/engine.ts` ingest:pull handler
 
-  - Add YouTube source handling in main ingest:pull worker
+  - Add YouTube source handling in main ingest:pull engine
   - Call `runIngestYouTube(boss)` when `source === 'youtube'`
   - Maintain separate processing for RSS and YouTube sources
   - Log source-specific metrics and performance
 
-- [x] **Content Fetch Updates**: Update ingest:fetch-content worker for YouTube
+- [x] **Content Fetch Updates**: Update ingest:fetch-content engine for YouTube
 
   - Create separate `ingest:fetch-youtube-content` queue
   - Route YouTube items to `runYouTubeFetchAndExtract()` function
   - Route article items to existing `runFetchAndExtract()` function
   - Process different content types with appropriate extractors
 
-- [ ] **Concurrency Configuration**: Optimize worker concurrency for YouTube processing
+- [ ] **Concurrency Configuration**: Optimize engine concurrency for YouTube processing
   - Set `teamSize: 2, teamConcurrency: 1` for fetch-content jobs
   - Add separate concurrency limits for transcription-heavy jobs
   - Configure Cloud Run with increased memory (4Gi) and CPU (2) for video processing
@@ -339,7 +341,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 ### Critical Path Items (BLOCKING PRODUCTION)
 
-- [x] **Fix googleapis Client**: Update `worker/src/clients/youtube-api.ts` for googleapis v159
+- [x] **Fix googleapis Client**: Update `engine/src/clients/youtube-api.ts` for googleapis v159
 
   - [x] Fix `part` parameter to use string arrays instead of strings (lines 86, 279)
   - [x] Update response handling for new googleapis response structure
@@ -384,7 +386,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 - [x] **Storage Module Implementation**: Created database-first transcript processing (COMPLETE - 2025-09-05)
 
-  - ✅ Created `worker/src/storage/youtube-uploads.ts` with `prepareYouTubeTranscript()` function
+  - ✅ Created `engine/src/storage/youtube-uploads.ts` with `prepareYouTubeTranscript()` function
   - ✅ Implemented `generateVTTContent()` for WebVTT format conversion
   - ✅ Used existing database connection pattern (no additional Supabase client)
   - ✅ Store VTT content directly in `contents.transcript_vtt` field
@@ -392,8 +394,8 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 - [x] **Database Integration**: Updated extraction pipeline for transcript storage (COMPLETE - 2025-09-05)
 
-  - ✅ Modified `worker/src/extract/youtube.ts` to use new storage functions
-  - ✅ Updated `insertContents()` in `worker/src/db.ts` to handle transcript fields
+  - ✅ Modified `engine/src/extract/youtube.ts` to use new storage functions
+  - ✅ Updated `insertContents()` in `engine/src/db.ts` to handle transcript fields
   - ✅ Store transcript URL in `contents.transcript_url` field
   - ✅ Store VTT content in `contents.transcript_vtt` field
   - ✅ Added comprehensive logging for transcript processing
@@ -449,7 +451,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 **Resolved Critical Errors**:
 
-- [x] `worker/src/clients/youtube-api.ts`: 4 errors (googleapis v159 compatibility) - FIXED
+- [x] `engine/src/clients/youtube-api.ts`: 4 errors (googleapis v159 compatibility) - FIXED
 - [x] `src/lib/supabase/types.ts`: Missing module (6 import errors) - GENERATED
 - [x] `src/components/feed/FeedList.tsx`: Async/await issues (2 errors) - FIXED
 - [x] `src/components/pricing/price-card.tsx`: Implicit any types (3 errors) - RESOLVED
@@ -502,7 +504,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 ### YouTube-Specific AI Analysis
 
-- [ ] **YouTube Analysis Prompts**: Create video-specific analysis in `worker/src/analyze/llm.ts`
+- [ ] **YouTube Analysis Prompts**: Create video-specific analysis in `engine/src/analyze/llm.ts`
 
   ```typescript
   const YOUTUBE_ANALYSIS_PROMPT = `
@@ -569,7 +571,7 @@ This checklist captures the complete implementation of YouTube video ingestion f
 
 ### Error Handling & Recovery
 
-- [ ] **YouTube-Specific Error Classes**: Create error handling in `worker/src/errors/youtube-errors.ts`
+- [ ] **YouTube-Specific Error Classes**: Create error handling in `engine/src/errors/youtube-errors.ts`
 
   ```typescript
   class YouTubeProcessingError extends Error {
@@ -661,8 +663,8 @@ This checklist captures the complete implementation of YouTube video ingestion f
 - [ ] **Resource Configuration**: Update Cloud Run deployment for video processing
 
   ```bash
-  gcloud run deploy zeke-worker \
-    --image gcr.io/your-project/zeke-worker \
+  gcloud run deploy zeke-engine \
+    --image gcr.io/your-project/zeke-engine \
     --platform managed \
     --region us-central1 \
     --memory 4Gi \

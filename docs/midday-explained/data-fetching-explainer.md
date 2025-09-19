@@ -21,7 +21,7 @@
   |------|----------|----------------|-----------|---------------|-----------|-----------|
   | TRPC appRouter | RPC (httpBatchLink) | `${process.env.NEXT_PUBLIC_API_URL}/trpc` | Bearer Supabase session | superjson encode/decode | Cursor via `meta.cursor` on infinite queries | apps/dashboard/src/trpc/client.tsx:41, apps/api/src/trpc/init.ts:26 |
   | zeke REST API | REST (Hono) | `https://api.zeke.ai` | Bearer API key or OAuth token | JSON | Query params, cursor fields | apps/api/src/index.ts:16 |
-  | Engine Worker | REST (OpenAPIHono) | `${process.env.ENGINE_API_URL}/` | Bearer engine API key | JSON | Query/cursor per route | packages/engine-client/src/index.ts:3, apps/engine/src/index.ts:17 |
+  | Engine Service | REST (OpenAPIHono) | `${process.env.ENGINE_API_URL}/` | Bearer engine API key | JSON | Query/cursor per route | packages/engine-client/src/index.ts:3, apps/engine/src/index.ts:17 |
   | Supabase Storage Proxy | REST | `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/…` | Bearer Supabase access token | Binary streaming | n/a | apps/dashboard/src/app/api/proxy/route.ts:22 |
   | Slack OAuth Exchange | REST | `https://slack.com/api/oauth.v2.access` | Client ID/secret | JSON | n/a | apps/dashboard/src/app/api/apps/slack/oauth_callback/route.ts:45 |
   | Currency Rates CDN | REST | `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1` | None | JSON | n/a | apps/engine/src/utils/rates.ts:3 |
@@ -46,7 +46,7 @@
   | Invoices | Drizzle `getInvoiceById`, `invoiceSummary` | Postgres | none (read-after-write via replication cache) | React Query tables/widgets | Column cookie `invoices-columns` | apps/api/src/trpc/routers/invoice.ts:98, apps/dashboard/src/components/tables/invoices/data-table.tsx:52 |
   | Inbox Items & Documents | Drizzle `getInbox`, Supabase Storage | Postgres + Supabase Storage (`vault` bucket) | Notifications triggered via Trigger.dev | React Query `trpc.inbox.*` | LocalStorage `inbox-include-already-matched` | apps/api/src/trpc/routers/inbox.ts:34, apps/dashboard/src/hooks/use-local-storage.ts:6 |
   | Notifications | Drizzle `getActivities` | Postgres | none | React Query `useNotifications` | n/a | apps/api/src/trpc/routers/notifications.ts:14 |
-  | Exchange Rates | Engine worker fetch + Supabase upsert | Supabase `exchange_rates` | none | Dashboard widgets read via TRPC | n/a | packages/jobs/src/tasks/rates/rates-scheduler.ts:6 |
+  | Exchange Rates | Engine service fetch + Supabase upsert | Supabase `exchange_rates` | none | Dashboard widgets read via TRPC | n/a | packages/jobs/src/tasks/rates/rates-scheduler.ts:6 |
   | Analytics Consent | Cookie flag | Cookie | n/a | n/a | `tracking-consent` | apps/dashboard/src/actions/tracking-consent-action.ts:12 |
 - References:
   - packages/cache/src/redis-client.ts:12 – Redis client initialization for caches
@@ -156,7 +156,7 @@
 - TRPC client/server inject Bearer tokens and locale headers before hitting Hono (apps/dashboard/src/trpc/client.tsx:44, apps/dashboard/src/trpc/server.tsx:35).
 - API context verifies JWT or API key, populates session/team and attaches Supabase service client (apps/api/src/trpc/init.ts:26).
 - REST middleware authenticates Bearer tokens and hydrates scopes with Redis caches (apps/api/src/rest/middleware/auth.ts:14).
-- Requests to engine worker sign with static API key (packages/engine-client/src/index.ts:3).
+- Requests to engine service sign with static API key (packages/engine-client/src/index.ts:3).
 
 ### 3.4 Serialization & Hydration
 - Query data serialized with superjson during dehydration to preserve Dates/Maps (apps/dashboard/src/trpc/query-client.ts:13).

@@ -15,7 +15,7 @@ Due to Railway's build timeout limitations with large Python ML dependencies (yt
 - **Full ML dependencies**: yt-dlp, OpenAI Whisper, PyTorch
 - **Video transcription** and **audio extraction**
 
-## 🚀 **Immediate Deployment: Core RSS Worker**
+## 🚀 **Immediate Deployment: Core RSS Engine**
 
 ### What Works Now
 ✅ **RSS Feed Ingestion**: Full RSS processing pipeline  
@@ -31,7 +31,7 @@ Due to Railway's build timeout limitations with large Python ML dependencies (yt
 ⚠️ **Audio Transcription**: Skipped if Whisper not installed  
 
 ### Code Behavior
-The worker is already designed to handle missing YouTube functionality gracefully:
+The engine is already designed to handle missing YouTube functionality gracefully:
 
 ```typescript
 // From job-definitions.ts
@@ -46,10 +46,10 @@ async function handleYouTubeIngest(boss: PgBoss): Promise<void> {
 
 ## 📋 **Deployment Instructions**
 
-### 1. Deploy Core RSS Worker to Railway
+### 1. Deploy Core RSS Engine to Railway
 
 ```bash
-cd apps/worker
+cd apps/engine
 
 # Deploy with lightweight Dockerfile (no YouTube deps)
 railway up
@@ -65,8 +65,8 @@ railway up
 
 **Required for RSS Processing:**
 ```bash
-DATABASE_URL="postgresql://worker:password@db.hblelrtwdpukaymtpchv.supabase.co:5432/postgres"
-WORKER_DB_PASSWORD="your-worker-password"
+DATABASE_URL="postgresql://engine:password@db.hblelrtwdpukaymtpchv.supabase.co:5432/postgres"
+WORKER_DB_PASSWORD="your-engine-password"
 SUPABASE_URL="https://hblelrtwdpukaymtpchv.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 OPENAI_API_KEY="your-openai-key"
@@ -88,13 +88,13 @@ After deployment, verify core functionality:
 
 ```bash
 # Health check
-curl https://your-worker.railway.app/healthz
+curl https://your-engine.railway.app/healthz
 
 # Status check (should show YouTube as disabled)
-curl https://your-worker.railway.app/debug/status
+curl https://your-engine.railway.app/debug/status
 
 # Trigger RSS ingestion
-curl -X POST https://your-worker.railway.app/debug/ingest-now
+curl -X POST https://your-engine.railway.app/debug/ingest-now
 ```
 
 ## 🔮 **Future YouTube Processing Options**
@@ -111,10 +111,10 @@ Deploy YouTube processing as a dedicated service with larger resources:
 - ❌ Additional service to manage
 - ❌ More complex architecture
 
-### Option 2: Different Platform for YouTube Worker
+### Option 2: Different Platform for YouTube Engine
 Use a platform better suited for ML workloads:
 
-**Google Cloud Run:**
+**Cloud Run (deprecated Google implementation):**
 - ✅ Higher memory limits (up to 32GB)
 - ✅ Longer build timeouts
 - ✅ Better ML dependency support
@@ -125,11 +125,11 @@ Use a platform better suited for ML workloads:
 - ✅ Good for batch processing
 
 ### Option 3: Hybrid Approach
-Keep core worker on Railway, add YouTube processing later:
+Keep core engine on Railway, add YouTube processing later:
 
-1. **Deploy core RSS worker** to Railway (now)
+1. **Deploy core RSS engine** to Railway (now)
 2. **Add YouTube service** when needed (later)
-3. **Queue YouTube jobs** from core worker to YouTube service
+3. **Queue YouTube jobs** from core engine to YouTube service
 
 ## 📊 **Performance Comparison**
 
@@ -140,7 +140,7 @@ Keep core worker on Railway, add YouTube processing later:
 
 ## 🎯 **Recommended Immediate Action**
 
-**Deploy Core RSS Worker Now:**
+**Deploy Core RSS Engine Now:**
 
 1. ✅ **Fast deployment** gets core functionality live immediately
 2. ✅ **Validates infrastructure** and database connectivity
@@ -155,7 +155,7 @@ Keep core worker on Railway, add YouTube processing later:
 
 ## 🚀 **Next Steps**
 
-1. **Deploy core worker** with current lightweight Dockerfile
+1. **Deploy core engine** with current lightweight Dockerfile
 2. **Verify RSS processing** works end-to-end
 3. **Monitor performance** and resource usage
 4. **Plan YouTube processing** based on actual needs and usage patterns

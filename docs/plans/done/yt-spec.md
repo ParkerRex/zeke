@@ -1,5 +1,7 @@
 # YouTube Ingestion Pipeline Specification
 
+> Note: Google Cloud-based YouTube ingestion has been removed from the active codebase. This specification remains for archival reference only.
+
 **Status**: Planning Phase  
 **Priority**: High Impact - 10x content volume increase  
 **Dependencies**: YouTube Data API v3, yt-dlp, Whisper/faster-whisper
@@ -121,12 +123,12 @@ interface YouTubeCursor {
 }
 ```
 
-## Worker Implementation
+## Engine Implementation
 
 ### YouTube Ingestion Module
 
 ```typescript
-// worker/src/ingest/youtube.ts
+// engine/src/ingest/youtube.ts
 import { google } from 'googleapis';
 import PgBoss from 'pg-boss';
 import { getYouTubeSources, upsertRawItem, updateSourceCursor } from '../db.js';
@@ -421,7 +423,7 @@ $$;
 ### Content Extraction Module
 
 ```typescript
-// worker/src/extract/youtube.ts
+// engine/src/extract/youtube.ts
 import { spawn } from 'child_process';
 import { createReadStream, createWriteStream, promises as fs } from 'fs';
 import { pipeline } from 'stream/promises';
@@ -836,7 +838,7 @@ FOR SELECT USING (bucket_id = 'youtube-transcripts' AND auth.role() = 'authentic
 
 ### Step 3: Create Storage Upload Module (25 minutes)
 
-Create `worker/src/storage/youtube-uploads.ts`:
+Create `engine/src/storage/youtube-uploads.ts`:
 
 ```typescript
 import { supabaseAdmin } from '../supabase.js';
@@ -926,7 +928,7 @@ export async function uploadYouTubeTranscript(
 
 ### Step 4: Update Extraction Pipeline (15 minutes)
 
-Modify `worker/src/extract/youtube.ts` to integrate storage upload:
+Modify `engine/src/extract/youtube.ts` to integrate storage upload:
 
 ```typescript
 // Add import at top of file
@@ -1186,19 +1188,19 @@ CHECK (
 );
 ```
 
-## Worker Integration
+## Engine Integration
 
-### Updated Worker Main Module
+### Updated Engine Main Module
 
 ```typescript
-// worker/src/worker.ts - YouTube integration
+// engine/src/engine.ts - YouTube integration
 import { runIngestYouTube } from './ingest/youtube.js';
 import { runYouTubeExtract } from './extract/youtube.js';
 
 // Add YouTube scheduling (every 10 minutes, offset from RSS)
 await boss.schedule('ingest:pull', '5,15,25,35,45,55 * * * *', { source: 'youtube' }, { tz: CRON_TZ });
 
-// Update ingest:pull worker to handle YouTube
+// Update ingest:pull engine to handle YouTube
 await boss.work('ingest:pull', { teamSize: 1, teamConcurrency: 1 }, async (jobs) => {
   for (const job of jobs) {
     const { source } = (job.data || {}) as { source?: string };
@@ -1230,7 +1232,7 @@ await boss.work('ingest:pull', { teamSize: 1, teamConcurrency: 1 }, async (jobs)
   }
 });
 
-// Update ingest:fetch-content worker to handle YouTube
+// Update ingest:fetch-content engine to handle YouTube
 await boss.work('ingest:fetch-content', { teamSize: 2, teamConcurrency: 1 }, async (jobs) => {
   for (const job of jobs) {
     const jobData = job.data as { rawItemIds: string[] };
@@ -1278,7 +1280,7 @@ await boss.work('ingest:fetch-content', { teamSize: 2, teamConcurrency: 1 }, asy
 ### Enhanced LLM Analysis for YouTube
 
 ```typescript
-// worker/src/analyze/llm.ts - YouTube-specific analysis
+// engine/src/analyze/llm.ts - YouTube-specific analysis
 const YOUTUBE_ANALYSIS_PROMPT = `
 You are analyzing a YouTube video transcript. Provide a comprehensive analysis considering the video format and speaker context.
 
@@ -1390,7 +1392,7 @@ export async function runAnalyzeLLM(jobData: { storyId: string }, boss: PgBoss):
 ### Environment Configuration
 
 ```bash
-# worker/.env additions for YouTube pipeline
+# engine/.env additions for YouTube pipeline
 YOUTUBE_API_KEY=your_youtube_data_api_v3_key
 YOUTUBE_QUOTA_LIMIT=10000
 YOUTUBE_QUOTA_RESET_HOUR=0  # UTC hour when quota resets
@@ -1404,7 +1406,7 @@ MAX_AUDIO_FILE_SIZE=524288000  # 500MB in bytes
 ### Docker Configuration
 
 ```dockerfile
-# worker/Dockerfile additions
+# engine/Dockerfile additions
 FROM node:18-slim
 
 # Install system dependencies for YouTube processing
@@ -1443,8 +1445,8 @@ CMD ["npm", "start"]
 
 ```bash
 # Deploy with increased resources for video processing
-gcloud run deploy zeke-worker \
-  --image gcr.io/your-project/zeke-worker \
+gcloud run deploy zeke-engine \
+  --image gcr.io/your-project/zeke-engine \
   --platform managed \
   --region us-central1 \
   --memory 4Gi \

@@ -28,7 +28,7 @@
 
 ### Remaining API Opportunities
 - Story chapters/timeline endpoint once the UI needs chapter playback.
-- Assistant message mutations that trigger the worker/LLM pipeline (currently stubbed for future integration).
+- Assistant message mutations that trigger the engine/LLM pipeline (currently stubbed for future integration).
 - Any additional filters (e.g., search facets, tag categories) identified during frontend implementation.
 
 ## Sequencing Plan

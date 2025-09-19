@@ -9,7 +9,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
   - ✓ Confirmed: Uses SUPABASE_DB_URL → DATABASE_URL → DATABASE_PRIMARY_URL fallback chain.
 - [x] Check environment configuration so every runtime has the database URL + optional `DB_POOL_SIZE`.
   - ✓ Confirmed: DB_POOL_SIZE defaults to 5, configurable via env var.
-  - Note: Worker has separate pg Pool at `apps/worker/src/db.ts` using `DATABASE_URL`.
+  - Note: Engine has separate pg Pool at `apps/engine/src/db.ts` using `DATABASE_URL`.
 
 ## Sprint 1 — Schema & Data Layer Foundations
 - [x] Audit `packages/db/src/schema.ts` against `docs/plans/in-progress/db-proposed-er.md` + the updated wireframe; outline required changes and open questions before implementation.
@@ -85,7 +85,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 - [ ] Add safe actions for highlight CRUD/sharing; ensure cache tags (`highlight_${id}`, `story_${id}`) revalidate correctly.
 - [ ] Update story/cluster API routes to include highlight arrays partitioned by origin and filtered by sharing scope.
 - [ ] Document new action contracts in `apps/dashboard/src/actions/README.md` (or equivalent).
-- [ ] Create worker task that prompts a system LLM to generate highlights from transcripts/chapters, persisting via the shared mutation (`origin = 'system'`).
+- [ ] Create engine task that prompts a system LLM to generate highlights from transcripts/chapters, persisting via the shared mutation (`origin = 'system'`).
 - [ ] Extend assistant thread flows to author highlights (`origin = 'assistant'`) and record `assistant_thread_id`.
 - [ ] Add observability (structured logs + metrics) for highlight generation success/failure.
 
@@ -93,7 +93,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 - [x] Implement TRPC client provider inside dashboard and route hooks through `useTRPC()`.
 - [x] Replace `/api/stories` proxy with `use-stories` hooks powered by `trpc.story.list/get/metrics`.
 - [ ] Migrate highlight UI to `use-highlights` + `use-highlight-engagement`.
-- [ ] Wire assistant UI (panels + chat sidebar) to `use-assistant` hooks; keep message-create stubbed until worker actions are ready.
+- [ ] Wire assistant UI (panels + chat sidebar) to `use-assistant` hooks; keep message-create stubbed until engine actions are ready.
 - [ ] Implement team switcher and account settings screens with `use-teams` + `use-set-active-team`.
 - [ ] Revisit notifications strategy: either add a TRPC router or encapsulate the Novu integration behind `use-notifications` until API work lands.
 - [ ] Introduce story chapter query/hook once the timeline component is built.
@@ -119,10 +119,10 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 ## Sprint 6 — Cleanup, Documentation, API & Pipeline
 - [ ] Remove old TRPC client/server wiring once replacements are live.
 - [ ] Update docs (PRDs, README snippets) to document the “Drizzle + Supabase cached queries + safe actions” workflow.
-- [ ] Deep-dive `apps/worker/**` ingestion tasks to map required updates (chapters, turns, metrics, highlight references) once the schema lands; plan follow-up implementation.
+- [ ] Deep-dive `apps/engine/**` ingestion tasks to map required updates (chapters, turns, metrics, highlight references) once the schema lands; plan follow-up implementation.
 - [ ] After Drizzle helpers are in place, refactor `apps/dashboard/src/app/api/pipeline/**`, `stories`, `share`, and `webhooks` routes to call the new data layer and keep business logic close to the tables.
 - [ ] Annotate the deferred share work with TODOs and ensure the route still returns a safe stub until we prioritize it.
-- [ ] Review pipeline status/trigger/recent endpoints once worker changes ship so metrics stay in sync with the upgraded schema.
+- [ ] Review pipeline status/trigger/recent endpoints once engine changes ship so metrics stay in sync with the upgraded schema.
 
 ## Cross-Cutting Backlog
 - 🔴 **Restore automated testing** (see `apps/dashboard/todo.md`): fix Vitest config, seed a test database, and re-enable CI coverage gates.
@@ -130,7 +130,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 - 🔴 **Tab state memory audit**: split `use-tabs.ts`, move heavy metadata out of URL state, and add cleanup hooks.
 - 🔶 **Webhook security hardening**: tighten error handling, rate limits, and audit logs around payment webhooks.
 - 🔶 **Auth flow validation**: expand end-to-end coverage for login/signup/callback paths.
-- 🔵 **Worker deployment + CI** (tracked in `apps/worker/todo.md`): Railway deploy config, automated tests, and monitoring for ingestion jobs.
+- 🔵 **Engine deployment + CI** (tracked in `apps/engine/todo.md`): Railway deploy config, automated tests, and monitoring for ingestion jobs.
 
 ## API Status
 
@@ -144,7 +144,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 
 ### Pending
 - Story chapters/timeline endpoint once the UI needs chapter playback.
-- Assistant message mutations that trigger the worker/LLM pipeline (currently stubbed for future integration).
+- Assistant message mutations that trigger the engine/LLM pipeline (currently stubbed for future integration).
 - Any additional filters (e.g., search facets, tag categories) identified during frontend implementation.
 
 ## Sequencing Plan

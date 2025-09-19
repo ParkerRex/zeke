@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/utils/admin';
-import { fetchPipelineCounts, fetchWorkerStatus } from '@/utils/pipeline';
+import { fetchPipelineCounts, fetchEngineStatus } from '@/utils/pipeline';
 import { ForbiddenError, UnauthorizedError } from '@/utils/errors';
 import { NextResponse } from 'next/server';
 
@@ -26,14 +26,14 @@ export async function GET(): Promise<Response> {
   }
 
   try {
-    const [worker, counts] = await Promise.all([
-      fetchWorkerStatus(),
+    const [engine, counts] = await Promise.all([
+      fetchEngineStatus(),
       fetchPipelineCounts(),
     ]);
 
     return NextResponse.json({
       ok: true,
-      worker,
+      engine,
       counts: {
         raw_items: counts.rawItems,
         contents: counts.contents,

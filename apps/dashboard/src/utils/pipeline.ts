@@ -6,7 +6,7 @@ import {
   getRecentPipelineActivity,
 } from "@zeke/db/src/queries/pipeline";
 
-export type WorkerStatus = Record<string, unknown> & { port?: string };
+export type EngineStatus = Record<string, unknown> & { port?: string };
 
 const DEFAULT_LOCAL_PORTS = ["8082", "8081", "8080"] as const;
 
@@ -29,10 +29,10 @@ export async function fetchRecentPipelineActivity(
 }
 
 /**
- * Attempt to reach the local worker debug endpoint so the admin UI can report
- * whether the worker is running. Falls back to `null` if no ports respond.
+ * Attempt to reach the local engine debug endpoint so the admin UI can report
+ * whether the engine is running. Falls back to `null` if no ports respond.
  */
-export async function fetchWorkerStatus(): Promise<WorkerStatus | null> {
+export async function fetchEngineStatus(): Promise<EngineStatus | null> {
   const ports = [
     process.env.WORKER_PORT,
     process.env.WORKER_HTTP_PORT,
@@ -63,7 +63,7 @@ export async function fetchWorkerStatus(): Promise<WorkerStatus | null> {
       }
 
       const json = (await response.json()) as Record<string, unknown>;
-      return { port, ...json } satisfies WorkerStatus;
+      return { port, ...json } satisfies EngineStatus;
     } catch {
       // Try next port
     }

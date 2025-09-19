@@ -1,6 +1,5 @@
 import { AppleSignIn } from "@/components/apple-sign-in";
 import { GithubSignIn } from "@/components/github-sign-in";
-import { GoogleSignIn } from "@/components/google-sign-in";
 import { OTPSignIn } from "@/components/otp-sign-in";
 import { Cookies } from "@/utils/constants";
 import {
@@ -15,6 +14,7 @@ import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { userAgent } from "next/server";
+import type { ReactNode } from "react";
 import backgroundDark from "public/assets/bg-login-dark.jpg";
 import backgroundLight from "public/assets/bg-login.jpg";
 
@@ -27,79 +27,57 @@ export default async function Page() {
   const preferred = cookieStore.get(Cookies.PreferredSignInProvider);
   const { device } = userAgent({ headers: await headers() });
 
-  let moreSignInOptions = null;
-  let preferredSignInOption =
+  const defaultPrimary =
+    device?.vendor === "Apple" ? <AppleSignIn /> : <GithubSignIn />;
+
+  const defaultSecondary =
     device?.vendor === "Apple" ? (
-      <div className="flex flex-col space-y-2">
-        <GoogleSignIn />
-        <AppleSignIn />
-      </div>
+      <>
+        <GithubSignIn />
+        <OTPSignIn className="border-t-[1px] border-border pt-8" />
+      </>
     ) : (
-      <GoogleSignIn />
+      <>
+        <AppleSignIn />
+        <OTPSignIn className="border-t-[1px] border-border pt-8" />
+      </>
     );
+
+  let preferredSignInOption = defaultPrimary;
+  let moreSignInOptions: ReactNode = defaultSecondary;
 
   switch (preferred?.value) {
     case "apple":
       preferredSignInOption = <AppleSignIn />;
       moreSignInOptions = (
         <>
-          <GoogleSignIn />
           <GithubSignIn />
           <OTPSignIn className="border-t-[1px] border-border pt-8" />
         </>
       );
       break;
-
     case "github":
       preferredSignInOption = <GithubSignIn />;
       moreSignInOptions = (
         <>
-          <GoogleSignIn />
           <AppleSignIn />
           <OTPSignIn className="border-t-[1px] border-border pt-8" />
         </>
       );
       break;
-
-    case "google":
-      preferredSignInOption = <GoogleSignIn />;
-      moreSignInOptions = (
-        <>
-          <AppleSignIn />
-          <GithubSignIn />
-          <OTPSignIn className="border-t-[1px] border-border pt-8" />
-        </>
-      );
-      break;
-
     case "otp":
       preferredSignInOption = <OTPSignIn />;
       moreSignInOptions = (
         <>
-          <GoogleSignIn />
           <AppleSignIn />
           <GithubSignIn />
         </>
       );
       break;
-
     default:
-      if (device?.vendor === "Apple") {
-        moreSignInOptions = (
-          <>
-            <GithubSignIn />
-            <OTPSignIn className="border-t-[1px] border-border pt-8" />
-          </>
-        );
-      } else {
-        moreSignInOptions = (
-          <>
-            <AppleSignIn />
-            <GithubSignIn />
-            <OTPSignIn className="border-t-[1px] border-border pt-8" />
-          </>
-        );
-      }
+      preferredSignInOption = defaultPrimary;
+      moreSignInOptions = defaultSecondary;
+      break;
   }
 
   return (

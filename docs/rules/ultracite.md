@@ -170,7 +170,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Make sure object literals are declared consistently (defaults to explicit definitions).
 - Use static Response methods instead of new Response() constructor when possible.
 - Make sure switch-case statements are exhaustive.
-- Make sure the `preconnect` attribute is used when using Google Fonts.
+- When loading remote fonts, ensure `preconnect` is used (avoid relying on Google Fonts).
 - Use `Array#{indexOf,lastIndexOf}()` instead of `Array#{findIndex,findLastIndex}()` when looking for the index of an item.
 - Make sure iterable callbacks return consistent values.
 - Use `with { type: "json" }` for JSON module imports.
@@ -293,7 +293,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Make sure default clauses in switch statements come last.
 - Make sure to pass a message value when creating a built-in error.
 - Make sure get methods always return a value.
-- Use a recommended display strategy with Google Fonts.
+- Use a recommended display strategy when loading remote fonts; prefer locally hosted fonts over Google Fonts.
 - Make sure for-in loops include an if statement.
 - Use Array.isArray() instead of instanceof Array.
 - Make sure to use the digits argument with Number#toFixed().

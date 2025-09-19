@@ -166,7 +166,7 @@ Manual overlays: in personal trees, semantic suggestions appear as “ghost leav
 ## Performance & Rendering
 
 - Rendering tech: SVG up to ~500 visible nodes; switch to Canvas/WebGL (e.g., Pixi) for larger.
-- Workers: run layout and heavy label packing in a Web Worker to keep UI responsive.
+- Workers: run layout and heavy label packing in a Web Engine to keep UI responsive.
 - Progressive load: render trunk and main boughs first; hydrate deeper levels on zoom/expand.
 - Culling: viewport + scale culling for leaves; text fades into badges when too small.
 - Interaction budget: maintain 60fps on M1 with 300 leaves; aim for <8ms frame time.

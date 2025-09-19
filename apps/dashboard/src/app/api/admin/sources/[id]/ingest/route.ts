@@ -1,11 +1,11 @@
 import { getAdminFlag } from '@zeke/supabase/queries';
 import { NextResponse } from 'next/server';
 
-type WorkerIngestResponse = { ok: boolean; port?: string };
+type EngineIngestResponse = { ok: boolean; port?: string };
 
-async function postWorkerIngest(
+async function postEngineIngest(
   sourceId: string
-): Promise<WorkerIngestResponse> {
+): Promise<EngineIngestResponse> {
   const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
   const ports = [
     process.env.WORKER_PORT,
@@ -23,7 +23,7 @@ async function postWorkerIngest(
       const res = await fetch(url, { method: 'POST', signal: ac.signal });
       clearTimeout(t);
       if (res.ok) {
-        return { ok: true, port } as WorkerIngestResponse;
+        return { ok: true, port } as EngineIngestResponse;
       }
     } catch {
       // try next
@@ -45,7 +45,7 @@ export async function POST(
     );
   }
   try {
-    const result = await postWorkerIngest(params.id);
+    const result = await postEngineIngest(params.id);
     const HTTP_OK = 200;
     const HTTP_SERVICE_UNAVAILABLE = 503;
     return NextResponse.json(result, {

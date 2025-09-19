@@ -137,7 +137,7 @@ interface PodcastCursor {
 ### Intelligent Content Matching Algorithm
 
 ```typescript
-// worker/src/matching/content-matcher.ts
+// engine/src/matching/content-matcher.ts
 interface ContentMatch {
   confidence: number; // 0-1 confidence score
   matchType: 'exact' | 'fuzzy' | 'metadata' | 'duration';
@@ -247,12 +247,12 @@ function generateContentFingerprint(content: {
 }
 ```
 
-## Worker Implementation
+## Engine Implementation
 
 ### Podcast Ingestion Module
 
 ```typescript
-// worker/src/ingest/podcasts.ts
+// engine/src/ingest/podcasts.ts
 import Parser from 'rss-parser';
 import PgBoss from 'pg-boss';
 import { ContentMatcher } from '../matching/content-matcher.js';
@@ -479,7 +479,7 @@ async function linkPodcastToExistingStory(storyId: string, podcastEpisode: Podca
 ### Enhanced Podcast Audio Processing
 
 ```typescript
-// worker/src/extract/podcasts.ts
+// engine/src/extract/podcasts.ts
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
@@ -845,7 +845,7 @@ $$;
 ### Enhanced Podcast Analysis
 
 ```typescript
-// worker/src/analyze/llm.ts - Podcast-specific analysis
+// engine/src/analyze/llm.ts - Podcast-specific analysis
 const PODCAST_ANALYSIS_PROMPT = `
 You are analyzing a podcast episode transcript. Consider the conversational format, host expertise, and guest insights.
 
@@ -965,19 +965,19 @@ export async function runAnalyzeLLM(jobData: { storyId: string }, boss: PgBoss):
 }
 ```
 
-## Worker Integration & Deployment
+## Engine Integration & Deployment
 
-### Updated Worker Main Module
+### Updated Engine Main Module
 
 ```typescript
-// worker/src/worker.ts - Podcast integration
+// engine/src/engine.ts - Podcast integration
 import { runIngestPodcasts } from './ingest/podcasts.js';
 import { runPodcastExtract } from './extract/podcasts.js';
 
 // Add podcast scheduling (every 15 minutes, offset from other sources)
 await boss.schedule('ingest:pull', '7,22,37,52 * * * *', { source: 'podcast' }, { tz: CRON_TZ });
 
-// Update ingest:pull worker to handle podcasts
+// Update ingest:pull engine engine to handle podcasts
 await boss.work('ingest:pull', { teamSize: 1, teamConcurrency: 1 }, async (jobs) => {
   for (const job of jobs) {
     const { source } = (job.data || {}) as { source?: string };
@@ -1011,7 +1011,7 @@ await boss.work('ingest:pull', { teamSize: 1, teamConcurrency: 1 }, async (jobs)
   }
 });
 
-// Update ingest:fetch-content worker to handle podcasts
+// Update ingest:fetch-content engine engine to handle podcasts
 await boss.work('ingest:fetch-content', { teamSize: 2, teamConcurrency: 1 }, async (jobs) => {
   for (const job of jobs) {
     const jobData = job.data as { rawItemIds: string[] };
@@ -1063,7 +1063,7 @@ await boss.work('ingest:fetch-content', { teamSize: 2, teamConcurrency: 1 }, asy
 ### Environment Configuration
 
 ```bash
-# worker/.env additions for podcast pipeline
+# engine/.env additions for podcast pipeline
 APPLE_PODCASTS_API_KEY=your_apple_podcasts_api_key
 APPLE_PODCASTS_RATE_LIMIT=1000
 RSS_FETCH_TIMEOUT=30000
@@ -1076,7 +1076,7 @@ CONTENT_MATCHING_THRESHOLD=0.8  # Confidence threshold for content matching
 ### Docker Configuration Updates
 
 ```dockerfile
-# worker/Dockerfile additions for podcast processing
+# engine/Dockerfile additions for podcast processing
 FROM node:18-slim
 
 # Install system dependencies

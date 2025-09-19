@@ -1,36 +1,21 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { embed, embedMany } from "ai";
-// TODO: UPDATE THIS TO ZEKE LOGIC
-const GOOGLE_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
+import { openai } from "@ai-sdk/openai";
 
-const google = createGoogleGenerativeAI({
-  apiKey: GOOGLE_API_KEY,
-});
-
-const EMBEDDING_CONFIG = {
-  model: google.textEmbedding("gemini-embedding-001"),
-  providerOptions: {
-    google: {
-      outputDimensionality: 768,
-      taskType: "SEMANTIC_SIMILARITY",
-    },
-  },
-  modelName: "gemini-embedding-001",
-};
+const EMBEDDING_MODEL_NAME = "text-embedding-3-small";
+const embeddingModel = openai.embedding(EMBEDDING_MODEL_NAME);
 
 /**
  * Generate a single embedding for a category name
  */
 export async function generateCategoryEmbedding(categoryName: string) {
   const { embedding } = await embed({
-    model: EMBEDDING_CONFIG.model,
+    model: embeddingModel,
     value: categoryName,
-    providerOptions: EMBEDDING_CONFIG.providerOptions,
   });
 
   return {
     embedding,
-    model: EMBEDDING_CONFIG.modelName,
+    model: EMBEDDING_MODEL_NAME,
   };
 }
 
@@ -39,14 +24,13 @@ export async function generateCategoryEmbedding(categoryName: string) {
  */
 export async function generateCategoryEmbeddings(categoryNames: string[]) {
   const { embeddings } = await embedMany({
-    model: EMBEDDING_CONFIG.model,
+    model: embeddingModel,
     values: categoryNames,
-    providerOptions: EMBEDDING_CONFIG.providerOptions,
   });
 
   return {
     embeddings,
-    model: EMBEDDING_CONFIG.modelName,
+    model: EMBEDDING_MODEL_NAME,
   };
 }
 

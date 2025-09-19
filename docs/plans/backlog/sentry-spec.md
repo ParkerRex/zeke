@@ -1,21 +1,21 @@
-Sentry Observability Spec (Web + Worker + DB)
+Sentry Observability Spec (Web + Engine + DB)
 
 Objective
 
 - Establish error tracking and basic performance tracing with minimal code churn and ongoing cost.
 - Replace ad-hoc console logging in app code with actionable telemetry and clear runbooks.
-- Focus on highest-leverage boundaries: API routes, server actions, worker jobs, and user-facing client errors.
+- Focus on highest-leverage boundaries: API routes, server actions, engine jobs, and user-facing client errors.
 
 Non‑Goals
 
-- Full DB log shipping or deep SQL-level APM. We capture at app/worker boundaries.
+- Full DB log shipping or deep SQL-level APM. We capture at app/engine boundaries.
 - Building custom dashboards beyond Sentry’s built-ins.
 - Refactoring the data layer to push Sentry calls into queries/mutations (kept third‑party free).
 
 Scope
 
-- Next.js app (server + client) and background worker (Node/pg-boss).
-- DB interactions via Supabase: capture errors and timing at call sites (actions, routes, worker), not inside query/mutation modules.
+- Next.js app (server + client) and engine service (Node/pg-boss).
+- DB interactions via Supabase: capture errors and timing at call sites (actions, routes, engine), not inside query/mutation modules.
 - Source maps and releases for readable stack traces.
 
 Architecture Overview
@@ -24,13 +24,13 @@ Architecture Overview
   - Use @sentry/nextjs. Autoload configs via sentry.client.config.ts and sentry.server.config.ts.
   - Wrap next.config.js with withSentryConfig for source maps and better stack traces.
   - Capture at boundaries: API routes, server actions; client components capture exceptions and show user feedback.
-- Worker:
+- Engine:
   - Use @sentry/node (+ profiling). Initialize once at process start.
   - Wrap each job with a helper that creates a span, adds job metadata, and captures exceptions.
   - Capture unhandled rejections/exceptions; flush on shutdown.
 - DB:
   - Do not call Sentry inside query/mutation modules to preserve “no 3rd‑party” rule.
-  - Instead, wrap calls in actions/routes/worker with spans and capture exceptions, tagging db.operation/table.
+  - Instead, wrap calls in actions/routes/engine with spans and capture exceptions, tagging db.operation/table.
 
 Environments & Secrets
 
@@ -38,7 +38,7 @@ Environments & Secrets
   - SENTRY_DSN (server)
   - NEXT_PUBLIC_SENTRY_DSN (client)
   - SENTRY_ENVIRONMENT (development|preview|production)
-- Required (worker):
+- Required (engine):
   - SENTRY_DSN, SENTRY_ENVIRONMENT
 - Source maps (CI/Vercel):
   - SENTRY_AUTH_TOKEN, plus sentry.properties (org, project) in repo root.
@@ -47,7 +47,7 @@ Sampling Defaults (tune post‑rollout)
 
 - Errors: 100% (default) — rely on alerts/rate limits for noise.
 - Traces: 0.1 (10%)
-- Profiles (worker): 0.05 initially or disabled if noisy.
+- Profiles (engine): 0.05 initially or disabled if noisy.
 
 Web Implementation
 
@@ -76,13 +76,13 @@ Web Implementation
 
 - Use beforeSend to drop headers like Authorization, cookies, and redact tokens/emails from request bodies/contexts where present.
 
-Worker Implementation
+Engine Implementation
 
 1. Dependencies
 
-- Add @sentry/node and @sentry/profiling-node in worker/package.json.
+- Add @sentry/node and @sentry/profiling-node in engine/package.json.
 
-2. Initialization (worker/src/worker.ts)
+2. Initialization (engine/src/engine.ts)
 
 - Initialize Sentry early with DSN and environment.
 - Enable profiling integration (optional), and set tracesSampleRate/profilesSampleRate.
@@ -106,9 +106,9 @@ Worker Implementation
 Database Strategy (Best Bang‑for‑Buck)
 
 - Keep query/mutation modules third‑party free as per codebase conventions.
-- Wrap calls in actions/routes/worker:
+- Wrap calls in actions/routes/engine:
   - Use Sentry.startSpan with a name like db:stories:list and attributes: { area: 'stories', op: 'list', table: 'stories' }.
-  - On thrown Supabase errors, capture at the boundary (action/route/worker) and add tags for op/table.
+  - On thrown Supabase errors, capture at the boundary (action/route/engine) and add tags for op/table.
 - Migrations:
   - Update migration scripts to capture failures (if run via Node/CLI scripts); otherwise log to stderr and rely on CI failure signal.
 - Future (optional):
@@ -130,8 +130,8 @@ Alerts & Ownership
 
 - Create alert rules for:
   - New issue in production.
-  - Error rate spike per service (web/worker).
-- Assign ownership by path prefixes: web (src/app, src/components), worker (worker/src/\*\*), queries/mutations (tagged via boundary spans).
+  - Error rate spike per service (web/engine).
+- Assign ownership by path prefixes: web (src/app, src/components), engine (engine/src/\*\*), queries/mutations (tagged via boundary spans).
 
 Runbook (Triage)
 
@@ -145,19 +145,19 @@ M1 — Scaffold & Verify
 
 - [ ] Add @sentry/nextjs to web; create sentry.client.config.ts and sentry.server.config.ts.
 - [ ] Wrap next.config.js with withSentryConfig; add sentry.properties; configure env vars in Vercel.
-- [ ] Add @sentry/node (+ profiling) to worker; initialize in worker/src/worker.ts; add unhandled handlers; basic beforeSend scrub.
-- [ ] Push a test error from an API route, a client component, and a failing worker job; verify events in Sentry.
+- [ ] Add @sentry/node (+ profiling) to engine service; initialize in engine/src/engine.ts; add unhandled handlers; basic beforeSend scrub.
+- [ ] Push a test error from an API route, a client component, and a failing engine job; verify events in Sentry.
 
 M2 — Boundary Instrumentation & Console Cleanup
 
 - [ ] Replace console.\* in app code with captureException/captureMessage or remove; surface errors via UI.
-- [ ] Add spans around key server actions/routes (auth, pricing, stories) and worker jobs (ingest, extract, analyze).
+- [ ] Add spans around key server actions/routes (auth, pricing, stories) and engine jobs (ingest, extract, analyze).
 - [ ] Tag spans with db.operation/table where applicable; do not modify query/mutation modules.
 
 M3 — Performance & Sampling Tune
 
-- [ ] Enable tracesSampleRate 0.1 (web & worker); adjust if volume is high/low.
-- [ ] Optionally enable profilesSampleRate (worker) at 0.05; tune or disable based on noise.
+- [ ] Enable tracesSampleRate 0.1 (web & engine); adjust if volume is high/low.
+- [ ] Optionally enable profilesSampleRate (engine) at 0.05; tune or disable based on noise.
 - [ ] Add ownership rules and two alert policies (new issue, spike).
 
 M4 — Nice‑to‑Haves (Optional)
@@ -168,8 +168,8 @@ M4 — Nice‑to‑Haves (Optional)
 
 Acceptance Criteria
 
-- Web and worker errors appear in Sentry with readable stack traces (source maps working), correct environment, and release tags.
-- At least three critical flows have spans: API route (webhook), one server action, and one worker job.
+- Web and engine errors appear in Sentry with readable stack traces (source maps working), correct environment, and release tags.
+- At least three critical flows have spans: API route (webhook), one server action, and one engine job.
 - No console.\* usage remains in app code; client errors show user feedback and are captured.
 - Alert rules exist and route to the appropriate owner/team.
 

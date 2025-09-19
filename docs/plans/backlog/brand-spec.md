@@ -1,4 +1,4 @@
-font: Zilla on Google Fonts
+font: System serif stack (was Zilla on Google Fonts)
 
 Headers
 Heading – XXL

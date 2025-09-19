@@ -63,7 +63,7 @@ This audit compares the existing Drizzle schema at `packages/db/src/schema.ts` a
 - `platformQuota` - Platform instrumentation (may keep for ops)
 - `sourceHealth` - Source monitoring (may keep for ops)
 - `sourceMetrics` - Source analytics (may keep for ops)
-- `jobMetrics` - Worker monitoring (may keep for ops)
+- `jobMetrics` - Engine monitoring (may keep for ops)
 
 ## Field-Level Gaps
 
@@ -153,7 +153,7 @@ This audit compares the existing Drizzle schema at `packages/db/src/schema.ts` a
 2. **Update type definitions**: Ensure TypeScript types align with new schema
 3. **Test RLS policies**: Verify security model with new tables
 4. **Update queries**: Implement query stubs from proposed ERD
-5. **Worker updates**: Modify ingestion to populate new tables
+5. **Engine updates**: Modify ingestion to populate new tables
 
 ## Notes for Implementation
 
