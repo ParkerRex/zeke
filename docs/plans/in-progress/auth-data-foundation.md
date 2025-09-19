@@ -1,5 +1,5 @@
-# Next Steps — Auth & Data Foundation
-_Epic: Wireframe reference — docs/plans/in-progress/wire-updated.png_
+# Auth & Data Foundation Epic Plan
+_Epic reference: docs/plans/in-progress/wire-updated.png_
 
 
 ## Sprint 0 — Pre-flight
@@ -98,10 +98,12 @@ _Epic: Wireframe reference — docs/plans/in-progress/wire-updated.png_
 - [ ] Revisit notifications strategy: either add a TRPC router or encapsulate the Novu integration behind `use-notifications` until API work lands.
 - [ ] Introduce story chapter query/hook once the timeline component is built.
 - [ ] Update assistant tools in `apps/dashboard/src/lib/tools/*` to call TRPC via `getQueryClient()` so server actions share the same contracts.
+- [ ] Surface toast/feedback in `select-team/table-row.tsx` when removing a team once the notifications refactor lands.
 
 ## Sprint 4 — Discover → Apply UX & Highlight Sharing
 - [ ] Refactor remaining pages to consume the TRPC hooks (Apply view, Market experiments).
 - [ ] Implement highlight panels per wireframes (group by origin, share badges, edit/delete controls).
+- [ ] Wire overlay panel CTA buttons (bookmark/highlight) once highlight mutations are available.
 - [ ] Build transcript selection UI for manual highlight creation.
 - [ ] Add sharing dialog (team members list, role selection) with optimistic updates.
 - [ ] Surface assistant/system attribution in highlight lists.
@@ -121,6 +123,14 @@ _Epic: Wireframe reference — docs/plans/in-progress/wire-updated.png_
 - [ ] After Drizzle helpers are in place, refactor `apps/dashboard/src/app/api/pipeline/**`, `stories`, `share`, and `webhooks` routes to call the new data layer and keep business logic close to the tables.
 - [ ] Annotate the deferred share work with TODOs and ensure the route still returns a safe stub until we prioritize it.
 - [ ] Review pipeline status/trigger/recent endpoints once worker changes ship so metrics stay in sync with the upgraded schema.
+
+## Cross-Cutting Backlog
+- 🔴 **Restore automated testing** (see `apps/dashboard/todo.md`): fix Vitest config, seed a test database, and re-enable CI coverage gates.
+- 🔴 **Database indexing & profiling**: add story/search indexes and validate query plans per the dashboard TODO backlog.
+- 🔴 **Tab state memory audit**: split `use-tabs.ts`, move heavy metadata out of URL state, and add cleanup hooks.
+- 🔶 **Webhook security hardening**: tighten error handling, rate limits, and audit logs around payment webhooks.
+- 🔶 **Auth flow validation**: expand end-to-end coverage for login/signup/callback paths.
+- 🔵 **Worker deployment + CI** (tracked in `apps/worker/todo.md`): Railway deploy config, automated tests, and monitoring for ingestion jobs.
 
 ## API Status
 
