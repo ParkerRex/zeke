@@ -87,29 +87,22 @@
 - [ ] Extend assistant thread flows to author highlights (`origin = 'assistant'`) and record `assistant_thread_id`.
 - [ ] Add observability (structured logs + metrics) for highlight generation success/failure.
 
-## Sprint 3 — Session Providers & Client State
-- [ ] In `(app)/(sidebar)/layout.tsx`, create `UserLoader` (server) that calls `getCurrentUserCached`.
-  - Redirect to `/login` when the user is missing.
-  - Render a `UserProvider` (client context) with the fetched data.
-- [ ] Add a similar `TeamProvider` if we need plan/limit context.
-- [ ] Update page loaders (e.g., `stories/[id]`, `today`, `apply`) to fetch data server-side via cached queries and pass to client components as props.
-- [ ] Enforce the subscription-driven redirect matrix described in `AUTH_LOGIN_SPEC` (trial, canceled, invite states) via the layout loaders and `apps/dashboard/src/middleware.ts`.
-- [ ] Replace TRPC hooks with context + safe-action hooks:
-  - `useUser()` reads from `UserProvider`.
-  - `useUpdateUser()` wraps `useAction(updateUserAction)`; optional TanStack `useMutation` wrappers when we need retries/refetch.
-- [ ] For components needing optimistic updates (pins, invites, chat), combine `useAction` with `useOptimistic` or `useActionQuery` (TanStack helper).
-- [ ] Provide reusable helpers for action-based queries/mutations to keep loading states consistent.
+## Sprint 3 — Dashboard Integration (In Progress)
+- [x] Implement TRPC client provider inside dashboard and route hooks through `useTRPC()`.
+- [x] Replace `/api/stories` proxy with `use-stories` hooks powered by `trpc.story.list/get/metrics`.
+- [ ] Migrate highlight UI to `use-highlights` + `use-highlight-engagement`.
+- [ ] Wire assistant UI (panels + chat sidebar) to `use-assistant` hooks; keep message-create stubbed until worker actions are ready.
+- [ ] Implement team switcher and account settings screens with `use-teams` + `use-set-active-team`.
+- [ ] Revisit notifications strategy: either add a TRPC router or encapsulate the Novu integration behind `use-notifications` until API work lands.
+- [ ] Introduce story chapter query/hook once the timeline component is built.
+- [ ] Update assistant tools in `apps/dashboard/src/lib/tools/*` to call TRPC via `getQueryClient()` so server actions share the same contracts.
 
 ## Sprint 4 — Discover → Apply UX & Highlight Sharing
-- [ ] Refactor existing components/pages to consume the new hooks instead of TRPC.
-  - Teams page already migrated; apply the same approach to Discover/Apply/Market modules.
-- [ ] Ensure new providers are mounted high enough so all descendants can access `useUser`/`useTeam`.
-- [ ] Implement server data façades for story details (highlights, chat threads, playbooks) following the ERD and the screenshot layout (executive brief, key insights, receipts panel).
-- [ ] Defer share flow polish for now—tag the relevant route/component with a `// TODO: share flow` so we can revisit post-MVP.
-- [ ] Implement highlight panels in Discover/Apply per wireframes (group by origin, display share badges, edit/delete controls).
-- [ ] Build transcript selection UI for manual highlight creation, capturing start/end seconds and quote text.
-- [ ] Add sharing dialog (team members list, role selection) and ensure optimistic updates with rollback on failure.
-- [ ] Surface assistant/system attribution (avatar, tooltip) in the highlight list.
+- [ ] Refactor remaining pages to consume the TRPC hooks (Apply view, Market experiments).
+- [ ] Implement highlight panels per wireframes (group by origin, share badges, edit/delete controls).
+- [ ] Build transcript selection UI for manual highlight creation.
+- [ ] Add sharing dialog (team members list, role selection) with optimistic updates.
+- [ ] Surface assistant/system attribution in highlight lists.
 
 ## Sprint 5 — Testing & Validation
 - [ ] Write unit/integration tests for Drizzle queries & mutations (against Supabase dev DB).

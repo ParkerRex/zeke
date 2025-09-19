@@ -18,44 +18,18 @@
 2. Trim `_app.ts` to expose only active routers; remove Midday leftovers as new routers come online.
 3. Establish shared helper utilities (auth, db context) – already in place via `createTRPCContext`.
 
-### 2. Stories & Clusters (Wireframe Columns 1–2)
-1. **Schemas** – `apps/api/src/schemas/story.ts`
-   - `storyListItemSchema`, `storyDetailSchema`, `storyClusterSchema`, `storyMetricsSchema`.
-2. **Router** – `apps/api/src/trpc/routers/story.ts`
-   - `list` → `listStoriesForDisplay` with filters (`type`, `search`, `after`, `limit`).
-   - `get` → `getStoryForDisplay` (includes cluster + metrics).
-   - `metrics` → `getStoryMetrics` (team scoped).
-   - `chapters` → repo for story turns (add helper if missing).
-3. Update `_app.ts` exports and add client procedure typings.
+### Completed API Deliverables
+- ✅ Story schemas + router (`apps/api/src/schemas/story.ts`, `apps/api/src/trpc/routers/story.ts`): list, get, metrics.
+- ✅ Highlight schemas + router (`apps/api/src/schemas/highlight.ts`, `apps/api/src/trpc/routers/highlight.ts`): byStory, engagement.
+- ✅ Assistant schemas + router (`apps/api/src/schemas/assistant.ts`, `apps/api/src/trpc/routers/assistant.ts`): get/create thread, list/create messages, add/remove sources, link citations.
+- ✅ Team schemas + router (`apps/api/src/schemas/team.ts`, `apps/api/src/trpc/routers/team.ts`): list, current, get, setActive, invites.
+- ✅ Supporting endpoints (`apps/api/src/schemas/search.ts`, `tags.ts`; `apps/api/src/trpc/routers/search.ts`, `tags.ts`): global/semantic search, tag CRUD.
+- ✅ `_app.ts` trimmed to Zeke-only routers; all Midday surfaces removed.
 
-### 3. Highlights & Key Findings (Wireframe Column 3)
-1. **Schemas** – `apps/api/src/schemas/highlight.ts`
-   - `highlightSchema`, `highlightInsightSchema`, `highlightEngagementSchema`.
-2. **Router** – `apps/api/src/trpc/routers/highlight.ts`
-   - `byStory` → `getHighlightsByStory` (verify/implement in repo).
-   - `engagement` → `getHighlightEngagement`.
-   - `create`, `pin`, `updateState` (mutations for future editing flows, can stub if not needed yet).
-
-### 4. Assistant & Chat Surface (Wireframe Column 4)
-1. **Schemas** – `apps/api/src/schemas/assistant.ts`
-   - `assistantThreadSchema`, `assistantMessageSchema`, `assistantSourceSchema`.
-2. **Router** – `apps/api/src/trpc/routers/assistant.ts`
-   - `threads.list` / `threads.get` → `assistant.ts` queries.
-   - `messages.list` → existing helper or new repo call.
-   - `messages.create` → mutation stub hooking into worker trigger (for now return placeholder until LLM pipeline connected).
-   - `sources.add/remove` → `assistantThreadSources` helpers.
-3. Ensure server-side tools (`apps/dashboard/src/lib/tools/*`) can call these procedures once wired.
-
-### 5. Teams & Workspace Context
-1. **Schemas** – `apps/api/src/schemas/team.ts`.
-2. **Router** – `apps/api/src/trpc/routers/team.ts`
-   - `list` / `get` / `switchActive` leveraging `team-access` and `teams` queries.
-   - `members` & `invites` using `users-on-team` and `user-invites` repos (optional phase if UI requires).
-
-### 6. Supporting Data (Optional for MVP)
-- **Search** – expose `packages/db/src/queries/search.ts` for global search.
-- **Tags & Filters** – for future filter panels; wire as needed.
-- **Playbooks / Goals** – only if corresponding UI surfaces land.
+### Remaining API Opportunities
+- Story chapters/timeline endpoint once the UI needs chapter playback.
+- Assistant message mutations that trigger the worker/LLM pipeline (currently stubbed for future integration).
+- Any additional filters (e.g., search facets, tag categories) identified during frontend implementation.
 
 ## Sequencing Plan
 1. ✅ Stories router + schemas.
@@ -105,9 +79,7 @@ Once each TRPC router is live, mirror it with typed React Query hooks under
   - `useActiveTeam()` → returns `trpc.team.getActive`; mutation to switch teams.
 
 - **Notifications** (`use-notifications.ts`)
-  - `useNotifications()` → wraps `trpc.notifications.list` queries (inbox + archived), handles optimistic updates.
-  - `useRealtimeNotifications()` → leverage `useRealtime` helper for Supabase channel updates.
-  - Mutations: `useNotificationsUpdateStatus`, `useNotificationsUpdateAllStatus` mirroring optimistic flow.
+  - TODO: reimplement using the forthcoming TRPC notifications router once prioritized (current Novu integration remains as placeholder).
 
 - **Shared Utilities**
   - Provide helper `prefetchStoryView()` for server components (uses `createTRPCClientCaller`).
