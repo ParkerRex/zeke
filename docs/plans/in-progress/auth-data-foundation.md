@@ -140,7 +140,7 @@ _Epic reference: docs/plans/in-progress/wire-updated.png_
 - ✅ Assistant schemas + router (`apps/api/src/schemas/assistant.ts`, `apps/api/src/trpc/routers/assistant.ts`): get/create thread, list/create messages, add/remove sources, link citations.
 - ✅ Team schemas + router (`apps/api/src/schemas/team.ts`, `apps/api/src/trpc/routers/team.ts`): list, current, get, setActive, invites.
 - ✅ Supporting endpoints (`apps/api/src/schemas/search.ts`, `tags.ts`; `apps/api/src/trpc/routers/search.ts`, `tags.ts`): global/semantic search, tag CRUD.
-- ✅ `_app.ts` trimmed to Zeke-only routers; all Midday surfaces removed.
+- ✅ `_app.ts` trimmed to Zeke-only routers; all Zeke surfaces removed.
 
 ### Pending
 - Story chapters/timeline endpoint once the UI needs chapter playback.

@@ -3,9 +3,9 @@ import { createTRPCRouter } from "../init";
 import { assistantRouter } from "./assistant";
 import { highlightRouter } from "./highlight";
 import { searchRouter } from "./search";
+import { storyRouter } from "./story";
 import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
-import { storyRouter } from "./story";
 import { userRouter } from "./user";
 
 export const appRouter = createTRPCRouter({

@@ -1,5 +1,5 @@
 "use client";
-
+// TODO: UPDATE THIS TO ZEKE LOGIC
 import {
   Dialog,
   DialogContent,
@@ -41,7 +41,7 @@ export function ChoosePlanModal({
         return `Your trial will end in ${daysLeft} ${daysLeft === 1 ? "day" : "days"}, after the trial period you will have read access only.`;
       }
 
-      return "Your trial period has ended. Please choose a plan to continue using Midday.";
+      return "Your trial period has ended. Please choose a plan to continue using Zeke.";
     }
 
     if (hasDiscount && discountPrice) {
@@ -51,7 +51,7 @@ export function ChoosePlanModal({
       return `As a valued early customer, you qualify for our special discount pricing. Get the Pro plan for $${discountPrice}/month instead of the regular $99/month and save ${savePercentage}%.`;
     }
 
-    return "Choose a plan to continue using Midday.";
+    return "Choose a plan to continue using Zeke.";
   };
 
   return (

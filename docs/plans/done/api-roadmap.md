@@ -1,5 +1,5 @@
 # Zeke API Integration Roadmap (TRPC-First)
-
+// TODO: UPDATE THIS TO ZEKE LOGIC
 ## Goals
 - Deliver the data contracts required by the dashboard wireframes and assistant flow using a TRPC-only transport surface.
 - Map each endpoint directly to repository helpers in `packages/db/src/queries` so the API remains a thin orchestration layer.
@@ -15,7 +15,7 @@
 
 ### 1. Foundation
 1. ✅ Users router (`user.me`, `user.update`, `user.delete`, `user.invites`).
-2. Trim `_app.ts` to expose only active routers; remove Midday leftovers as new routers come online.
+2. ✅ Trim `_app.ts` to expose only active routers; remove Zeke leftovers as new routers come online.
 3. Establish shared helper utilities (auth, db context) – already in place via `createTRPCContext`.
 
 ### Completed API Deliverables
@@ -24,7 +24,7 @@
 - ✅ Assistant schemas + router (`apps/api/src/schemas/assistant.ts`, `apps/api/src/trpc/routers/assistant.ts`): get/create thread, list/create messages, add/remove sources, link citations.
 - ✅ Team schemas + router (`apps/api/src/schemas/team.ts`, `apps/api/src/trpc/routers/team.ts`): list, current, get, setActive, invites.
 - ✅ Supporting endpoints (`apps/api/src/schemas/search.ts`, `tags.ts`; `apps/api/src/trpc/routers/search.ts`, `tags.ts`): global/semantic search, tag CRUD.
-- ✅ `_app.ts` trimmed to Zeke-only routers; all Midday surfaces removed.
+- ✅ `_app.ts` trimmed to Zeke-only routers; all Zeke surfaces removed.
 
 ### Remaining API Opportunities
 - Story chapters/timeline endpoint once the UI needs chapter playback.
