@@ -10,6 +10,11 @@ import {
 
 export type { StoryClusterView, StoryEmbedKind, StoryOverlaySummary };
 
+/**
+ * Fetch stories with overlay + transcript metadata in the format that the
+ * dashboard UI expects. This hides the Drizzle plumbing so server components
+ * just call a single helper.
+ */
 export async function fetchStoriesForDashboard(
   params: ListStoryClustersParams = {},
 ) {
@@ -17,6 +22,9 @@ export async function fetchStoriesForDashboard(
   return listStoriesForDisplay(db, params);
 }
 
+/**
+ * Fetch a single story + cluster context for the dashboard detail views.
+ */
 export async function fetchStoryForDashboard(storyId: string) {
   const db = await connectDb();
   return getStoryForDisplay(db, storyId);

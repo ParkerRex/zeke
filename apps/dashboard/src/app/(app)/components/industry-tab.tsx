@@ -1,5 +1,5 @@
 'use client';
-import type { StoryClusterView } from '@/lib/stories';
+import type { StoryClusterView } from '@/utils/stories';
 import type { Tab } from '@/src/hooks/use-tabs';
 import { useEffect, useMemo, useState } from 'react';
 import StoryRow from './story-row';

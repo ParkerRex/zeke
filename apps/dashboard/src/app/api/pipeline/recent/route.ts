@@ -1,26 +1,33 @@
-import {
-  getAdminFlag,
-  getRecentPipelineActivityQuery,
-} from '@zeke/supabase/queries';
-import { createClient } from '@zeke/supabase/server';
-import { NextResponse } from 'next/server';
+import { requireAdmin } from "@/utils/admin";
+import { ForbiddenError, UnauthorizedError } from "@/utils/errors";
+import { fetchRecentPipelineActivity } from "@/utils/pipeline";
+import { NextResponse } from "next/server";
 
 export async function GET(): Promise<Response> {
-  const { isAdmin } = await getAdminFlag();
-  if (!isAdmin) {
-    const HTTP_FORBIDDEN = 403;
+  try {
+    await requireAdmin();
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json(
+        { ok: false, error: "unauthorized" },
+        { status: 401 },
+      );
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json(
+        { ok: false, error: "forbidden" },
+        { status: 403 },
+      );
+    }
     return NextResponse.json(
-      { ok: false, error: 'forbidden' },
-      { status: HTTP_FORBIDDEN }
+      { ok: false, error: String(error) },
+      { status: 500 },
     );
   }
   try {
     const LIMIT_RECENT = 25;
-    const supabase = createClient({ admin: true });
     const { rawItems, contents, stories } =
-      await getRecentPipelineActivityQuery(supabase, {
-        limit: LIMIT_RECENT,
-      });
+      await fetchRecentPipelineActivity(LIMIT_RECENT);
 
     return NextResponse.json({
       ok: true,
@@ -33,7 +40,7 @@ export async function GET(): Promise<Response> {
     const HTTP_INTERNAL_SERVER_ERROR = 500;
     return NextResponse.json(
       { ok: false, error: String(e) },
-      { status: HTTP_INTERNAL_SERVER_ERROR }
+      { status: HTTP_INTERNAL_SERVER_ERROR },
     );
   }
 }

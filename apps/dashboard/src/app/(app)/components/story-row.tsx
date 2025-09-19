@@ -1,7 +1,7 @@
 'use client';
 import { useTabs } from '@/src/hooks/use-tabs';
 import { domainFromUrl } from '@/src/utils/url';
-import type { StoryClusterView } from '@/lib/stories';
+import type { StoryClusterView } from '@/utils/stories';
 import { useRouter } from 'next/navigation';
 import { StoryKindIcon } from './story-kind-icon';
 

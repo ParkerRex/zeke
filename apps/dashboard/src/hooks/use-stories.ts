@@ -1,6 +1,6 @@
 'use client';
 import { isAbortError, safeErrorMessage } from '@/src/utils/errors';
-import type { StoryClusterView } from '@/lib/stories';
+import type { StoryClusterView } from '@/utils/stories';
 import { useCallback, useEffect, useState } from 'react';
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes

@@ -1,4 +1,4 @@
-import { fetchStoryForDashboard } from '@/lib/stories';
+import { fetchStoryForDashboard } from '@/utils/stories';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request): Promise<Response> {

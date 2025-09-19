@@ -1,4 +1,4 @@
-import { fetchStoriesForDashboard } from '@/lib/stories';
+import { fetchStoriesForDashboard } from '@/utils/stories';
 import { storyQuerySchema, withValidation } from '@/src/utils/api-schemas';
 import { createClient } from '@zeke/supabase/server';
 import { NextResponse } from 'next/server';

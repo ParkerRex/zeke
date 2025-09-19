@@ -1,4 +1,4 @@
-import { fetchStoriesForDashboard, type StoryClusterView } from '@/lib/stories';
+import { fetchStoriesForDashboard, type StoryClusterView } from '@/utils/stories';
 import { domainFromUrl } from '@/src/utils/url';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -1,5 +1,5 @@
 'use client';
-import type { StoryClusterView } from '@/lib/stories';
+import type { StoryClusterView } from '@/utils/stories';
 import { companyViewParser } from '@/src/utils/nuqs';
 import type { Tab } from '@/src/hooks/use-tabs';
 import Image from 'next/image';

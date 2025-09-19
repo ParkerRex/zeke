@@ -1,4 +1,4 @@
-import { fetchStoriesForDashboard } from '@/lib/stories';
+import { fetchStoriesForDashboard } from '@/utils/stories';
 
 import StoryRow from './feed/story-row';
 

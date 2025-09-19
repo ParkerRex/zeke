@@ -9,7 +9,7 @@ import {
   IoNewspaper,
 } from 'react-icons/io5';
 
-import type { StoryEmbedKind } from '@/lib/stories';
+import type { StoryEmbedKind } from '@/utils/stories';
 
 export function StoryKindIcon({
   kind,

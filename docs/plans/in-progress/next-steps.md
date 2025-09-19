@@ -39,9 +39,9 @@
       - Added view-model transformers in `packages/db/src/utils/story-view.ts` + `packages/db/src/queries/story-display.ts`, removing the dependency on `@zeke/supabase/types/Cluster` at call sites.
       - Updated server components, API routes, and client hooks to consume the new helpers (`/api/stories`, `/api/share`, dashboard feed widgets, marketing pages, tabs, etc.).
       - TODO follow-up: delete the legacy `Cluster` definition from `@zeke/supabase/types` once pricing/admin refactors are complete.
-    - [ ] Pipeline widgets:
-      - Add `apps/dashboard/src/actions/pipeline/get-pipeline-status-action.ts` and `get-pipeline-activity-action.ts` (schemas in `actions/schemas/pipeline.ts`) that wrap `getPipelineCounts` and `getRecentPipelineActivity`.
-      - Swap `/api/pipeline/status` + `/api/pipeline/recent` routes and dashboard widgets to use the new actions so zero code references the Supabase REST helpers.
+    - [x] Pipeline widgets:
+      - Added `apps/dashboard/src/actions/pipeline/get-pipeline-status-action.ts` and `get-pipeline-activity-action.ts` with corresponding Zod schemas in `actions/schemas/pipeline.ts`, plus shared admin guard utilities.
+      - Replaced `/api/pipeline/status` and `/api/pipeline/recent` to call Drizzle-backed helpers under `apps/dashboard/src/lib/pipeline.ts`, eliminating the `@zeke/supabase/queries` dependency for counts/activity while preserving the existing response contracts.
     - [ ] Pricing & subscriptions:
       - Introduce `apps/dashboard/src/actions/billing/get-products-action.ts` and `get-team-subscription-action.ts` (schemas in `actions/schemas/billing.ts`) which call `getActiveProductsWithPrices` and `getTeamActiveSubscription`.
       - Update `PricingSection`, checkout flow, and manage-subscription route to call those actions; remove imports from `@zeke/supabase/queries`.

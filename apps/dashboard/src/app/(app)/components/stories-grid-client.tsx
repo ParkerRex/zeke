@@ -1,5 +1,5 @@
 "use client";
-import type { StoryClusterView } from "@/lib/stories";
+import type { StoryClusterView } from "@/utils/stories";
 import { Button } from "@zeke/ui/button";
 import { Input } from "@zeke/ui/input";
 import { useRouter } from "next/navigation";

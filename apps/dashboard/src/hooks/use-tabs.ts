@@ -8,7 +8,7 @@ import {
   globalPanelParser,
   tabMetadataParser
 } from '@/src/utils/nuqs';
-import type { StoryEmbedKind, StoryOverlaySummary } from '@/lib/stories';
+import type { StoryEmbedKind, StoryOverlaySummary } from '@/utils/stories';
 
 export type Tab = {
   id: string; // clusterId or "share:abc123"

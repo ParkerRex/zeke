@@ -1,5 +1,5 @@
 import { withAuth } from '@/lib/auth/middleware-helpers';
-import { fetchStoryForDashboard } from '@/lib/stories';
+import { fetchStoryForDashboard } from '@/utils/stories';
 import { NextResponse } from 'next/server';
 
 export const GET = withAuth(
