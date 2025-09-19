@@ -24,7 +24,7 @@ interface Props {
 export const ConnectionIssueEmail = ({
   fullName = "",
   bankName = "Revolut",
-  teamName = "Midday",
+  teamName = "Zeke",
 }: Props) => {
   const firstName = fullName ? fullName.split(" ").at(0) : "";
   const text = `${firstName ? `Hi ${firstName}, ` : ""}We wanted to inform you that our connection to your bank ${bankName} for your team ${teamName} is currently disconnected.`;
@@ -70,7 +70,7 @@ export const ConnectionIssueEmail = ({
             <br />
             We wanted to let you know that your bank <strong>{bankName}</strong>{" "}
             for team <strong>{teamName}</strong> is currently disconnected. To
-            keep Midday running smoothly, we'll need you to reconnect your bank.
+            keep Zeke running smoothly, we'll need you to reconnect your bank.
             <br />
             <br />
             The good news? It only takes 60 seconds to get everything back on

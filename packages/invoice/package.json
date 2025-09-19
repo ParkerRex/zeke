@@ -1,0 +1,36 @@
+{
+	"name": "@zeke/invoice",
+	"private": true,
+	"main": "src/index.tsx",
+	"scripts": {
+		"clean": "rm -rf .turbo node_modules",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"exports": {
+		".": "./src/index.tsx",
+		"./token": "./src/token/index.ts",
+		"./number": "./src/utils/number.ts",
+		"./templates/html": "./src/templates/html/index.tsx",
+		"./templates/pdf": "./src/templates/pdf/index.tsx",
+		"./templates/og": "./src/templates/og/index.tsx",
+		"./editor": "./src/editor/index.tsx",
+		"./calculate": "./src/utils/calculate.ts",
+		"./format-to-html": "./src/templates/html/format.tsx",
+		"./content": "./src/utils/content.ts",
+		"./types": "./src/types.ts",
+		"./utils": "./src/utils/transform.ts"
+	},
+	"dependencies": {
+		"@zeke/ui": "workspace:*",
+		"@zeke/utils": "workspace:*",
+		"@react-pdf/renderer": "^4.3.0",
+		"date-fns": "^4.1.0",
+		"jose": "^6.0.11",
+		"qrcode": "^1.5.4"
+	},
+	"devDependencies": {
+		"@types/qrcode": "^1.5.5"
+	}
+}

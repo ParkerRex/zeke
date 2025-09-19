@@ -1,6 +1,6 @@
-# Midday Desktop App
+# Zeke Desktop App
 
-A Tauri-based desktop application for Midday that supports multiple environments with a native transparent titlebar on macOS.
+A Tauri-based desktop application for Zeke that supports multiple environments with a native transparent titlebar on macOS.
 
 ## Features
 

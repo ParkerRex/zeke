@@ -1,92 +1,112 @@
 export const SCOPES = [
-	"bank-accounts.read",
-	"bank-accounts.write",
-	"customers.read",
-	"customers.write",
-	"documents.read",
-	"documents.write",
-	"inbox.read",
-	"inbox.write",
-	"invoices.read",
-	"invoices.write",
-	"reports.read",
-	"search.read",
-	"tags.read",
-	"tags.write",
-	"teams.read",
-	"teams.write",
-	"tracker-entries.read",
-	"tracker-entries.write",
-	"tracker-projects.read",
-	"tracker-projects.write",
-	"transactions.read",
-	"transactions.write",
-	"users.read",
-	"users.write",
-	"notifications.read",
-	"notifications.write",
-	"apis.all", // All API scopes
-	"apis.read", // All read scopes
+  "stories.read",
+  "stories.write",
+  "stories.metrics",
+  "highlights.read",
+  "highlights.write",
+  "assistant.read",
+  "assistant.write",
+  "search.read",
+  "tags.read",
+  "tags.write",
+  "teams.read",
+  "teams.manage",
+  "users.read",
+  "users.manage",
 ] as const;
-// TODO: UPDATE THIS TO ZEKE LOGIC
-export type Scope = (typeof SCOPES)[number];
-export type ScopePreset = "all_access" | "read_only" | "restricted";
 
-export const scopePresets = [
-	{
-		value: "all_access",
-		label: "All",
-		description: "full access to all resources",
-	},
-	{
-		value: "read_only",
-		label: "Read Only",
-		description: "read-only access to all resources",
-	},
-	{
-		value: "restricted",
-		label: "Restricted",
-		description: "restricted access to some resources",
-	},
+export type Scope = (typeof SCOPES)[number];
+export type ScopePreset = "all_access" | "read_only" | "observer";
+
+const readOnlyScopes = SCOPES.filter((scope) => scope.endsWith(".read"));
+const observerScopes: Scope[] = [
+  "stories.read",
+  "stories.metrics",
+  "highlights.read",
+  "search.read",
 ];
 
-export const scopesToName = (scopes: string[]) => {
-	if (scopes.includes("apis.all")) {
-		return {
-			name: "All access",
-			description: "full access to all resources",
-			preset: "all_access",
-		};
-	}
+export const scopePresets = [
+  {
+    value: "all_access" as const,
+    label: "All Access",
+    description: "Full access to every REST and TRPC surface",
+    scopes: [...SCOPES],
+  },
+  {
+    value: "read_only" as const,
+    label: "Read Only",
+    description: "Read access across the API",
+    scopes: readOnlyScopes,
+  },
+  {
+    value: "observer" as const,
+    label: "Observer",
+    description: "Read access limited to stories, highlights, and search",
+    scopes: observerScopes,
+  },
+];
 
-	if (scopes.includes("apis.read")) {
-		return {
-			name: "Read-only",
-			description: "read-only access to all resources",
-			preset: "read_only",
-		};
-	}
+export const scopesToName = (scopes: Scope[]) => {
+  if (scopes.length === SCOPES.length) {
+    return {
+      name: "All Access",
+      description: "Full access to every REST and TRPC surface",
+      preset: "all_access" as const,
+    };
+  }
 
-	return {
-		name: "Restricted",
-		description: "restricted access to some resources",
-		preset: "restricted",
-	};
+  const normalized = new Set(scopes);
+  if (observerScopes.every((scope) => normalized.has(scope))) {
+    return {
+      name: "Observer",
+      description: "Read access for stories, highlights, and search",
+      preset: "observer" as const,
+    };
+  }
+
+  if (scopes.every((scope) => scope.endsWith(".read"))) {
+    return {
+      name: "Read Only",
+      description: "Read access across the API",
+      preset: "read_only" as const,
+    };
+  }
+
+  return {
+    name: "Custom",
+    description: "Custom mix of scopes",
+    preset: undefined,
+  } as const;
 };
 
-export const expandScopes = (scopes: string[]): string[] => {
-	if (scopes.includes("apis.all")) {
-		// Return all scopes except any that start with "apis."
-		return SCOPES.filter((scope) => !scope.startsWith("apis."));
-	}
+export const expandScopes = (scopes: string[]): Scope[] => {
+  if (!scopes.length) {
+    return [];
+  }
 
-	if (scopes.includes("apis.read")) {
-		// Return all read scopes except any that start with "apis."
-		return SCOPES.filter(
-			(scope) => scope.endsWith(".read") && !scope.startsWith("apis."),
-		);
-	}
+  const allowed = new Set<Scope>();
 
-	// For custom scopes, filter out any "apis." scopes
-	return scopes.filter((scope) => !scope.startsWith("apis."));
+  for (const scope of scopes) {
+    if (scope === "all_access") {
+      SCOPES.forEach((entry) => allowed.add(entry));
+      continue;
+    }
+
+    if (scope === "read_only") {
+      readOnlyScopes.forEach((entry) => allowed.add(entry));
+      continue;
+    }
+
+    if (scope === "observer") {
+      observerScopes.forEach((entry) => allowed.add(entry));
+      continue;
+    }
+
+    if ((SCOPES as readonly string[]).includes(scope)) {
+      allowed.add(scope as Scope);
+    }
+  }
+
+  return Array.from(allowed);
 };

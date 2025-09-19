@@ -1,0 +1,19 @@
+{
+  "extends": "@zeke/tsconfig/base.json",
+  "include": [
+    "src",
+    "../../types"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@jobs/*": [
+        "src/*"
+      ]
+    },
+    "jsx": "react-jsx"
+  }
+}

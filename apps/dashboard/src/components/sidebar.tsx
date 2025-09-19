@@ -1,30 +1,41 @@
-import { Cookies } from "@/utils/constants";
+"use client";
+
+import { cn } from "@zeke/ui/cn";
 import { Icons } from "@zeke/ui/icons";
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { Suspense } from "react";
+import { useState } from "react";
 import { MainMenu } from "./main-menu";
-import { TeamMenu } from "./team-menu";
+import { TeamDropdown } from "./team-dropdown";
 
 export function Sidebar() {
-  const initialItems = cookies().has(Cookies.MenuConfig)
-    ? JSON.parse(cookies().get(Cookies.MenuConfig)?.value)
-    : null;
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <aside className="h-screen flex-shrink-0 flex-col justify-between fixed top-0 ml-4 pb-4 items-center hidden md:flex">
-      <div className="flex flex-col items-center justify-center">
-        <div className="mt-6 todesktop:mt-[35px]">
-          <Link href="/">
-            <Icons.LogoSmall />
-          </Link>
-        </div>
-        <MainMenu initialItems={initialItems} />
+    <aside
+      className={cn(
+        "h-screen flex-shrink-0 flex-col desktop:overflow-hidden desktop:rounded-tl-[10px] desktop:rounded-bl-[10px] justify-between fixed top-0 pb-4 items-center hidden md:flex z-50 transition-all duration-200 ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb;",
+        "bg-background border-r border-border",
+        isExpanded ? "w-[240px]" : "w-[70px]",
+      )}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+    >
+      <div
+        className={cn(
+          "absolute top-0 left-0 h-[70px] flex items-center justify-center bg-background border-b border-border transition-all duration-200 ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb;",
+          isExpanded ? "w-full" : "w-[69px]",
+        )}
+      >
+        <Link href="/" className="absolute left-[22px] transition-none">
+          <Icons.LogoSmall />
+        </Link>
       </div>
 
-      <Suspense>
-        <TeamMenu />
-      </Suspense>
+      <div className="flex flex-col w-full pt-[70px] flex-1">
+        <MainMenu isExpanded={isExpanded} />
+      </div>
+
+      <TeamDropdown isExpanded={isExpanded} />
     </aside>
   );
 }

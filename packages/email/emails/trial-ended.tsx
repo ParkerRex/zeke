@@ -21,7 +21,7 @@ interface Props {
 
 export const TrialEndedEmail = ({ fullName = "" }: Props) => {
   const firstName = fullName ? fullName.split(" ").at(0) : "";
-  const text = `${firstName ? `Hi ${firstName}, ` : ""}Your Midday trial has now ended, which means you have read-only access.`;
+  const text = `${firstName ? `Hi ${firstName}, ` : ""}Your Zeke trial has now ended, which means you have read-only access.`;
   const themeClasses = getEmailThemeClasses();
   const lightStyles = getEmailInlineStyles("light");
 
@@ -44,7 +44,7 @@ export const TrialEndedEmail = ({ fullName = "" }: Props) => {
             className={`text-[21px] font-normal text-center p-0 my-[30px] mx-0 ${themeClasses.heading}`}
             style={{ color: lightStyles.text.color }}
           >
-            Your Midday Trial Has Ended
+            Your Zeke Trial Has Ended
           </Heading>
 
           <br />
@@ -59,7 +59,7 @@ export const TrialEndedEmail = ({ fullName = "" }: Props) => {
             className={themeClasses.text}
             style={{ color: lightStyles.text.color }}
           >
-            Your Midday trial has now ended, which means you have read-only
+            Your Zeke trial has now ended, which means you have read-only
             access.
           </Text>
           <Text
@@ -84,9 +84,8 @@ export const TrialEndedEmail = ({ fullName = "" }: Props) => {
             className={`text-[14px] ${themeClasses.text}`}
             style={{ color: lightStyles.text.color }}
           >
-            If this is the last time we hear from you, thanks for giving Midday
-            a try. We won't send any more emails, but you're always welcome
-            back.
+            If this is the last time we hear from you, thanks for giving Zeke a
+            try. We won't send any more emails, but you're always welcome back.
           </Text>
           <Text
             className={`text-[14px] ${themeClasses.text}`}

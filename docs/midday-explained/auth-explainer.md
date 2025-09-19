@@ -21,6 +21,10 @@
     - Referenced at:
       - `packages/db/src/schema.ts:2186` (mirrors `auth.users` metadata)
       - `packages/supabase/src/client/server.ts:39` (server client bootstrap)
+  - Name: Google OAuth
+    - Issuer/discovery: Supabase Google provider (client-side OAuth) [apps/dashboard/src/components/google-sign-in.tsx:24-52]
+    - Client ID/secret: Managed within Supabase project settings (not stored in repo)
+    - Referenced at: `apps/dashboard/src/components/google-sign-in.tsx:20-58`
   - Name: GitHub OAuth
     - Issuer/discovery: Supabase GitHub provider [apps/dashboard/src/components/github-sign-in.tsx:26-49]
     - Client ID/secret: Managed in Supabase (unknown)
@@ -60,7 +64,7 @@
 
 ## 2. Authentication Flows
 ### 2.1 Supabase OAuth Login
-- Initiation endpoint: Client invokes `supabase.auth.signInWithOAuth` from login UI [apps/dashboard/src/components/github-sign-in.tsx:26-49]
+- Initiation endpoint: Client invokes `supabase.auth.signInWithOAuth` from login UI (e.g., `apps/dashboard/src/components/google-sign-in.tsx:24-52`, `apps/dashboard/src/components/apple-sign-in.tsx:23-36`, `apps/dashboard/src/components/github-sign-in.tsx:26-49`)
 - Callback handler: Next route `/api/auth/callback` processes codes, analytics, and redirects [apps/dashboard/src/app/api/auth/callback/route.ts:11-80]
 - Middleware chain: `updateSession` → locale middleware → session/MFA guard [apps/dashboard/src/middleware.ts:12-88]
 - Error handling: Redirects invite flows, empty teams, or MFA setup based on session state [apps/dashboard/src/app/api/auth/callback/route.ts:51-74]
@@ -219,5 +223,5 @@
 12. Open Questions
 	• Supabase-managed cookie attributes (HttpOnly/SameSite/Secure values) are inherited from the SDK and not overridden in this repo—actual runtime values depend on Supabase defaults [packages/supabase/src/client/server.ts:55-78]
 	• CSRF handling inside `next-safe-action` is library-defined; no custom configuration observed, so verification of token strategy requires upstream documentation [apps/dashboard/src/actions/safe-action.ts:11-55]
-	• OAuth client secrets for third-party providers (GitHub, Apple) are stored outside the repository; rotation and storage practices are unspecified (unknown)
+	• OAuth client secrets for third-party providers (Google, GitHub, Apple) are stored outside the repository; rotation and storage practices are unspecified (unknown)
 ---

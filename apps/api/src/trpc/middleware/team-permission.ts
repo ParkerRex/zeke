@@ -1,5 +1,5 @@
+import { ensureTeamAccess, TeamAccessError } from "@api/auth/team";
 import type { Session } from "@api/utils/auth";
-import { teamCache } from "@zeke/cache/team-cache";
 import type { Database } from "@zeke/db/client";
 import { TRPCError } from "@trpc/server";
 
@@ -27,46 +27,31 @@ export const withTeamPermission = async <TReturn>(opts: {
     });
   }
 
-  const result = await ctx.db.query.users.findFirst({
-    with: {
-      usersOnTeams: {
-        columns: {
-          id: true,
-          teamId: true,
-        },
-      },
-    },
-    where: (users, { eq }) => eq(users.id, userId),
-  });
+  let teamId: string | null;
 
-  if (!result) {
+  try {
+    teamId = await ensureTeamAccess(ctx.db, userId);
+  } catch (error) {
+    if (error instanceof TeamAccessError) {
+      if (error.code === "USER_NOT_FOUND") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: error.message,
+        });
+      }
+
+      if (error.code === "TEAM_FORBIDDEN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: error.message,
+        });
+      }
+    }
+
     throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "User not found",
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Failed to resolve team access",
     });
-  }
-
-  const teamId = result.teamId;
-
-  // If teamId is null, user has no team assigned but this is now allowed
-  if (teamId !== null) {
-    const cacheKey = `user:${userId}:team:${teamId}`;
-    let hasAccess = await teamCache.get(cacheKey);
-
-    if (hasAccess === undefined) {
-      hasAccess = result.usersOnTeams.some(
-        (membership) => membership.teamId === teamId,
-      );
-
-      await teamCache.set(cacheKey, hasAccess);
-    }
-
-    if (!hasAccess) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "No permission to access this team",
-      });
-    }
   }
 
   return next({

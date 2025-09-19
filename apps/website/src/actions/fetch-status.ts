@@ -3,7 +3,7 @@
 import { getStatus } from "@openstatus/react";
 
 export async function fetchStatus() {
-	const res = await getStatus("zeke");
+	const res = await getStatus("midday");
 
 	const { status } = res;
 

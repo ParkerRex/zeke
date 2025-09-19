@@ -4,10 +4,10 @@ import { getEmailUrl } from "@zeke/utils/envs";
 const baseUrl = getEmailUrl();
 
 export function Logo() {
-	// CSS-blended version for automatic dark mode adaptation
-	return (
-		<Section className="mt-[32px]">
-			<style>{`
+  // CSS-blended version for automatic dark mode adaptation
+  return (
+    <Section className="mt-[32px]">
+      <style>{`
           .logo-blend {
             filter: none;
           }
@@ -33,13 +33,13 @@ export function Logo() {
           }
         `}</style>
 
-			<Img
-				src={`${baseUrl}/email/logo.png`}
-				width="40"
-				height="40"
-				alt="Midday"
-				className="my-0 mx-auto block logo-blend"
-			/>
-		</Section>
-	);
+      <Img
+        src={`${baseUrl}/email/logo.png`}
+        width="40"
+        height="40"
+        alt="Zeke"
+        className="my-0 mx-auto block logo-blend"
+      />
+    </Section>
+  );
 }

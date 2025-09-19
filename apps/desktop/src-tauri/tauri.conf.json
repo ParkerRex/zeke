@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Midday",
+  "productName": "Zeke",
   "identifier": "ai.midday.app",
   "app": {
     "macOSPrivateApi": true,

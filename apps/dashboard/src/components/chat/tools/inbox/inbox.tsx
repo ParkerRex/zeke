@@ -1,6 +1,6 @@
 "use client";
-import { Skeleton } from "@midday/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@zeke/ui/skeleton";
 // TODO: UPDATE THIS TO ZEKE LOGIC
 import { BotMessage } from "@/components/chat/messages";
 import { FilePreview } from "@/components/file-preview";

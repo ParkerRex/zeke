@@ -3,13 +3,13 @@
 > Source repository context: dashboard app + API surfaces. All file references use workspace-relative paths.
 
 ## Overview
-- zeke relies on Supabase Auth for identity, exposing Apple, GitHub, and email OTP options via the public login route (`apps/dashboard/src/app/[locale]/(public)/login/page.tsx:27-193`).
+- zeke relies on Supabase Auth for identity, exposing Google, Apple, GitHub, and email OTP options via the public login route (`apps/dashboard/src/app/[locale]/(public)/login/page.tsx:27-193`).
 - There is no dedicated “sign-up” endpoint; the first successful login seeds an application profile and funnels the user into team creation (`apps/dashboard/src/app/[locale]/(app)/teams/create/page.tsx:12-48`).
 - Subscription state is stored on the `teams` table (`packages/db/src/schema.ts:1308-1332`) and updated by Polar webhooks (`apps/dashboard/src/app/api/webhook/polar/route.ts:9-53`). Trial status and cancellation flags influence feature access and UI prompts across the dashboard.
 
 ## Public Entry Points
 - **Login screen** – renders primary and secondary auth options, remembers the preferred provider, and toggles a consent banner for EU users (`apps/dashboard/src/app/[locale]/(public)/login/page.tsx:27-193`).
-- **OAuth buttons** – each button calls `supabase.auth.signInWithOAuth` with provider-specific redirect metadata (`apps/dashboard/src/components/apple-sign-in.tsx:17-41`, `apps/dashboard/src/components/github-sign-in.tsx:17-41`).
+- **OAuth buttons** – each button calls `supabase.auth.signInWithOAuth` with provider-specific redirect metadata (`apps/dashboard/src/components/google-sign-in.tsx:20-58`, `apps/dashboard/src/components/apple-sign-in.tsx:17-41`, `apps/dashboard/src/components/github-sign-in.tsx:17-41`).
 - **OTP email flow** – posts `signInWithOtp`, then verifies the code through a safe server action that establishes a session and redirects (`apps/dashboard/src/components/otp-sign-in.tsx:47-133`, `apps/dashboard/src/actions/verify-otp-action.ts:16-40`).
 - **Desktop hand-off** – desktop clients pass `client=desktop`, which bounces through `/verify` to deep-link back into the native app (`apps/dashboard/src/app/[locale]/(public)/verify/page.tsx:7-10`, `apps/dashboard/src/components/desktop-sign-in-verify-code.tsx:18-42`).
 

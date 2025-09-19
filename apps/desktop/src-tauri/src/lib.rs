@@ -42,7 +42,7 @@ fn show_window(window: tauri::Window) -> Result<(), String> {
 async fn check_for_updates(app: tauri::AppHandle) -> Result<(), String> {
     use tauri_plugin_dialog::{DialogExt, MessageDialogKind, MessageDialogButtons};
     use tauri_plugin_updater::UpdaterExt;
-    
+
     #[cfg(desktop)]
     {
         // Try to check for updates
@@ -56,7 +56,7 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<(), String> {
                         .kind(MessageDialogKind::Info)
                         .buttons(MessageDialogButtons::OkCancel)
                         .blocking_show();
-                    
+
                     if answer {
                         // User wants to update - provide required callbacks
                         let _ = update.download_and_install(
@@ -74,7 +74,7 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<(), String> {
                     // No update available - show current version info
                     let version = app.package_info().version.to_string();
                     app.dialog()
-                        .message(format!("Midday\nversion {}\n\nYou're up to date!", version))
+                        .message(format!("Zeke\nversion {}\n\nYou're up to date!", version))
                         .title("No Updates Available")
                         .kind(MessageDialogKind::Info)
                         .buttons(MessageDialogButtons::Ok)
@@ -100,7 +100,7 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<(), String> {
                 .blocking_show();
         }
     }
-    
+
     #[cfg(not(desktop))]
     {
         // Mobile platforms don't support auto-updates
@@ -111,7 +111,7 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<(), String> {
             .buttons(MessageDialogButtons::Ok)
             .blocking_show();
     }
-    
+
     Ok(())
 }
 
@@ -255,11 +255,11 @@ async fn create_preloaded_search_window(
         search_window_label,
         WebviewUrl::External(tauri::Url::parse(&search_url)?),
     )
-    .title("Midday Search")
+    .title("Zeke Search")
     .inner_size(720.0, 450.0)
     .min_inner_size(720.0, 450.0)
     .resizable(false)
-    .user_agent("Mozilla/5.0 (compatible; Midday Desktop App)")
+    .user_agent("Mozilla/5.0 (compatible; Zeke Desktop App)")
     .transparent(true)
     .decorations(false)
     .visible(false) // Start hidden for preloading
@@ -401,14 +401,14 @@ pub fn run() {
 
             // Create shared search window state
             let search_state: SearchWindowState = Arc::new(Mutex::new(false));
-            
+
             // Add search state to managed state so commands can access it
             app.manage(search_state.clone());
 
             // Clone app_handle before it gets moved into closures
             let app_handle_for_deep_links = app_handle.clone();
             let app_handle_for_navigation = app_handle.clone();
-            
+
             // Auth state is now accessed via managed state for consistency
 
             // Initialize global shortcuts
@@ -431,7 +431,7 @@ pub fn run() {
                                 if let Some(managed_search_state) = app_handle.try_state::<SearchWindowState>() {
                                     let current_search_state = *managed_search_state.lock().unwrap();
                                     println!("🔍 Shortcut: Search state from managed state: {}", current_search_state);
-                                    
+
                                     // Use the same app_handle for both search state and toggle function
                                     let result = toggle_search_window(app_handle, &managed_search_state);
                                     match result {
@@ -467,10 +467,10 @@ pub fn run() {
                 "main",
                 WebviewUrl::External(tauri::Url::parse(&app_url).unwrap()),
             )
-            .title("Midday")
+            .title("Zeke")
             .inner_size(1450.0, 900.0)
             .min_inner_size(1450.0, 900.0)
-            .user_agent("Mozilla/5.0 (compatible; Midday Desktop App)")
+            .user_agent("Mozilla/5.0 (compatible; Zeke Desktop App)")
             .decorations(false)
             .visible(false)
             .transparent(true)
@@ -516,7 +516,7 @@ pub fn run() {
                     println!("🔍 Event received: search-window-enabled = {}", enabled);
                     *search_state_for_events.lock().unwrap() = enabled;
                     println!("🔍 Search window state updated to {}", enabled);
-                    
+
                     // If search is disabled, clean up search window to prevent interference
                     if !enabled {
                         println!("🔍 Search disabled, cleaning up search window");
@@ -557,7 +557,7 @@ pub fn run() {
             // Don't preload search window immediately - create it on first use instead
             // This prevents interference with the login flow
 
-            // Set the default app menu to restore the Midday menu
+            // Set the default app menu to restore the Zeke menu
             let app_menu = Menu::default(app.handle())?;
             app.set_menu(app_menu)?;
 
@@ -621,7 +621,7 @@ pub fn run() {
             tauri::RunEvent::ExitRequested { api, .. } => {
                 // Prevent app from quitting to keep global shortcuts working
                 api.prevent_exit();
-                
+
                 // Hide all windows instead of quitting
                 if let Some(main_window) = app_handle.get_webview_window("main") {
                     let _ = main_window.hide();

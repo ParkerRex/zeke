@@ -1,35 +1,24 @@
 "use client";
 
-import { updateMenuAction } from "@/actions/update-menu-action";
-import { useMenuStore } from "@/store/menu";
-import { Button } from "@zeke/ui/button";
 import { cn } from "@zeke/ui/cn";
 import { Icons } from "@zeke/ui/icons";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@zeke/ui/tooltip";
-import { useClickAway } from "@uidotdev/usehooks";
-import { Reorder, motion, useMotionValue } from "framer-motion";
-import { useAction } from "next-safe-action/hooks";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { useLongPress } from "use-long-press";
+import { useEffect, useState } from "react";
 
 const icons = {
-  "/": () => <Icons.Overview size={22} />,
-  "/transactions": () => <Icons.Transactions size={22} />,
-  "/invoices": () => <Icons.Invoice size={22} />,
-  "/tracker": () => <Icons.Tracker size={22} />,
-  "/vault": () => <Icons.Files size={22} />,
-  "/settings": () => <Icons.Settings size={22} />,
-  "/inbox": () => <Icons.Inbox2 size={22} />,
-};
+  "/": () => <Icons.Overview size={20} />,
+  "/transactions": () => <Icons.Transactions size={20} />,
+  "/invoices": () => <Icons.Invoice size={20} />,
+  "/tracker": () => <Icons.Tracker size={20} />,
+  "/customers": () => <Icons.Customers size={20} />,
+  "/vault": () => <Icons.Vault size={20} />,
+  "/settings": () => <Icons.Settings size={20} />,
+  "/apps": () => <Icons.Apps size={20} />,
+  "/inbox": () => <Icons.Inbox2 size={20} />,
+} as const;
 
-const defaultItems = [
+const items = [
   {
     path: "/",
     name: "Overview",
@@ -37,202 +26,270 @@ const defaultItems = [
   {
     path: "/inbox",
     name: "Inbox",
+    children: [{ path: "/inbox/settings", name: "Settings" }],
   },
   {
     path: "/transactions",
     name: "Transactions",
+    children: [
+      {
+        path: "/transactions/categories",
+        name: "Categories",
+      },
+      {
+        path: "/transactions?step=connect",
+        name: "Connect bank",
+      },
+      {
+        path: "/transactions?step=import&hide=true",
+        name: "Import",
+      },
+      { path: "/transactions?createTransaction=true", name: "Create new" },
+    ],
   },
   {
     path: "/invoices",
     name: "Invoices",
+    children: [
+      { path: "/invoices?statuses=paid", name: "Paid" },
+      { path: "/invoices?statuses=unpaid", name: "Unpaid" },
+      { path: "/invoices?statuses=overdue", name: "Overdue" },
+      { path: "/invoices?statuses=draft", name: "Draft" },
+      { path: "/invoices?statuses=scheduled", name: "Scheduled" },
+      { path: "/invoices?type=create", name: "Create new" },
+    ],
   },
   {
     path: "/tracker",
     name: "Tracker",
+    children: [{ path: "/tracker?create=true", name: "Create new" }],
+  },
+  {
+    path: "/customers",
+    name: "Customers",
+    children: [{ path: "/customers?createCustomer=true", name: "Create new" }],
   },
   {
     path: "/vault",
     name: "Vault",
   },
   {
+    path: "/apps",
+    name: "Apps",
+    children: [
+      { path: "/apps", name: "All" },
+      { path: "/apps?tab=installed", name: "Installed" },
+    ],
+  },
+  {
     path: "/settings",
     name: "Settings",
+    children: [
+      { path: "/settings", name: "General" },
+      { path: "/settings/billing", name: "Billing" },
+      { path: "/settings/accounts", name: "Bank Connections" },
+      { path: "/settings/members", name: "Members" },
+      { path: "/settings/notifications", name: "Notifications" },
+      { path: "/settings/developer", name: "Developer" },
+    ],
   },
 ];
 
 interface ItemProps {
-  item: { path: string; name: string };
+  item: {
+    path: string;
+    name: string;
+    children?: { path: string; name: string }[];
+  };
   isActive: boolean;
-  isCustomizing: boolean;
-  onRemove: (path: string) => void;
-  disableRemove: boolean;
-  onDragEnd: () => void;
+  isExpanded: boolean;
+  isItemExpanded: boolean;
+  onToggle: (path: string) => void;
   onSelect?: () => void;
 }
+
+const ChildItem = ({
+  child,
+  isActive,
+  isExpanded,
+  shouldShow,
+  onSelect,
+  index,
+}: {
+  child: { path: string; name: string };
+  isActive: boolean;
+  isExpanded: boolean;
+  shouldShow: boolean;
+  onSelect?: () => void;
+  index: number;
+}) => {
+  const showChild = isExpanded && shouldShow;
+
+  return (
+    <Link
+      prefetch
+      href={child.path}
+      onClick={() => onSelect?.()}
+      className="block group/child"
+    >
+      <div className="relative">
+        {/* Child item text */}
+        <div
+          className={cn(
+            "ml-[35px] mr-[15px] h-[32px] flex items-center",
+            "border-l border-[#DCDAD2] dark:border-[#2C2C2C] pl-3",
+            "transition-all duration-200 ease-out",
+            showChild
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-2",
+          )}
+          style={{
+            transitionDelay: showChild
+              ? `${40 + index * 20}ms`
+              : `${index * 20}ms`,
+          }}
+        >
+          <span
+            className={cn(
+              "text-xs font-medium transition-colors duration-200",
+              "text-[#888] group-hover/child:text-primary",
+              "whitespace-nowrap overflow-hidden",
+              isActive && "text-primary",
+            )}
+          >
+            {child.name}
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const Item = ({
   item,
   isActive,
-  isCustomizing,
-  onRemove,
-  disableRemove,
-  onDragEnd,
+  isExpanded,
+  isItemExpanded,
+  onToggle,
   onSelect,
 }: ItemProps) => {
-  const y = useMotionValue(0);
-  const Icon = icons[item.path];
+  const Icon = icons[item.path as keyof typeof icons];
+  const pathname = usePathname();
+  const hasChildren = item.children && item.children.length > 0;
+
+  // Children should be visible when: expanded sidebar AND this item is expanded
+  const shouldShowChildren = isExpanded && isItemExpanded;
+
+  const handleChevronClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggle(item.path);
+  };
 
   return (
-    <TooltipProvider delayDuration={70}>
+    <div className="group">
       <Link
         prefetch
         href={item.path}
-        onClick={(evt) => {
-          if (isCustomizing) {
-            evt.preventDefault();
-          }
-
-          onSelect?.();
-        }}
-        onMouseDown={(evt) => {
-          if (isCustomizing) {
-            evt.preventDefault();
-          }
-        }}
+        onClick={() => onSelect?.()}
+        className="group"
       >
-        <Tooltip>
-          <TooltipTrigger className="w-full">
-            <Reorder.Item
-              onDragEnd={onDragEnd}
-              key={item.path}
-              value={item}
-              id={item.path}
-              style={{ y }}
-              layoutRoot
-              className={cn(
-                "relative border border-transparent md:w-[45px] h-[45px] flex items-center md:justify-center",
-                "hover:bg-accent hover:border-[#DCDAD2] hover:dark:border-[#2C2C2C]",
-                isActive &&
-                  "bg-[#F2F1EF] dark:bg-secondary border-[#DCDAD2] dark:border-[#2C2C2C]",
-                isCustomizing &&
-                  "bg-background border-[#DCDAD2] dark:border-[#2C2C2C]",
-              )}
-            >
-              <motion.div
-                className="relative"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {!disableRemove && isCustomizing && (
-                  <Button
-                    onClick={() => onRemove(item.path)}
-                    variant="ghost"
-                    size="icon"
-                    className="absolute -left-4 -top-4 w-4 h-4 p-0 rounded-full bg-border hover:bg-border hover:scale-150 z-10 transition-all"
-                  >
-                    <Icons.Remove className="w-3 h-3" />
-                  </Button>
-                )}
+        <div className="relative">
+          {/* Background that expands */}
+          <div
+            className={cn(
+              "border border-transparent h-[40px] transition-all duration-200 ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb; ml-[15px] mr-[15px]",
+              isActive &&
+                "bg-[#F2F1EF] dark:bg-secondary border-[#DCDAD2] dark:border-[#2C2C2C]",
+              isExpanded ? "w-[calc(100%-30px)]" : "w-[40px]",
+            )}
+          />
 
-                <div
+          {/* Icon - always in same position from sidebar edge */}
+          <div className="absolute top-0 left-[15px] w-[40px] h-[40px] flex items-center justify-center dark:text-[#666666] text-black group-hover:!text-primary pointer-events-none">
+            <div className={cn(isActive && "dark:!text-white")}>
+              <Icon />
+            </div>
+          </div>
+
+          {isExpanded && (
+            <div className="absolute top-0 left-[55px] right-[4px] h-[40px] flex items-center pointer-events-none">
+              <span
+                className={cn(
+                  "text-sm font-medium transition-opacity duration-200 ease-in-out text-[#666] group-hover:text-primary",
+                  "whitespace-nowrap overflow-hidden",
+                  hasChildren ? "pr-2" : "",
+                  isActive && "text-primary",
+                )}
+              >
+                {item.name}
+              </span>
+              {hasChildren && (
+                <button
+                  type="button"
+                  onClick={handleChevronClick}
                   className={cn(
-                    "flex space-x-3 p-0 items-center pl-2 md:pl-0",
-                    isCustomizing &&
-                      "animate-[jiggle_0.3s_ease-in-out_infinite] transform-gpu pointer-events-none",
+                    "w-8 h-8 flex items-center justify-center transition-all duration-200 ml-auto mr-3",
+                    "text-[#888] hover:text-primary pointer-events-auto",
+                    isActive && "text-primary/60",
+                    shouldShowChildren && "rotate-180",
                   )}
                 >
-                  <Icon />
-                  <span className="flex md:hidden">{item.name}</span>
-                </div>
-              </motion.div>
-            </Reorder.Item>
-          </TooltipTrigger>
-          <TooltipContent
-            side="left"
-            className="px-3 py-1.5 text-xs hidden md:flex"
-            sideOffset={10}
-          >
-            {item.name}
-          </TooltipContent>
-        </Tooltip>
+                  <Icons.ChevronDown size={16} />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </Link>
-    </TooltipProvider>
+
+      {/* Children */}
+      {hasChildren && (
+        <div
+          className={cn(
+            "transition-all duration-300 ease-out overflow-hidden",
+            shouldShowChildren ? "max-h-96 mt-1" : "max-h-0",
+          )}
+        >
+          {item.children!.map((child, index) => {
+            const isChildActive = pathname === child.path;
+            return (
+              <ChildItem
+                key={child.path}
+                child={child}
+                isActive={isChildActive}
+                isExpanded={isExpanded}
+                shouldShow={shouldShowChildren}
+                onSelect={onSelect}
+                index={index}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
-};
-
-const listVariant = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.04,
-    },
-  },
-};
-
-const itemVariant = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1 },
 };
 
 type Props = {
-  initialItems?: { path: string; name: string }[];
   onSelect?: () => void;
+  isExpanded?: boolean;
 };
 
-export function MainMenu({ initialItems, onSelect }: Props) {
-  const [items, setItems] = useState(initialItems ?? defaultItems);
-  const { isCustomizing, setCustomizing } = useMenuStore();
+export function MainMenu({ onSelect, isExpanded = false }: Props) {
   const pathname = usePathname();
   const part = pathname?.split("/")[1];
-  const updateMenu = useAction(updateMenuAction);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  const hiddenItems = defaultItems.filter(
-    (item) => !items.some((i) => i.path === item.path),
-  );
-
-  const onReorder = (items) => {
-    setItems(items);
-  };
-
-  const onDragEnd = () => {
-    updateMenu.execute(items);
-  };
-
-  const onRemove = (path: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.path !== path));
-    updateMenu.execute(items.filter((item) => item.path !== path));
-  };
-
-  const onAdd = (item) => {
-    const updatedItems = [...items, item];
-    setItems(updatedItems);
-    updateMenu.execute(updatedItems);
-  };
-
-  const bind = useLongPress(
-    () => {
-      setCustomizing(true);
-    },
-    {
-      cancelOnMovement: 0,
-    },
-  );
-
-  const ref = useClickAway(() => {
-    setCustomizing(false);
-  });
+  // Reset expanded item when sidebar expands/collapses
+  useEffect(() => {
+    setExpandedItem(null);
+  }, [isExpanded]);
 
   return (
-    <div className="mt-6" {...bind()} ref={ref}>
-      <nav>
-        <Reorder.Group
-          axis="y"
-          onReorder={onReorder}
-          values={items}
-          className="flex flex-col gap-1.5"
-        >
+    <div className="mt-6 w-full">
+      <nav className="w-full">
+        <div className="flex flex-col gap-2">
           {items.map((item) => {
             const isActive =
               (pathname === "/" && item.path === "/") ||
@@ -243,56 +300,17 @@ export function MainMenu({ initialItems, onSelect }: Props) {
                 key={item.path}
                 item={item}
                 isActive={isActive}
-                isCustomizing={isCustomizing}
-                onRemove={onRemove}
-                disableRemove={items.length === 1}
-                onDragEnd={onDragEnd}
+                isExpanded={isExpanded}
+                isItemExpanded={expandedItem === item.path}
+                onToggle={(path) => {
+                  setExpandedItem(expandedItem === path ? null : path);
+                }}
                 onSelect={onSelect}
               />
             );
           })}
-        </Reorder.Group>
+        </div>
       </nav>
-
-      {hiddenItems.length > 0 && isCustomizing && (
-        <nav className="border-t-[1px] mt-6 pt-6">
-          <motion.ul
-            variants={listVariant}
-            initial="hidden"
-            animate="show"
-            className="flex flex-col gap-1.5"
-          >
-            {hiddenItems.map((item) => {
-              const Icon = icons[item.path];
-
-              return (
-                <motion.li
-                  variants={itemVariant}
-                  key={item.path}
-                  className={cn(
-                    "border border-transparent w-[45px] h-[45px] flex items-center md:justify-center",
-                    "hover:bg-secondary hover:border-[#DCDAD2] hover:dark:border-[#2C2C2C]",
-                    "bg-background border-[#DCDAD2] dark:border-[#2C2C2C]",
-                  )}
-                >
-                  <div className="relative">
-                    <Button
-                      onClick={() => onAdd(item)}
-                      variant="ghost"
-                      size="icon"
-                      className="absolute -left-4 -top-4 w-4 h-4 p-0 rounded-full bg-border hover:bg-border hover:scale-150 z-10 transition-all"
-                    >
-                      <Icons.Add className="w-3 h-3" />
-                    </Button>
-
-                    <Icon />
-                  </div>
-                </motion.li>
-              );
-            })}
-          </motion.ul>
-        </nav>
-      )}
     </div>
   );
 }

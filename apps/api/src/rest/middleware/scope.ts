@@ -1,6 +1,6 @@
-// Middleware factory ensuring the requester has at least one permitted authorization scope.
 import type { Scope } from "@api/utils/scopes";
 import type { MiddlewareHandler } from "hono";
+import { HTTPException } from "hono/http-exception";
 
 export const withRequiredScope = (
   ...requiredScopes: Scope[]
@@ -9,31 +9,19 @@ export const withRequiredScope = (
     const scopes = c.get("scopes") as Scope[] | undefined;
 
     if (!scopes) {
-      return c.json(
-        {
-          error: "Unauthorized",
-          description:
-            "No scopes found for the current user. Authentication is required.",
-        },
-        401,
-      );
+      throw new HTTPException(401, {
+        message: "Missing scopes for authenticated user",
+      });
     }
 
-    // Check if user has at least one of the required scopes
-    const hasRequiredScope = requiredScopes.some((requiredScope) =>
-      scopes.includes(requiredScope),
-    );
+    const hasScope = requiredScopes.length
+      ? requiredScopes.some((scope) => scopes.includes(scope))
+      : true;
 
-    if (!hasRequiredScope) {
-      return c.json(
-        {
-          error: "Forbidden",
-          description: `Insufficient permissions. Required scopes: ${requiredScopes.join(
-            ", ",
-          )}. Your scopes: ${scopes.join(", ")}`,
-        },
-        403,
-      );
+    if (!hasScope) {
+      throw new HTTPException(403, {
+        message: `Insufficient permissions. Required: ${requiredScopes.join(", ")}`,
+      });
     }
 
     await next();

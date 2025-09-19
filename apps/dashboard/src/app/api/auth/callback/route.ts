@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const client = requestUrl.searchParams.get("client");
   const returnTo = requestUrl.searchParams.get("return_to");
   const provider = requestUrl.searchParams.get("provider");
-  const allowedProviders = new Set(["apple", "github", "otp"]);
+  const allowedProviders = new Set(["google", "apple", "github", "otp"]);
 
   if (client === "desktop") {
     return NextResponse.redirect(`${requestUrl.origin}/verify?code=${code}`);

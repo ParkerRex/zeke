@@ -4,9 +4,9 @@ import { getEmailUrl } from "@zeke/utils/envs";
 const baseUrl = getEmailUrl();
 
 export function LogoFooter() {
-	return (
-		<Section>
-			<style>{`
+  return (
+    <Section>
+      <style>{`
           .logo-blend {
             filter: none;
           }
@@ -32,14 +32,14 @@ export function LogoFooter() {
           }
         `}</style>
 
-			<Link href="https://go.midday.ai/FZwOHud">
-				<Img
-					src={`${baseUrl}/email/logo-footer.png`}
-					width="80"
-					alt="Midday"
-					className="block logo-blend"
-				/>
-			</Link>
-		</Section>
-	);
+      <Link href="https://go.midday.ai/FZwOHud">
+        <Img
+          src={`${baseUrl}/email/logo-footer.png`}
+          width="80"
+          alt="Zeke"
+          className="block logo-blend"
+        />
+      </Link>
+    </Section>
+  );
 }

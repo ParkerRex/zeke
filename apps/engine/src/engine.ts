@@ -1,7 +1,7 @@
 /**
  * New Engine Entry Point - Clean and Simple
  *
- * This is the new main entry point that replaces the legacy monolithic worker entrypoint.
+ * This is the new main entry point that replaces the legacy monolithic service entrypoint.
  * It's much simpler and easier to understand for beginners.
  *
  * What this file does:

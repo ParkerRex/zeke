@@ -1,14 +1,14 @@
 import {
-    DEFAULT_SERVER_ERROR_MESSAGE,
-    createSafeActionClient,
-  } from "next-safe-action";
+	createSafeActionClient,
+	DEFAULT_SERVER_ERROR_MESSAGE,
+} from "next-safe-action";
 
-  export const actionClient = createSafeActionClient({
-    handleReturnedServerError(e) {
-      if (e instanceof Error) {
-        return e.message;
-      }
+export const actionClient = createSafeActionClient({
+	handleReturnedServerError(e) {
+		if (e instanceof Error) {
+			return e.message;
+		}
 
-      return DEFAULT_SERVER_ERROR_MESSAGE;
-    },
-  });
+		return DEFAULT_SERVER_ERROR_MESSAGE;
+	},
+});

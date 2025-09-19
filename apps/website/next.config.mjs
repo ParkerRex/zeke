@@ -2,14 +2,20 @@
 const config = {
 	poweredByHeader: false,
 	reactStrictMode: true,
-	transpilePackages: ["@zeke/ui", "@zeke/tailwind"],
+	trailingSlash: true,
+	transpilePackages: ["@zeke/ui", "@zeke/tailwind", "next-mdx-remote"],
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
 	typescript: {
 		ignoreBuildErrors: true,
 	},
+	experimental: {
+		inlineCss: true,
+	},
 	images: {
+		loader: "custom",
+		loaderFile: "./image-loader.ts",
 		remotePatterns: [
 			{
 				protocol: "https",
@@ -21,11 +27,6 @@ const config = {
 		return [
 			{
 				source: "/en/(.*)",
-				destination: "/",
-				permanent: true,
-			},
-			{
-				source: "/public-beta",
 				destination: "/",
 				permanent: true,
 			},

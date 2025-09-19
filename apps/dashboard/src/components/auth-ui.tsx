@@ -14,6 +14,8 @@ const titleMap = {
 	signup: "Join ZEKE and start getting insights",
 } as const;
 
+type OAuthProvider = "google" | "github" | "apple";
+
 export function AuthUI({
 	mode,
 	signInWithOAuth,
@@ -21,12 +23,12 @@ export function AuthUI({
 	align = "center",
 }: {
 	mode: "login" | "signup";
-	signInWithOAuth: (provider: "github" | "apple") => Promise<ActionResponse>;
+	signInWithOAuth: (provider: OAuthProvider) => Promise<ActionResponse>;
 	showBrand?: boolean;
 	align?: "left" | "center";
 }) {
 	const [pending, setPending] = useState(false);
-	async function handleOAuthClick(provider: "github" | "apple") {
+	async function handleOAuthClick(provider: OAuthProvider) {
 		setPending(true);
 		const response = await signInWithOAuth(provider);
 
@@ -68,13 +70,13 @@ export function AuthUI({
 				<Button
 					className="flex w-full items-center justify-center gap-2 py-4"
 					disabled={pending}
-					onClick={() => handleOAuthClick("github")}
+					onClick={() => handleOAuthClick("google")}
 					size="lg"
 					type="button"
 					variant="default"
 				>
-					<Icons.Github size={20} />
-					Continue with Github
+					<Icons.Google size={20} />
+					Continue with Google
 				</Button>
 			</div>
 			{mode === "signup" && (
