@@ -1,4 +1,6 @@
 # Next Steps — Auth & Data Foundation
+_Epic: Wireframe reference — docs/plans/in-progress/wire-updated.png_
+
 
 ## Sprint 0 — Pre-flight
 - [x] Confirm all Drizzle table/relations live under `packages/db/schema` and imports point there.
