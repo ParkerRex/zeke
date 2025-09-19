@@ -259,14 +259,10 @@ export const assistantMessagesInputSchema = z
       .max(200)
       .default(50)
       .openapi({ description: "Number of messages to return", example: 50 }),
-    before: z
-      .string()
-      .nullable()
-      .optional()
-      .openapi({
-        description: "Return messages created before this ISO timestamp",
-        example: "2024-05-16T09:00:00Z",
-      }),
+    before: z.string().nullable().optional().openapi({
+      description: "Return messages created before this ISO timestamp",
+      example: "2024-05-16T09:00:00Z",
+    }),
   })
   .openapi({
     description: "Parameters for listing assistant messages",
@@ -373,8 +369,12 @@ export const assistantLinkMessageSourcesInputSchema = z
 export type AssistantThread = z.infer<typeof assistantThreadSchema>;
 export type AssistantMessage = z.infer<typeof assistantMessageSchema>;
 export type AssistantThreadSource = z.infer<typeof assistantThreadSourceSchema>;
-export type AssistantMessageSource = z.infer<typeof assistantMessageSourceSchema>;
+export type AssistantMessageSource = z.infer<
+  typeof assistantMessageSourceSchema
+>;
 export type AssistantThreadContextInput = z.infer<
   typeof assistantThreadContextInputSchema
 >;
-export type AssistantMessagesInput = z.infer<typeof assistantMessagesInputSchema>;
+export type AssistantMessagesInput = z.infer<
+  typeof assistantMessagesInputSchema
+>;

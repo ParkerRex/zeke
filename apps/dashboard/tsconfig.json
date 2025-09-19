@@ -10,7 +10,7 @@
         "../api/src/*"
       ],
       "@engine/*": [
-        "../engine/src/*"
+        "../worker/src/*"
       ],
       "@jobs/*": [
         "../../packages/jobs/src/*"

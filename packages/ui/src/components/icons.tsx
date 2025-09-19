@@ -1,21 +1,6 @@
-import type { ComponentProps } from "react";
 import { ArchiveIcon } from "@radix-ui/react-icons";
 import { FaXTwitter } from "react-icons/fa6";
 import { FiGithub } from "react-icons/fi";
-import {
-  CalendarIcon as LucideCalendarIcon,
-  Chrome as LucideChrome,
-  Command as LucideCommand,
-  LifeBuoy as LucideLifeBuoy,
-  Folder as LucideFolder,
-  Loader2 as LucideLoader2,
-  Monitor as LucideMonitor,
-  Moon as LucideMoon,
-  Send as LucideSend,
-  Settings2 as LucideSettings2,
-  SquareTerminal as LucideSquareTerminal,
-  Sun as LucideSun,
-} from "lucide-react";
 import {
   MdArrowBack,
   MdArrowDownward,
@@ -109,8 +94,6 @@ type SVGIconProps = {
   children?: React.ReactNode;
   viewBox?: string;
 };
-
-type LucideIconProps = ComponentProps<typeof LucideLoader2>;
 
 const SVGIcon: React.FC<SVGIconProps> = ({
   size = 20,
@@ -602,18 +585,4 @@ export const Icons = {
   OutgoingMail: MdOutlineSignpost,
   AttachEmail: MdOutlineAttachEmail,
   SyncAlt: MdOutlineSyncAlt,
-  Loader2: (props?: LucideIconProps) => <LucideLoader2 {...props} />,
-  Calendar: (props?: LucideIconProps) => <LucideCalendarIcon {...props} />,
-  Chrome: (props?: LucideIconProps) => <LucideChrome {...props} />,
-  Command: (props?: LucideIconProps) => <LucideCommand {...props} />,
-  LifeBuoy: (props?: LucideIconProps) => <LucideLifeBuoy {...props} />,
-  FolderIcon: (props?: LucideIconProps) => <LucideFolder {...props} />,
-  Send: (props?: LucideIconProps) => <LucideSend {...props} />,
-  Settings2: (props?: LucideIconProps) => <LucideSettings2 {...props} />,
-  SquareTerminal: (props?: LucideIconProps) => (
-    <LucideSquareTerminal {...props} />
-  ),
-  Monitor: (props?: LucideIconProps) => <LucideMonitor {...props} />,
-  Moon: (props?: LucideIconProps) => <LucideMoon {...props} />,
-  Sun: (props?: LucideIconProps) => <LucideSun {...props} />,
 };

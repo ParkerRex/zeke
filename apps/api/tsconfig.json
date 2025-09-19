@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
@@ -20,13 +22,27 @@
     "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
-      "@api/*": ["src/*"],
-      "@engine/*": ["../engine/src/*"],
-      "@jobs/*": ["../../packages/jobs/src/*"],
-      "@db/*": ["../../packages/db/src/*"]
+      "@api/*": [
+        "src/*"
+      ],
+      "@engine/*": [
+        "../worker/src/*"
+      ],
+      "@jobs/*": [
+        "../../packages/jobs/src/*"
+      ],
+      "@db/*": [
+        "../../packages/db/src/*"
+      ]
     },
-    "types": ["bun-types"]
+    "types": [
+      "bun-types"
+    ]
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*.ts"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

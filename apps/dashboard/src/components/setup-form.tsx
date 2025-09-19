@@ -1,9 +1,9 @@
 "use client";
 
-import { updateUserSchema } from "@/actions/schema";
-import { updateUserAction } from "@/actions/update-user-action";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@zeke/ui/button";
+import { useUserMutation } from "@/hooks/use-user";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -14,75 +14,63 @@ import {
   FormMessage,
 } from "@zeke/ui/form";
 import { Input } from "@zeke/ui/input";
-import { useToast } from "@zeke/ui/use-toast";
-import { Icons } from "@zeke/ui/icons";
-import { useAction } from "next-safe-action/hooks";
+import { SubmitButton } from "@zeke/ui/submit-button";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import { useRef, useState } from "react";
+import { z } from "zod";
 import { AvatarUpload } from "./avatar-upload";
 
-type Props = {
-  userId: string;
-  avatarUrl?: string;
-  fullName?: string;
-};
+const formSchema = z.object({
+  fullName: z.string().min(2).max(32),
+});
 
-export function SetupForm({ userId, avatarUrl, fullName }: Props) {
-  const { toast } = useToast();
+export function SetupForm() {
   const router = useRouter();
   const uploadRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const updateUser = useAction(updateUserAction, {
-    onError: () => {
-      toast({
-        duration: 3500,
-        variant: "error",
-        title: "Something went wrong please try again.",
-      });
-    },
-    onSuccess: () => {
-      router.replace("/");
-    },
-  });
+  const trpc = useTRPC();
+  const { data: user } = useSuspenseQuery(trpc.user.me.queryOptions());
 
-  const form = useForm<z.infer<typeof updateUserSchema>>({
-    resolver: zodResolver(updateUserSchema),
+  const updateUserMutation = useUserMutation();
+
+  const form = useZodForm(formSchema, {
     defaultValues: {
-      full_name: fullName ?? "",
+      fullName: user?.fullName ?? "",
     },
   });
 
-  const isSubmitting =
-    updateUser.status !== "idle" && updateUser.status !== "hasErrored";
+  function handleSubmit(data: z.infer<typeof formSchema>) {
+    updateUserMutation.mutate(data, {
+      onSuccess: async () => {
+        setIsRedirecting(true);
+        // Invalidate all queries to ensure fresh data
+        await queryClient.invalidateQueries();
+        // Redirect directly to teams page
+        router.push("/teams");
+      },
+      onError: () => {
+        setIsRedirecting(false);
+      },
+    });
+  }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(updateUser.execute)}
-        className="space-y-8"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <div className="flex justify-between items-end gap-4">
           <AvatarUpload
-            userId={userId}
-            avatarUrl={avatarUrl}
-            fullName={fullName}
+            userId={user?.id ?? ""}
+            avatarUrl={user?.avatarUrl}
             size={80}
             ref={uploadRef}
           />
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => uploadRef.current?.click()}
-          >
-            Upload
-          </Button>
         </div>
 
         <FormField
           control={form.control}
-          name="full_name"
+          name="fullName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Full name</FormLabel>
@@ -97,13 +85,13 @@ export function SetupForm({ userId, avatarUrl, fullName }: Props) {
           )}
         />
 
-		<Button type="submit" className="w-full" disabled={isSubmitting}>
-			{isSubmitting ? (
-				<Icons.Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <span>Save</span>
-          )}
-        </Button>
+        <SubmitButton
+          type="submit"
+          className="w-full"
+          isSubmitting={updateUserMutation.isPending || isRedirecting}
+        >
+          Save
+        </SubmitButton>
       </form>
     </Form>
   );
