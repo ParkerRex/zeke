@@ -58,9 +58,9 @@
 - **Playbooks / Goals** – only if corresponding UI surfaces land.
 
 ## Sequencing Plan
-1. Stories router + schemas.
-2. Highlights router + schemas.
-3. Assistant router + schemas (blocks chat tools).
+1. ✅ Stories router + schemas.
+2. ✅ Highlights router + schemas.
+3. ✅ Assistant router + schemas (blocks chat tools).
 4. Team router for account switching.
 5. Additional supporting endpoints (search, tags) on demand.
 

@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "../init";
 import { apiKeysRouter } from "./api-keys";
 import { appsRouter } from "./apps";
+import { assistantRouter } from "./assistant";
 import { bankAccountsRouter } from "./bank-accounts";
 import { bankConnectionsRouter } from "./bank-connections";
 import { billingRouter } from "./billing";
@@ -14,6 +15,7 @@ import { inboxAccountsRouter } from "./inbox-accounts";
 import { institutionsRouter } from "./institutions";
 import { invoiceRouter } from "./invoice";
 import { invoiceTemplateRouter } from "./invoice-template";
+import { highlightRouter } from "./highlight";
 import { notificationSettingsRouter } from "./notification-settings";
 import { notificationsRouter } from "./notifications";
 import { oauthApplicationsRouter } from "./oauth-applications";
@@ -22,6 +24,7 @@ import { searchRouter } from "./search";
 import { shortLinksRouter } from "./short-links";
 import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
+import { storyRouter } from "./story";
 import { trackerEntriesRouter } from "./tracker-entries";
 import { trackerProjectsRouter } from "./tracker-projects";
 import { transactionAttachmentsRouter } from "./transaction-attachments";
@@ -33,6 +36,7 @@ import { userRouter } from "./user";
 export const appRouter = createTRPCRouter({
   notifications: notificationsRouter,
   notificationSettings: notificationSettingsRouter,
+  assistant: assistantRouter,
   apps: appsRouter,
   bankAccounts: bankAccountsRouter,
   bankConnections: bankConnectionsRouter,
@@ -56,6 +60,8 @@ export const appRouter = createTRPCRouter({
   transactionCategories: transactionCategoriesRouter,
   transactions: transactionsRouter,
   transactionTags: transactionTagsRouter,
+  highlight: highlightRouter,
+  story: storyRouter,
   user: userRouter,
   search: searchRouter,
   shortLinks: shortLinksRouter,
