@@ -1,7 +1,7 @@
 # Authentication & Authorization Explainer
-> Repository: midday  
-> Generated: 2025-09-16T22:24:20Z  
-> Analyzer: Codex GPT-5 (CLI)  
+> Repository: zeke
+> Generated: 2025-09-16T22:24:20Z
+> Analyzer: Codex GPT-5 (CLI)
 > Coverage: server | client | jobs | infra | tests
 
 ## 0. Method
@@ -53,7 +53,7 @@
   - `apps/dashboard/src/trpc/client.tsx:41-53`
 
 ### 1.3 Cookies
-- Cookies set:  
+- Cookies set:
   | Name | Path | Domain | HttpOnly | Secure | SameSite | Max-Age/Expires | Persistence (cookie/db/cache) | Purpose | Set In (file:lines) |
   |------|------|--------|----------|--------|----------|------------------|-------------------------------|---------|---------------------|
   | `preferred-signin-provider` | default (`/`) | default | not specified (Next default) | not specified | not specified | +1 year [apps/dashboard/src/app/api/auth/callback/route.ts:24-27] | cookie | Remember last IdP/OTP choice [apps/dashboard/src/app/api/auth/callback/route.ts:24-27] |
@@ -106,7 +106,7 @@
     SA->>B: redirect(return_to)
   ```
 
-### 2.3 Midday OAuth for API Clients
+### 2.3 zeke OAuth for API Clients
 - Initiation endpoint: `GET /oauth/authorize` serves consent data [apps/api/src/rest/routers/oauth.ts:50-136]
 - Callback handler: `POST /oauth/authorize` validates user session via Supabase token and issues authorization codes [apps/api/src/rest/routers/oauth.ts:139-310]
 - Middleware chain: `publicMiddleware` (DB) + route-specific rate limiter (15 requests/15min) [apps/api/src/rest/middleware/index.ts:11-18; apps/api/src/rest/routers/oauth.ts:38-47]
@@ -117,7 +117,7 @@
   sequenceDiagram
     participant App as Third-party App
     participant User as Browser
-    participant API as Midday API
+    participant API as zeke API
     participant DB as Postgres
     App->>User: Redirect to /oauth/authorize
     User->>API: GET /oauth/authorize
@@ -141,7 +141,7 @@
   ```mermaid
   sequenceDiagram
     participant Client as API Client
-    participant API as Midday REST/TRPC
+    participant API as zeke REST/TRPC
     participant Redis as Redis Cache
     participant DB as Postgres
     Client->>API: GET /teams (Authorization: Bearer mid_x)
@@ -172,7 +172,7 @@
 4. Secrets & Key Management
 	• Source: `.env` templates specify Supabase, Redis, encryption, and webhook keys [apps/api/.env-template:1-48; apps/dashboard/.env-example:1-82]
 	• Rotation: Not defined in repo (operator responsibility); API revoke endpoints exist for OAuth tokens [apps/api/src/rest/routers/oauth.ts:536-614]
-	• References: AES-256-GCM encryption uses `MIDDAY_ENCRYPTION_KEY` [packages/encryption/src/index.ts:7-66]; Supabase service key consumed by server clients [apps/api/src/services/supabase.ts:4-16]
+	• References: AES-256-GCM encryption uses `zeke_ENCRYPTION_KEY` [packages/encryption/src/index.ts:7-66]; Supabase service key consumed by server clients [apps/api/src/services/supabase.ts:4-16]
 
 5. Dependencies
 

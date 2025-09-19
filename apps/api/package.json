@@ -1,12 +1,58 @@
 {
   "name": "@zeke/api",
-  "private": true,
   "scripts": {
-    "dev": "supabase start",
-    "login": "supabase login",
-    "db:reset" : ""
+    "dev": "TZ=UTC PORT=3003 bun run --hot src/index.ts",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "exports": {
+    "./trpc/routers/_app": "./src/trpc/routers/_app.ts"
   },
   "dependencies": {
-    "supabase": "2.40.7"
+    "@ai-sdk/openai": "^1.3.22",
+    "@hono/trpc-server": "^0.4.0",
+    "@hono/zod-openapi": "^0.19.8",
+    "@hono/zod-validator": "^0.7.0",
+    "@zeke/cache": "workspace:*",
+    "@zeke/categories": "workspace:*",
+    "@zeke/db": "workspace:*",
+    "@zeke/documents": "workspace:*",
+    "@zeke/encryption": "workspace:*",
+    "@zeke/engine": "workspace:*",
+    "@zeke/engine-client": "workspace:*",
+    "@zeke/inbox": "workspace:*",
+    "@zeke/invoice": "workspace:*",
+    "@zeke/jobs": "workspace:*",
+    "@zeke/location": "workspace:*",
+    "@zeke/logger": "workspace:*",
+    "@zeke/notifications": "workspace:*",
+    "@zeke/supabase": "workspace:*",
+    "@polar-sh/sdk": "^0.34.9",
+    "@scalar/hono-api-reference": "^0.9.4",
+    "@sindresorhus/slugify": "^2.2.1",
+    "@trigger.dev/sdk": "4.0.1",
+    "@trpc/server": "^11.5.0",
+    "ai": "^4.3.19",
+    "camelcase-keys": "^9.1.3",
+    "date-fns": "^4.1.0",
+    "hono": "^4.8.12",
+    "hono-rate-limiter": "^0.4.2",
+    "jose": "^6.0.11",
+    "nanoid": "^5.1.5",
+    "pino": "^9.7.0",
+    "postgres": "^3.4.7",
+    "resend": "^4.6.0",
+    "snakecase-keys": "^8.0.1",
+    "superjson": "^2.2.2",
+    "uuid": "^11.1.0",
+    "zod": "3.25.64",
+    "zod-openapi": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.16"
   }
 }

@@ -54,11 +54,11 @@ updateUserMutation.mutate({ fullName: data?.fullName });
      - Batches parallel procedure calls into fewer HTTP requests.
      - Points at `${NEXT_PUBLIC_API_URL}/trpc`.
      - Uses `superjson` as the data transformer to keep dates, maps, etc. intact.
-     - Injects an `Authorization: Bearer <token>` header by calling the Supabase browser client (`@midday/supabase/client`).
+     - Injects an `Authorization: Bearer <token>` header by calling the Supabase browser client (`@zeke/supabase/client`).
        *Supabase handles session storage; the dashboard simply reuses the access token so the tRPC API trusts the user.*
   3. Wraps the React tree in both `QueryClientProvider` and `TRPCProvider`, wiring TanStack Query and the tRPC hooks together.
 
-### Why `@midday/supabase` exists
+### Why `@zeke/supabase` exists
 - Browser code calls `packages/supabase/src/client/client.ts` to get a Supabase browser client configured with project env vars.
 - Server code (e.g., API routes) can call `packages/supabase/src/client/server.ts` to create service or anon clients with cookie handling.
 - This package centralizes Supabase setup so both the dashboard and the API reuse the same auth utilities.

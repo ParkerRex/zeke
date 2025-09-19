@@ -1,5 +1,5 @@
 # Data Fetching & State Management Explainer
-> Repository: midday
+> Repository: zeke
 > Generated: 2025-09-16T23:08:30Z
 > Analyzer: Codex GPT-5
 > Coverage: client | server | workers | infra | tests
@@ -20,7 +20,7 @@
   | Name | Protocol | Base URL/Path | Auth Mode | Serialization | Pagination | File:Lines |
   |------|----------|----------------|-----------|---------------|-----------|-----------|
   | TRPC appRouter | RPC (httpBatchLink) | `${process.env.NEXT_PUBLIC_API_URL}/trpc` | Bearer Supabase session | superjson encode/decode | Cursor via `meta.cursor` on infinite queries | apps/dashboard/src/trpc/client.tsx:41, apps/api/src/trpc/init.ts:26 |
-  | Midday REST API | REST (Hono) | `https://api.midday.ai` | Bearer API key or OAuth token | JSON | Query params, cursor fields | apps/api/src/index.ts:16 |
+  | zeke REST API | REST (Hono) | `https://api.zeke.ai` | Bearer API key or OAuth token | JSON | Query params, cursor fields | apps/api/src/index.ts:16 |
   | Engine Worker | REST (OpenAPIHono) | `${process.env.ENGINE_API_URL}/` | Bearer engine API key | JSON | Query/cursor per route | packages/engine-client/src/index.ts:3, apps/engine/src/index.ts:17 |
   | Supabase Storage Proxy | REST | `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/…` | Bearer Supabase access token | Binary streaming | n/a | apps/dashboard/src/app/api/proxy/route.ts:22 |
   | Slack OAuth Exchange | REST | `https://slack.com/api/oauth.v2.access` | Client ID/secret | JSON | n/a | apps/dashboard/src/app/api/apps/slack/oauth_callback/route.ts:45 |

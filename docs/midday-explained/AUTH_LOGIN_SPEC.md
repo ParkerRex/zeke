@@ -1,9 +1,9 @@
-# Midday Login & Subscription Flow Spec
+# zeke Login & Subscription Flow Spec
 
 > Source repository context: dashboard app + API surfaces. All file references use workspace-relative paths.
 
 ## Overview
-- Midday relies on Supabase Auth for identity, exposing Google, Apple, GitHub, and email OTP options via the public login route (`apps/dashboard/src/app/[locale]/(public)/login/page.tsx:27-193`).
+- zeke relies on Supabase Auth for identity, exposing Google, Apple, GitHub, and email OTP options via the public login route (`apps/dashboard/src/app/[locale]/(public)/login/page.tsx:27-193`).
 - There is no dedicated “sign-up” endpoint; the first successful login seeds an application profile and funnels the user into team creation (`apps/dashboard/src/app/[locale]/(app)/teams/create/page.tsx:12-48`).
 - Subscription state is stored on the `teams` table (`packages/db/src/schema.ts:1308-1332`) and updated by Polar webhooks (`apps/dashboard/src/app/api/webhook/polar/route.ts:9-53`). Trial status and cancellation flags influence feature access and UI prompts across the dashboard.
 
