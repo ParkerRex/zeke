@@ -62,7 +62,7 @@
 2. ✅ Highlights router + schemas.
 3. ✅ Assistant router + schemas (blocks chat tools).
 4. ✅ Team router for account switching.
-5. Additional supporting endpoints (search, tags) on demand.
+5. ✅ Additional supporting endpoints (search, tags) on demand.
 
 At each step:
 - Create/update schemas.

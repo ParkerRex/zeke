@@ -1,43 +1,71 @@
 import {
-  createTagSchema,
-  deleteTagSchema,
-  updateTagSchema,
+  createTagInputSchema,
+  deleteTagInputSchema,
+  tagSchema,
+  updateTagInputSchema,
 } from "@api/schemas/tags";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { createTag, deleteTag, getTags, updateTag } from "@zeke/db/queries";
+import { z } from "@hono/zod-openapi";
 
 export const tagsRouter = createTRPCRouter({
-  get: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
-    return getTags(db, {
-      teamId: teamId!,
-    });
-  }),
+  list: protectedProcedure
+    .output(z.array(tagSchema))
+    .query(async ({ ctx: { db, teamId } }) => {
+      if (!teamId) {
+        return [];
+      }
+
+      const rows = await getTags(db, { teamId });
+      return rows;
+    }),
 
   create: protectedProcedure
-    .input(createTagSchema)
+    .input(createTagInputSchema)
+    .output(tagSchema)
     .mutation(async ({ ctx: { db, teamId }, input }) => {
-      return createTag(db, {
+      if (!teamId) {
+        throw new Error("Active team required");
+      }
+
+      const tag = await createTag(db, {
         teamId: teamId!,
         name: input.name,
       });
+
+      return tag;
     }),
 
   delete: protectedProcedure
-    .input(deleteTagSchema)
+    .input(deleteTagInputSchema)
+    .output(tagSchema.nullable())
     .mutation(async ({ ctx: { db, teamId }, input }) => {
-      return deleteTag(db, {
+      if (!teamId) {
+        return null;
+      }
+
+      const tag = await deleteTag(db, {
         id: input.id,
-        teamId: teamId!,
+        teamId,
       });
+
+      return tag ?? null;
     }),
 
   update: protectedProcedure
-    .input(updateTagSchema)
+    .input(updateTagInputSchema)
+    .output(tagSchema)
     .mutation(async ({ ctx: { db, teamId }, input }) => {
-      return updateTag(db, {
+      if (!teamId) {
+        throw new Error("Active team required");
+      }
+
+      const tag = await updateTag(db, {
         id: input.id,
         name: input.name,
-        teamId: teamId!,
+        teamId,
       });
+
+      return tag;
     }),
 });

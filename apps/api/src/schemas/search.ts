@@ -1,77 +1,151 @@
 import { z } from "@hono/zod-openapi";
 
-export const globalSearchSchema = z
+export const searchResultSchema = z
   .object({
-    searchTerm: z.string().optional().openapi({
-      description: "The term to search for across all data sources.",
-      example: "Acme",
+    id: z.string().uuid().openapi({
+      description: "Identifier of the matched entity",
+      example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
     }),
-    language: z.string().optional().openapi({
-      description: "Language code to use for search relevance and results.",
-      example: "en",
+    type: z.string().openapi({
+      description: "Entity type returned by search (e.g. story, highlight)",
+      example: "story",
     }),
-    limit: z.coerce.number().min(1).max(1000).default(30).openapi({
-      description: "Maximum number of results to return.",
-      example: 30,
+    title: z.string().openapi({
+      description: "Primary label for the result",
+      example: "OpenAI GPT-5 Training Leaked",
     }),
-    itemsPerTableLimit: z.coerce.number().min(1).max(100).default(5).openapi({
-      description: "Maximum number of results to return per table/entity.",
-      example: 5,
+    relevance: z.number().openapi({
+      description: "Relevance score returned by the search routine",
+      example: 0.87,
     }),
-    relevanceThreshold: z.coerce.number().min(0).max(1).default(0.01).openapi({
-      description: "Minimum relevance score threshold for including a result.",
-      example: 0.01,
+    created_at: z.string().openapi({
+      description: "Creation timestamp for the underlying entity",
+      example: "2024-05-12T15:30:00Z",
+    }),
+    data: z.record(z.unknown()).openapi({
+      description: "Raw payload returned by the search procedure",
     }),
   })
   .openapi({
-    description:
-      "Parameters for performing a global search across all data sources.",
+    description: "Generic search hit",
   });
 
-export const searchResponseSchema = z
-  .array(
-    z.object({
-      id: z.string().openapi({
-        description: "Unique identifier for the search result item.",
-        example: "b3b7e6e2-8c2a-4e2a-9b1a-2e4b5c6d7f8a",
+export const globalSearchInputSchema = z
+  .object({
+    searchTerm: z
+      .string()
+      .min(1)
+      .max(120)
+      .openapi({
+        description: "Full text query",
+        example: "GPT-5",
       }),
-      type: z.string().openapi({
-        description:
-          "Type of the entity returned (e.g., invoice, customer, transaction).",
-        example: "invoice",
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .openapi({
+        description: "Maximum number of results",
+        example: 20,
       }),
-      relevance: z.number().openapi({
-        description: "Relevance score for the search result.",
-        example: 0.92,
+    itemsPerTableLimit: z
+      .number()
+      .int()
+      .min(1)
+      .max(20)
+      .optional()
+      .openapi({
+        description: "Per-entity cap when querying multiple tables",
+        example: 5,
       }),
-      created_at: z.string().openapi({
-        description: "ISO 8601 timestamp when the entity was created.",
-        example: "2024-06-01T00:00:00.000Z",
+    language: z
+      .string()
+      .optional()
+      .openapi({
+        description: "Language hint for full-text search",
+        example: "english",
       }),
-      data: z.any().openapi({
-        description:
-          "Additional data for the search result, structure depends on the type.",
-        example: {
-          invoiceNumber: "INV-2024-001",
-          customerName: "Acme Corporation",
-          amount: 1500.75,
-        },
+    relevanceThreshold: z
+      .number()
+      .optional()
+      .openapi({
+        description: "Minimum relevance to include a result",
+        example: 0.5,
       }),
-    }),
-  )
+  })
   .openapi({
-    description: "Search results.",
-    example: [
-      {
-        id: "b3b7e6e2-8c2a-4e2a-9b1a-2e4b5c6d7f8a",
-        type: "invoice",
-        relevance: 0.92,
-        created_at: "2024-06-01T00:00:00.000Z",
-        data: {
-          invoiceNumber: "INV-2024-001",
-          customerName: "Acme Corporation",
-          amount: 1500.75,
-        },
-      },
-    ],
+    description: "Parameters for the global search procedure",
   });
+
+export const semanticSearchInputSchema = z
+  .object({
+    searchTerm: z.string().min(1).max(256).openapi({
+      description: "Natural language query",
+      example: "Recent AI regulation news",
+    }),
+    itemsPerTableLimit: z
+      .number()
+      .int()
+      .min(1)
+      .max(20)
+      .default(5)
+      .openapi({
+        description: "Max results per table",
+        example: 5,
+      }),
+    language: z.string().optional().openapi({
+      description: "Language hint for embedding lookup",
+      example: "english",
+    }),
+    types: z
+      .array(z.string())
+      .optional()
+      .openapi({
+        description: "Entity types to limit the search",
+        example: ["stories", "highlights"],
+      }),
+    amount: z.number().optional().openapi({
+      description: "Exact amount filter for financial entities",
+      example: 1200,
+    }),
+    amountMin: z.number().optional().openapi({
+      description: "Minimum amount filter",
+      example: 100,
+    }),
+    amountMax: z.number().optional().openapi({
+      description: "Maximum amount filter",
+      example: 5000,
+    }),
+    status: z.string().optional().openapi({
+      description: "Status filter (e.g. invoice status)",
+      example: "pending",
+    }),
+    currency: z.string().optional().openapi({
+      description: "Currency code filter",
+      example: "USD",
+    }),
+    startDate: z.string().optional().openapi({
+      description: "Filter by start date (ISO string)",
+      example: "2024-05-01",
+    }),
+    endDate: z.string().optional().openapi({
+      description: "Filter by end date (ISO string)",
+      example: "2024-05-31",
+    }),
+    dueDateStart: z.string().optional().openapi({
+      description: "Invoice due date lower bound",
+      example: "2024-05-15",
+    }),
+    dueDateEnd: z.string().optional().openapi({
+      description: "Invoice due date upper bound",
+      example: "2024-05-31",
+    }),
+  })
+  .openapi({
+    description: "Parameters for semantic search",
+  });
+
+export type SearchResult = z.infer<typeof searchResultSchema>;
+export type GlobalSearchInput = z.infer<typeof globalSearchInputSchema>;
