@@ -1,33 +1,31 @@
 {
-	"name": "zeke",
-	"private": true,
-	"workspaces": [
-		"packages/*",
-		"apps/*",
-		"packages/email/*"
-	],
-	"scripts": {
-		"build": "turbo build",
-		"clean": "git clean -xdf node_modules",
-		"clean:workspaces": "turbo clean",
-		"dev": "turbo dev --parallel",
-		"test": "turbo test --parallel",
-		"start:dashboard": "turbo start --filter=@zeke/dashboard",
-		"start:website": "turbo start --filter=@zeke/website",
-		"dev:api": "turbo dev --filter=@zeke/api",
-		"dev:dashboard": "turbo dev --filter=@zeke/dashboard",
-		"build:dashboard": "turbo build --filter=@zeke/dashboard",
-		"dev:website": "turbo dev --filter=@zeke/website ",
-		"dev:desktop": "turbo dev --filter=@zeke/desktop",
-		"format": "biome format --write .",
-		"lint": "turbo lint && manypkg check",
-		"typecheck": "turbo typecheck"
-	},
-	"dependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@manypkg/cli": "^0.24.0",
-		"turbo": "2.5.6",
-		"typescript": "^5.9.2"
-	},
-	"packageManager": "bun@1.2.21"
+  "name": "zeke",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*", "packages/email/*"],
+  "scripts": {
+    "build": "turbo build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo clean",
+    "dev": "turbo dev --parallel",
+    "test": "turbo test --parallel",
+    "start:dashboard": "turbo start --filter=@zeke/dashboard",
+    "start:website": "turbo start --filter=@zeke/website",
+    "dev:api": "turbo dev --filter=@zeke/api",
+    "dev:dashboard": "turbo dev --filter=@zeke/dashboard",
+    "build:dashboard": "turbo build --filter=@zeke/dashboard",
+    "dev:engine": "turbo dev --filter=@zeke/engine",
+    "dev:website": "turbo dev --filter=@zeke/website ",
+    "dev:desktop": "turbo dev --filter=@zeke/desktop",
+    "jobs:dashboard": "turbo jobs --filter=@zeke/jobs",
+    "format": "biome format --write .",
+    "lint": "turbo lint && manypkg check",
+    "typecheck": "turbo typecheck"
+  },
+  "dependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@manypkg/cli": "^0.24.0",
+    "turbo": "2.5.6",
+    "typescript": "^5.9.2"
+  },
+  "packageManager": "bun@1.2.21"
 }
