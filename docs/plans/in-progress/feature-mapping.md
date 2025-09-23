@@ -1,5 +1,92 @@
 # Midday-to-Zeke Feature Mapping
 
+
+```mermaid
+graph TD
+      subgraph Experience
+          U[User]
+          INBOX[Inbox]
+          NOTIFS[Notifications]
+      end
+
+      subgraph Ingestion
+          BANK[(Bank Account)]
+          DOCSRC["Document Sources<br>uploads, email, apps"]
+          JOBS["Jobs<br>node connector"]
+      end
+
+      subgraph "Core Primitives"
+          TX[Transactions]
+          DOCS[Documents]
+          ENG[Engine]
+          INV[Invoices]
+      end
+
+      U -->|connects| BANK
+      U -->|submits| DOCSRC
+      BANK -->|raw transactions| JOBS
+      DOCSRC -->|files & metadata| JOBS
+      JOBS -->|normalize & fan‑out| TX
+      JOBS -->|index & classify| DOCS
+      TX -->|triage| INBOX
+      DOCS -->|triage| INBOX
+      INBOX -->|review & context| ENG
+      ENG -->|match & enrich| TX
+      ENG -->|extract data| DOCS
+      ENG -->|draft invoices| INV
+      ENG -->|trigger alerts| NOTIFS
+      INV -->|route for approval| INBOX
+      INV -->|store signed copy| DOCS
+      NOTIFS -->|deliver updates| U
+```
+
+## How This Architecture Works
+
+### The Three Layers Explained
+
+**Experience Layer (Top)** - Where humans interact with the system:
+- **User**: That's you! The person who feeds data into the system and gets insights back
+- **Inbox**: Your command center where stuff that needs your attention piles up (think Gmail but for all your business data)
+- **Notifications**: The system tapping you on the shoulder when something important happens
+
+**Ingestion Layer (Middle)** - The data vacuum that sucks everything in:
+- **Bank Account**: Direct connection to financial data (automated bank feeds)
+- **Document Sources**: All the random files you throw at it - PDFs, emails, spreadsheets, whatever
+- **Jobs**: Background workers that process all this crap without you having to babysit them
+
+**Core Primitives (Bottom)** - Where the magic happens:
+- **Transactions (TX)**: Individual financial records or in Zeke's world, discrete pieces of information
+- **Documents (DOCS)**: Stored files with metadata, searchable and organized
+- **Engine (ENG)**: The brain that matches, enriches, and makes sense of everything
+- **Invoices (INV)**: Generated outputs/reports (or in Zeke terms, your "Briefs")
+
+### The Data Flow (Follow the Arrows)
+
+1. **Getting Data In**: You either connect a bank account or upload documents manually
+2. **Processing Pipeline**: Jobs grab that raw data and:
+   - Normalize it (make it consistent)
+   - Fan it out to create Transactions
+   - Index and classify Documents
+3. **Triage Station**: Both Transactions and Documents hit your Inbox for review
+4. **The Engine Room**: The Inbox feeds the Engine which:
+   - Matches receipts to transactions (or in Zeke, links sources to insights)
+   - Extracts structured data from documents
+   - Drafts invoices/reports automatically
+5. **Closing the Loop**: 
+   - Invoices go back to Inbox for approval
+   - Approved invoices get stored as Documents
+   - Important stuff triggers Notifications back to you
+
+### Why This Matters for Zeke
+
+This is basically showing how Midday's financial automation flow can be repurposed for Zeke's knowledge management. Instead of:
+- Bank transactions → Think "data sources"
+- Receipts → Think "evidence/citations"
+- Invoice generation → Think "brief/report creation"
+- Financial matching → Think "insight correlation"
+
+The beauty is that the same pipeline architecture works whether you're processing bank statements or research documents. It's all just data flowing through transformation stages until it becomes something useful.
+
 This document maps key features of the Midday open-source project to the Zeke platform's core primitives-Stories, Sources, Insights, Briefs, and Playbooks-and outlines how to adapt or rename them. It also highlights architectural patterns from Midday (tRPC structure, Supabase usage, modal flows, sync jobs) that Zeke can emulate. All mappings cover both UI components and backend/data alignment.
 
 ## Feature Mappings
@@ -51,23 +138,26 @@ Midday's reports module generates summaries of financial data. This equates to Z
 
 ### AI Assistant & Insights (Tailored Analysis) -> Insights (AI-Generated or Query-Driven)
 **Description / Justification**
-Midday's AI assistant answers financial questions, surfacing insights from underlying data. This mirrors Zeke's Insight primitive, especially for AI-generated findings drawn from source materials.
+Midday's AI assistant answers financial questions, surfacing insights from underlying data. For Zeke, the assistant also elicits a lightweight profile of the team's objectives and current projects so the generated insights are anchored to the operator's business goals. Those "goal-aware" insights become the raw ingredients that Playbooks later operationalize.
 
 **Implementation Notes**
-- Implement an AI Insight Assistant that queries embeddings of source content via a tRPC endpoint (`search` or `ask`) similar to Midday's approach with OpenAI and pgvector.
-- Present answers in a chat or query interface, allowing users to save AI responses as confirmed insights.
-- Repurpose Midday's intelligent filtering utilities (e.g., `generate-transactions-filters.ts`, `generate-vault-filters.ts`) to help users sift through sources.
+- Implement an AI Insight Assistant that queries embeddings of source content via a tRPC endpoint (`search` or `ask`) similar to Midday's approach with OpenAI and pgvector, while tracking goal-aligned metadata (goal id, time horizon, owner) per insight.
+- Fold a goal-discovery step into the conversation (assistant asks clarifying questions, fetches past playbooks, infers objectives from briefs) so the AI can ground its recommendations in tangible outcomes.
+- Allow operators to confirm, edit, or reject the proposed context before persisting it, then promote confirmed responses into structured insights ready to seed playbooks or briefs.
+- Repurpose Midday's intelligent filtering utilities (e.g., `generate-transactions-filters.ts`, `generate-vault-filters.ts`) to help users sift through sources and surface playbook-ready signals.
 
 ### Ingestion Workflows (Matching Engine) -> Playbooks (Automated Sequences)
 **Description / Justification**
-Midday's backend workflows-document matching, background jobs, Trigger.dev sequences-are orchestrated steps (upload -> OCR -> match -> notify). These map directly to Zeke's Playbooks: repeatable automation chains that operate on sources to yield outcomes.
+Midday's backend workflows-document matching, background jobs, Trigger.dev sequences-are orchestrated steps (upload -> OCR -> match -> notify). These map directly to Zeke's Playbooks: repeatable automation chains that operate on sources to yield outcomes, with goal-aware insights acting as the playbook inputs. The playbook primitive should only surface when it can drive a concrete next action; if no actionable use case exists, the assistant leaves the insight as informational rather than forcing a workflow.
 
 **Implementation Notes**
-- Define playbooks as configurable sequences, using background workers or serverless functions to run long-lived jobs.
-- Mirror Midday's Trigger.dev integration (`tasks.trigger(...)`) alongside a realtime status hook (like `useSyncStatus`) to monitor progress in the UI.
-- Combine URL-driven flows, background tasks, and realtime updates so users can launch, observe, and reuse playbooks (e.g., a "Source Ingestion Playbook" modeled after Midday's Magic Inbox).
+- Define playbooks as configurable sequences, using background workers or serverless functions to run long-lived jobs, and parameterize each run with the goals and constraints captured by the assistant.
+- Introduce a goal-to-playbook recommendation step: once an insight is confirmed, suggest relevant playbooks (and pre-fill variables) based on matching tags, past outcomes, or Midday-style rule libraries.
+- Mirror Midday's Trigger.dev integration (`tasks.trigger(...)`) alongside a realtime status hook (like `useSyncStatus`) to monitor progress in the UI, and surface progress back to the assistant thread so users can ask follow-up questions.
+- Combine URL-driven flows, background tasks, and realtime updates so users can launch, observe, and reuse playbooks (e.g., a "Source Ingestion Playbook" modeled after Midday's Magic Inbox) while logging completions to enrich future goal-discovery prompts.
+- Add a guardrail stage ("is this actionable?") that validates prerequisites before a playbook run starts; if the answer is no, capture why and feed that back into assistant messaging so the user understands the limitation and can address it manually.
 
-_Notes:_ Midday features without direct analogs in Zeke (such as Time Tracking or Team Management) are out of scope here, though their patterns-project timelines, multi-tenancy-may inspire future primitives.
+_Notes:_ Midday's Team Management concepts are already ported into Zeke's primitives. Time Tracking still lacks a clear application, though adjacent patterns (project timelines, multi-tenancy) may inspire future work.
 
 ## Architectural Patterns & Best Practices from Midday
 - **Modular tRPC router structure:** Separate routers by domain (transactions, documents, inbox, reports) with shared Zod schemas and a dedicated types package. Mirror this by creating routers for each Zeke primitive to maintain end-to-end type safety.

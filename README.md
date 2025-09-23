@@ -1,26 +1,45 @@
 # ∆ / ZEKE
 
 **AI-Powered News Intelligence Platform**
-
 ZEKE ingests news from multiple sources, analyzes it with LLMs, and delivers stories and insights through modern web applications.
 
-### Hook Ideas
-- check for updates in the codebase and re-write the `agents.md` and `readme.md`
--
 
 ### For DB Changes
-- update the `schema.ts` in `packages/db/src`
-- run `
+Drizzle Flow
+  - packages/db/src/schema.ts is the canonical schema file; define new tables/columns
+  there before touching anything else.
+  - The Drizzle CLI reads packages/db/drizzle.config.ts:1, so export your Supabase
+  session pooler URL as DATABASE_SESSION_POOLER (and, when running the API, the
+  region-specific URLs such as DATABASE_PRIMARY_URL, etc.).
+  - From the repo root run cd packages/db && bunx --bun drizzle-kit generate --name
+  add_my_table to emit a SQL migration into the migrations/ folder that lives
+  alongside the config; commit the generated SQL plus the updated schema.
+  - To get the changes into a local database, point DATABASE_SESSION_POOLER (or
+  DATABASE_PRIMARY_URL) at your local Postgres/Supabase instance and run bunx --bun
+  drizzle-kit push:pg; the command applies whatever is new in migrations/.
+  - For the hosted Supabase project, repeat the push with the production pooler
+  string (you’ll find it in Supabase → Project Settings → Database); use a service-
+  role key and make sure you’re targeting the right environment before running the
+  command.
+  - After pushing, restart whatever services depend on the schema (API, jobs, etc.)
+  so they pick up the new structure.
+
+  Supabase Types
+
+  - The generated client types live in packages/supabase/src/types/db.ts, and the
+  package exposes them via packages/supabase/src/types/index.ts.
+  - Install and log in with the Supabase CLI (supabase login), set PROJECT_ID (and
+  SUPABASE_ACCESS_TOKEN if you’re using service tokens), then run cd packages/
+  supabase && bun run db:generate; this pipes supabase gen types --lang=typescript
+  into src/types/db.ts.
+  - Commit the regenerated types together with the migration so downstream apps
+  (@midday/supabase) stay in sync.
+  - If you need to verify everything end-to-end, rerun the relevant service (bunx
+  turbo dev --filter=@midday/api, etc.) and/or whatever tests exercise the new tables
+  before opening a PR.
 
 
 
-### System Components
-- `apps/api` — Hono/TRPC edge API that fronts Supabase access, enforces auth and permissions, and now delegates async work to Trigger.dev tasks in `@zeke/jobs`.
-- `apps/dashboard`, `apps/desktop`, `apps/website` — user interfaces (Next.js dashboard, Electron app, marketing site) that consume the API to deliver analyzed stories and notifications.
-- `apps/engine` — Cloudflare Worker surface for provider/webhook endpoints and Trigger.dev webhooks, replacing the retired Express/pg-boss worker.
-- `packages/jobs` — Trigger.dev task suite handling ingestion (RSS pull, source fetch, article extraction, analysis, one-off jobs) with shared helpers under `src/lib` and DB access via `getDb()`.
-- `packages/db` — Drizzle schema, query helpers, and replica-aware clients reused by both API and jobs; Supabase migrations live under `apps/api/supabase`.
-- Supporting packages (`packages/cache`, `notifications`, `supabase`, etc.) — shared utilities for caching, email, storage, and third-party integrations.
 
 ### Trigger.dev Job Structure (Zeke)
 

@@ -1,5 +1,54 @@
 # Midday-to-Zeke Mapping Plan
 
+ZEKE Primitives:
+1. data Providers: the place we get the raw pieces of content (arXiv, youtube, RSS, people on X using XGPT)
+2. Raw item: the actual piece of content from sources (the actual articles, audio from podcasts, the video transcripts, the tweets from xgpt)
+3. stories:
+
+
+## conversions:
+### Primitives:
+1. Invoices/receipts = data sources (news sources)
+- Introduce a Source Inbox in Zeke where users can forward emails or upload files to a unique inbox address or folder.
+- Use background jobs to extract text, classify content, and link sources to relevant insights or stories; Midday's upload -> OCR -> match pipeline can serve as a baseline playbook.
+- Support the inbox via a dedicated table and tRPC router to manage incoming records and their processing status. Rename "Magic Inbox" to Source Inbox or Imports for clarity.
+2. invoices =
+3. documents =
+
+### features
+magic inbox (automated receipt inbox) ->
+
+
+┌─────────────┐    ┌───────────┐    ┌─────────────────────────────────┐
+│ Data        │───▶│ Raw Items │───▶│ Stories                         │
+│ Provider    │    │           │    │ (summary with opinion based on  │
+│             │    │           │    │  your business context)         │
+└─────────────┘    └───────────┘    └─────────────────────────────────┘
+                                                     │
+                                                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ Highlights                                                          │
+└─────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ Why It Matters (custom to you)                                     │
+└─────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ Playbooks                                                           │
+│ (how to turn the raw items into action in your business)           │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
 ## Purpose
 - Document how each critical Midday feature or architectural pattern should translate into Zeke’s primitives and workflows.
 - Surface current implementation gaps in Zeke where Midday assumptions (transactions, bank accounts, invoicing) still exist.
