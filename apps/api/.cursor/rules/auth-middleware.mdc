@@ -1,5 +1,255 @@
 ---
-description:
+description: "Auth patterns for REST (Hono) and tRPC: tokens, scopes, context, and primary-read-after-write. Use this as a quick-start when adding protected endpoints."
 globs:
+  - apps/api/src/rest/**
+  - apps/api/src/trpc/**
+  - apps/api/src/utils/**
 alwaysApply: true
 ---
+
+### Overview
+- **REST stack**: Hono + zod-openapi. Protected routes use `protectedMiddleware` which chains DB, auth, rate limiting, and primary-read-after-write.
+- **tRPC stack**: Independent auth path using Supabase JWTs; `protectedProcedure` enforces session and team permission.
+- **Two token types** accepted by REST middleware via `Authorization: Bearer <token>`:
+  - **OAuth access tokens**: prefixed with `mid_access_token_`.
+  - **API keys**: prefixed with `mid_` and validated against a strict format.
+
+### How REST auth is wired
+- Mount public OAuth routes first, then enable the protected pipeline for everything else:
+```21:27:apps/api/src/rest/routers/index.ts
+// Mount OAuth routes first (publicly accessible)
+routers.route("/oauth", oauthRouter);
+
+// Apply protected middleware to all subsequent routes
+routers.use(...protectedMiddleware);
+```
+
+- `protectedMiddleware` order matters: DB → Auth → Rate limit (by user id) → Primary-read-after-write.
+```18:31:apps/api/src/rest/middleware/index.ts
+export const protectedMiddleware: MiddlewareHandler[] = [
+  withDatabase,
+  withAuth,
+  rateLimiter({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    limit: 100,
+    keyGenerator: (c) => {
+      return c.get("session")?.user?.id ?? "unknown";
+    },
+    statusCode: 429,
+    message: "Rate limit exceeded",
+  }),
+  withPrimaryReadAfterWrite,
+];
+```
+
+### Token handling in REST (`withAuth`)
+- OAuth access tokens (team comes from token; includes application context; scopes expanded):
+```34:61:apps/api/src/rest/middleware/auth.ts
+// Handle OAuth access tokens (start with mid_access_token_)
+if (token.startsWith("mid_access_token_")) {
+  const tokenData = await validateAccessToken(db, token);
+  if (!tokenData || !tokenData.user) {
+    throw new HTTPException(401, {
+      message: "Invalid or expired access token",
+    });
+  }
+  const session = {
+    teamId: tokenData.teamId,
+    user: {
+      id: tokenData.user.id,
+      email: tokenData.user.email,
+      full_name: tokenData.user.fullName,
+    },
+    oauth: {
+      applicationId: tokenData.applicationId,
+      clientId: tokenData.application?.clientId,
+      applicationName: tokenData.application?.name,
+    },
+  };
+  c.set("session", session);
+  c.set("teamId", session.teamId);
+  c.set("scopes", expandScopes(tokenData.scopes ?? []));
+  await next();
+  return;
+}
+```
+
+- API keys (hashed lookup + caches; team comes from key; scopes expanded; last-used updated):
+```66:87:apps/api/src/rest/middleware/auth.ts
+// Handle API keys (start with mid_ but not mid_access_token_)
+if (!token.startsWith("mid_") || !isValidApiKeyFormat(token)) {
+  throw new HTTPException(401, { message: "Invalid token format" });
+}
+
+const keyHash = hash(token);
+let apiKey = await apiKeyCache.get(keyHash);
+if (!apiKey) {
+  apiKey = await getApiKeyByToken(db, keyHash);
+  if (apiKey) {
+    await apiKeyCache.set(keyHash, apiKey);
+  }
+}
+if (!apiKey) {
+  throw new HTTPException(401, { message: "Invalid API key" });
+}
+```
+
+- REST context contract set by auth:
+```114:121:apps/api/src/rest/middleware/auth.ts
+const session = {
+  teamId: apiKey.teamId,
+  user: {
+    id: user.id,
+    email: user.email,
+    full_name: user.fullName,
+  },
+};
+c.set("session", session);
+c.set("teamId", session.teamId);
+c.set("scopes", expandScopes(apiKey.scopes ?? []));
+```
+
+### Scopes and enforcement
+- Expansion rules support presets:
+  - `apis.all` → all non-`apis.*` scopes
+  - `apis.read` → all `*.read`
+  - Custom lists are filtered to drop any `apis.*`
+```77:92:apps/api/src/utils/scopes.ts
+export const expandScopes = (scopes: string[]): string[] => {
+  if (scopes.includes("apis.all")) {
+    return SCOPES.filter((scope) => !scope.startsWith("apis."));
+  }
+  if (scopes.includes("apis.read")) {
+    return SCOPES.filter(
+      (scope) => scope.endsWith(".read") && !scope.startsWith("apis."),
+    );
+  }
+  return scopes.filter((scope) => !scope.startsWith("apis."));
+};
+```
+
+- Route-level checks use `withRequiredScope` and will 401 when no scopes and 403 when insufficient:
+```4:40:apps/api/src/rest/middleware/scope.ts
+export const withRequiredScope = (
+  ...requiredScopes: Scope[]
+): MiddlewareHandler => {
+  return async (c, next) => {
+    const scopes = c.get("scopes") as Scope[] | undefined;
+    if (!scopes) {
+      return c.json(
+        { error: "Unauthorized", description: "No scopes found for the current user. Authentication is required." },
+        401,
+      );
+    }
+    const hasRequiredScope = requiredScopes.some((requiredScope) =>
+      scopes.includes(requiredScope),
+    );
+    if (!hasRequiredScope) {
+      return c.json(
+        { error: "Forbidden", description: `Insufficient permissions. Required scopes: ${requiredScopes.join(", ")}. Your scopes: ${scopes.join(", ")}` },
+        403,
+      );
+    }
+    await next();
+  };
+};
+```
+
+- Example usage in a REST route:
+```24:47:apps/api/src/rest/routers/bank-accounts.ts
+app.openapi(
+  createRoute({
+    method: "get",
+    path: "/",
+    summary: "List all bank accounts",
+    ...,
+    middleware: [withRequiredScope("bank-accounts.read")],
+  }),
+  async (c) => { /* handler */ },
+);
+```
+
+### Primary read-after-write (consistency routing)
+- Mutations always use primary; queries temporarily use primary after a team mutation. For OAuth sessions, team is taken from the token; for non-OAuth, current team is resolved from user → team cache/DB.
+```13:23:apps/api/src/rest/middleware/primary-read-after-write.ts
+// Determine operation type based on HTTP method
+const method = c.req.method;
+const operationType = ["POST", "PUT", "PATCH", "DELETE"].includes(method)
+  ? "mutation"
+  : "query";
+```
+
+```26:33:apps/api/src/rest/middleware/primary-read-after-write.ts
+// For OAuth sessions, use the token's team, not the user's current team
+if (session?.oauth) {
+  teamId = session.teamId || null;
+}
+```
+
+```56:66:apps/api/src/rest/middleware/primary-read-after-write.ts
+// Mutations: mark team, switch to primary-only if available
+if (operationType === "mutation") {
+  await replicationCache.set(teamId);
+  const dbWithPrimary = db as DatabaseWithPrimary;
+  if (dbWithPrimary.usePrimaryOnly) {
+    finalDb = dbWithPrimary.usePrimaryOnly();
+  }
+}
+```
+
+```70:80:apps/api/src/rest/middleware/primary-read-after-write.ts
+// Queries: if recent mutation, switch to primary-only
+const timestamp = await replicationCache.get(teamId);
+const now = Date.now();
+if (timestamp && now < timestamp) {
+  const dbWithPrimary = db as DatabaseWithPrimary;
+  if (dbWithPrimary.usePrimaryOnly) {
+    finalDb = dbWithPrimary.usePrimaryOnly();
+  }
+}
+```
+
+```84:90:apps/api/src/rest/middleware/primary-read-after-write.ts
+// Set database and context in Hono context
+c.set("db", finalDb);
+c.set("session", session);
+c.set("teamId", teamId);
+```
+
+### tRPC auth (separate pipeline)
+- tRPC derives `session` from a Supabase JWT (not the `mid_access_token_` OAuth token) and attaches DB + geo.
+```22:39:apps/api/src/trpc/init.ts
+export const createTRPCContext = async (_: unknown, c: Context) => {
+  const accessToken = c.req.header("Authorization")?.split(" ")[1];
+  const session = await verifyAccessToken(accessToken);
+  const supabase = await createClient(accessToken);
+  const geo = getGeoContext(c.req);
+  return { session, supabase, db, geo };
+};
+```
+
+- `protectedProcedure` enforces team permission, primary routing, and requires a session:
+```63:81:apps/api/src/trpc/init.ts
+export const protectedProcedure = t.procedure
+  .use(withTeamPermissionMiddleware)
+  .use(withPrimaryDbMiddleware)
+  .use(async (opts) => {
+    const { teamId, session } = opts.ctx;
+    if (!session) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return opts.next({ ctx: { teamId, session } });
+  });
+```
+
+### Checklist for new REST endpoints
+- Place route under a router that runs after `routers.use(...protectedMiddleware)`.
+- Add `withRequiredScope('<resource>.<read|write>')` to each operation.
+- Read context via `c.get('db')`, `c.get('teamId')`, `c.get('session')`.
+- Prefer POST/PUT/PATCH/DELETE for mutations (ensures primary; queries may use primary shortly after mutations).
+
+### Signals from repo config (auth-related)
+- CORS allows `Authorization` header; clients must send `Authorization: Bearer <token>`.
+- OpenAPI registers HTTP bearer as `token` (example `MIDDAY_API_KEY`).
+- Fly sets `PORT=8080`; server reads `PORT` and listens on all interfaces; not auth-specific but relevant for testing.
+

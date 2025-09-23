@@ -1,5 +1,154 @@
 ---
-description:
+description: Guidelines and patterns for all packages under packages/* — exports, structure, naming, and how apps consume them.
 globs:
+  - packages/**
 alwaysApply: true
 ---
+
+### Overview
+
+- Monorepo managed by Turbo + workspaces. Internal libraries live under `packages/*` and are consumed by apps via `@midday/*` imports.
+- TypeScript strict mode, `NodeNext` resolution, and pathless imports using each package's `exports` map.
+- Packages are private, tree-shakeable where possible (`sideEffects: false`) and expose stable entrypoints only.
+
+### General package conventions
+
+- Each package defines a focused domain (e.g., `@midday/db`, `@midday/ui`, `@midday/supabase`, `@midday/invoice`).
+- Prefer explicit `exports` maps in `package.json` instead of deep imports. Apps must import only exported entrypoints.
+- Keep public API surface small and intention-revealing. Organize exports by capability: `./queries`, `./client`, `./utils`, `./types`.
+- Use semantic file names for entrypoints; avoid ambiguous names. Example structure:
+
+```text
+packages/foo/
+  package.json (with "exports")
+  src/
+    index.ts (re-exports the public API)
+    client.ts
+    queries/index.ts
+    utils/*.ts
+```
+
+- Testing: many packages use `bun test`. Keep tests colocated under `src` or `src/test` without exporting them.
+- Lint/format/typecheck via biome/tsc; no emit in libraries.
+
+### Import rules in apps
+
+- Do NOT import internal file paths like `@midday/db/src/...`. Always import through declared `exports`:
+
+```ts
+import { getInvoices } from "@midday/db/queries";
+import { storage } from "@midday/supabase/storage";
+import { InvoiceEditor } from "@midday/invoice/editor";
+import { Button } from "@midday/ui/button";
+```
+
+- Apps and other packages rely on these stable entrypoints; changing them is a breaking change across the monorepo.
+
+### Package-specific notes
+
+#### @midday/db
+- Purpose: DB client (Drizzle), schema, and query layer. Handles primary/replica routing via higher-level helpers.
+- Exports:
+  - `./client` — singleton client for standard reads/writes
+  - `./job-client` — client tuned for background jobs
+  - `./queries` — domain queries (team-scoped in apps)
+  - `./schema` — Drizzle schema
+  - `./utils/*` — helpers like `api-keys`, `search-query`, `health`, `currency`
+- Usage: consume via `ctx.db` (tRPC) or `c.get('db')` (REST) and pass `teamId` explicitly from middleware.
+
+#### @midday/ui
+- Purpose: shared React UI components, Tailwind config, and utilities.
+- Exports component-per-file (e.g., `./button`, `./dialog`) and utilities (`./cn`, `./hooks`).
+- Tree-shakeable; import only needed modules. Also exports `./globals.css` and `./tailwind.config` for app-level styling.
+
+#### @midday/utils
+- Purpose: light, framework-agnostic utilities.
+- Exports root index plus focused modules: `./envs`, `./format`, `./tax`.
+
+#### @midday/email
+- Purpose: React Email templates and rendering utilities.
+- Exports:
+  - `./emails/*` — individual email templates
+  - `./locales` — i18n helpers for emails
+  - `./render` — server-side rendering entrypoint
+- Depends on `@midday/ui` for shared primitives.
+
+#### @midday/notifications
+- Purpose: notification orchestration and schemas (email and more).
+- Exports root and `./types/*` type modules. Depends on `@midday/email`, `@midday/inbox`, and `@midday/db`.
+
+#### @midday/supabase
+- Purpose: thin client wrappers and queries for Supabase.
+- Exports: `./server`, `./client`, `./client-query`, `./job`, `./mutations`, `./queries`, `./cached-queries`, `./storage`, `./types`.
+- Apps must select the correct surface (server vs client) based on runtime.
+
+#### @midday/invoice
+- Purpose: invoice rendering (HTML/PDF/OG), editor, and calculation utilities.
+- Exports: `./templates/*`, `./editor`, `./calculate`, `./format-to-html`, `./types`, `./utils`.
+- UI dependencies are encapsulated; consumers import components or utilities as needed.
+
+#### @midday/import
+- Purpose: document/import mapping and validation helpers.
+- Exports: `./mappings`, `./transform`, `./validate` (and root).
+
+#### @midday/inbox
+- Purpose: email inbox connectors and parsing utilities.
+- Exports: root, `./connector`, `./utils`. Depends on `@midday/supabase` and `@midday/encryption`.
+
+#### @midday/location
+- Purpose: country, currency, timezone data and helpers.
+- Exports: root plus `./countries`, `./countries-intl`, `./currencies`, `./country-flags`, `./timezones`.
+
+#### @midday/events
+- Purpose: client/server analytics helpers.
+- Exports: `./server`, `./client`, `./events`.
+
+#### @midday/app-store
+- Purpose: integrations and app store SDK (Slack, Zapier, etc.).
+- Exports: root, `./types`, `./slack*`, and `./db`.
+
+#### Other utility packages
+- `@midday/encryption`, `@midday/cache`, `@midday/logger`, `@midday/engine-client`, `@midday/documents`, `@midday/jobs` provide focused functionality and should follow the same explicit-exports pattern.
+
+### Versioning and coupling
+
+- All packages are private and versioned together via workspaces. Breaking changes to exports can impact multiple apps; prefer additive changes and deprecation periods.
+- Avoid cross-package circular dependencies. If two domains need each other, extract shared types/utilities into a smaller package.
+
+### Adding a new package (checklist)
+
+1) Create `packages/<name>/package.json` with `private: true`, `sideEffects: false` (if safe), and an `exports` map. Add `scripts` for lint/format/typecheck.
+2) Put sources in `src/*`. Create `src/index.ts` that re-exports the public API.
+3) Keep runtime-specific code separated (e.g., server vs client) and export distinct entrypoints.
+4) Add the package to other packages/apps via `workspace:*` semver and import only via exports.
+5) If the package exposes React components, keep props typed and avoid default exports.
+
+### Do/Don't
+
+- Do import only from declared `exports`. Don't deep import internal files.
+- Do keep domain logic within the package. Don't duplicate logic in apps.
+- Do explicitly pass `teamId` and user context to DB helpers in apps. Don't read multi-tenant context inside library code unless documented.
+
+### Quick reference — common imports
+
+```ts
+// Database layer
+import { dbHealth } from "@midday/db/utils/health";
+import { getInvoices } from "@midday/db/queries";
+
+// Supabase wrappers
+import { createClient } from "@midday/supabase/server";
+import { storage } from "@midday/supabase/storage";
+
+// UI
+import { Button } from "@midday/ui/button";
+import "@midday/ui/globals.css";
+
+// Utilities
+import { formatMoney } from "@midday/utils/format";
+```
+
+### Maintenance
+
+- When changing an export, update all dependents or provide a compat re-export in `src/index.ts` during a deprecation window.
+- Keep package READMEs up-to-date with example imports matching the `exports` map.

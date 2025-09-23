@@ -1,0 +1,99 @@
+---
+description: "Website app patterns for Next.js 15 + MDX in apps/website"
+globs:
+  - apps/website/src/**/*.{ts,tsx,mdx}
+  - apps/website/next.config.mjs
+  - apps/website/tailwind.config.ts
+  - apps/website/image-loader.ts
+alwaysApply: true
+---
+
+### Overview
+
+- The website is a Next.js 15 app directory project focused on marketing pages and a product updates blog.
+- Styling uses Tailwind with `@midday/ui` as a preset; global CSS is in `src/styles/globals.css`.
+- MDX content (product updates) lives under `src/app/updates/posts/*.mdx` and is rendered server-side via `next-mdx-remote/rsc` with custom components.
+- Images use a custom Next.js image loader that proxies via Cloudflare Images (`image-loader.ts`).
+- Server Actions use `"use server"` and `next-safe-action` for validated actions.
+
+### Routing and structure (app/)
+
+- Root layout `src/app/layout.tsx` defines global metadata, fonts, theme provider, header/footer, and wraps all pages in a container.
+- Landing page is `src/app/page.tsx` which renders `StartPage` assembled from section components in `src/components/*`.
+- Updates routes:
+  - `src/app/updates/page.tsx` lists posts using `getBlogPosts()` and `Article`.
+  - `src/app/updates/[slug]/page.tsx` renders a single post, uses `generateStaticParams()` and `generateMetadata()` for SEO.
+  - `src/app/sitemap.ts` adds `"/"`, `"/updates"`, and each post to the sitemap.
+
+### MDX content model
+
+- Posts live in `src/app/updates/posts/*.mdx` with YAML frontmatter:
+  - Required: `title`, `publishedAt`, `summary`, `tag`
+  - Optional: `image`
+- `src/lib/blog.ts` loads MDX files at build time, parses frontmatter, and returns `{ metadata, slug, content }`.
+- Rendering:
+  - `src/components/mdx.tsx` exports `CustomMDX` using `next-mdx-remote/rsc` and a curated component map:
+    - Headings (`h1`-`h6`) auto-generate ids and anchors via `slugify`.
+    - `a` maps to internal `next/link` for relative paths and opens external links in a new tab.
+    - `code` uses `sugar-high` for inline code highlighting.
+    - `Image`, `Table`, `iframe` are supported.
+  - Page-level wrappers add container width and optional lead image via `next/image`.
+
+### Styling
+
+- Tailwind preset comes from `@midday/ui/tailwind.config`. Local `tailwind.config.ts` targets `./src/**/*.{ts,tsx}` and `../../packages/ui/src/**/*.{ts,tsx}`.
+- Global styles `src/styles/globals.css` include typography for the `.updates` article wrapper and code block styles compatible with `sugar-high` output.
+- Use utility classes consistently; avoid component-local CSS unless updating MDX typography rules.
+
+### Images
+
+- `next.config.mjs` sets `images.loader = "custom"` and `images.loaderFile = "./image-loader.ts"`.
+- `image-loader.ts` rewrites to `https://midday.ai/cdn-cgi/image/width={w},quality={q}/{src}`.
+- Prefer `next/image` for post images and marketing assets to benefit from the loader and responsive sizing.
+
+### Server Actions
+
+- Validated actions are built with `next-safe-action`:
+  - Define schemas in `src/actions/schema.ts` (zod).
+  - Create a shared client in `src/actions/safe-action.ts` to map server errors.
+  - Example validated action: `send-support-action.ts` uses `.schema(...).action(async ({ parsedInput }) => ...)`.
+- Simple form actions can use plain `"use server"` functions (e.g., `subscribe-action.ts`) when validation is offloaded to providers.
+
+### SEO and metadata
+
+- Global site metadata is defined in `src/app/layout.tsx` using Next Metadata API.
+- Post pages supply `generateMetadata()` with Open Graph/Twitter images and article data.
+- JSON-LD is embedded for posts via a `<script type="application/ld+json">` block.
+- `src/app/sitemap.ts` maintains canonical URLs and last-modified dates for posts.
+
+### Client vs server components
+
+- Default to server components for pages and MDX rendering.
+- Use `"use client"` only when hooks or browser-only APIs are required (e.g., `header.tsx`, `updates-toolbar.tsx`).
+- Co-locate client UI in `src/components/` and keep server utilities in `src/lib/` and `src/actions/`.
+
+### Adding a new update post (recipe)
+
+1) Create `src/app/updates/posts/<slug>.mdx` with frontmatter:
+```mdx
+---
+title: "My Feature"
+publishedAt: "2025-09-23"
+summary: "What shipped and why it matters."
+tag: "update"
+image: "/public/path-or-remote-url.jpg"
+---
+
+Intro paragraph...
+```
+2) The post is auto-listed on `/updates` and statically generated for `/updates/<slug>`.
+3) For images, use absolute paths or remote URLs compatible with the custom loader.
+
+### Quick checklist
+
+- Add/modify posts only under `src/app/updates/posts/` with valid frontmatter.
+- Prefer server components; add `"use client"` only when necessary.
+- Use `CustomMDX` for MDX rendering; avoid arbitrary MDX component globals.
+- Keep actions in `src/actions/*` and validate with zod + `next-safe-action` when taking user input.
+- Use `next/image` for all content images to leverage the custom loader.
+- Update `sitemap.ts` only if new routes outside updates are added; posts are included automatically.
