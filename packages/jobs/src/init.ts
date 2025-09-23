@@ -1,6 +1,24 @@
-import { locals, tasks } from "@trigger.dev/sdk";
+import { configure, locals, tasks } from "@trigger.dev/sdk";
 import type { Database } from "@zeke/db/client";
 import { createJobDb } from "@zeke/db/job-client";
+
+const triggerAccessToken =
+	process.env.TRIGGER_SECRET_KEY ??
+	process.env.TRIGGER_API_KEY ??
+	process.env.TRIGGER_SECRET ??
+	process.env.TRIGGER_DEV_API_KEY;
+
+const triggerApiUrl = process.env.TRIGGER_API_URL ?? process.env.TRIGGER_ENDPOINT;
+
+if (triggerAccessToken) {
+	const configuration: { accessToken: string; baseURL?: string } = {
+		accessToken: triggerAccessToken,
+	};
+	if (triggerApiUrl) {
+		configuration.baseURL = triggerApiUrl;
+	}
+	configure(configuration);
+}
 
 // Store the database instance
 const DbLocal = locals.create<{

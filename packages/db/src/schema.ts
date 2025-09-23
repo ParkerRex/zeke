@@ -109,6 +109,13 @@ export const playbookStatus = pgEnum("playbook_status", [
   "published",
   "archived",
 ]);
+export const playbookRunStatus = pgEnum("playbook_run_status", [
+  "pending",
+  "running",
+  "succeeded",
+  "failed",
+  "cancelled",
+]);
 export const stepStatus = pgEnum("step_status", [
   "pending",
   "in_progress",
@@ -1163,6 +1170,62 @@ export const playbookOutputs = pgTable(
   ],
 );
 
+export const playbookRuns = pgTable(
+  "playbook_runs",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    playbook_id: uuid("playbook_id")
+      .notNull()
+      .references(() => playbooks.id, { onDelete: "cascade" }),
+    team_id: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+    triggered_by: uuid("triggered_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    trigger_source: text("trigger_source"),
+    status: playbookRunStatus("status").notNull().default("pending"),
+    metadata: jsonb("metadata"),
+    started_at: timestamp("started_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    completed_at: timestamp("completed_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+  },
+  (table) => [
+    index("playbook_runs_playbook_idx").using("btree", table.playbook_id),
+    index("playbook_runs_team_idx").using("btree", table.team_id),
+    index("playbook_runs_status_idx").using("btree", table.status),
+  ],
+);
+
+export const playbookRunEvents = pgTable(
+  "playbook_run_events",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    run_id: uuid("run_id")
+      .notNull()
+      .references(() => playbookRuns.id, { onDelete: "cascade" }),
+    step_id: uuid("step_id").references(() => playbookSteps.id, {
+      onDelete: "set null",
+    }),
+    event_type: text("event_type").notNull(),
+    detail: jsonb("detail"),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+  },
+  (table) => [
+    index("playbook_run_events_run_idx").using("btree", table.run_id),
+    index("playbook_run_events_step_idx").using("btree", table.step_id),
+    index("playbook_run_events_type_idx").using("btree", table.event_type),
+  ],
+);
+
 // ============================================================================
 // ASSISTANT TABLES
 // ============================================================================
@@ -1438,20 +1501,6 @@ export const sourceHealth = pgTable("source_health", {
     mode: "string",
   }).defaultNow(),
 });
-
-export const jobMetrics = pgTable(
-  "job_metrics",
-  {
-    name: text("name").notNull(),
-    state: text("state").notNull(),
-    count: integer("count").notNull().default(0),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [primaryKey({ columns: [table.name, table.state] })],
-);
 
 // ============================================================================
 // TODO: team_state deferred per plan

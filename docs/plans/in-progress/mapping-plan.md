@@ -181,4 +181,3 @@
 - Draft highlight creation/matching service design.
 - Plan Supabase migrations for Sources/Highlights/Playbooks tables and policies.
 - Update dashboard copy + navigation to reflect new primitives.
-

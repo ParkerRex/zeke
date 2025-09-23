@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "../init";
 import { assistantRouter } from "./assistant";
 import { highlightRouter } from "./highlight";
+import { pipelineRouter } from "./pipeline";
 import { searchRouter } from "./search";
 import { storyRouter } from "./story";
 import { tagsRouter } from "./tags";
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   story: storyRouter,
   user: userRouter,
   search: searchRouter,
+  pipeline: pipelineRouter,
 });
 
 // export type definition of API

@@ -6,7 +6,7 @@ Next Actions (high priority)
 
 - [ ] Add health badge/tooltip in Sources table using `source_health` (OK/Warn/Error + last message).
 - [ ] Add YouTube quota threshold coloring (warn when remaining < configurable %).
-- [ ] Remove Overview polling once job_metrics + platform_quota prove stable; optional Realtime for recent lists later.
+- [ ] Remove Overview polling once Trigger.dev webhooks + `platform_quota` prove stable; optional Realtime for recent lists later.
 - [ ] Add inline “Edit Source” dialog (metadata tweaks for youtube_search.query, uploads_playlist_id, etc.).
 
 This checklist implements the admin-only console per admin-spec.md. No code duplication; reuse existing components/APIs where possible.
@@ -190,7 +190,7 @@ Plan
 - Realtime (see .cursor/rules/use-realtime.mdc):
   - Enable Realtime for `public.source_metrics` and subscribe in Admin client.
   - Broadcast changes on insert/update; optimistic UI can update a row when the corresponding `source_id` payload arrives.
-  - For job queue counts, also subscribe to `pgboss.job` (or a light `job_metrics` table if needed) and aggregate client‑side by `name:state` (or mirror the computed map into a table with a trigger if preferred).
+  - For job queue counts, rely on Trigger.dev dashboards/webhooks; no local aggregation needed unless product requirements change.
 - UI wiring:
   - Sources table: add columns “Raw”, “Contents”, “Stories”, “24h”, and badge “Last seen” from metrics; hydrate initially from API list; live‑update via Realtime subscription.
   - Remove 2s interval polling for Overview once Realtime is verified (keep as fallback when Realtime is offline).
@@ -243,8 +243,7 @@ Goal: Replace job queue polling with realtime summaries.
 
 Plan
 
-- Table: `public.job_metrics` (`name text`, `state text`, `count int`, `updated_at timestamptz`, primary key (`name`,`state`)).
-- Engine: every 2–5 seconds (or after a work batch), aggregate from `pgboss.job` and upsert counts. Keep cadence light to reduce DB writes.
+- No dedicated Trigger.dev run table; rely on Trigger.dev UI/webhooks for operational data. Keep `platform_quota` and `source_health` in Supabase for quota + source status.
 - Realtime: add to publication; Admin subscribes and recomputes the map in the Overview “Job Queue” card.
 
 Acceptance

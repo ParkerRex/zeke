@@ -13,7 +13,6 @@
     "dev:api": "turbo dev --filter=@zeke/api",
     "dev:dashboard": "turbo dev --filter=@zeke/dashboard",
     "build:dashboard": "turbo build --filter=@zeke/dashboard",
-    "dev:engine": "turbo dev --filter=@zeke/engine",
     "dev:website": "turbo dev --filter=@zeke/website ",
     "dev:desktop": "turbo dev --filter=@zeke/desktop",
     "jobs:dashboard": "turbo jobs --filter=@zeke/jobs",

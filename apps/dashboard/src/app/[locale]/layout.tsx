@@ -8,6 +8,7 @@ import { Toaster } from "@zeke/ui/toaster";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
+import { Lora } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactElement } from "react";
 import { Providers } from "./providers";
@@ -66,6 +67,13 @@ export const viewport = {
     { media: "(prefers-color-scheme: dark)" },
   ],
 };
+
+const lora = Lora({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif",
+});
 
 export default async function Layout({
   children,

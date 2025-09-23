@@ -6,7 +6,7 @@ Next Actions
 
 - Add health badges in Sources using `source_health` (OK/Warn/Error) with last message tooltip.
 - Add YouTube quota threshold coloring; consider surfacing reset countdown.
-- Remove Overview polling once Realtime job_metrics/platform_quota prove stable; optionally move recent lists to Realtime with admin RLS.
+- Remove Overview polling once Trigger.dev webhooks + `platform_quota` prove stable; optionally move recent lists to Realtime with admin RLS if we decide to mirror anything locally.
 - Add inline “Edit Source” dialog for metadata tweaks (YouTube search query, uploads playlist id, backfill limits).
 
 ## MVP Scope
@@ -48,9 +48,9 @@ Next Actions
 
 Current state
 
-- Baseline migration includes `users.is_admin`, `sources.active/created_at/updated_at`, RLS posture, YT indexes, additional admin indexes (`contents(raw_item_id)`, `contents(extracted_at)`, `sources(last_checked)`), and pg-boss schema.
-- Realtime tables for admin: `source_metrics`, `platform_quota`, `source_health`, `job_metrics`.
-- Engine filters `active=false` sources and writes health/quota snapshots; mirrors job metrics.
+- Baseline migration includes `users.is_admin`, `sources.active/created_at/updated_at`, RLS posture, YT indexes, additional admin indexes (`contents(raw_item_id)`, `contents(extracted_at)`, `sources(last_checked)`), and removal of the old pg-boss schema.
+- Realtime tables for admin: `source_metrics`, `platform_quota`, `source_health`; queue/run visibility lives in Trigger.dev.
+- Enginev2 + Trigger.dev tasks filter `active=false` sources and write health/quota snapshots; run history stays in Trigger.dev dashboards/webhooks rather than local tables.
 - Pipeline admin gating enforced (`/api/pipeline/*` return 403 for non-admin).
 - Admin endpoints exist (including preview, single-source ingest, one-off ingest).
 - `/admin` implemented with Tabs; “Sources” (counts, preview, backfill, seed, one-off) and “Overview” inline; “Forecast” inline.
@@ -145,7 +145,7 @@ Contracts (initial)
 - Respect pause: filter out `active = false` in `getRssSources` and `getYouTubeSources` queries.
 - Backfill window: read `sources.last_cursor` or `metadata.published_after` and pass to fetchers.
 - Dry-run preview: add engine helpers that call fetchers with small limits and skip `upsertRawItem`/enqueue (return items + estimated quota used).
-- No change to existing queues (`ingest:pull`, `ingest:fetch-content`, `ingest:fetch-youtube-content`, `analyze:llm`).
+- Jobs now run exclusively through Trigger.dev tasks (see `packages/jobs/src/tasks/**`); the legacy pg-boss queues were removed.
 - Respect existing YouTube fields: `metadata.published_after` for searches; prefer `last_cursor` for generic cursors to avoid duplicating fields.
 
 ## Rollout Plan
@@ -180,4 +180,4 @@ Progress Snapshot
 - Pipeline APIs: `src/app/api/pipeline/*`
 - Supabase admin client: `src/lib/supabase/supabase-admin.ts`
 - Queries & mutations alias: `@db/*` resolving to `supabase/*`
-- Engine ingest + queues: `engine/src/engine.ts`, `engine/src/ingest/rss.ts`, `engine/src/ingest/youtube.ts`, `engine/src/fetch/youtube.ts`
+- Engine ingest + queues: `packages/jobs/src/tasks/sources/**`, `packages/jobs/src/tasks/insights/**`, `packages/jobs/src/tasks/stories/**`

@@ -2,8 +2,8 @@
 
 import { TrackerProjectForm } from "@/components/forms/tracker-project-form";
 import { useTrackerParams } from "@/hooks/use-tracker-params";
-import { ScrollArea } from "@midday/ui/scroll-area";
-import { Sheet, SheetContent, SheetHeader } from "@midday/ui/sheet";
+import { ScrollArea } from "@zeke/ui/scroll-area";
+import { Sheet, SheetContent, SheetHeader } from "@zeke/ui/sheet";
 import React from "react";
 
 type Props = {

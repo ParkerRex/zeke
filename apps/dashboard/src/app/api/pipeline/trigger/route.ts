@@ -1,35 +1,6 @@
+import { ingestPull } from '@zeke/jobs/tasks';
 import { getAdminFlag } from '@zeke/supabase/queries';
 import { NextResponse } from 'next/server';
-
-type EngineTriggerResponse = { ok: boolean; port?: string };
-
-async function postEngine(path: string): Promise<EngineTriggerResponse> {
-  const DEFAULT_LOCAL_PORTS = ['8082', '8081', '8080'] as const;
-  const ports = [
-    process.env.WORKER_PORT,
-    process.env.WORKER_HTTP_PORT,
-    ...DEFAULT_LOCAL_PORTS,
-  ].filter(Boolean) as string[];
-
-  for (const port of ports) {
-    try {
-      const ac = new AbortController();
-      const TIMEOUT_MS = 2000;
-      const t = setTimeout(() => ac.abort(), TIMEOUT_MS);
-      const res = await fetch(`http://127.0.0.1:${port}${path}`, {
-        method: 'POST',
-        signal: ac.signal,
-      });
-      clearTimeout(t);
-      if (res.ok) {
-        return { ok: true, port } as EngineTriggerResponse;
-      }
-    } catch {
-      // try next
-    }
-  }
-  return { ok: false };
-}
 
 export async function POST(req: Request): Promise<Response> {
   const { isAdmin } = await getAdminFlag();
@@ -40,18 +11,24 @@ export async function POST(req: Request): Promise<Response> {
       { status: HTTP_FORBIDDEN }
     );
   }
+
   try {
     const { kind } = (await req.json().catch(() => ({ kind: 'rss' }))) as {
       kind?: unknown;
     };
-    const path =
-      kind === 'youtube' ? '/debug/ingest-youtube' : '/debug/ingest-now';
-    const result = await postEngine(path);
+
+    if (kind === 'youtube') {
+      const HTTP_BAD_REQUEST = 400;
+      return NextResponse.json(
+        { ok: false, error: 'youtube_ingest_disabled' },
+        { status: HTTP_BAD_REQUEST }
+      );
+    }
+
+    await ingestPull.trigger({ reason: 'manual' });
+
     const HTTP_OK = 200;
-    const HTTP_SERVICE_UNAVAILABLE = 503;
-    return NextResponse.json(result, {
-      status: result.ok ? HTTP_OK : HTTP_SERVICE_UNAVAILABLE,
-    });
+    return NextResponse.json({ ok: true }, { status: HTTP_OK });
   } catch (e: unknown) {
     const HTTP_INTERNAL_SERVER_ERROR = 500;
     return NextResponse.json(

@@ -1,7 +1,6 @@
-import type { AppType } from "@zeke/engine";
 import { hc } from "hono/client";
 
-export const client = hc<AppType>(`${process.env.ENGINE_API_URL}/`, {
+export const client = hc(`${process.env.ENGINE_API_URL}/`, {
 	headers: {
 		Authorization: `Bearer ${process.env.ENGINE_API_KEY}`,
 	},

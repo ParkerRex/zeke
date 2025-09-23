@@ -21,16 +21,16 @@
   |------|----------|----------------|-----------|---------------|-----------|-----------|
   | TRPC appRouter | RPC (httpBatchLink) | `${process.env.NEXT_PUBLIC_API_URL}/trpc` | Bearer Supabase session | superjson encode/decode | Cursor via `meta.cursor` on infinite queries | apps/dashboard/src/trpc/client.tsx:41, apps/api/src/trpc/init.ts:26 |
   | zeke REST API | REST (Hono) | `https://api.zeke.ai` | Bearer API key or OAuth token | JSON | Query params, cursor fields | apps/api/src/index.ts:16 |
-  | Engine Service | REST (OpenAPIHono) | `${process.env.ENGINE_API_URL}/` | Bearer engine API key | JSON | Query/cursor per route | packages/engine-client/src/index.ts:3, apps/engine/src/index.ts:17 |
+  | Engine Worker | REST (Hono) | `${process.env.ENGINE_API_URL}/` | Bearer engine API key | JSON | Route-specific | packages/engine-client/src/index.ts:1, apps/engine/src/index.ts:1 |
   | Supabase Storage Proxy | REST | `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/…` | Bearer Supabase access token | Binary streaming | n/a | apps/dashboard/src/app/api/proxy/route.ts:22 |
   | Slack OAuth Exchange | REST | `https://slack.com/api/oauth.v2.access` | Client ID/secret | JSON | n/a | apps/dashboard/src/app/api/apps/slack/oauth_callback/route.ts:45 |
-  | Currency Rates CDN | REST | `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1` | None | JSON | n/a | apps/engine/src/utils/rates.ts:3 |
+  | Currency Rates CDN | REST | `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1` | None | JSON | n/a | packages/location/src/currencies.ts:1 |
   | AI Streaming Chat | SSE/DataStream | Next API route `/api/chat` | None (relies on session tools) | AI SDK streamText | n/a | apps/dashboard/src/app/api/chat/route.ts:17 |
 - Schemas / operations:
   - apps/api/src/trpc/routers/transactions.ts:26 – `transactions.get` returns `{ data, meta.cursor }` with filters
   - apps/api/src/trpc/routers/invoice.ts:98 – `invoice.get` and `invoice.invoiceSummary`
   - apps/api/src/trpc/routers/search.ts:10 – semantic fallback with LLM-generated filters
-  - apps/engine/src/routes/transactions/index.ts:37 – Teller proxy returning transformed accounts/transactions
+- (legacy) apps/engine/src/routes/transactions/index.ts – removed with the pg-boss worker sunset; ingestion now flows through Trigger.dev tasks.
 - Request construction and headers:
   - apps/dashboard/src/trpc/client.tsx:44 – injects `Authorization: Bearer ${session.access_token}`
   - apps/dashboard/src/trpc/server.tsx:35 – adds timezone/locale/country headers for geo-aware analytics

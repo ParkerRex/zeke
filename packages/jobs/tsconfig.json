@@ -7,13 +7,16 @@
   "exclude": [
     "node_modules"
   ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@jobs/*": [
-        "src/*"
-      ]
-    },
-    "jsx": "react-jsx"
-  }
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@jobs/*": [
+                "src/*"
+            ],
+            "@db/*": [
+                "../db/src/*"
+            ]
+        },
+        "jsx": "react-jsx"
+    }
 }

@@ -1,6 +1,6 @@
 import { desc, sql } from "drizzle-orm";
 import type { Database } from "@db/client";
-import { contents, jobMetrics, rawItems, stories } from "@db/schema";
+import { contents, rawItems, stories } from "@db/schema";
 
 export type PipelineCounts = {
   rawItems: number;
@@ -41,13 +41,6 @@ export type PipelineActivity = {
   rawItems: PipelineRawItem[];
   contents: PipelineContent[];
   stories: PipelineStory[];
-};
-
-export type JobMetricRow = {
-  name: string;
-  state: string;
-  count: number;
-  updatedAt: string;
 };
 
 /**
@@ -154,28 +147,4 @@ export async function getRecentPipelineActivity(
       createdAt: row.createdAt,
     })),
   } satisfies PipelineActivity;
-}
-
-/**
- * Snapshot pg-boss style metrics stored in job_metrics.
- */
-export async function getJobMetricsSnapshot(
-  db: Database,
-): Promise<JobMetricRow[]> {
-  const rows = await db
-    .select({
-      name: jobMetrics.name,
-      state: jobMetrics.state,
-      count: jobMetrics.count,
-      updatedAt: jobMetrics.updated_at,
-    })
-    .from(jobMetrics)
-    .orderBy(jobMetrics.name, jobMetrics.state);
-
-  return rows.map((row) => ({
-    name: row.name,
-    state: row.state,
-    count: row.count,
-    updatedAt: row.updatedAt,
-  }));
 }

@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from "hono";
-import { withApiContext } from "./context";
 import { withAuth } from "./auth";
+import { withApiContext } from "./context";
 import { withTeamContext } from "./team";
 
 export const publicMiddleware: MiddlewareHandler[] = [withApiContext];

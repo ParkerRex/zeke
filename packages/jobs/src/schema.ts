@@ -1,306 +1,115 @@
-import {
-	documentProcessedSchema,
-	documentUploadedSchema,
-	inboxAutoMatchedSchema,
-	inboxCrossCurrencyMatchedSchema,
-	inboxNeedsReviewSchema,
-	inboxNewSchema,
-	invoiceCancelledSchema,
-	invoiceCreatedSchema,
-	invoiceOverdueSchema,
-	invoicePaidSchema,
-	invoiceReminderSentSchema,
-	invoiceScheduledSchema,
-	invoiceSentSchema,
-	transactionsCreatedSchema,
-	transactionsExportedSchema,
-} from "@zeke/notifications";
 import { z } from "zod";
 
-export const sendInvoiceReminderSchema = z.object({
-	invoiceId: z.string().uuid(),
+export const ingestPullSchema = z.object({
+	sourceType: z.literal("rss").default("rss"),
+	reason: z.enum(["schedule", "manual"]).default("schedule"),
 });
 
-export type SendInvoiceReminderPayload = z.infer<
-	typeof sendInvoiceReminderSchema
->;
+export type IngestPullPayload = z.infer<typeof ingestPullSchema>;
 
-export const generateInvoiceSchema = z.object({
-	invoiceId: z.string().uuid(),
-	deliveryType: z.enum(["create", "create_and_send", "scheduled"]),
+export const ingestSourceSchema = z.object({
+	sourceId: z.string().uuid("sourceId must be a UUID"),
+	reason: z.enum(["schedule", "manual", "retry"]).default("schedule"),
+	cursor: z.string().optional(),
 });
 
-export type GenerateInvoicePayload = z.infer<typeof generateInvoiceSchema>;
+export type IngestSourcePayload = z.infer<typeof ingestSourceSchema>;
 
-export const deleteConnectionSchema = z.object({
-	referenceId: z.string().optional().nullable(),
-	provider: z.enum(["gocardless", "teller", "plaid", "enablebanking"]),
-	accessToken: z.string().optional().nullable(),
+export const fetchContentSchema = z.object({
+	rawItemIds: z.array(z.string().uuid("rawItemIds entries must be UUIDs")).min(1),
 });
 
-export type DeleteConnectionPayload = z.infer<typeof deleteConnectionSchema>;
+export type FetchContentPayload = z.infer<typeof fetchContentSchema>;
 
-export const initialBankSetupSchema = z.object({
-	teamId: z.string().uuid(),
-	connectionId: z.string().uuid(),
+export const analyzeStorySchema = z.object({
+	storyId: z.string().uuid("storyId must be a UUID"),
+	trigger: z.enum(["auto", "manual", "retry"]).default("auto"),
 });
 
-export type InitialBankSetupPayload = z.infer<typeof initialBankSetupSchema>;
+export type AnalyzeStoryPayload = z.infer<typeof analyzeStorySchema>;
 
-export const processDocumentSchema = z.object({
-	mimetype: z.string(),
-	filePath: z.array(z.string()),
-	teamId: z.string(),
+export const oneOffIngestSchema = z.object({
+	url: z.string().url(),
+	requestedBy: z.string().uuid().optional(),
 });
 
-export type ProcessDocumentPayload = z.infer<typeof processDocumentSchema>;
+export type OneOffIngestPayload = z.infer<typeof oneOffIngestSchema>;
 
-export const processAttachmentSchema = z.object({
-	teamId: z.string().uuid(),
-	mimetype: z.string(),
-	size: z.number(),
-	filePath: z.array(z.string()),
-	referenceId: z.string().optional(),
-	website: z.string().optional(),
-	inboxAccountId: z.string().uuid().optional(),
+export const ingestUploadSchema = z.object({
+	sourceId: z.string().uuid("sourceId must be a UUID"),
+	items: z
+		.array(
+			z.object({
+				externalId: z.string().min(1),
+				url: z.string().url().optional(),
+				title: z.string().optional().nullable(),
+				text: z.string().optional(),
+				metadata: z.record(z.any()).optional(),
+			}),
+		)
+		.min(1),
+	uploadedBy: z.string().uuid().optional(),
 });
 
-export type ProcessAttachmentPayload = z.infer<typeof processAttachmentSchema>;
+export type IngestUploadPayload = z.infer<typeof ingestUploadSchema>;
 
-export const deleteTeamSchema = z.object({
-	teamId: z.string().uuid(),
-	connections: z.array(
-		z.object({
-			provider: z.string(),
-			referenceId: z.string().nullable(),
-			accessToken: z.string().nullable(),
-		}),
-	),
+export const linkSourceToStorySchema = z.object({
+	sourceId: z.string().uuid("sourceId must be a UUID"),
+	storyId: z.string().uuid("storyId must be a UUID"),
 });
 
-export type DeleteTeamPayload = z.infer<typeof deleteTeamSchema>;
+export type LinkSourceToStoryPayload = z.infer<typeof linkSourceToStorySchema>;
 
-export const inviteTeamMembersSchema = z.object({
-	teamId: z.string().uuid(),
-	ip: z.string(),
-	locale: z.string(),
-	invites: z.array(
-		z.object({
-			email: z.string().email(),
-			invitedByName: z.string(),
-			invitedByEmail: z.string().email(),
-			teamName: z.string(),
-		}),
-	),
+const insightBaseSchema = z.object({
+	title: z.string().optional().nullable(),
+	summary: z.string().min(1, "summary is required"),
+	quote: z.string().optional().nullable(),
+	tags: z.array(z.string()).optional(),
+	metadata: z.record(z.any()).optional(),
+	origin: z.enum(["system", "assistant"]).default("system"),
 });
 
-export type InviteTeamMembersPayload = z.infer<typeof inviteTeamMembersSchema>;
-
-export const updateBaseCurrencySchema = z.object({
-	teamId: z.string().uuid(),
-	baseCurrency: z.string(),
+export const dedupeInsightsSchema = z.object({
+	storyId: z.string().uuid("storyId must be a UUID"),
+	teamId: z.string().uuid().optional(),
+	createdBy: z.string().uuid("createdBy must be a UUID"),
+	insights: z.array(insightBaseSchema).min(1, "insights must not be empty"),
 });
 
-export type UpdateBaseCurrencyPayload = z.infer<
-	typeof updateBaseCurrencySchema
->;
+export type DedupeInsightsPayload = z.infer<typeof dedupeInsightsSchema>;
 
-export const exportTransactionsSchema = z.object({
-	teamId: z.string().uuid(),
-	locale: z.string(),
-	dateFormat: z.string().nullable().optional(),
-	transactionIds: z.array(z.string().uuid()),
+export const attachInsightSchema = z.object({
+	storyId: z.string().uuid("storyId must be a UUID"),
+	teamId: z.string().uuid("teamId must be a UUID"),
+	createdBy: z.string().uuid("createdBy must be a UUID"),
+	insight: insightBaseSchema,
 });
 
-export type ExportTransactionsPayload = z.infer<
-	typeof exportTransactionsSchema
->;
+export type AttachInsightPayload = z.infer<typeof attachInsightSchema>;
 
-export const importTransactionsSchema = z.object({
-	inverted: z.boolean(),
-	filePath: z.array(z.string()).optional(),
-	bankAccountId: z.string(),
-	currency: z.string(),
-	teamId: z.string(),
-	table: z.array(z.record(z.string(), z.string())).optional(),
-	mappings: z.object({
-		amount: z.string(),
-		date: z.string(),
-		description: z.string(),
-	}),
+export const summarizeStorySchema = z.object({
+	storyId: z.string().uuid("storyId must be a UUID"),
+	mode: z.enum(["auto", "force"]).default("auto"),
 });
 
-export type ImportTransactionsPayload = z.infer<
-	typeof importTransactionsSchema
->;
+export type SummarizeStoryPayload = z.infer<typeof summarizeStorySchema>;
 
-export const syncConnectionSchema = z.object({
-	connectionId: z.string().uuid(),
-	manualSync: z.boolean().optional(),
+export const updateStoryStatusSchema = z.object({
+	storyId: z.string().uuid("storyId must be a UUID"),
+	teamId: z.string().uuid().optional(),
+	state: z.enum(["unread", "read", "archived"]).default("unread"),
 });
 
-export type SyncConnectionPayload = z.infer<typeof syncConnectionSchema>;
+export type UpdateStoryStatusPayload = z.infer<typeof updateStoryStatusSchema>;
 
-export const reconnectConnectionSchema = z.object({
-	teamId: z.string().uuid(),
-	connectionId: z.string().uuid(),
-	provider: z.string(),
+export const runPlaybookSchema = z.object({
+	playbookId: z.string().uuid("playbookId must be a UUID"),
+	teamId: z.string().uuid("teamId must be a UUID"),
+	triggeredBy: z.string().uuid("triggeredBy must be a UUID").optional(),
+	triggerSource: z
+		.enum(["dashboard", "api", "schedule", "system"])
+		.default("dashboard"),
+	metadata: z.record(z.any()).optional(),
 });
 
-export type ReconnectConnectionPayload = z.infer<
-	typeof reconnectConnectionSchema
->;
-
-export const initialInboxSetupSchema = z.object({
-	id: z.string().uuid(), // This is the inbox_account row id
-});
-
-export type InitialInboxSetupPayload = z.infer<typeof initialInboxSetupSchema>;
-
-export const onboardTeamSchema = z.object({
-	userId: z.string().uuid(),
-});
-
-export type OnboardTeamPayload = z.infer<typeof onboardTeamSchema>;
-
-export const inboxSlackUploadSchema = z.object({
-	teamId: z.string(),
-	token: z.string(),
-	channelId: z.string(),
-	threadId: z.string().optional(),
-	file: z.object({
-		id: z.string(),
-		name: z.string(),
-		mimetype: z.string(),
-		size: z.number(),
-		url: z.string(),
-	}),
-});
-
-export type InboxSlackUploadPayload = z.infer<typeof inboxSlackUploadSchema>;
-
-export const processTransactionAttachmentSchema = z.object({
-	transactionId: z.string(),
-	mimetype: z.string(),
-	filePath: z.array(z.string()),
-	teamId: z.string().uuid(),
-});
-
-export type ProcessTransactionAttachmentPayload = z.infer<
-	typeof processTransactionAttachmentSchema
->;
-
-export const embedTransactionSchema = z.object({
-	transactionIds: z.array(z.string().uuid()),
-	teamId: z.string().uuid(),
-});
-
-export type EmbedTransactionPayload = z.infer<typeof embedTransactionSchema>;
-
-export const scheduleInvoiceJobSchema = z.object({
-	invoiceId: z.string().uuid(),
-	scheduledAt: z.string().datetime(),
-});
-
-export type ScheduleInvoiceJobPayload = z.infer<
-	typeof scheduleInvoiceJobSchema
->;
-
-const baseJobSchema = z.object({
-	teamId: z.string().uuid(),
-	sendEmail: z.boolean().optional().default(false),
-});
-
-export const notificationSchema = z.discriminatedUnion("type", [
-	baseJobSchema
-		.extend({
-			type: z.literal("transactions_created"),
-		})
-		.merge(transactionsCreatedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("inbox_new"),
-		})
-		.merge(inboxNewSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_paid"),
-		})
-		.merge(invoicePaidSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_overdue"),
-		})
-		.merge(invoiceOverdueSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_scheduled"),
-		})
-		.merge(invoiceScheduledSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_sent"),
-		})
-		.merge(invoiceSentSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_reminder_sent"),
-		})
-		.merge(invoiceReminderSentSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_cancelled"),
-		})
-		.merge(invoiceCancelledSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("invoice_created"),
-		})
-		.merge(invoiceCreatedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("transactions_exported"),
-		})
-		.merge(transactionsExportedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("document_uploaded"),
-		})
-		.merge(documentUploadedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("document_processed"),
-		})
-		.merge(documentProcessedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("inbox_auto_matched"),
-		})
-		.merge(inboxAutoMatchedSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("inbox_needs_review"),
-		})
-		.merge(inboxNeedsReviewSchema.omit({ users: true })),
-
-	baseJobSchema
-		.extend({
-			type: z.literal("inbox_cross_currency_matched"),
-		})
-		.merge(inboxCrossCurrencyMatchedSchema.omit({ users: true })),
-]);
-
-export type NotificationPayload = z.infer<typeof notificationSchema>;
+export type RunPlaybookPayload = z.infer<typeof runPlaybookSchema>;

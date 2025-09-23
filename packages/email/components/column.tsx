@@ -12,13 +12,13 @@ export function Column({ title, description, footer, imgSrc }: Props) {
   const themeClasses = getEmailThemeClasses();
 
   return (
-    <Section className="text-left p-0 m-0 text-left">
-      <Section className="p-0 m-0 w-full w-full w-[265px] inline-block align-top box-border mb-4 md:mb-0 text-left">
+    <Section className="text-left p-0 m-0">
+      <Section className="p-0 m-0 w-[265px] inline-block align-top box-border mb-4 md:mb-0 text-left">
         <Section className="text-left p-0 m-0 pb-10">
           <Img src={imgSrc} alt={title} className="w-[245px]" />
         </Section>
       </Section>
-      <Section className="inline-block align-top box-border w-full w-[280px] text-left">
+      <Section className="inline-block align-top box-border w-[280px] text-left">
         <Section className="text-left p-0 m-0">
           <Text className={`pt-0 m-0 font-medium mb-2 ${themeClasses.text}`}>
             {title}

@@ -1909,20 +1909,6 @@ export const sourceHealth = pgTable("source_health", {
 	}).defaultNow(),
 });
 
-export const jobMetrics = pgTable(
-	"job_metrics",
-	{
-		name: text("name").notNull(),
-		state: text("state").notNull(),
-		count: integer("count").notNull().default(0),
-		updatedAt: timestamp("updated_at", {
-			withTimezone: true,
-			mode: "string",
-		}).defaultNow(),
-	},
-	(table) => [primaryKey({ columns: [table.name, table.state] })],
-);
-
 // ============================================================================
 // TODO: team_state deferred per plan
 // This is a placeholder for future team state management features
@@ -2036,7 +2022,7 @@ Message Source Links: After the assistant answers, this table can link an assist
 Tables: activities, plus Billing (products, prices, subscriptions) and Ops (platform_quota, source_health, job_metrics).
 Activities: A unified activity log for noteworthy events (story published, highlight created, playbook published, subscription changes, etc.). Each row can reference various entities (story, highlight, playbook, etc.) and has an actor (user) and visibility (team, personal, system). This is useful for building an activity feed.
 Billing Tables: These track Stripe products, prices, and team subscriptions. They are mostly standard for a SaaS app. For readability, they’re separate from the content pipeline schema – you might document them in a Billing section to avoid mixing with content tables.
-Operational Tables: E.g. platform_quota for API usage quotas, source_health for monitoring source sync status (ok/warn/error with timestamps), and job_metrics for tracking background job counts. These support monitoring and should be documented as such, separate from the core product logic.
+Operational Tables: E.g. platform_quota for API usage quotas and source_health for monitoring source sync status (ok/warn/error with timestamps). Trigger.dev retains job/activity history so we avoid duplicating those tables locally. These support monitoring and should be documented as such, separate from the core product logic.
 Key Schema Changes for Clarity
 Based on the above, here are the main changes we’d make to improve readability and alignment with the data pipeline:
 Rename confusing tables to pipeline terms: For example, rename discoveries → raw_items to clearly indicate these are newly discovered content items awaiting processing
@@ -2141,7 +2127,7 @@ Message Source Links: After the assistant answers, this table can link an assist
 Tables: activities, plus Billing (products, prices, subscriptions) and Ops (platform_quota, source_health, job_metrics).
 Activities: A unified activity log for noteworthy events (story published, highlight created, playbook published, subscription changes, etc.). Each row can reference various entities (story, highlight, playbook, etc.) and has an actor (user) and visibility (team, personal, system). This is useful for building an activity feed.
 Billing Tables: These track Stripe products, prices, and team subscriptions. They are mostly standard for a SaaS app. For readability, they’re separate from the content pipeline schema – you might document them in a Billing section to avoid mixing with content tables.
-Operational Tables: E.g. platform_quota for API usage quotas, source_health for monitoring source sync status (ok/warn/error with timestamps), and job_metrics for tracking background job counts. These support monitoring and should be documented as such, separate from the core product logic.
+Operational Tables: E.g. platform_quota for API usage quotas and source_health for monitoring source sync status (ok/warn/error with timestamps). Trigger.dev retains job/activity history so we avoid duplicating those tables locally. These support monitoring and should be documented as such, separate from the core product logic.
 Key Schema Changes for Clarity
 Based on the above, here are the main changes we’d make to improve readability and alignment with the data pipeline:
 Rename confusing tables to pipeline terms: For example, rename discoveries → raw_items to clearly indicate these are newly discovered content items awaiting processing

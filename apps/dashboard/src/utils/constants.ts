@@ -13,3 +13,11 @@ export const Cookies = {
 export const LocalStorageKeys = {
   MatchLearningToastSeen: "match-learning-toast-seen",
 };
+
+export const STRINGS = {
+  loading: 'Loading...',
+  loadError: 'Unable to load data right now.',
+  retry: 'Retry',
+  openAStory: 'Select a story to inspect its details.',
+  comingSoon: 'We're finishing this experience—thanks for your patience.',
+};

@@ -4,12 +4,9 @@ import {
   semanticSearchInputSchema,
 } from "@api/schemas/search";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
-import {
-  globalSearchQuery,
-  globalSemanticSearchQuery,
-} from "@zeke/db/queries";
-import { TRPCError } from "@trpc/server";
 import { z } from "@hono/zod-openapi";
+import { TRPCError } from "@trpc/server";
+import { globalSearchQuery, globalSemanticSearchQuery } from "@zeke/db/queries";
 
 export const searchRouter = createTRPCRouter({
   global: protectedProcedure

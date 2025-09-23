@@ -1,4 +1,4 @@
-import { ensureTeamAccess, TeamAccessError } from "@api/auth/team";
+import { TeamAccessError, ensureTeamAccess } from "@api/auth/team";
 import type { MiddlewareHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
 

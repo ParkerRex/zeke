@@ -7,13 +7,13 @@ import {
   storyMetricsSchema,
 } from "@api/schemas/story";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
+import { z } from "@hono/zod-openapi";
+import { TRPCError } from "@trpc/server";
 import {
   getStoryForDisplay,
   getStoryMetrics,
   listStoriesForDisplay,
 } from "@zeke/db/queries";
-import { TRPCError } from "@trpc/server";
-import { z } from "@hono/zod-openapi";
 
 export const storyRouter = createTRPCRouter({
   list: protectedProcedure

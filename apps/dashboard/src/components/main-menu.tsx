@@ -7,88 +7,42 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const icons = {
-  "/": () => <Icons.Overview size={20} />,
-  "/transactions": () => <Icons.Transactions size={20} />,
-  "/invoices": () => <Icons.Invoice size={20} />,
-  "/tracker": () => <Icons.Tracker size={20} />,
-  "/customers": () => <Icons.Customers size={20} />,
-  "/vault": () => <Icons.Vault size={20} />,
+  "/": () => <Icons.Stories size={20} />,
+  "/sources": () => <Icons.Sources size={20} />,
+  "/stories": () => <Icons.Stories size={20} />,
+  "/insights": () => <Icons.Insights size={20} />,
+  "/briefs": () => <Icons.Briefs size={20} />,
+  "/playbooks": () => <Icons.Playbooks size={20} />,
   "/settings": () => <Icons.Settings size={20} />,
-  "/apps": () => <Icons.Apps size={20} />,
-  "/inbox": () => <Icons.Inbox2 size={20} />,
 } as const;
 
 const items = [
   {
-    path: "/",
-    name: "Overview",
+    path: "/sources",
+    name: "Sources",
   },
   {
-    path: "/inbox",
-    name: "Inbox",
-    children: [{ path: "/inbox/settings", name: "Settings" }],
+    path: "/stories",
+    name: "Stories",
   },
   {
-    path: "/transactions",
-    name: "Transactions",
-    children: [
-      {
-        path: "/transactions/categories",
-        name: "Categories",
-      },
-      {
-        path: "/transactions?step=connect",
-        name: "Connect bank",
-      },
-      {
-        path: "/transactions?step=import&hide=true",
-        name: "Import",
-      },
-      { path: "/transactions?createTransaction=true", name: "Create new" },
-    ],
+    path: "/insights",
+    name: "Insights",
   },
   {
-    path: "/invoices",
-    name: "Invoices",
-    children: [
-      { path: "/invoices?statuses=paid", name: "Paid" },
-      { path: "/invoices?statuses=unpaid", name: "Unpaid" },
-      { path: "/invoices?statuses=overdue", name: "Overdue" },
-      { path: "/invoices?statuses=draft", name: "Draft" },
-      { path: "/invoices?statuses=scheduled", name: "Scheduled" },
-      { path: "/invoices?type=create", name: "Create new" },
-    ],
+    path: "/briefs",
+    name: "Briefs",
   },
   {
-    path: "/tracker",
-    name: "Tracker",
-    children: [{ path: "/tracker?create=true", name: "Create new" }],
-  },
-  {
-    path: "/customers",
-    name: "Customers",
-    children: [{ path: "/customers?createCustomer=true", name: "Create new" }],
-  },
-  {
-    path: "/vault",
-    name: "Vault",
-  },
-  {
-    path: "/apps",
-    name: "Apps",
-    children: [
-      { path: "/apps", name: "All" },
-      { path: "/apps?tab=installed", name: "Installed" },
-    ],
+    path: "/playbooks",
+    name: "Playbooks",
   },
   {
     path: "/settings",
     name: "Settings",
     children: [
-      { path: "/settings", name: "General" },
-      { path: "/settings/billing", name: "Billing" },
-      { path: "/settings/accounts", name: "Bank Connections" },
-      { path: "/settings/members", name: "Members" },
+      { path: "/settings", name: "Workspace" },
+      { path: "/settings/members", name: "Team" },
       { path: "/settings/notifications", name: "Notifications" },
       { path: "/settings/developer", name: "Developer" },
     ],

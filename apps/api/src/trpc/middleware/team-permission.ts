@@ -1,7 +1,7 @@
-import { ensureTeamAccess, TeamAccessError } from "@api/auth/team";
+import { TeamAccessError, ensureTeamAccess } from "@api/auth/team";
 import type { Session } from "@api/utils/auth";
-import type { Database } from "@zeke/db/client";
 import { TRPCError } from "@trpc/server";
+import type { Database } from "@zeke/db/client";
 
 export const withTeamPermission = async <TReturn>(opts: {
   ctx: {
