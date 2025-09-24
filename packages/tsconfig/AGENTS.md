@@ -12,5 +12,5 @@ packages/tsconfig/                      # Shared TypeScript configurations for t
 ├── base.json                           # Core TypeScript defaults shared by every package (strict, NodeNext, DOM libs, JSON imports)
 ├── nextjs.json                         # Adds Next.js plugin, Bundler resolution, JSX preserve, and disables emit for app/route code
 ├── react-library.json                  # Targets component libraries; keeps base defaults while enabling the modern react-jsx transform
-└── package.json                        # Internal package manifest so other workspaces can depend on @midday/tsconfig
+└── package.json                        # Internal package manifest so other workspaces can depend on @zeke/tsconfig
 ```

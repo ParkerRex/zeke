@@ -1,63 +1,80 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-import { useAction } from "next-safe-action/hooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useTRPC } from "@/trpc/client";
+import type { RouterOutputs } from "@api/trpc/routers/_app";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Avatar, AvatarFallback, AvatarImageNext } from "@zeke/ui/avatar";
 import { SubmitButton } from "@zeke/ui/submit-button";
-import { Avatar, AvatarFallback, AvatarImage } from "@zeke/ui/avatar";
 import { TableRow as BaseTableRow, TableCell } from "@zeke/ui/table";
-import { setActiveTeamAction } from "@/actions/teams/set-active-team-action";
-import type { SelectTeamRow } from "./types";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type Props = {
-  row: SelectTeamRow;
+  row: RouterOutputs["team"]["list"][number];
 };
 
 export function TableRow({ row }: Props) {
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const trpc = useTRPC();
   const router = useRouter();
-  const changeTeam = useAction(setActiveTeamAction, {
-    onSuccess: () => {
-      router.push("/");
-    },
-  });
 
-  useEffect(() => {
-    if (changeTeam.status === "hasErrored") {
-      // TODO: surface toast once notification system wired
-      console.error(changeTeam.error);
-    }
-  }, [changeTeam.status, changeTeam.error]);
+  const changeTeamMutation = useMutation(
+    trpc.user.update.mutationOptions({
+      onMutate: () => {
+        setIsLoading(true);
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries();
+        router.push("/");
+      },
+      onError: () => {
+        setIsLoading(false);
+      },
+    }),
+  );
 
   return (
     <BaseTableRow key={row.id} className="hover:bg-transparent">
-      <TableCell className="border-r-0 py-4 px-0">
+      <TableCell className="border-r-[0px] py-4 px-0">
         <div className="flex items-center space-x-4">
           <Avatar className="size-8 rounded-none">
-            {row.logoUrl ? (
-              <AvatarImage src={row.logoUrl} alt={row.name ?? ""} />
-            ) : null}
+            {row.logoUrl && (
+              <AvatarImageNext
+                src={row.logoUrl}
+                alt={row.name ?? ""}
+                width={32}
+                height={32}
+              />
+            )}
             <AvatarFallback className="rounded-none">
               <span className="text-xs">
-                {row.name?.charAt(0)?.toUpperCase()}
+                {row?.name?.charAt(0)?.toUpperCase()}
               </span>
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="font-medium text-sm">{row.name}</span>
+            <span className="font-medium text-sm">{row?.name}</span>
           </div>
         </div>
       </TableCell>
       <TableCell className="px-0">
         <div className="flex justify-end">
-          <SubmitButton
-            isSubmitting={changeTeam.status === "executing"}
-            variant="outline"
-            onClick={() => {
-              changeTeam.execute({ teamId: row.id });
-            }}
-          >
-            Launch
-          </SubmitButton>
+          <div className="flex space-x-3 items-center">
+            <SubmitButton
+              isSubmitting={isLoading}
+              variant="outline"
+              onClick={() => {
+                changeTeamMutation.mutate({
+                  teamId: row.id!,
+                });
+              }}
+            >
+              Launch
+            </SubmitButton>
+          </div>
         </div>
       </TableCell>
     </BaseTableRow>

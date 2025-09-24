@@ -1,53 +1,57 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from "@tanstack/react-query";
+
+
 import { useTRPC } from "@/trpc/client";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 export function useUserQuery() {
-	const trpc = useTRPC();
-	return useSuspenseQuery(trpc.user.me.queryOptions());
+  const trpc = useTRPC();
+  return useSuspenseQuery(trpc.user.me.queryOptions());
 }
 
 export function useUserMutation() {
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-	return useMutation(
-		trpc.user.update.mutationOptions({
-			onMutate: async (newData) => {
-				// Cancel outgoing refetches
-				await queryClient.cancelQueries({
-					queryKey: trpc.user.me.queryKey(),
-				});
+  return useMutation(
+    trpc.user.update.mutationOptions({
+      onMutate: async (newData) => {
+        // Cancel outgoing refetches
+        await queryClient.cancelQueries({
+          queryKey: trpc.user.me.queryKey(),
+        });
 
-				// Get current data
-				const previousData = queryClient.getQueryData(trpc.user.me.queryKey());
+        // Get current data
+        const previousData = queryClient.getQueryData(trpc.user.me.queryKey());
 
-				// Optimistically update
-				queryClient.setQueryData(trpc.user.me.queryKey(), (old: any) => ({
-					...old,
-					...newData,
-				}));
+        // Optimistically update
+        queryClient.setQueryData(trpc.user.me.queryKey(), (old: any) => ({
+          ...old,
+          ...newData,
+        }));
 
-				return { previousData };
-			},
-			onError: (_, __, context) => {
-				// Rollback on error
-				queryClient.setQueryData(
-					trpc.user.me.queryKey(),
-					context?.previousData,
-				);
-			},
-			onSettled: () => {
-				// Refetch after error or success
-				queryClient.invalidateQueries({
-					queryKey: trpc.user.me.queryKey(),
-				});
-			},
-		}),
-	);
+        return { previousData };
+      },
+      onError: (_, __, context) => {
+        // Rollback on error
+        queryClient.setQueryData(
+          trpc.user.me.queryKey(),
+          context?.previousData,
+        );
+      },
+      onSettled: () => {
+        // Refetch after error or success
+        queryClient.invalidateQueries({
+          queryKey: trpc.user.me.queryKey(),
+        });
+      },
+    }),
+  );
 }

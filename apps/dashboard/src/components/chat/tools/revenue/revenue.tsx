@@ -1,4 +1,8 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
+
 import { useQuery } from "@tanstack/react-query";
 // TODO: UPDATE THIS TO ZEKE LOGIC
 import { BarChart } from "@/components/charts/bar-chart";

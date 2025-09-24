@@ -1,3 +1,6 @@
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
 import type { useI18n } from "@/locales/client";
 import { formatAmount } from "@zeke/utils/format";
 import { format } from "date-fns";

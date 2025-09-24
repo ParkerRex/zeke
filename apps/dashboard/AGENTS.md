@@ -3,15 +3,15 @@
 ## Coding Preferences
 - Favor Next.js App Router patterns: default to server components for data-heavy views, add `"use client"` only when a React hook or browser API requires it.
 - Lean on `@/trpc` clients and React Query for reads; pair mutations with `next-safe-action` server actions so side effects stay on the server and optimistic updates are guarded.
-- Keep TypeScript strictness intact: prefer explicit return types, avoid `any`, and extend shared types from `@midday/*` packages before creating local duplicates.
+- Keep TypeScript strictness intact: prefer explicit return types, avoid `any`, and extend shared types from `@zeke/*` packages before creating local duplicates.
 - Model validation with Zod schemas that live beside the features they protect (actions, forms, APIs); reuse shared schemas from the database package when possible.
-- Compose UI with the shared `@midday/ui` primitives and Tailwind utility classes; only reach for bespoke CSS when a component needs custom keyframes or global overrides.
+- Compose UI with the shared `@zeke/ui` primitives and Tailwind utility classes; only reach for bespoke CSS when a component needs custom keyframes or global overrides.
 - Manage page-level state with React Query caches or `src/store` Zustand slices; limit component-level `useState` to ephemeral UI knobs.
 - Derive URL state via `nuqs` helpers (`useQueryStates`, `parseAs*`) so filters and modal steps stay shareable and reload-safe.
 - Keep forms declarative: couple `react-hook-form` with the `useZodForm` helper, encapsulate sync work in hooks like `useUpload`, and surface activity through the shared `SubmitButton`.
 - Encapsulate integrations (Plaid, Teller, Polar, Resend, Trigger.dev) behind dedicated modules in `src/utils` or `src/lib/tools`; never call third-party SDKs directly from components.
-- When introducing new async flows, hook into the toast system from `@midday/ui/use-toast` and invalidate affected queries to keep the dashboard realtime.
-- Guard time-sensitive logic with the UTC default set in `package.json` scripts and reuse helpers from `@midday/utils` for formatting, number flow, and date math.
+- When introducing new async flows, hook into the toast system from `@zeke/ui/use-toast` and invalidate affected queries to keep the dashboard realtime.
+- Guard time-sensitive logic with the UTC default set in `package.json` scripts and reuse helpers from `@zeke/utils` for formatting, number flow, and date math.
 - Keep instrumentation consistent by exporting traces from `instrumentation.ts` and logging through `src/utils/logger`; follow Sentry’s setup when capturing errors.
 - Respect localization: load copy through `next-international` helpers in `src/locales` and ensure new routes live under `[locale]` with the providers wired in.
 - Test where behaviour is non-trivial using `bun test` and component contracts with `@testing-library/react` (when introduced); run `biome check` before shipping.

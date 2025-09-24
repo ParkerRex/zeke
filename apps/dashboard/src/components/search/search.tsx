@@ -1,4 +1,6 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { FormatAmount } from "@/components/format-amount";
 import { InvoiceStatus } from "@/components/invoice-status";
@@ -27,10 +29,11 @@ import { Icons } from "@zeke/ui/icons";
 import { Spinner } from "@zeke/ui/spinner";
 import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useCopyToClipboard, useDebounceValue } from "usehooks-ts";
+import { useDebounceValue } from "usehooks-ts";
+import { useCopyToClipboard } from "usehooks-ts";
 import { FilePreviewIcon } from "../file-preview-icon";
 import { TrackerTimer } from "../tracker-timer";
 
@@ -90,10 +93,7 @@ function CopyButton({ path }: { path: string }) {
 function DownloadButton({
   href,
   filename,
-}: {
-  href: string;
-  filename?: string;
-}) {
+}: { href: string; filename?: string }) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async (e: React.MouseEvent) => {
@@ -303,10 +303,7 @@ const useSearchNavigation = () => {
 const SearchResultItemDisplay = ({
   item,
   dateFormat,
-}: {
-  item: SearchItem;
-  dateFormat?: string;
-}) => {
+}: { item: SearchItem; dateFormat?: string }) => {
   const nav = useSearchNavigation();
 
   let icon: ReactNode | undefined;

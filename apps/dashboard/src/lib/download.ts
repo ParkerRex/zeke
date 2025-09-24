@@ -1,3 +1,6 @@
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
 import { invoke } from "@zeke/desktop-client/core";
 import { isDesktopApp } from "@zeke/desktop-client/platform";
 

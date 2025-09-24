@@ -33,9 +33,9 @@ Drizzle Flow
   supabase && bun run db:generate; this pipes supabase gen types --lang=typescript
   into src/types/db.ts.
   - Commit the regenerated types together with the migration so downstream apps
-  (@midday/supabase) stay in sync.
+  (@zeke/supabase) stay in sync.
   - If you need to verify everything end-to-end, rerun the relevant service (bunx
-  turbo dev --filter=@midday/api, etc.) and/or whatever tests exercise the new tables
+  turbo dev --filter=@zeke/api, etc.) and/or whatever tests exercise the new tables
   before opening a PR.
 
 

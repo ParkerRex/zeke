@@ -1,6 +1,14 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
+import { createPlaidLinkTokenAction } from "@/actions/institutions/create-plaid-link";
+import { exchangePublicToken } from "@/actions/institutions/exchange-public-token";
 import { useConnectParams } from "@/hooks/use-connect-params";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { track } from "@zeke/events/client";
+import { LogEvents } from "@zeke/events/events";
 import { Button } from "@zeke/ui/button";
 import {
   Dialog,
@@ -12,12 +20,20 @@ import {
 import { Input } from "@zeke/ui/input";
 import { Skeleton } from "@zeke/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePlaidLink } from "react-plaid-link";
+import { useDebounceValue, useScript } from "usehooks-ts";
+import { BankLogo } from "../bank-logo";
+import { ConnectBankProvider } from "../connect-bank-provider";
+import { CountrySelector } from "../country-selector";
+import { InstitutionInfo } from "../institution-info";
 
 function SearchSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from(new Array(10), (_, index) => (
         <div className="flex items-center space-x-4" key={index.toString()}>
+          <Skeleton className="h-9 w-9 rounded-full" />
           <div className="flex flex-col space-y-1">
             <Skeleton className="h-2 rounded-none w-[140px]" />
             <Skeleton className="h-2 rounded-none w-[40px]" />
@@ -34,6 +50,8 @@ function formatProvider(provider: string) {
       return "Enable Banking";
     case "gocardless":
       return "GoCardLess";
+    case "plaid":
+      return "Plaid";
     case "teller":
       return "Teller";
   }
@@ -46,6 +64,7 @@ type SearchResultProps = {
   provider: string;
   availableHistory: number;
   maximumConsentValidity: number;
+  openPlaid: () => void;
   type?: "personal" | "business";
 };
 
@@ -55,31 +74,35 @@ function SearchResult({
   logo,
   provider,
   availableHistory,
+  openPlaid,
   maximumConsentValidity,
   type,
 }: SearchResultProps) {
   return (
     <div className="flex justify-between">
       <div className="flex items-center">
-        <div className="space-y-1 cursor-default">
+        <BankLogo src={logo} alt={name} />
+
+        <div className="ml-4 space-y-1 cursor-default">
           <p className="text-sm font-medium leading-none">{name}</p>
-          <span className="text-[#878787] text-xs capitalize">
-            Via {formatProvider(provider)}
-            {type ? ` • ${type}` : ""}
-          </span>
+          <InstitutionInfo provider={provider}>
+            <span className="text-[#878787] text-xs capitalize">
+              Via {formatProvider(provider)}
+              {type ? ` • ${type}` : ""}
+            </span>
+          </InstitutionInfo>
         </div>
       </div>
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          // Stubbed - no actual connection logic
-          console.log(`Connecting to ${name} via ${provider}`);
-        }}
-      >
-        Connect
-      </Button>
+      <ConnectBankProvider
+        id={id}
+        name={name}
+        provider={provider}
+        openPlaid={openPlaid}
+        maximumConsentValidity={maximumConsentValidity}
+        availableHistory={availableHistory}
+        type={type}
+      />
     </div>
   );
 }
@@ -91,7 +114,9 @@ type ConnectTransactionsModalProps = {
 export function ConnectTransactionsModal({
   countryCode: initialCountryCode,
 }: ConnectTransactionsModalProps) {
+  const trpc = useTRPC();
   const router = useRouter();
+  const [plaidToken, setPlaidToken] = useState<string | undefined>();
   const {
     countryCode,
     search: query,
@@ -100,6 +125,44 @@ export function ConnectTransactionsModal({
   } = useConnectParams(initialCountryCode);
 
   const isOpen = step === "connect";
+
+  // NOTE: Load SDKs here so it's not unmonted
+  useScript("https://cdn.teller.io/connect/connect.js", {
+    removeOnUnmount: false,
+  });
+
+  const { open: openPlaid } = usePlaidLink({
+    token: plaidToken,
+    publicKey: "",
+    env: process.env.NEXT_PUBLIC_PLAID_ENVIRONMENT!,
+    clientName: "Midday",
+    product: ["transactions"],
+    onSuccess: async (public_token, metadata) => {
+      const { access_token, item_id } = await exchangePublicToken(public_token);
+
+      setParams({
+        step: "account",
+        provider: "plaid",
+        token: access_token,
+        ref: item_id,
+        institution_id: metadata.institution?.institution_id,
+      });
+      track({
+        event: LogEvents.ConnectBankAuthorized.name,
+        channel: LogEvents.ConnectBankAuthorized.channel,
+        provider: "plaid",
+      });
+    },
+    onExit: () => {
+      setParams({ step: "connect" });
+
+      track({
+        event: LogEvents.ConnectBankCanceled.name,
+        channel: LogEvents.ConnectBankCanceled.channel,
+        provider: "plaid",
+      });
+    },
+  });
 
   const handleOnClose = () => {
     setParams({
@@ -110,41 +173,34 @@ export function ConnectTransactionsModal({
     });
   };
 
-  // Mock data for UI demonstration
-  const mockInstitutions = [
-    {
-      id: "1",
-      name: "Chase Bank",
-      logo: null,
-      provider: "teller",
-      availableHistory: 90,
-      maximumConsentValidity: 180,
-      type: "personal" as const,
-    },
-    {
-      id: "2",
-      name: "Bank of America",
-      logo: null,
-      provider: "gocardless",
-      availableHistory: 90,
-      maximumConsentValidity: 90,
-      type: "business" as const,
-    },
-    {
-      id: "3",
-      name: "Wells Fargo",
-      logo: null,
-      provider: "enablebanking",
-      availableHistory: 365,
-      maximumConsentValidity: 180,
-    },
-  ];
+  const [debouncedQuery] = useDebounceValue(query ?? "", 200);
 
-  const filteredInstitutions = query
-    ? mockInstitutions.filter((institution) =>
-        institution.name.toLowerCase().includes(query.toLowerCase()),
-      )
-    : mockInstitutions;
+  const { data, isLoading } = useQuery(
+    trpc.institutions.get.queryOptions(
+      {
+        q: debouncedQuery,
+        countryCode,
+      },
+      {
+        enabled: isOpen,
+      },
+    ),
+  );
+
+  useEffect(() => {
+    async function createLinkToken() {
+      const token = await createPlaidLinkTokenAction();
+
+      if (token) {
+        setPlaidToken(token);
+      }
+    }
+
+    // NOTE: Only run where Plaid is supported
+    if ((isOpen && countryCode === "US") || (isOpen && countryCode === "CA")) {
+      createLinkToken();
+    }
+  }, [isOpen, countryCode]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOnClose}>
@@ -181,23 +237,54 @@ export function ConnectTransactionsModal({
                   autoFocus
                   value={query ?? ""}
                 />
+
+                <div className="absolute right-0">
+                  <CountrySelector
+                    defaultValue={countryCode}
+                    onSelect={(countryCode) => {
+                      setParams({ countryCode });
+                    }}
+                  />
+                </div>
               </div>
 
               <div className="h-[430px] space-y-4 overflow-auto scrollbar-hide pt-2 mt-2">
-                {filteredInstitutions.map((institution) => (
-                  <SearchResult
-                    key={institution.id}
-                    id={institution.id}
-                    name={institution.name}
-                    logo={institution.logo}
-                    provider={institution.provider}
-                    availableHistory={institution.availableHistory}
-                    maximumConsentValidity={institution.maximumConsentValidity}
-                    type={institution.type}
-                  />
-                ))}
+                {isLoading && <SearchSkeleton />}
 
-                {filteredInstitutions.length === 0 && (
+                {data?.map((institution) => {
+                  if (!institution) {
+                    return null;
+                  }
+
+                  return (
+                    <SearchResult
+                      key={institution.id}
+                      id={institution.id}
+                      name={institution.name}
+                      logo={institution.logo}
+                      provider={institution.provider}
+                      // GoCardLess
+                      availableHistory={
+                        institution.availableHistory
+                          ? +institution.availableHistory
+                          : 0
+                      }
+                      // EnableBanking
+                      maximumConsentValidity={
+                        institution.maximumConsentValidity
+                          ? +institution.maximumConsentValidity
+                          : 0
+                      }
+                      type={institution?.type ?? undefined}
+                      openPlaid={() => {
+                        setParams({ step: null });
+                        openPlaid();
+                      }}
+                    />
+                  );
+                })}
+
+                {!isLoading && data?.length === 0 && (
                   <div className="flex flex-col items-center justify-center min-h-[350px]">
                     <p className="font-medium mb-2">No banks found</p>
                     <p className="text-sm text-center text-[#878787]">

@@ -1,5 +1,7 @@
 "use client";
-// TODO: UPDATE THIS TO ZEKE LOGIC
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
 import {
   Dialog,
   DialogContent,
@@ -41,7 +43,7 @@ export function ChoosePlanModal({
         return `Your trial will end in ${daysLeft} ${daysLeft === 1 ? "day" : "days"}, after the trial period you will have read access only.`;
       }
 
-      return "Your trial period has ended. Please choose a plan to continue using Zeke.";
+      return "Your trial period has ended. Please choose a plan to continue using Midday.";
     }
 
     if (hasDiscount && discountPrice) {
@@ -51,7 +53,7 @@ export function ChoosePlanModal({
       return `As a valued early customer, you qualify for our special discount pricing. Get the Pro plan for $${discountPrice}/month instead of the regular $99/month and save ${savePercentage}%.`;
     }
 
-    return "Choose a plan to continue using Zeke.";
+    return "Choose a plan to continue using Midday.";
   };
 
   return (

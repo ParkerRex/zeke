@@ -1,149 +1,334 @@
-import { HeadlessService } from "@novu/headless";
-import { createClient } from "@zeke/supabase/client";
-import { getUserQuery } from "@zeke/supabase/queries";
-import { useCallback, useEffect, useRef, useState } from "react";
+"use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
+import { useRealtime } from "@/hooks/use-realtime";
+import { useUserQuery } from "@/hooks/use-user";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@zeke/api/trpc/routers/_app";
+import { useCallback, useMemo } from "react";
+
+// Infer types from tRPC router
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+type RouterInputs = inferRouterInputs<AppRouter>;
+type NotificationsList = RouterOutputs["notifications"]["list"];
+type NotificationsData = NotificationsList["data"];
+
+// Use the natural tRPC types without modification
+export type Activity = NotificationsData[number];
+
+type UpdateStatusInput = RouterInputs["notifications"]["updateStatus"];
+type UpdateAllStatusInput = RouterInputs["notifications"]["updateAllStatus"];
+
+// Utility functions to safely handle metadata without excessive casting
+export function getMetadata(activity: Activity): Record<string, any> {
+  return (activity.metadata as Record<string, any>) || {};
+}
+
+export function getMetadataProperty(activity: Activity, key: string): any {
+  const metadata = getMetadata(activity);
+  return metadata[key];
+}
 
 export function useNotifications() {
-  const supabase = createClient();
-  const [isLoading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
-  const [subscriberId, setSubscriberId] = useState();
-  const headlessServiceRef = useRef<HeadlessService>();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { data: user } = useUserQuery();
 
-  const markAllMessagesAsRead = () => {
-    const headlessService = headlessServiceRef.current;
+  const {
+    data: activitiesData,
+    isLoading,
+    error,
+  } = useQuery(
+    trpc.notifications.list.queryOptions({
+      maxPriority: 3, // Only fetch notifications (priority <= 3)
+      pageSize: 20,
+      status: ["unread", "read"], // Exclude archived notifications from query
+    }),
+  );
 
-    if (headlessService) {
-      setNotifications((prevNotifications) =>
-        prevNotifications.map((notification) => {
-          return {
-            ...notification,
-            read: true,
-          };
-        }),
-      );
+  // Separate query for archived notifications
+  const { data: archivedActivitiesData, isLoading: archivedIsLoading } =
+    useQuery(
+      trpc.notifications.list.queryOptions({
+        maxPriority: 3,
+        pageSize: 20,
+        status: "archived", // Only archived notifications
+      }),
+    );
 
-      headlessService.markAllMessagesAsRead({
-        listener: () => {},
-        onError: () => {},
-      });
-    }
-  };
-
-  const markMessageAsRead = (messageId: string) => {
-    const headlessService = headlessServiceRef.current;
-
-    if (headlessService) {
-      setNotifications((prevNotifications) =>
-        prevNotifications.map((notification) => {
-          if (notification.id === messageId) {
-            return {
-              ...notification,
-              read: true,
-            };
-          }
-
-          return notification;
-        }),
-      );
-
-      headlessService.markNotificationsAsRead({
-        messageId: [messageId],
-        listener: (result) => {},
-        onError: (error) => {},
-      });
-    }
-  };
-
-  const fetchNotifications = useCallback(() => {
-    const headlessService = headlessServiceRef.current;
-
-    if (headlessService) {
-      headlessService.fetchNotifications({
-        listener: ({}) => {},
-        onSuccess: (response) => {
-          setLoading(false);
-          setNotifications(response.data);
-        },
-      });
-    }
-  }, []);
-
-  const markAllMessagesAsSeen = () => {
-    const headlessService = headlessServiceRef.current;
-
-    if (headlessService) {
-      setNotifications((prevNotifications) =>
-        prevNotifications.map((notification) => ({
-          ...notification,
-          seen: true,
-        })),
-      );
-      headlessService.markAllMessagesAsSeen({
-        listener: () => {},
-        onError: () => {},
-      });
-    }
-  };
-
-  useEffect(() => {
-    async function fetchUser() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const { data: userData } = await getUserQuery(
-        supabase,
-        session?.user?.id,
-      );
-
-      if (userData) {
-        setSubscriberId(`${userData.team_id}_${userData.id}`);
+  // Real-time subscription for activities filtered by user_id
+  useRealtime({
+    channelName: "user-notifications",
+    event: "INSERT",
+    table: "activities",
+    filter: `user_id=eq.${user?.id}`,
+    onEvent: (payload) => {
+      // Only handle new notifications (priority <= 3), not archived updates
+      const newRecord = payload?.new as any; // Supabase payload type
+      if (newRecord?.priority && newRecord.priority <= 3) {
+        // Invalidate both inbox and archived queries
+        queryClient.invalidateQueries({
+          queryKey: trpc.notifications.list.queryKey(),
+        });
       }
-    }
+    },
+  });
 
-    fetchUser();
-  }, [supabase]);
+  // Mutations
+  const updateStatusMutation = useMutation(
+    trpc.notifications.updateStatus.mutationOptions({
+      onMutate: async (variables: UpdateStatusInput) => {
+        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries({
+          queryKey: trpc.notifications.list.queryKey(),
+        });
 
-  useEffect(() => {
-    const headlessService = headlessServiceRef.current;
+        // Define query keys for both inbox and archived
+        const inboxQueryKey = trpc.notifications.list.queryKey({
+          maxPriority: 3,
+          pageSize: 20,
+          status: ["unread", "read"],
+        });
 
-    if (headlessService) {
-      headlessService.listenNotificationReceive({
-        listener: () => {
-          fetchNotifications();
-        },
+        const archivedQueryKey = trpc.notifications.list.queryKey({
+          maxPriority: 3,
+          pageSize: 20,
+          status: "archived",
+        });
+
+        // Snapshot both query states
+        const previousInboxData =
+          queryClient.getQueryData<NotificationsList>(inboxQueryKey);
+        const previousArchivedData =
+          queryClient.getQueryData<NotificationsList>(archivedQueryKey);
+
+        if (variables.status === "archived") {
+          // Moving from inbox to archived
+          let notificationToMove: Activity | null = null;
+
+          // Remove from inbox
+          queryClient.setQueryData<NotificationsList>(inboxQueryKey, (old) => {
+            if (!old?.data) return old;
+
+            const filteredData = old.data.filter((notification) => {
+              if (notification.id === variables.activityId) {
+                notificationToMove = { ...notification, status: "archived" };
+                return false;
+              }
+              return true;
+            });
+
+            return { ...old, data: filteredData };
+          });
+
+          // Add to archived (if we found the notification)
+          if (notificationToMove) {
+            queryClient.setQueryData<NotificationsList>(
+              archivedQueryKey,
+              (old) => {
+                if (!old?.data)
+                  return {
+                    data: [notificationToMove!],
+                    meta: old?.meta || {
+                      cursor: null,
+                      hasPreviousPage: false,
+                      hasNextPage: false,
+                    },
+                  };
+                return { ...old, data: [notificationToMove!, ...old.data] };
+              },
+            );
+          }
+        } else {
+          // For other status changes (like unread -> read), just update the inbox
+          queryClient.setQueryData<NotificationsList>(inboxQueryKey, (old) => {
+            if (!old?.data) return old;
+
+            return {
+              ...old,
+              data: old.data.map((notification) =>
+                notification.id === variables.activityId
+                  ? { ...notification, status: variables.status }
+                  : notification,
+              ),
+            };
+          });
+        }
+
+        // Return context for rollback
+        return {
+          previousInboxData,
+          previousArchivedData,
+          inboxQueryKey,
+          archivedQueryKey,
+        };
+      },
+      onError: (_, __, context) => {
+        // Rollback both queries if mutation fails
+        if (context?.previousInboxData) {
+          queryClient.setQueryData(
+            context.inboxQueryKey,
+            context.previousInboxData,
+          );
+        }
+        if (context?.previousArchivedData) {
+          queryClient.setQueryData(
+            context.archivedQueryKey,
+            context.previousArchivedData,
+          );
+        }
+      },
+    }),
+  );
+
+  const updateAllStatusMutation = useMutation(
+    trpc.notifications.updateAllStatus.mutationOptions({
+      onMutate: async (variables: UpdateAllStatusInput) => {
+        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries({
+          queryKey: trpc.notifications.list.queryKey(),
+        });
+
+        // Define query keys for both inbox and archived
+        const inboxQueryKey = trpc.notifications.list.queryKey({
+          maxPriority: 3,
+          pageSize: 20,
+          status: ["unread", "read"],
+        });
+
+        const archivedQueryKey = trpc.notifications.list.queryKey({
+          maxPriority: 3,
+          pageSize: 20,
+          status: "archived",
+        });
+
+        // Snapshot both query states
+        const previousInboxData =
+          queryClient.getQueryData<NotificationsList>(inboxQueryKey);
+        const previousArchivedData =
+          queryClient.getQueryData<NotificationsList>(archivedQueryKey);
+
+        if (variables.status === "archived") {
+          // Moving all inbox notifications to archived
+          let notificationsToMove: Activity[] = [];
+
+          // Clear inbox and collect notifications to move
+          queryClient.setQueryData<NotificationsList>(inboxQueryKey, (old) => {
+            if (!old?.data) return old;
+
+            notificationsToMove = old.data.map((notification) => ({
+              ...notification,
+              status: "archived" as const,
+            }));
+
+            return { ...old, data: [] };
+          });
+
+          // Add all to archived
+          if (notificationsToMove.length > 0) {
+            queryClient.setQueryData<NotificationsList>(
+              archivedQueryKey,
+              (old) => {
+                if (!old?.data)
+                  return {
+                    data: notificationsToMove,
+                    meta: old?.meta || {
+                      cursor: null,
+                      hasPreviousPage: false,
+                      hasNextPage: false,
+                    },
+                  };
+                return { ...old, data: [...notificationsToMove, ...old.data] };
+              },
+            );
+          }
+        } else if (variables.status === "read") {
+          // Update all unread to read in inbox (don't move between queries)
+          queryClient.setQueryData<NotificationsList>(inboxQueryKey, (old) => {
+            if (!old?.data) return old;
+
+            return {
+              ...old,
+              data: old.data.map((notification) => ({
+                ...notification,
+                status: variables.status,
+              })),
+            };
+          });
+        }
+
+        // Return context for rollback
+        return {
+          previousInboxData,
+          previousArchivedData,
+          inboxQueryKey,
+          archivedQueryKey,
+        };
+      },
+      onError: (_, __, context) => {
+        // Rollback both queries if mutation fails
+        if (context?.previousInboxData) {
+          queryClient.setQueryData(
+            context.inboxQueryKey,
+            context.previousInboxData,
+          );
+        }
+        if (context?.previousArchivedData) {
+          queryClient.setQueryData(
+            context.archivedQueryKey,
+            context.previousArchivedData,
+          );
+        }
+      },
+    }),
+  );
+
+  // Return notification activities directly without transformation
+  const notifications = activitiesData?.data || [];
+  const archivedNotifications = archivedActivitiesData?.data || [];
+
+  // Mark a single message as read (archived)
+  const markMessageAsRead = useCallback(
+    (messageId: string) => {
+      updateStatusMutation.mutate({
+        activityId: messageId,
+        status: "archived",
       });
-    }
-  }, [headlessServiceRef.current]);
+    },
+    [updateStatusMutation],
+  );
 
-  useEffect(() => {
-    if (subscriberId && !headlessServiceRef.current) {
-      const headlessService = new HeadlessService({
-        applicationIdentifier:
-          process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER!,
-        subscriberId,
-      });
+  // Mark all messages as read (archived)
+  const markAllMessagesAsRead = useCallback(() => {
+    updateAllStatusMutation.mutate({
+      status: "archived",
+    });
+  }, [updateAllStatusMutation]);
 
-      headlessService.initializeSession({
-        listener: () => {},
-        onSuccess: () => {
-          headlessServiceRef.current = headlessService;
-          fetchNotifications();
-        },
-        onError: () => {},
-      });
-    }
-  }, [fetchNotifications, subscriberId]);
+  // Mark all messages as seen (read)
+  const markAllMessagesAsSeen = useCallback(() => {
+    updateAllStatusMutation.mutate({
+      status: "read",
+    });
+  }, [updateAllStatusMutation]);
+
+  const hasUnseenNotifications = useMemo(
+    () =>
+      notifications.some((notification) => notification.status === "unread"),
+    [notifications],
+  );
 
   return {
-    isLoading,
-    markAllMessagesAsRead,
+    isLoading: isLoading || archivedIsLoading,
+    error,
+    notifications, // Main notifications (unread/read) - already filtered by query
+    archived: archivedNotifications, // Archived notifications from separate query
+    hasUnseenNotifications,
     markMessageAsRead,
+    markAllMessagesAsRead,
     markAllMessagesAsSeen,
-    hasUnseenNotifications: notifications.some(
-      (notification) => !notification.seen,
-    ),
-    notifications,
   };
 }

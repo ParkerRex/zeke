@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Read(//Users/parkerrex/**)"
+      "Read(//Users/parkerrex/**)",
+      "Bash(chmod:*)",
+      "Bash(/tmp/add_todo_components_bulk.sh:*)"
     ],
     "deny": [],
     "ask": []

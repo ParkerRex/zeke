@@ -1,3 +1,6 @@
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
 import { getQueryClient, trpc } from "@/trpc/server";
 import { calculateAvgBurnRate } from "@/utils/format";
 import { tool } from "ai";

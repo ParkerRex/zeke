@@ -1,21 +1,24 @@
-// import { useInvoiceParams } from "@/hooks/use-invoice-params";
-// import { Sheet, SheetContent } from "@zeke/ui/sheet";
-// import React from "react";
-// import { InvoiceDetails } from "../invoice-details";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-// export function InvoiceDetailsSheet() {
-//   const { invoiceId, type, setParams } = useInvoiceParams();
+import { useInvoiceParams } from "@/hooks/use-invoice-params";
+import { Sheet, SheetContent } from "@zeke/ui/sheet";
+import React from "react";
+import { InvoiceDetails } from "../invoice-details";
 
-//   const isOpen = Boolean(invoiceId && type === "details");
+export function InvoiceDetailsSheet() {
+  const { invoiceId, type, setParams } = useInvoiceParams();
 
-//   return (
-//     <Sheet
-//       open={isOpen}
-//       onOpenChange={() => setParams({ invoiceId: null, type: null })}
-//     >
-//       <SheetContent>
-//         <InvoiceDetails />
-//       </SheetContent>
-//     </Sheet>
-//   );
-// }
+  const isOpen = Boolean(invoiceId && type === "details");
+
+  return (
+    <Sheet
+      open={isOpen}
+      onOpenChange={() => setParams({ invoiceId: null, type: null })}
+    >
+      <SheetContent>
+        <InvoiceDetails />
+      </SheetContent>
+    </Sheet>
+  );
+}

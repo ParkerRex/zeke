@@ -1,4 +1,8 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
+
 import { useChat } from "@ai-sdk/react";
 import { useEffect } from "react";
 // TODO: UPDATE THIS TO ZEKE LOGIC

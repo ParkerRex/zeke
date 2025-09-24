@@ -6,7 +6,7 @@
 - **Reach for `getDb()`** from `src/init.ts` when touching Postgres and use the provided Supabase client helpers; avoid ad-hoc connection setup inside tasks
 - **Capture job logging** through `@trigger.dev/sdk`'s logger and keep structured metadata consistent for easier tracing in Trigger
 - **Share reusable routines** by extending the helpers in `src/utils/` (e.g., `processBatch`, `triggerBatch`, `text-preparation`) instead of re-implementing batching or transformation logic inside tasks
-- **Keep domain behavior inside its task folder** (`bank/`, `inbox/`, `invoice/`, etc.) and call cross-cutting utilities or connectors (`@midday/inbox`, `@midday/notifications`) rather than duplicating API access
+- **Keep domain behavior inside its task folder** (`bank/`, `inbox/`, `invoice/`, etc.) and call cross-cutting utilities or connectors (`@zeke/inbox`, `@zeke/notifications`) rather than duplicating API access
 - **When introducing schedulers**, mirror the existing pattern: configure via `schedules.task`, generate cron strings with `generateCronTag`, and guard re-registration through deduplication keys
 - **Co-locate new low-level helpers** with accompanying Bun or Trigger-facing tests (see `src/utils/transform.test.ts`) to preserve coverage close to the implementation
 
@@ -128,7 +128,7 @@ Database connections are managed through `src/init.ts`:
 Tasks are organized by business domain:
 - Each domain (bank, inbox, invoice, etc.) owns its folder
 - Cross-cutting concerns use shared utilities
-- External packages (`@midday/inbox`, `@midday/notifications`) for common functionality
+- External packages (`@zeke/inbox`, `@zeke/notifications`) for common functionality
 
 ### Scheduler Patterns
 Consistent approach for scheduled jobs:
@@ -164,7 +164,7 @@ When creating a new job:
    ```typescript
    import { schemaTask } from "@trigger.dev/sdk/v3";
    import { NewJobPayload } from "@jobs/schema";
-   
+
    export const newJob = schemaTask({
      id: "new-job",
      schema: NewJobPayload,

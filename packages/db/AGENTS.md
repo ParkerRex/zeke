@@ -10,7 +10,7 @@
 - Update `schema.ts` for every structural change (enums, relations, indexes) and keep column names in `snake_case` to match Postgres conventions.
 - Re-export new query modules from `queries/index.ts` and keep the list alphabetized to simplify discovery.
 - Define parameter/return types near their usage, prefer `type` aliases, and avoid `any`; lean on `Awaited<ReturnType<...>>` helpers for shared shapes.
-- Shared logic that spans queries lives in `src/utils`; keep those helpers pure when possible and use `@midday/logger` for observability.
+- Shared logic that spans queries lives in `src/utils`; keep those helpers pure when possible and use `@zeke/logger` for observability.
 - Expand or adjust fixtures in `src/test` whenever query behavior changes; keep the golden dataset authoritative for transaction matching flows.
 - Use the `@db/*` path alias provided in `tsconfig.json`, sort imports by external vs. internal modules, and leave TODOs with context plus owner initials.
 

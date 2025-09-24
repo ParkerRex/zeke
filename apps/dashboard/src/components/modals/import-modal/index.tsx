@@ -1,4 +1,6 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { importTransactionsAction } from "@/actions/transactions/import-transactions";
 import { useSyncStatus } from "@/hooks/use-sync-status";
@@ -26,56 +28,26 @@ import { ImportCsvContext, importSchema } from "./context";
 import { FieldMapping } from "./field-mapping";
 import { SelectFile } from "./select-file";
 
-/** Available pages in the import modal flow */
 const pages = ["select-file", "confirm-import"] as const;
 
-/**
- * Props for the ImportModal component
- */
 type Props = {
-  /** Array of available currency codes */
   currencies: string[];
-  /** Default currency to use for imports */
   defaultCurrency: string;
 };
 
-/**
- * Modal component for importing CSV transaction files.
- *
- * Provides a two-step flow:
- * 1. File selection and validation
- * 2. Field mapping confirmation and import execution
- *
- * The modal integrates with URL state management to maintain import state
- * and provides real-time feedback during the import process.
- *
- * @param currencies - Array of available currency codes for selection
- * @param defaultCurrency - Default currency to pre-select in the form
- */
 export function ImportModal({ currencies, defaultCurrency }: Props) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-
-  /** Unique identifier for the current import run */
   const [runId, setRunId] = useState<string | undefined>();
-
-  /** Access token for tracking import progress */
   const [accessToken, setAccessToken] = useState<string | undefined>();
-
-  /** Whether an import operation is currently in progress */
   const [isImporting, setIsImporting] = useState(false);
-
-  /** Column headers extracted from the uploaded CSV file */
   const [fileColumns, setFileColumns] = useState<string[] | null>(null);
-
-  /** Sample rows from the CSV file for preview */
   const [firstRows, setFirstRows] = useState<Record<string, string>[] | null>(
     null,
   );
 
   const { data: user } = useUserQuery();
 
-  /** Current page index in the import flow */
   const [pageNumber, setPageNumber] = useState<number>(0);
   const page = pages[pageNumber];
 
@@ -85,7 +57,6 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
 
   const { status, setStatus } = useSyncStatus({ runId, accessToken });
 
-  /** URL query parameters for modal state management */
   const [params, setParams] = useQueryStates({
     step: parseAsString,
     accountId: parseAsString,
@@ -93,10 +64,8 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
     hide: parseAsBoolean.withDefault(false),
   });
 
-  /** Whether the modal should be open based on URL parameters */
   const isOpen = params.step === "import";
 
-  /** Server action for importing transactions */
   const importTransactions = useAction(importTransactionsAction, {
     onSuccess: ({ data }) => {
       if (data) {
@@ -117,7 +86,6 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
     },
   });
 
-  /** Form management for import configuration */
   const {
     control,
     watch,
@@ -135,9 +103,6 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
 
   const file = watch("file");
 
-  /**
-   * Closes the modal and resets all state
-   */
   const onclose = () => {
     setFileColumns(null);
     setFirstRows(null);
@@ -152,21 +117,18 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
     });
   };
 
-  // Set bank account ID from URL parameters
   useEffect(() => {
     if (params.accountId) {
       setValue("bank_account_id", params.accountId);
     }
   }, [params.accountId]);
 
-  // Set inverted flag based on transaction type
   useEffect(() => {
     if (params.type) {
       setValue("inverted", params.type === "credit");
     }
   }, [params.type]);
 
-  // Handle import failure status
   useEffect(() => {
     if (status === "FAILED") {
       setIsImporting(false);
@@ -180,7 +142,6 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
     }
   }, [status]);
 
-  // Handle successful import completion
   useEffect(() => {
     if (status === "COMPLETED") {
       setRunId(undefined);
@@ -211,7 +172,7 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
     }
   }, [status]);
 
-  // Auto-advance to field mapping page when file is ready
+  // Go to second page if file looks good
   useEffect(() => {
     if (file && fileColumns && pageNumber === 0) {
       setPageNumber(1);
@@ -242,7 +203,7 @@ export function ImportModal({ currencies, defaultCurrency }: Props) {
               {page === "select-file" &&
                 "Upload a CSV file of your transactions."}
               {page === "confirm-import" &&
-                "We've mapped each column to what we believe is correct, but please review the data below to confirm it's accurate."}
+                "We’ve mapped each column to what we believe is correct, but please review the data below to confirm it’s accurate."}
             </DialogDescription>
           </DialogHeader>
 

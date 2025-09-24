@@ -1,0 +1,26 @@
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
+
+import { useQueryStates } from "nuqs";
+import { createLoader, parseAsArrayOf, parseAsString } from "nuqs/server";
+
+const invoiceFilterParamsSchema = {
+  q: parseAsString,
+  statuses: parseAsArrayOf(parseAsString),
+  customers: parseAsArrayOf(parseAsString),
+  start: parseAsString,
+  end: parseAsString,
+};
+
+export function useInvoiceFilterParams() {
+  const [filter, setFilter] = useQueryStates(invoiceFilterParamsSchema);
+
+  return {
+    filter,
+    setFilter,
+    hasFilters: Object.values(filter).some((value) => value !== null),
+  };
+}
+
+export const loadInvoiceFilterParams = createLoader(invoiceFilterParamsSchema);

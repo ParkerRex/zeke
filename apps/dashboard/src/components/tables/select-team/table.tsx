@@ -1,11 +1,13 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
+import type { RouterOutputs } from "@api/trpc/routers/_app";
 import { Table, TableBody } from "@zeke/ui/table";
-import type { SelectTeamRow } from "./types";
 import { TableRow } from "./table-row";
 
 type Props = {
-  data: SelectTeamRow[];
+  data: RouterOutputs["team"]["list"];
 };
 
 export function SelectTeamTable({ data }: Props) {

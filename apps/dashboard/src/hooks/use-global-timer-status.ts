@@ -1,9 +1,13 @@
 "use client";
+// TODO: This is for example purposes only from the Midday project
+// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+
+
 
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-// TODO: UPDATE THIS TO ZEKE LOGIC
+
 export function useGlobalTimerStatus() {
   const trpc = useTRPC();
   const originalTitleRef = useRef<string | undefined>(undefined);
@@ -72,7 +76,7 @@ export function useGlobalTimerStatus() {
       const minutes = Math.floor((totalElapsedTime % 3600) / 60);
       const seconds = totalElapsedTime % 60;
       const timeDisplay = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      const newTitle = `${timeDisplay} • ${projectName} | Zeke`;
+      const newTitle = `${timeDisplay} • ${projectName} | Midday`;
 
       // Only update title if it actually changed to reduce DOM operations
       if (lastTitleUpdateRef.current !== newTitle) {
