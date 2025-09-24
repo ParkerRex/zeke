@@ -1,188 +1,143 @@
+// sv.ts
 export default {
-  transaction_methods: {
-    card_purchase: "Kortbetalning",
-    payment: "Betalning",
-    card_atm: "Kort bankomat",
-    transfer: "Överföring",
-    other: "Annan",
-    ach: "Ach",
-    deposit: "Deposition",
-    wire: "Wire",
-    fee: "Avgift",
-    interest: "Ränta",
+  navigation: {
+    today: "Idag",
+    sources: "Källor",
+    stories: "Nyheter",
+    insights: "Insikter",
+    briefs: "Sammandrag",
+    playbooks: "Handlingsplaner",
+    watchlists: "Bevakningslistor",
+    settings: {
+      root: "Inställningar",
+      workspace: "Arbetsyta",
+      team: "Team",
+      notifications: "Aviseringar",
+      developer: "Utvecklare",
+    },
   },
-  language: {
-    title: "Språk",
-    description: "Ändra språket som används i användargränssnittet.",
-    placeholder: "Välj språk",
+  status: {
+    loading: "Laddar …",
+    loadError: "Det går inte att ladda data just nu.",
+    retry: "Försök igen",
+    comingSoon: "Vi färdigställer den här upplevelsen – tack för tålamodet.",
+    openStory: "Välj en story för att visa detaljer.",
   },
-  languages: {
-    en: "Engelska",
-    sv: "Svenska",
+  today: {
+    title: "Dagens viktigaste nyheter",
+    description: "Dagens främsta AI- och teknikhistorier med kontextuella insikter.",
   },
-  timezone: {
-    title: "Tidzon",
-    description: "Aktuell tidzoninställning.",
-    placeholder: "Välj tidzon",
+  stories: {
+    title: "Nyheter",
+    description: "Utforska AI-drivna nyhetsartiklar med sammanhang och sammanfattningar.",
+    discoverHeading: "Utforska nyheter",
+    searchPlaceholder: "Sök efter artiklar (titel eller URL)…",
+    filter: {
+      all: "Alla",
+      youtube: "YouTube",
+      arxiv: "arXiv",
+      podcast: "Podcast",
+      reddit: "Reddit",
+      hn: "HN",
+      article: "Artikel",
+    },
+    loadMore: "Ladda fler",
+    showingCount: "Visar {shown} av {total} nyheter",
+    personalizedTitle: "Personligt nyhetsflöde",
+    gatedTitle: "Registrera dig för att låsa upp det personliga nyhetsflödet och mycket mer",
+    signupCta: "Registrera dig",
+    settingsAria: "Inställningar",
   },
-  inbox_filter: {
-    all: "Alla",
-    todo: "Att göra",
-    done: "Slutförda",
+  news: {
+    topTitle: "Toppnyheter",
+    latestTitle: "Senaste nyheter",
+    showMore: "Visa mer",
+    hypeScore: "Hype-poäng",
+    hypeLabel: "Hype",
+    coverage: "{value}% {label} täckning",
+    coverageLabel: "vänster",
+    sources: {
+      one: "{count} källa",
+      other: "{count} källor",
+    },
+    timeAgo: "för {time} sedan",
+    chiliAria: "styrka",
   },
-  spending_period: {
-    last_30d: "Senaste 30 dagarna",
-    this_month: "Den här månaden",
-    last_month: "Förra månaden",
-    this_year: "Det här året",
-    last_year: "Förra året",
+  watchlists: {
+    header: "Bevakningslistor",
+    empty: "Skapa en lista över objekt att bevaka. Kommer snart.",
   },
-  transactions_period: {
-    all: "All",
-    income: "Inkomst",
-    outcome: "Utgifter",
+  insights: {
+    header: "Insikter",
+    intro1:
+      "Granskning av insikter hamnar här – vi lyfter fram höjdpunkter, länkar tillbaka till underliggande källor och lägger upp uppföljningar i kö. Datakontrakten är på plats och instrumentpanelen tänds när de nya Trigger.dev-jobben för insikter landar.",
+    intro2:
+      "Tills dess påminner ytan om att stories mynnar ut i insikter, och gränssnittet speglar Midday-flödet fast med Zekes vokabulär.",
   },
-  chart_type: {
-    profit: "Vinst",
-    revenue: "Omsättning",
-    burn_rate: "Brännhastighet",
+  sources: {
+    header: "Källor",
+    intro1:
+      "Här kopplar team ihop RSS-flöden, nyhetsbrev, forskningsbibliotek och andra insamlingskällor. Vi färdigställer Trigger.dev-jobben och Cloudflare-routrarna, så UI:t är tills vidare en platshållare.",
+    intro2:
+      "Så snart onboardingflödet är på plats kan du lägga till källor här och låta ZEKE samla in, normalisera och dirigera stories genom det nya jobbsystemet.",
   },
-  folders: {
-    all: "Alla",
-    exports: "Exporteringar",
-    inbox: "Inkorg",
-    imports: "Importer",
-    transactions: "Transaktioner",
-    invoices: "Fakturor",
+  briefs: {
+    header: "Sammandrag",
+    intro1:
+      "Playbooks och sammanfattningar mynnar ut i sammandrag – strukturerade paket att dela eller exportera. Rapporteringskedjan kopplas fortfarande, så betrakta detta som en platshållare medan flödet story → insikt → sammandrag tar form.",
   },
-  mfa_status: {
-    verified: "Verifierad",
-    unverified: "Overifierad",
+  playbooks: {
+    header: "Handlingsplaner",
+    intro1:
+      "Handlingsplaner låter dig kedja Trigger.dev-jobb – samla källor, skapa insikter och publicera sammandrag på schema. UI:t landar när orkestreringen är stabil; tills dess behåller vi en platshållare så navigationen fortsätter följa Midday-strukturen.",
   },
-  roles: {
-    owner: "Ägare",
-    member: "Medlem",
+  overlay: {
+    whyItMatters: "Varför det är viktigt",
+    hype: "Hype",
+    confidence: "säkerhet",
+    sources: "Källor",
+    share: "Dela",
   },
-  tracker_status: {
-    in_progress: "Pågående",
-    completed: "Färdig",
+  tabs: {
+    one: "Stängde {count} flik",
+    other: "Stängde {count} flikar",
+    undo: "Ångra",
   },
-  account_balance: {
-    total_balance: "Total saldo",
+  support: {
+    success: "Supportärende skickat.",
+    error: "Något gick fel, försök igen.",
+    subjectLabel: "Ämne",
+    subjectPlaceholder: "Sammanfatta problemet du har",
+    areaLabel: "Område",
+    areaPlaceholder: "Välj område",
+    areas: {
+      stories: "Stories",
+      insights: "Insikter",
+      watchlists: "Bevakningslistor",
+      sources: "Källor",
+      briefs: "Sammandrag",
+      playbooks: "Handlingsplaner",
+      integrations: "Integrationer",
+      general: "Allmänt",
+    },
+    severityLabel: "Allvarlighetsgrad",
+    severityPlaceholder: "Välj allvarlighetsgrad",
+    severities: {
+      low: "Låg",
+      normal: "Normal",
+      high: "Hög",
+      urgent: "Brådskande",
+    },
+    messageLabel: "Meddelande",
+    messagePlaceholder:
+      "Beskriv problemet du upplever samt relevant information. Var så detaljerad som möjligt.",
+    submit: "Skicka",
   },
-  transaction_categories: {
-    // Parent Categories
-    revenue: "Intäkter och pengar från verksamheten",
-    "cost-of-goods-sold":
-      "Direkta kostnader för att producera varor eller tjänster",
-    "sales-marketing":
-      "Kostnader relaterade till försäljning och marknadsföring",
-    operations: "Dagliga driftskostnader för att driva verksamheten",
-    "professional-services":
-      "Avgifter till externa experter och tjänsteleverantörer",
-    "human-resources":
-      "Anställdrelaterade kostnader inklusive löner, förmåner och utbildning",
-    "travel-entertainment": "Affärsresor, måltider och nöjeskostnader",
-    technology: "Programvara, hårdvara och teknologirelaterade kostnader",
-    "banking-finance":
-      "Bankavgifter, lånebetalningar och finansiella transaktioner",
-    "assets-capex": "Kapitalutgifter och tillgångsförvärv",
-    "liabilities-debt": "Skuldförbindelser och uppskjuten intäkt",
-    taxes: "Skattebetalningar och myndighetsavgifter",
-    "owner-equity": "Ägareinvesteringar, uttag och eget kapital",
-    system: "Systemgenererade kategorier för okategoriserade transaktioner",
-
-    // Child Categories - Revenue
-    income: "Allmänna affärsintäkter från olika källor",
-    "product-sales":
-      "Intäkter från försäljning av fysiska eller digitala produkter",
-    "service-revenue": "Intäkter från att tillhandahålla tjänster till kunder",
-    "consulting-revenue": "Intäkter från konsulttjänster och rådgivning",
-    "subscription-revenue":
-      "Återkommande intäkter från prenumerationsbaserade tjänster",
-    "interest-income": "Intäkter från ränta på investeringar eller lån",
-    "other-income": "Diverse intäkter som inte klassificeras annorstädes",
-    "customer-refunds": "Pengar återbetalda till kunder för återbetalningar",
-    "chargebacks-disputes": "Intäktsjusteringar från betalningsdispyt",
-
-    // Child Categories - Cost of Goods Sold
-    inventory: "Kostnad för varor som hålls för försäljning",
-    manufacturing: "Produktionskostnader för tillverkning av varor",
-    "shipping-inbound": "Kostnader för att ta emot varor och material",
-    "duties-customs": "Importtullar och tullavgifter",
-
-    // Child Categories - Sales & Marketing
-    marketing: "Marknadsföringskampanjer och promotionskostnader",
-    advertising: "Betalda annonser och mediaplaceringar",
-    website: "Webbplatsutveckling, hosting och underhåll",
-    events: "Mässor, konferenser och evenemangskostnader",
-    "promotional-materials":
-      "Broschyrer, visitkort och marknadsföringsmaterial",
-
-    // Child Categories - Operations
-    "office-supplies": "Kontorsmaterial och pappersvaror",
-    rent: "Kontor, lager eller utrustningshyra",
-    utilities: "El, vatten, gas och andra räkningar",
-    "facilities-expenses": "Byggnadsunderhåll och anläggningskostnader",
-    equipment: "Icke-kapitalutrustning och underhåll",
-    "internet-and-telephone": "Internet, telefon och kommunikationstjänster",
-    shipping: "Utgående frakt och leveranskostnader",
-
-    // Child Categories - Professional Services
-    "professional-services-fees": "Juridiska, redovisnings- och konsultarvoden",
-    contractors: "Betalningar till oberoende entreprenörer och frilansare",
-    insurance: "Företagsförsäkringspremier och täckning",
-
-    // Child Categories - Human Resources
-    salary: "Anställdas löner och arvoden",
-    training: "Anställdas utbildning och utvecklingskostnader",
-    "employer-taxes": "Arbetsgivaravgifter och bidrag",
-    benefits: "Anställdas förmåner och sjukförsäkring",
-
-    // Child Categories - Travel & Entertainment
-    travel: "Affärsresekostnader inklusive transport",
-    meals: "Affärsmåltider och middagskostnader",
-    activity: "Nöjes- och teambuildingaktiviteter",
-
-    // Child Categories - Technology
-    software: "Programvarulicenser och prenumerationer",
-    "non-software-subscriptions": "Icke-programvaruprenumerationer",
-
-    // Child Categories - Banking & Finance
-    transfer: "Banköverföringar mellan konton",
-    "credit-card-payment": "Kreditkortsbetalningar och avgifter",
-    "banking-fees": "Bankkontounderhåll och transaktionsavgifter",
-    "loan-proceeds": "Pengar mottagna från lån och finansiering",
-    "loan-principal-repayment": "Huvudstolsbetalningar på lån",
-    "interest-expense": "Ränta betalad på lån och kredit",
-    payouts: "Betalningsplattformsutbetalningar till företaget",
-    "processor-fees": "Betalningsbehandling och transaktionsavgifter",
-    fees: "Allmänna bank- och finansiella avgifter",
-
-    // Child Categories - Assets
-    "fixed-assets": "Långsiktiga tillgångar som byggnader och utrustning",
-    "prepaid-expenses": "Förhandsbetalningar för framtida tjänster",
-
-    // Child Categories - Liabilities & Debt
-    leases: "Utrustnings- och fastighetsleasingsbetalningar",
-    "deferred-revenue": "Förhandsbetalningar mottagna för framtida tjänster",
-
-    // Child Categories - Taxes & Government
-    "vat-gst-pst-qst-payments":
-      "Mervärdesskatt och försäljningsskattebetalningar",
-    "sales-use-tax-payments":
-      "Försäljnings- och användningsskatteförpliktelser",
-    "income-tax-payments": "Inkomstskattebetalningar och avbetalningar",
-    "payroll-tax-remittances": "Anställdas skatteavdrag och remitteringar",
-    "government-fees": "Myndighetslicensiering och regelverksavgifter",
-
-    // Child Categories - Owner / Equity
-    "owner-draws": "Pengar som dras av företagsägare",
-    "capital-investment": "Ägareinvesteringar i företaget",
-    "charitable-donations": "Välgörenhetsbidrag och donationer",
-
-    // Child Categories - System
-    uncategorized: "Transaktioner som inte har klassificerats ännu",
-    other: "Diverse transaktioner som inte passar in i andra kategorier",
+  feedback: {
+    trigger: "Feedback",
+    thanksTitle: "Tack för din feedback!",
+    thanksBody: "Vi återkommer så snart som möjligt",
+    textareaPlaceholder: "Idéer för att förbättra sidan eller problem du upplever.",
+    send: "Skicka",
   },
-} as const;
+}

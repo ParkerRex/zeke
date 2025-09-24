@@ -1,242 +1,154 @@
-# Claude Commands Documentation
+# Claude Command Chains
 
-## Best Practices
+## Quick Start
 
-### Command Usage Guidelines
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     🐛 DEBUG CHAIN                          │
+├─────────────────────────────────────────────────────────────┤
+│  /debug-rca "problem description" "bug-name"               │
+│     ↓                                                       │
+│  Creates: .agents/debugging/[bug-name]/[bug-name]-rca.md   │
+│     ↓                                                       │
+│  /debug-solution .../[bug-name]-rca.md                     │
+│     ↓                                                       │
+│  Creates: .agents/debugging/[bug-name]/[bug-name]-solution.md│
+│     ↓                                                       │
+│  /debug-implement .../[bug-name]-solution.md               │
+│     ↓                                                       │
+│  Creates plan & implements fixes                           │
+└─────────────────────────────────────────────────────────────┘
 
-1. **Use descriptive identifiers**: When commands ask for 3-word identifiers, make them meaningful (e.g., "user-auth-system" not "thing-one-two")
+┌─────────────────────────────────────────────────────────────┐
+│                    ✨ NEW FEATURE CHAIN                     │
+├─────────────────────────────────────────────────────────────┤
+│  /feature-spec "feature description"                       │
+│     ↓                                                       │
+│  Creates: .agents/features/[name]/[name]-tech-spec.md      │
+│     ↓                                                       │
+│  /feature-plan .agents/features/[name]/[name]-tech-spec.md │
+│     ↓                                                       │
+│  Creates: .agents/features/[name]/[name]-plan.md           │
+│     ↓                                                       │
+│  /feature-implement .agents/features/[name]/[name]-plan.md │
+│     ↓                                                       │
+│  Implements the feature following the plan                 │
+│     ↓                                                       │
+│  /feature-finish .agents/features/[name]/[name]-plan.md    │
+│     ↓                                                       │
+│  Validates, tests, updates changelog, creates PR & archives│
+└─────────────────────────────────────────────────────────────┘
+```
 
-2. **Provide complete context**: Include all relevant details in your descriptions - the AI needs context to generate accurate specifications
+## Debug Chain
 
-3. **Follow the workflow**: Commands are designed to work in sequence - don't skip steps
+The debug chain helps you systematically analyze and fix complex issues through root cause analysis:
 
-4. **Check outputs**: Always review generated files before proceeding to the next step
+1. **`/debug-rca`** - Performs root cause analysis
+   - Requires: problem description + bug name (e.g., "auth-token-expiry")
+   - Creates event sequence diagram
+   - Multi-angle analysis (technical, operational, environmental, monitoring)
+   - Identifies root causes and contributing factors
+   - Output: `.agents/debugging/[bug-name]/[bug-name]-rca.md`
 
-5. **Keep artifacts organized**: All generated files are stored in `.agents/` subdirectories for easy tracking
+2. **`/debug-solution`** - Designs technical solution architecture
+   - Reads the RCA document
+   - Creates comprehensive solution architecture
+   - Includes integration plans and risk assessment
+   - Output: `.agents/debugging/[bug-name]/[bug-name]-solution.md`
 
-### File Organization
+3. **`/debug-implement`** - Creates plan and implements fixes
+   - Reads solution/RCA document
+   - Creates implementation plan with phases
+   - Executes fixes systematically
+   - Updates plan with completion status
+   - Output: `.agents/debugging/[bug-name]/[bug-name]-plan.md`
 
-All Claude command artifacts are stored in `.agents/` with this structure:
+## New Feature Chain
+
+The feature chain guides you through planning and implementing new features:
+
+1. **`/feature-spec`** - Creates technical specification
+   - Analyzes existing tech stack (package.json, etc.)
+   - Generates comprehensive PRD aligned with current codebase
+   - Output: `.agents/features/[name]/[name]-tech-spec.md`
+
+2. **`/feature-plan`** - Creates implementation plan
+   - Breaks down spec into atomic tasks (1-4 hours each)
+   - Organizes tasks by phases and dependencies
+   - Output: `.agents/features/[name]/[name]-plan.md`
+
+3. **`/feature-implement`** - Executes the plan
+   - Works through tasks systematically
+   - Optional batch mode: Add `true` for parallel execution
+   - Input: Path to plan.md file
+
+4. **`/feature-finish`** - Finalizes and ships the feature
+   - Verifies all tasks are complete
+   - Runs tests and typechecks until they pass
+   - Asks if you want to update CHANGELOG.md (shows draft first)
+   - Asks if you want to create a GitHub PR (shows PR message)
+   - Asks if you want to archive to `.agents/features/shipped/`
+   - Input: Path to plan.md file
+
+## Directory Structure
+
 ```
 .agents/
-├── features/          # New feature development
-│   └── [identifier]/  # Each feature gets its own folder
-├── debugging/         # Bug fixes and RCA
-│   └── [identifier]/  # Each bug gets its own folder
-└── ...
+├── debugging/
+│   └── [bug-name]/
+│       ├── [bug-name]-rca.md      # Root cause analysis
+│       ├── [bug-name]-solution.md # Solution architecture
+│       └── [bug-name]-plan.md     # Implementation plan
+├── features/
+│   └── [feature-name]/
+│       ├── [feature-name]-tech-spec.md
+│       └── [feature-name]-plan.md
+└── features/shipped/              # Completed features
+    └── [feature-name]-[date]/
+        ├── [feature-name]-tech-spec.md
+        └── [feature-name]-plan.md
 ```
 
----
+## Examples
 
-## Feature Development Commands
+### Debug Chain Example
+```bash
+# 1. Analyze the root cause
+/debug-rca "Users getting 401 errors after login" "auth-token-expiry"
 
-### Complete Feature Development Workflow
+# 2. Design the solution
+/debug-solution .agents/debugging/auth-token-expiry/auth-token-expiry-rca.md
 
-Build new features systematically from specification to implementation.
-
-#### `/feature-spec` - Generate Technical Specification
-Creates a comprehensive technical product requirements document for a new feature.
-
-**Usage:**
-```
-/feature-spec "Detailed description of the feature including user needs, business goals, and high-level requirements"
+# 3. Implement the fixes
+/debug-implement .agents/debugging/auth-token-expiry/auth-token-expiry-solution.md
 ```
 
-**Output:**
-- Creates directory: `.agents/features/[3-word-identifier]/`
-- Generates: `[identifier]-tech-spec.md` with complete technical PRD
+### Feature Chain Example
+```bash
+# 1. Create technical specification
+/feature-spec "Add user notification system with email and SMS"
 
-**Example:**
-```
-/feature-spec "We need a user authentication system that supports email/password login, OAuth with Google and GitHub, password reset via email, and session management with JWT tokens. Should include rate limiting and account lockout after failed attempts."
-```
-Creates: `.agents/features/user-auth-system/user-auth-system-tech-spec.md`
+# 2. Generate implementation plan
+/feature-plan .agents/features/user-notification/user-notification-tech-spec.md
 
-#### `/feature-plan` - Generate Implementation Plan
-Takes the tech spec and generates an actionable implementation plan.
+# 3. Execute the implementation
+/feature-implement .agents/features/user-notification/user-notification-plan.md
 
-**Usage:**
-```
-/feature-plan ".agents/features/[identifier]/[identifier]-tech-spec.md"
-```
-
-**Output:**
-- Creates: `[identifier]-plan.md` with atomic, executable tasks
-- Each task is independently completable (1-4 hours of work)
-- Tasks are organized into logical phases
-- Includes acceptance criteria and dependencies
-
-#### `/feature-implement` - Execute Implementation Plan
-Executes the implementation plan tasks systematically.
-
-**Usage:**
-```
-/feature-implement ".agents/features/[identifier]/[identifier]-plan.md"
+# 4. Finalize and ship the feature
+/feature-finish .agents/features/user-notification/user-notification-plan.md
+# This will:
+# - Check all tasks are done
+# - Run tests until they pass
+# - Ask if you want to update CHANGELOG
+# - Ask if you want to create a PR
+# - Ask if you want to archive the docs
 ```
 
-**Options:**
-```
-/feature-implement ".agents/features/[identifier]/[identifier]-plan.md" true
-```
-- Standard mode (default): Asks for confirmation after each task
-- Accept-edits mode (pass `true`): Auto-executes up to 10 tasks
+## Tips
 
-**Features:**
-- Executes tasks in order with dependency checking
-- One retry on failure before asking for help
-- Updates plan file with completion status and timestamps
-- Provides execution summary at the end
-
-### Complete Feature Development Workflow Example
-
-1. **Generate the technical specification:**
-   ```
-   /feature-spec "Build a notification system that supports email, SMS, and in-app notifications. Users should be able to configure preferences per notification type. Include templating support and delivery tracking."
-   ```
-   Creates: `.agents/features/notification-delivery-system/notification-delivery-system-tech-spec.md`
-
-2. **Create the implementation plan:**
-   ```
-   /feature-plan ".agents/features/notification-delivery-system/notification-delivery-system-tech-spec.md"
-   ```
-   Creates: `.agents/features/notification-delivery-system/notification-delivery-system-plan.md`
-
-3. **Execute the implementation:**
-   ```
-   /feature-implement ".agents/features/notification-delivery-system/notification-delivery-system-plan.md"
-   ```
-   Or for batch mode:
-   ```
-   /feature-implement ".agents/features/notification-delivery-system/notification-delivery-system-plan.md" true
-   ```
-
-### Feature Development Tips
-
-- **Start with clear requirements**: The better your initial description, the more accurate the tech spec
-- **Review before proceeding**: Check the tech spec before generating the plan
-- **Track progress**: Implementation tasks are marked complete in the plan file
-- **Handle blockers**: If implementation fails, the system will retry once then ask for guidance
-- **Use batch mode wisely**: Only use accept-edits mode when you're confident in the plan
-
----
-
-## Debugging Commands
-
-### Systematic Bug Analysis and Resolution
-
-Fix bugs methodically with root cause analysis and structured implementation.
-
-#### `/debug-rca` - Root Cause Analysis
-Performs comprehensive root cause analysis on a bug or incident.
-
-**Usage:**
-```
-/debug-rca "Full problem description" "3-word-bug-identifier"
-```
-
-**Arguments:**
-- Problem report: Complete details of the issue, symptoms, timeline
-- Bug identifier: 3-word hyphenated description (e.g., "auth-token-expiry")
-
-**Output:**
-Creates: `.agents/debugging/[identifier]/[identifier]-rca.md`
-
-**Example:**
-```
-/debug-rca "Users are experiencing intermittent login failures. The system returns 'Invalid token' errors after successful authentication. This started happening after the last deployment on Friday. Error logs show token validation failures despite tokens being recently issued." "auth-token-expiry"
-```
-
-#### `/debug-implement` - Implementation Plan & Fixes
-Creates an implementation plan from RCA and executes fixes.
-
-**Usage:**
-```
-/debug-implement "[RCA document content]"
-```
-
-**Output:**
-- Creates: `.agents/debugging/[identifier]/[identifier]-plan.md`
-- Executes fixes based on the plan
-
-### Debugging Workflow Example
-
-1. **Analyze the bug:**
-   ```
-   /debug-rca "Detailed bug description..." "database-connection-timeout"
-   ```
-
-2. **Implement fixes:**
-   ```
-   /debug-implement "[paste RCA content]"
-   ```
-
-### RCA Document Contents
-
-The root cause analysis includes:
-- Event sequence diagram
-- Multi-angle analysis (technical, operational, environmental, monitoring)
-- Root cause identification
-- Impact assessment
-- Prevention recommendations
-- Lessons learned
-
----
-
-## Command Development
-
-### Creating New Commands
-
-To create a new Claude command:
-
-1. **Create command file**: `.claude/commands/[command-name].md`
-
-2. **Add frontmatter:**
-   ```yaml
-   ---
-   name: command-name
-   description: Brief description of what the command does
-   args:
-     arg1:
-       type: string
-       description: What this argument is for
-       required: true
-   ---
-   ```
-
-3. **Write the prompt**: Include clear instructions for the AI
-
-4. **Test thoroughly**: Ensure outputs are consistent and useful
-
-### Command Best Practices
-
-- **Single responsibility**: Each command should do one thing well
-- **Clear outputs**: Specify exactly what files/artifacts to create
-- **Error handling**: Include retry logic and failure modes
-- **Progress tracking**: Update files to show completion status
-- **User feedback**: Provide clear status messages
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Files not created in expected location:**
-- Check that the `.agents/` directory exists
-- Verify the identifier format (lowercase, hyphens)
-
-**Commands not recognized:**
-- Ensure command file has proper frontmatter
-- Check command name matches filename
-
-**Incomplete execution:**
-- Review error messages for specific failures
-- Check dependencies are met (e.g., tech spec exists before planning)
-
-### Getting Help
-
-If you encounter issues:
-1. Check the command output for error messages
-2. Verify input format matches examples
-3. Review generated files for completeness
-4. Ask for clarification on specific steps
+- Feature specs automatically detect and use your existing tech stack
+- Debug RCA includes multi-angle analysis for comprehensive understanding
+- All commands create traceable documentation for your decisions
+- Use batch mode in feature-implement for faster execution: `/feature-implement [path] true`
+- Bug names should be descriptive 2-word identifiers (e.g., "auth-token", "memory-leak")

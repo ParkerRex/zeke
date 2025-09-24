@@ -3,7 +3,9 @@
     "allow": [
       "Read(//Users/parkerrex/**)",
       "Bash(chmod:*)",
-      "Bash(/tmp/add_todo_components_bulk.sh:*)"
+      "Bash(/tmp/add_todo_components_bulk.sh:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(bun typecheck:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,36 +1,35 @@
 ---
-name: feature-spec
-argument-hint: "[feature-description]"
 description: Generate a comprehensive technical specification document for a new feature
-allowed-tools: Bash(mkdir -p), Write
 ---
 
 # Feature Technical Specification Generator
 
 You are an expert technical product manager and solutions architect tasked with creating a comprehensive Technical Product Requirements Document (PRD) for a software feature.
 
-## Input
+## When to Apply This Rule
 
-Feature description: $1
+Apply this rule when the user requests:
+- Creating a technical specification for a new feature
+- Generating a feature PRD (Product Requirements Document)
+- Planning a new feature implementation
+- Creating comprehensive technical documentation for a feature
 
 ## Process
 
-1. Analyze the existing project's tech stack by examining:
-   - package.json, package-lock.json, pnpm-lock.yaml, bun.lockb, or similar dependency files
+1. **Analyze the existing project's tech stack** by examining:
+   - [package.json](mdc:package.json), package-lock.json, pnpm-lock.yaml, bun.lockb, or similar dependency files
    - Existing code patterns and frameworks in use
    - Current architectural patterns and conventions
 
-2. Analyze the feature description and generate a 2-word kebab-case identifier (e.g., "user-auth", "payment-processing", "data-export")
+2. **Generate a 2-word kebab-case identifier** from the feature description (e.g., "user-auth", "payment-processing", "data-export")
 
-3. Create the directory structure: `.agents/features/[identifier]/`
+3. **Create the directory structure**: `.agents/features/[identifier]/`
 
-4. Generate a comprehensive technical PRD that aligns with the existing tech stack and save it to: `.agents/features/[identifier]/[identifier]-tech-spec.md`
-
-5. Output the path to the created file so it can be used with `/feature-plan`
+4. **Generate a comprehensive technical PRD** that aligns with the existing tech stack and save it to: `.agents/features/[identifier]/[identifier]-tech-spec.md`
 
 ## Technical PRD Structure
 
-The document should include:
+The document must include all of the following sections:
 
 ### Executive Summary
 - Feature overview and primary purpose
@@ -157,14 +156,14 @@ Authentication: [Auth method]
 - **Business Constraints**: Budget
 - **Assumptions**: Key design assumptions
 
-## Important Notes
+## Critical Guidelines
 
 - **ALWAYS examine the existing project's package.json, lock files, and codebase first**
 - **Recommend technologies that are already in use in the project when possible**
 - **Only suggest new dependencies if absolutely necessary for the feature**
 - **Follow existing architectural patterns and conventions found in the codebase**
 
-## Output
+## Output Requirements
 
 Create a complete technical PRD that:
 - Aligns with the existing project's technology choices and patterns
