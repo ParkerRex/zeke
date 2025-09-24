@@ -1,8 +1,10 @@
 "use client";
 
+import { getUrl } from "@/utils/environment";
+import { isDesktopApp } from "@zeke/desktop-client/platform";
 import { createClient } from "@zeke/supabase/client";
-import { Button } from "@zeke/ui/button";
 import { Icons } from "@zeke/ui/icons";
+import { SubmitButton } from "@zeke/ui/submit-button";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -15,35 +17,57 @@ export function GoogleSignIn() {
   const handleSignIn = async () => {
     setLoading(true);
 
-    const redirectTo = new URL("/api/auth/callback", window.location.origin);
+    if (isDesktopApp()) {
+      const redirectTo = new URL("/api/auth/callback", getUrl());
 
-    if (returnTo) {
-      redirectTo.searchParams.append("return_to", returnTo);
+      redirectTo.searchParams.append("provider", "google");
+      redirectTo.searchParams.append("client", "desktop");
+
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo.toString(),
+          queryParams: {
+            prompt: "select_account",
+            client: "desktop",
+          },
+        },
+      });
+    } else {
+      const redirectTo = new URL("/api/auth/callback", getUrl());
+
+      if (returnTo) {
+        redirectTo.searchParams.append("return_to", returnTo);
+      }
+
+      redirectTo.searchParams.append("provider", "google");
+
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo.toString(),
+          queryParams: {
+            prompt: "select_account",
+          },
+        },
+      });
     }
 
-    redirectTo.searchParams.append("provider", "google");
-
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: redirectTo.toString(),
-      },
-    });
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   return (
-    <Button
+    <SubmitButton
       onClick={handleSignIn}
-      className="active:scale-[0.98] bg-primary px-6 py-4 text-secondary font-medium flex space-x-2 h-[40px] w-full"
+      className="bg-primary px-6 py-4 text-secondary font-medium h-[40px] w-full"
+      isSubmitting={isLoading}
     >
-      {isLoading ? (
-        <Icons.Loader2 className="h-4 w-4 animate-spin" />
-      ) : (
-        <>
-          <Icons.Google />
-          <span>Continue with Google</span>
-        </>
-      )}
-    </Button>
+      <div className="flex items-center space-x-2">
+        <Icons.Google />
+        <span>Continue with Google</span>
+      </div>
+    </SubmitButton>
   );
 }

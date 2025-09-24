@@ -14,7 +14,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "tailwind.config.ts"
+    "tailwind.config.ts",
+    "../dashboard/src/actions/tracking-consent-action.ts"
   ],
   "exclude": [
     "node_modules"

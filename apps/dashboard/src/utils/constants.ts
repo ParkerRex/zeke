@@ -1,6 +1,7 @@
 export const Cookies = {
   PreferredSignInProvider: "preferred-signin-provider",
   StoriesColumns: "stories-columns",
+  MfaSetupVisited: "mfa-setup-visited",
   BriefsColumns: "briefs-columns",
   InboxFilter: "inbox-filter-v2",
   TrackingConsent: "tracking-consent",
@@ -29,7 +30,8 @@ export const STRINGS = {
   retry: "Retry",
   openAStory: "Select a story to inspect its details.",
   comingSoon: "We're finishing this experience—thanks for your patience.",
-  noHighlights: "No highlights confirmed yet. Review your story feed to get started.",
+  noHighlights:
+    "No highlights confirmed yet. Review your story feed to get started.",
   attentionSaved: "Hours saved this week",
   sourceConnected: "Source connected successfully",
   playbackLaunched: "Playbook launched",

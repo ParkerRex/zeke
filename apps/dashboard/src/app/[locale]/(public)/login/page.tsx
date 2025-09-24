@@ -1,8 +1,10 @@
 import { AppleSignIn } from "@/components/apple-sign-in";
+import { ConsentBanner } from "@/components/consent-banner";
 import { GithubSignIn } from "@/components/github-sign-in";
 import { GoogleSignIn } from "@/components/google-sign-in";
 import { OTPSignIn } from "@/components/otp-sign-in";
 import { Cookies } from "@/utils/constants";
+import { isEU } from "@zeke/location";
 import {
   Accordion,
   AccordionContent,
@@ -15,39 +17,30 @@ import { cookies, headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { userAgent } from "next/server";
-import type { ReactNode } from "react";
 import backgroundDark from "public/assets/bg-login-dark.jpg";
 import backgroundLight from "public/assets/bg-login.jpg";
 
 export const metadata: Metadata = {
-  title: "Login | zeke",
+  title: "Login | Zeke",
 };
 
 export default async function Page() {
   const cookieStore = await cookies();
   const preferred = cookieStore.get(Cookies.PreferredSignInProvider);
+  const showTrackingConsent =
+    (await isEU()) && !cookieStore.has(Cookies.TrackingConsent);
   const { device } = userAgent({ headers: await headers() });
 
-  const defaultPrimary =
-    device?.vendor === "Apple" ? <AppleSignIn /> : <GoogleSignIn />;
-
-  const defaultSecondary =
+  let moreSignInOptions = null;
+  let preferredSignInOption =
     device?.vendor === "Apple" ? (
-      <>
+      <div className="flex flex-col space-y-2">
         <GoogleSignIn />
-        <GithubSignIn />
-        <OTPSignIn className="border-t-[1px] border-border pt-8" />
-      </>
-    ) : (
-      <>
         <AppleSignIn />
-        <GithubSignIn />
-        <OTPSignIn className="border-t-[1px] border-border pt-8" />
-      </>
+      </div>
+    ) : (
+      <GoogleSignIn />
     );
-
-  let preferredSignInOption = defaultPrimary;
-  let moreSignInOptions: ReactNode = defaultSecondary;
 
   switch (preferred?.value) {
     case "apple":
@@ -60,6 +53,7 @@ export default async function Page() {
         </>
       );
       break;
+
     case "github":
       preferredSignInOption = <GithubSignIn />;
       moreSignInOptions = (
@@ -70,6 +64,7 @@ export default async function Page() {
         </>
       );
       break;
+
     case "google":
       preferredSignInOption = <GoogleSignIn />;
       moreSignInOptions = (
@@ -80,6 +75,7 @@ export default async function Page() {
         </>
       );
       break;
+
     case "otp":
       preferredSignInOption = <OTPSignIn />;
       moreSignInOptions = (
@@ -90,10 +86,24 @@ export default async function Page() {
         </>
       );
       break;
+
     default:
-      preferredSignInOption = defaultPrimary;
-      moreSignInOptions = defaultSecondary;
-      break;
+      if (device?.vendor === "Apple") {
+        moreSignInOptions = (
+          <>
+            <GithubSignIn />
+            <OTPSignIn className="border-t-[1px] border-border pt-8" />
+          </>
+        );
+      } else {
+        moreSignInOptions = (
+          <>
+            <AppleSignIn />
+            <GithubSignIn />
+            <OTPSignIn className="border-t-[1px] border-border pt-8" />
+          </>
+        );
+      }
   }
 
   return (
@@ -132,7 +142,7 @@ export default async function Page() {
             <div className="w-full max-w-md space-y-8">
               {/* Welcome Section */}
               <div className="text-center">
-                <h1 className="text-lg mb-4 font-serif">Welcome to zeke</h1>
+                <h1 className="text-lg mb-4 font-serif">Welcome to Zeke</h1>
                 <p className="text-[#878787] text-sm mb-8">
                   New here or coming back? Choose how you want to continue
                 </p>
@@ -164,11 +174,11 @@ export default async function Page() {
               <div className="text-center absolute bottom-4 left-0 right-0">
                 <p className="text-xs text-[#878787] leading-relaxed font-mono">
                   By signing in you agree to our{" "}
-                  <Link href="https://zeke.ai/terms" className="underline">
+                  <Link href="https://zekehq.com/terms" className="underline">
                     Terms of service
                   </Link>{" "}
                   &{" "}
-                  <Link href="https://zeke.ai/policy" className="underline">
+                  <Link href="https://zekehq.com/policy" className="underline">
                     Privacy policy
                   </Link>
                 </p>
@@ -177,6 +187,9 @@ export default async function Page() {
           </div>
         </div>
       </div>
+
+      {/* Consent Banner */}
+      {showTrackingConsent && <ConsentBanner />}
     </div>
   );
 }

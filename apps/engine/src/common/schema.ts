@@ -20,11 +20,10 @@ export const GeneralErrorSchema = z.object({
 });
 
 export const Providers = z.enum([
-  "youtube",
-  "hackernews",
-  "reddit",
-  "rss",
-  "manual",
+  "teller",
+  "plaid",
+  "gocardless",
+  "enablebanking",
 ]);
 
 export const HeadersSchema = z.object({
