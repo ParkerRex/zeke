@@ -1,151 +1,79 @@
 import { z } from "@hono/zod-openapi";
 
-export const searchResultSchema = z
+export const globalSearchSchema = z
   .object({
-    id: z.string().uuid().openapi({
-      description: "Identifier of the matched entity",
-      example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
+    searchTerm: z.string().optional().openapi({
+      description: "Research query to discover insights across ingested knowledge sources.",
+      example: "market expansion strategy",
     }),
-    type: z.string().openapi({
-      description: "Entity type returned by search (e.g. story, highlight)",
-      example: "story",
-    }),
-    title: z.string().openapi({
-      description: "Primary label for the result",
-      example: "OpenAI GPT-5 Training Leaked",
-    }),
-    relevance: z.number().openapi({
-      description: "Relevance score returned by the search routine",
-      example: 0.87,
-    }),
-    created_at: z.string().openapi({
-      description: "Creation timestamp for the underlying entity",
-      example: "2024-05-12T15:30:00Z",
-    }),
-    data: z.record(z.unknown()).openapi({
-      description: "Raw payload returned by the search procedure",
-    }),
-  })
-  .openapi({
-    description: "Generic search hit",
-  });
-
-export const globalSearchInputSchema = z
-  .object({
-    searchTerm: z
-      .string()
-      .min(1)
-      .max(120)
-      .openapi({
-        description: "Full text query",
-        example: "GPT-5",
-      }),
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(100)
-      .optional()
-      .openapi({
-        description: "Maximum number of results",
-        example: 20,
-      }),
-    itemsPerTableLimit: z
-      .number()
-      .int()
-      .min(1)
-      .max(20)
-      .optional()
-      .openapi({
-        description: "Per-entity cap when querying multiple tables",
-        example: 5,
-      }),
-    language: z
-      .string()
-      .optional()
-      .openapi({
-        description: "Language hint for full-text search",
-        example: "english",
-      }),
-    relevanceThreshold: z
-      .number()
-      .optional()
-      .openapi({
-        description: "Minimum relevance to include a result",
-        example: 0.5,
-      }),
-  })
-  .openapi({
-    description: "Parameters for the global search procedure",
-  });
-
-export const semanticSearchInputSchema = z
-  .object({
-    searchTerm: z.string().min(1).max(256).openapi({
-      description: "Natural language query",
-      example: "Recent AI regulation news",
-    }),
-    itemsPerTableLimit: z
-      .number()
-      .int()
-      .min(1)
-      .max(20)
-      .default(5)
-      .openapi({
-        description: "Max results per table",
-        example: 5,
-      }),
     language: z.string().optional().openapi({
-      description: "Language hint for embedding lookup",
-      example: "english",
+      description: "Language for contextual understanding and cited output generation.",
+      example: "en",
     }),
-    types: z
-      .array(z.string())
-      .optional()
-      .openapi({
-        description: "Entity types to limit the search",
-        example: ["stories", "highlights"],
-      }),
-    amount: z.number().optional().openapi({
-      description: "Exact amount filter for financial entities",
-      example: 1200,
+    limit: z.coerce.number().min(1).max(1000).default(30).openapi({
+      description: "Maximum insights to surface for triage and goal alignment.",
+      example: 30,
     }),
-    amountMin: z.number().optional().openapi({
-      description: "Minimum amount filter",
-      example: 100,
+    itemsPerTableLimit: z.coerce.number().min(1).max(100).default(5).openapi({
+      description: "Discovery depth per entity type for comprehensive research coverage.",
+      example: 5,
     }),
-    amountMax: z.number().optional().openapi({
-      description: "Maximum amount filter",
-      example: 5000,
-    }),
-    status: z.string().optional().openapi({
-      description: "Status filter (e.g. invoice status)",
-      example: "pending",
-    }),
-    currency: z.string().optional().openapi({
-      description: "Currency code filter",
-      example: "USD",
-    }),
-    startDate: z.string().optional().openapi({
-      description: "Filter by start date (ISO string)",
-      example: "2024-05-01",
-    }),
-    endDate: z.string().optional().openapi({
-      description: "Filter by end date (ISO string)",
-      example: "2024-05-31",
-    }),
-    dueDateStart: z.string().optional().openapi({
-      description: "Invoice due date lower bound",
-      example: "2024-05-15",
-    }),
-    dueDateEnd: z.string().optional().openapi({
-      description: "Invoice due date upper bound",
-      example: "2024-05-31",
+    relevanceThreshold: z.coerce.number().min(0).max(1).default(0.01).openapi({
+      description: "Minimum confidence score for insight inclusion in research outcomes.",
+      example: 0.01,
     }),
   })
   .openapi({
-    description: "Parameters for semantic search",
+    description:
+      "Discovery parameters for transforming hours of research into cited, goal-aware insights.",
   });
 
-export type SearchResult = z.infer<typeof searchResultSchema>;
-export type GlobalSearchInput = z.infer<typeof globalSearchInputSchema>;
+export const searchResponseSchema = z
+  .array(
+    z.object({
+      id: z.string().openapi({
+        description: "Citation reference for tracking insight provenance in published outputs.",
+        example: "b3b7e6e2-8c2a-4e2a-9b1a-2e4b5c6d7f8a",
+      }),
+      type: z.string().openapi({
+        description:
+          "Entity classification for triage workflows (story, playbook, transaction, etc).",
+        example: "story",
+      }),
+      relevance: z.number().openapi({
+        description: "Goal-alignment score for prioritizing insights during triage.",
+        example: 0.92,
+      }),
+      created_at: z.string().openapi({
+        description: "Temporal context for research freshness and trend analysis.",
+        example: "2024-06-01T00:00:00.000Z",
+      }),
+      data: z.any().openapi({
+        description:
+          "Discovered insight payload ready for application in playbooks and outcomes.",
+        example: {
+          storyId: "STR-2024-001",
+          entityName: "Acme Research Lab",
+          impact: 1500.75,
+          citations: ["source1", "source2"],
+        },
+      }),
+    }),
+  )
+  .openapi({
+    description: "Discovered insights triaged for goal-aware application and publishing.",
+    example: [
+      {
+        id: "b3b7e6e2-8c2a-4e2a-9b1a-2e4b5c6d7f8a",
+        type: "story",
+        relevance: 0.92,
+        created_at: "2024-06-01T00:00:00.000Z",
+        data: {
+          storyId: "STR-2024-001",
+          entityName: "Acme Research Lab",
+          impact: 1500.75,
+          citations: ["quarterly-report.pdf", "market-analysis.xlsx"],
+        },
+      },
+    ],
+  });

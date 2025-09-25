@@ -9,7 +9,7 @@
 - **Reuse shared form/input primitives** where possible (`form.tsx`, `input.tsx`, `currency-input.tsx`); new field types should compose existing base components rather than re-styling from scratch
 - **Keep CSS globals minimal**; prefer Tailwind plugin configuration (`tailwind.config.ts`) or component classes over new global selectors
 - **Every new public export** should be added to `package.json` and, if theme-dependent, documented in `README.md`
-
+// Relations
 ## Project Structure
 
 ```

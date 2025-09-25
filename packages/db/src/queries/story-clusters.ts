@@ -1,17 +1,14 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import type { SQL } from "drizzle-orm/sql/sql";
 import type { Database } from "@db/client";
 import {
   contents,
-  storyClusters,
   stories,
-  storyKind,
+  storyClusters,
+  type storyKind,
   storyOverlays,
 } from "@db/schema";
-import {
-  getStoryMetrics,
-  type StoryMetricsRow,
-} from "./story-analytics";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm/sql/sql";
+import { type StoryMetricsRow, getStoryMetrics } from "./story-analytics";
 
 export type StoryKind = (typeof storyKind.enumValues)[number];
 
@@ -93,11 +90,17 @@ function mapStory(row: StoryRow): StoryClusterStory {
     : null;
 
   const overlay: StoryClusterOverlay | null =
-    row.overlayWhy || row.overlayConfidence || row.overlayCitations || row.overlayState
+    row.overlayWhy ||
+    row.overlayConfidence ||
+    row.overlayCitations ||
+    row.overlayState
       ? {
           whyItMatters: row.overlayWhy,
           confidence,
-          citations: (row.overlayCitations ?? null) as Record<string, unknown> | null,
+          citations: (row.overlayCitations ?? null) as Record<
+            string,
+            unknown
+          > | null,
           analysisState: row.overlayState,
           analyzedAt: row.overlayAnalyzedAt,
         }
@@ -187,7 +190,12 @@ async function fetchStoryRows(
 }
 
 function buildFilters(
-  params: Partial<{ kind: StoryKind | "all"; storyIds: string[]; clusterId: string; search: string | null }> = {},
+  params: Partial<{
+    kind: StoryKind | "all";
+    storyIds: string[];
+    clusterId: string;
+    search: string | null;
+  }> = {},
 ): SQL | null {
   const conditions: SQL[] = [];
 
@@ -244,10 +252,7 @@ export async function getStoryClusterById(
     return null;
   }
 
-  const rows = await fetchStoryRows(
-    db,
-    buildFilters({ clusterId }),
-  );
+  const rows = await fetchStoryRows(db, buildFilters({ clusterId }));
 
   return {
     id: cluster.id,
@@ -285,10 +290,7 @@ export async function getStoryClusterForStory(
     return getStoryClusterById(db, story.clusterId);
   }
 
-  const rows = await fetchStoryRows(
-    db,
-    buildFilters({ storyIds: [story.id] }),
-  );
+  const rows = await fetchStoryRows(db, buildFilters({ storyIds: [story.id] }));
 
   return {
     id: story.id,
@@ -306,6 +308,7 @@ export type ListStoryClustersParams = {
   kind?: StoryKind | "all";
   search?: string | null;
   storyIds?: string[];
+  teamId?: string;
 };
 
 export type ListStoryClustersResult = {

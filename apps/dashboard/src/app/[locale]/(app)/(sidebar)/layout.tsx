@@ -1,3 +1,4 @@
+import { ExportStatus } from "@/components/export-status";
 import { GlobalTimerProvider } from "@/components/global-timer-provider";
 import { Header } from "@/components/header";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
@@ -25,7 +26,7 @@ export default async function Layout({
   // NOTE: These are used in the global sheets
   batchPrefetch([
     trpc.team.current.queryOptions(),
-    trpc.story.list.queryOptions({ limit: 20, offset: 0, kind: "all" }),
+    trpc.invoice.defaultSettings.queryOptions(),
     trpc.search.global.queryOptions({ searchTerm: "" }),
   ]);
 
@@ -54,6 +55,8 @@ export default async function Layout({
           <Header />
           <div className="px-6">{children}</div>
         </div>
+
+        <ExportStatus />
 
         <Suspense>
           <GlobalSheets

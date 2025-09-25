@@ -1,0 +1,115 @@
+{
+  "title": "Monolith: Real Time Recommendation System With Collisionless Embedding Table",
+  "creators": [
+    {
+      "name": "Zhuoran Liu",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Leqi Zou",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Xuan Zou",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Caihua Wang",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Biao Zhang",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Da Tang",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Bolin Zhu",
+      "role": "author",
+      "context": "Fudan University (internship at Bytedance)"
+    },
+    {
+      "name": "Yijie Zhu",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Peng Wu",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Ke Wang",
+      "role": "author",
+      "context": "Bytedance Inc."
+    },
+    {
+      "name": "Youlong Cheng",
+      "role": "author",
+      "context": "Bytedance Inc. (Corresponding author)",
+      "credibility": "Production system deployed in BytePlus Recommend product"
+    }
+  ],
+  "contentType": "paper",
+  "highlights": [
+    "Collisionless embedding table using Cuckoo Hashing achieves O(1) lookups/deletions and improves AUC by 7.73% for users and 2.86% for items vs hash collisions (p. 6)",
+    "Online training with minute-level parameter sync improves AUC by 14-18% over batch training in production ads model (p. 9)",
+    "Sparse parameters sync every minute (400MB transfer) while dense parameters sync daily to reduce network overhead (p. 9)",
+    "System handles embedding tables with 2^48 ID space reduced to 2^25 through decomposition, serving multi-terabyte models (p. 6)",
+    "Daily PS snapshots tolerate 0.01% failure rate, losing only 1 day of updates across 1000 PS shards serving 15M DAU (p. 9)"
+  ],
+  "calculatedConsumptionTime": "20 min read",
+  "whyItMatters": "ByteDance solved the trillion-parameter embedding problem that kills most real-time rec systems - their collisionless hash tables prevent the quality degradation from ID collisions while online training with minute-level updates captures user behavior drift 14-18% better than batch systems (p. 2, p. 9). This directly addresses the sparse feature explosion and concept drift that make production recommendation systems fail at scale.",
+  "sauce": "ByteDance trades PS reliability for real-time learning - they snapshot daily instead of hourly because losing 15K users' feedback once every 10 days barely moves the needle (p. 9)",
+  "keyTakeaways": [
+    "Collisionless embedding tables are essential - MD5 hashing with collisions drops model quality consistently across epochs and time, while Cuckoo HashMap maintains performance (p. 7-8)",
+    "Minute-level parameter sync beats hourly by significant margins - 30min sync interval achieves 79.80 AUC vs 79.66 for 5hr interval on Criteo dataset (p. 8)",
+    "Memory optimization through feature filtering - IDs appearing <10 times and stale IDs are filtered, with expiration times tunable per embedding table (p. 3)",
+    "Sparse vs dense parameter sync can be decoupled - sparse embeddings need minute-level updates while dense variables move slowly enough for daily sync (p. 5)",
+    "System reliability can be traded for speed - with 0.01% daily PS failure rate, losing one day of updates per shard every 10 days is acceptable for 0.01% of DAU (p. 9)"
+  ],
+  "prerequisites": [
+    "Understanding of parameter server architectures in distributed ML",
+    "Familiarity with embedding tables and sparse feature handling",
+    "Knowledge of concept drift in recommendation systems",
+    "Basic understanding of hash collision problems"
+  ],
+  "bestQuotes": [
+    "\"Unlike language models where number of word-pieces are limited, the amount of users and ranking items are orders of magnitude larger\" (p. 2)",
+    "\"The same user interested in one topic could shift their zeal every next minute\" (p. 2)",
+    "\"Finding the right trade-off between model quality and computation overhead is difficult for personalized ranking systems since users are extremely sensitive on recommendation quality\" (p. 9)"
+  ],
+  "actionableInsights": [
+    "Implement Cuckoo Hashing for embedding tables if you're seeing collision-related quality degradation - expect 7-8% AUC improvement (p. 6-7)",
+    "Test minute-level parameter sync for sparse features while keeping dense parameters on slower schedules to optimize network usage (p. 5, p. 9)",
+    "Add occurrence threshold filtering and ID expiration to embedding tables - filter IDs appearing <10 times and expire based on feature sensitivity (p. 3-4)",
+    "Consider daily instead of hourly PS snapshots if your DAU is large enough that 0.01% data loss is acceptable (p. 9)",
+    "Separate training and serving PS with incremental sync of touched keys only - maintain a hash set of updated IDs since last sync (p. 5)"
+  ],
+  "relatedContent": [
+    {
+      "title": "XDL: an industrial deep learning framework",
+      "relationship": "builds-on"
+    },
+    {
+      "title": "Persia: Scaling to 100 Trillion Parameters",
+      "relationship": "builds-on"
+    },
+    {
+      "title": "Kraken: Memory-Efficient Continual Learning",
+      "relationship": "builds-on"
+    },
+    {
+      "title": "Core modeling at Instagram (hash collision approach)",
+      "relationship": "contradicts"
+    }
+  ]
+}

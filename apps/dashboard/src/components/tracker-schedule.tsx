@@ -17,16 +17,16 @@ import {
 import type { RouterOutputs } from "@api/trpc/routers/_app";
 import { TZDate, tz } from "@date-fns/tz";
 import { UTCDate } from "@date-fns/utc";
-import { cn } from "@midday/ui/cn";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { cn } from "@zeke/ui/cn";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuShortcut,
   ContextMenuTrigger,
-} from "@midday/ui/context-menu";
-import { ScrollArea } from "@midday/ui/scroll-area";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+} from "@zeke/ui/context-menu";
+import { ScrollArea } from "@zeke/ui/scroll-area";
 import {
   addDays,
   addMinutes,

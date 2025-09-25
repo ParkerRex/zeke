@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@midday/ui/cn";
+import { cn } from "@zeke/ui/cn";
 import { useQueryState } from "nuqs";
 
 const tabs = [

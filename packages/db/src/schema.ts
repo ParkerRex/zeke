@@ -1,11 +1,4 @@
-/**
- * Revised Drizzle Schema for Zeke
- * Based on docs/plans/in-progress/db-proposed-er.md
- *
- * This schema implements the Discover → Apply content intelligence pipeline
- * with multi-tenant support, story intelligence, highlights, playbooks, and assistant features.
- */
-
+import type { UIChatMessage } from "@api/ai/types";
 import { sql } from "drizzle-orm";
 import {
   bigint,
@@ -1503,10 +1496,104 @@ export const sourceHealth = pgTable("source_health", {
 });
 
 // ============================================================================
-// TODO: team_state deferred per plan
-// This is a placeholder for future team state management features
+// CHAT TABLES
 // ============================================================================
 
-// TODO: Implement team_state management in a future iteration
-// This will include features like workspace preferences, team-wide settings,
-// and collaborative state that spans multiple entities
+export const chats = pgTable(
+  "chats",
+  {
+    id: text("id").primaryKey(), // nanoid
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    title: text("title"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    teamIdIdx: index("chats_team_id_idx").on(table.teamId),
+    userIdIdx: index("chats_user_id_idx").on(table.userId),
+    updatedAtIdx: index("chats_updated_at_idx").on(table.updatedAt),
+  }),
+);
+
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chats.id, {
+        onDelete: "cascade",
+      }),
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    content: jsonb("content").$type<UIChatMessage>().notNull(), // Store individual message as JSONB
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    chatIdIdx: index("chat_messages_chat_id_idx").on(table.chatId),
+    teamIdIdx: index("chat_messages_team_id_idx").on(table.teamId),
+    userIdIdx: index("chat_messages_user_id_idx").on(table.userId),
+    createdAtIdx: index("chat_messages_created_at_idx").on(table.createdAt),
+  }),
+);
+
+export const chatFeedback = pgTable(
+  "chat_feedback",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chats.id, {
+        onDelete: "cascade",
+      }),
+    messageId: text("message_id").notNull(), // Client-side message ID from AI SDK
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    type: text("type").notNull(), // "positive", "negative", "other"
+    comment: text("comment"), // Optional comment
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    chatIdIdx: index("chat_feedback_chat_id_idx").on(table.chatId),
+    messageIdIdx: index("chat_feedback_message_id_idx").on(table.messageId),
+    teamIdIdx: index("chat_feedback_team_id_idx").on(table.teamId),
+    userIdIdx: index("chat_feedback_user_id_idx").on(table.userId),
+    typeIdx: index("chat_feedback_type_idx").on(table.type),
+    createdAtIdx: index("chat_feedback_created_at_idx").on(table.createdAt),
+  }),
+);
+
+// Relations

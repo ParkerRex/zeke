@@ -1,141 +1,245 @@
 import { z } from "@hono/zod-openapi";
 
-export const teamPlanSchema = z
-  .enum(["trial", "starter", "pro", "enterprise"])
-  .openapi({
-    description: "Subscription tier for a team",
+export const teamResponseSchema = z.object({
+  id: z.string().uuid().openapi({
+    description: "Unique identifier for the research team workspace",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+  name: z.string().openapi({
+    description:
+      "Name of the research team or organization conducting goal-aware analysis",
+    example: "Acme Research Lab",
+  }),
+  logoUrl: z.string().url().nullable().openapi({
+    description:
+      "Visual identity for the team's published insights and research outputs",
+    example: "https://cdn.midday.ai/logos/acme-corp.png",
+  }),
+  plan: z.enum(["trial", "starter", "pro"]).openapi({
+    description:
+      "Research capability tier determining discovery depth and publishing features",
     example: "pro",
-  });
+  }),
+  // subscriptionStatus: z
+  //   .enum([
+  //     "active",
+  //     "canceled",
+  //     "past_due",
+  //     "unpaid",
+  //     "trialing",
+  //     "incomplete",
+  //     "incomplete_expired",
+  //   ])
+  //   .nullable()
+  //   .openapi({
+  //     description: "Current subscription status of the team",
+  //     example: "active",
+  //   }),
+});
 
-export const teamSummarySchema = z
-  .object({
-    id: z.string().uuid().openapi({
-      description: "Team identifier",
-      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
-    }),
-    name: z.string().openapi({
-      description: "Team display name",
-      example: "Zeke Intelligence",
-    }),
-    slug: z.string().nullable().openapi({
-      description: "URL-friendly slug",
-      example: "zeke-intel",
-    }),
-    logoUrl: z.string().url().nullable().openapi({
-      description: "Team logo URL",
-      example: "https://cdn.zeke.ai/logos/zeke.png",
-    }),
-    planCode: teamPlanSchema.nullable(),
-  })
-  .openapi({
-    description: "Summary information for a team",
-  });
+export const teamsResponseSchema = z.object({
+  data: z.array(teamResponseSchema).openapi({
+    description:
+      "Research workspaces where teams discover, triage, apply and publish insights",
+  }),
+});
 
-export const teamDetailSchema = teamSummarySchema
-  .extend({
-    metadata: z.record(z.unknown()).nullable().openapi({
-      description: "Custom metadata stored for the team",
-    }),
-    createdAt: z.string().openapi({
-      description: "Creation timestamp",
-      example: "2024-01-04T10:00:00Z",
-    }),
-    updatedAt: z.string().openapi({
-      description: "Last update timestamp",
-      example: "2024-05-16T12:23:00Z",
-    }),
-  })
-  .openapi({
-    description: "Detailed team record returned to the dashboard",
-  });
-
-export const teamMemberSchema = z
-  .object({
-    id: z.string().uuid().openapi({
-      description: "Membership record identifier",
-      example: "0f1e2d3c-4b5a-6789-0123-abcdef456789",
-    }),
-    userId: z.string().uuid().openapi({
-      description: "User identifier",
+export const getTeamByIdSchema = z.object({
+  id: z
+    .string()
+    .uuid()
+    .openapi({
+      description: "Unique identifier for the research team workspace",
+      example: "123e4567-e89b-12d3-a456-426614174000",
+      param: {
+        in: "path",
+        name: "id",
+        required: true,
+      },
+    })
+    .openapi({
+      description: "Unique identifier for the research team workspace",
       example: "123e4567-e89b-12d3-a456-426614174000",
     }),
-    email: z.string().email().openapi({
-      description: "User email",
-      example: "alex@zeke.ai",
+});
+
+export const updateTeamByIdSchema = z.object({
+  name: z.string().min(2).max(32).optional().openapi({
+    description:
+      "Research team identity used in published citations and applied outcomes (2-32 chars)",
+    example: "Acme Research Lab",
+  }),
+  email: z.string().email().optional().openapi({
+    description:
+      "Primary contact for research collaboration and insight distribution",
+    example: "research@acme.com",
+  }),
+  logoUrl: z
+    .string()
+    .url()
+    .refine((url) => url.includes("midday.ai"), {
+      message: "logoUrl must be a midday.ai domain URL",
+    })
+    .optional()
+    .openapi({
+      description:
+        "Team branding for published research outputs. Must be hosted on midday.ai domain",
+      example: "https://cdn.midday.ai/logos/acme-corp.png",
     }),
-    fullName: z.string().nullable().openapi({
-      description: "Full name",
-      example: "Alex Parker",
+  baseCurrency: z.string().optional().openapi({
+    description:
+      "Default currency for financial research analysis and outcome tracking (ISO 4217)",
+    example: "USD",
+  }),
+  countryCode: z.string().optional().openapi({
+    description: "Geographic context for research localization and compliance",
+    example: "US",
+  }),
+});
+
+export const createTeamSchema = z.object({
+  name: z.string().openapi({
+    description:
+      "Research team name for collaborative discovery and insight publishing",
+    example: "Acme Research Lab",
+  }),
+  baseCurrency: z.string().openapi({
+    description:
+      "Primary currency for financial analysis in research outcomes (ISO 4217)",
+    example: "USD",
+  }),
+  countryCode: z.string().optional().openapi({
+    description: "Geographic context for research localization and compliance",
+    example: "US",
+  }),
+  logoUrl: z.string().url().optional().openapi({
+    description: "Visual identity for published research and applied playbooks",
+    example: "https://cdn.midday.ai/logos/acme-corp.png",
+  }),
+  switchTeam: z.boolean().optional().default(false).openapi({
+    description:
+      "Immediately activate this research workspace for discovery and triage",
+    example: true,
+  }),
+});
+
+export const leaveTeamSchema = z.object({
+  teamId: z.string().openapi({
+    description:
+      "Research workspace to disconnect from and archive access to insights",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+});
+
+export const acceptTeamInviteSchema = z.object({
+  id: z.string().openapi({
+    description:
+      "Invitation to join collaborative research and insight publishing workspace",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+});
+
+export const declineTeamInviteSchema = z.object({
+  id: z.string().openapi({
+    description: "Research collaboration invitation to decline",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+});
+
+export const deleteTeamSchema = z.object({
+  teamId: z.string().openapi({
+    description:
+      "Research workspace to permanently archive with all discovered insights",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+});
+
+export const deleteTeamMemberSchema = z.object({
+  teamId: z.string().openapi({
+    description:
+      "Research workspace containing shared insights and applied outcomes",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+  userId: z.string().openapi({
+    description:
+      "Researcher to revoke access from discovery and publishing capabilities",
+    example: "456e7890-f12a-34b5-c678-901234567890",
+  }),
+});
+
+export const updateTeamMemberSchema = z.object({
+  teamId: z.string().openapi({
+    description:
+      "Research workspace where collaboration permissions are managed",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+  userId: z.string().openapi({
+    description:
+      "Researcher whose discovery and publishing permissions to modify",
+    example: "456e7890-f12a-34b5-c678-901234567890",
+  }),
+  role: z.enum(["owner", "member"]).openapi({
+    description:
+      "Research access level: 'owner' can publish and configure playbooks, 'member' can discover and apply insights",
+    example: "member",
+  }),
+});
+
+export const inviteTeamMembersSchema = z
+  .array(
+    z.object({
+      email: z.string().openapi({
+        description:
+          "Email of researcher to invite for collaborative discovery",
+        example: "john.doe@acme.com",
+      }),
+      role: z.enum(["owner", "member"]).openapi({
+        description:
+          "Research permissions: 'owner' publishes insights and manages playbooks, 'member' discovers and applies outcomes",
+        example: "member",
+      }),
     }),
-    role: z.enum(["owner", "admin", "member", "viewer"]).openapi({
-      description: "Role within the team",
-      example: "admin",
-    }),
-    joinedAt: z.string().nullable().openapi({
-      description: "When the user joined",
-      example: "2024-01-03T10:00:00Z",
-    }),
-  })
+  )
   .openapi({
-    description: "Membership information for a teammate",
+    description:
+      "Researchers to invite for collaborative discovery and insight publishing",
+    example: [
+      { email: "john.doe@acme.com", role: "member" },
+      { email: "jane.smith@acme.com", role: "owner" },
+    ],
   });
 
-export const teamListResponseSchema = z
-  .array(teamSummarySchema)
-  .openapi({
-    description: "Teams available to the current user",
-  });
+export const deleteTeamInviteSchema = z.object({
+  id: z.string().openapi({
+    description: "Pending research collaboration invitation to revoke",
+    example: "invite-123abc456def",
+  }),
+});
 
-export const teamInvitesSchema = z
-  .object({
-    id: z.string().uuid().openapi({
-      description: "Invite identifier",
-      example: "ef12cd34-ab56-7890-1234-56789abcdef0",
-    }),
-    email: z.string().email().openapi({
-      description: "Invite recipient email",
-      example: "guest@zeke.ai",
-    }),
-    role: z.enum(["owner", "admin", "member", "viewer"]).openapi({
-      description: "Proposed team role",
-      example: "member",
-    }),
-    status: z.enum(["pending", "accepted", "expired", "revoked"]).openapi({
-      description: "Invite status",
-      example: "pending",
-    }),
-    expiresAt: z.string().nullable().openapi({
-      description: "Expiry timestamp",
-      example: "2024-06-01T00:00:00Z",
-    }),
-    team: teamSummarySchema.nullable(),
-  })
-  .openapi({
-    description: "Team invite awaiting the current user",
-  });
+export const teamMemberResponseSchema = z.object({
+  id: z.string().uuid().openapi({
+    description: "Unique identifier of the research collaborator",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+  role: z.enum(["owner", "member"]).openapi({
+    description:
+      "Research capabilities: 'owner' publishes insights and configures playbooks, 'member' discovers and applies outcomes",
+    example: "owner",
+  }),
+  fullName: z.string().openapi({
+    description: "Researcher's name for attribution in published insights",
+    example: "John Doe",
+  }),
+  avatarUrl: z.string().url().nullable().openapi({
+    description:
+      "Visual identity for research collaboration and citation tracking",
+    example: "https://cdn.midday.ai/avatars/john-doe.png",
+  }),
+});
 
-export const teamSetActiveInputSchema = z
-  .object({
-    teamId: z.string().uuid().openapi({
-      description: "Team to set as active",
-      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
-    }),
-  })
-  .openapi({
-    description: "Payload for switching the active team",
-  });
-
-export const teamIdInputSchema = z
-  .object({
-    teamId: z.string().uuid().openapi({
-      description: "Identifier for fetching team details",
-      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
-    }),
-  })
-  .openapi({
-    description: "Input that expects a team id",
-  });
-
-export type TeamSummary = z.infer<typeof teamSummarySchema>;
-export type TeamDetail = z.infer<typeof teamDetailSchema>;
-export type TeamMember = z.infer<typeof teamMemberSchema>;
+export const teamMembersResponseSchema = z.object({
+  data: z.array(teamMemberResponseSchema).openapi({
+    description:
+      "Research collaborators with their discovery and publishing permissions",
+  }),
+});

@@ -1,15 +1,15 @@
 import { useTRPC } from "@/trpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@midday/ui/accordion";
-import { Button } from "@midday/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@midday/ui/card";
-import { ScrollArea } from "@midday/ui/scroll-area";
-import { Sheet, SheetContent, SheetHeader } from "@midday/ui/sheet";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+} from "@zeke/ui/accordion";
+import { Button } from "@zeke/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@zeke/ui/card";
+import { ScrollArea } from "@zeke/ui/scroll-area";
+import { Sheet, SheetContent, SheetHeader } from "@zeke/ui/sheet";
 import Image from "next/image";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 import { useState } from "react";
@@ -239,7 +239,7 @@ export function App({
             </p>
 
             <a
-              href="mailto:support@midday.dev"
+              href="mailto:support@zeke.dev"
               className="text-[10px] text-red-500"
             >
               Report app

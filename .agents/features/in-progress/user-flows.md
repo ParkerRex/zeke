@@ -57,7 +57,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 ## 7. App Store & Integrations Hub
 1. **Load the Apps workspace** – `/apps` (`apps/dashboard/src/app/[locale]/(app)/(sidebar)/apps/page.tsx`) prefetches three TRPC queries before hydration: `trpc.apps.get` (installed official integrations), `trpc.oauthApplications.list` (all approved external apps), and `trpc.oauthApplications.authorized` (connections the current team has already approved). The page renders `AppsHeader` above a Suspense-wrapped `Apps` grid.
 2. **Tabbing & search state** – `AppsHeader` combines `AppsTabs` (controlled by `useQueryState('tab')`) with the shared `SearchField`. Switching tabs rewrites the `tab` query parameter (default `all`, alternative `installed`), while updating the search box mutates `q`. Both params are consumed downstream without a full reload.
-3. **Unifying official & external apps** – `Apps` fetches data through React Query’s `useSuspenseQuery` (mirroring the server prefetch) and normalizes each source into a single `UnifiedApp` shape: Midday-maintained apps enrich metadata from `@midday/app-store`, while approved OAuth apps map properties such as scope lists, contact info, and install URLs. The combined array is filtered based on the active tab and search query.
+3. **Unifying official & external apps** – `Apps` fetches data through React Query’s `useSuspenseQuery` (mirroring the server prefetch) and normalizes each source into a single `UnifiedApp` shape: Midday-maintained apps enrich metadata from `@zeke/app-store`, while approved OAuth apps map properties such as scope lists, contact info, and install URLs. The combined array is filtered based on the active tab and search query.
 4. **Grid rendering & empty states** – The component lays apps out in a responsive grid of `UnifiedAppComponent` cards. If no installed apps exist (installed tab, no results) it shows a “No apps installed” message; if a search yields nothing the UI offers a “Clear search” button that resets to `/apps` via `router.push`.
 5. **Card-level actions** – Each `UnifiedAppComponent` card shows logo, description, and primary CTAs. Clicking “Details” sets `useQueryStates({ app: id })`, opening a sheet; “Install” triggers either `app.onInitialize()` for official apps or `window.open/installUrl` for external apps (using desktop deep-link helpers when needed). An installed app shows “Disconnect”, which calls either `trpc.apps.disconnect` or `trpc.oauthApplications.revokeAccess` and invalidates the relevant TRPC caches.
 6. **Detail sheet experience** – The sheet (still in `UnifiedAppComponent`) previews screenshots via `Carousel`/`Image` components, repeats install/disconnect controls, and presents sections through `Accordion`: “How it works” (long description/overview), “Settings” (for official apps with configurable options), “Website” and “Permissions” (external app metadata rendered via badges using `getScopeDescription`). Copy at the bottom clarifies certification and support expectations.
@@ -412,3 +412,72 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 13. **Trigger deletes** from grid/list/detail views to remove both the database row and Supabase storage object (`vault-item-actions.tsx:1`, `document-actions.tsx:1`, `documents.ts:1`).
 
 14. **Launch the vault sheet from other surfaces** (transactions, inbox, widgets) to inspect or attach files without manually navigating to `/vault` (`global-sheets.tsx:1`, `select-attachment.tsx:1`, `widgets/vault/vault.tsx:1`).
+
+
+## 14. # Event Stack
+
+- **LogEvents** centralizes named/channel pairs for auth, banking, vault, inbox, and support events that other packages consume
+  `packages/events/src/events.ts:1`.
+
+- The **React provider** wraps both dashboard and marketing apps, wiring OpenPanel while limiting screen/outgoing link tracking to production builds
+  `packages/events/src/client.tsx:9`
+  `apps/dashboard/src/app/[locale]/layout.tsx:6`
+  `apps/website/src/app/layout.tsx:9`.
+
+- **Server helper `setupAnalytics`** checks the tracking-consent cookie before calling `identify`, then defers `track` calls via `waitUntil`; non-prod environments log to the console instead of OpenPanel
+  `packages/events/src/server.ts:10`.
+
+- **authActionClient** injects analytics into server actions and auto-fires any `metadata.track` payload after fetching the authenticated user
+  `apps/dashboard/src/actions/safe-action.ts:42`.
+
+- **API/webhook routes** call `setupAnalytics` directly when safe actions aren’t involved, keeping sign-in, registration, and inbox ingestion in the same telemetry channel
+  `apps/dashboard/src/app/api/auth/callback/route.ts:41`
+  `apps/dashboard/src/app/api/webhook/registered/route.ts:41`
+  `apps/dashboard/src/app/api/webhook/inbox/route.ts:86`.
+
+
+# Instrumented Actions
+
+1. **Sign-in & onboarding** – OAuth callback records *User Signed In*, while the Supabase registration webhook logs *User Registered* before kicking off team onboarding
+   `apps/dashboard/src/app/api/auth/callback/route.ts:41`
+   `apps/dashboard/src/app/api/webhook/registered/route.ts:41`.
+
+2. **Bank linking (Plaid/Teller)** – Client modal and Teller widget emit success/cancel events with provider context whenever a user authorizes or exits a link attempt
+   `apps/dashboard/src/components/modals/connect-transactions-modal.tsx:148`
+   `apps/dashboard/src/components/teller-connect.tsx:37`.
+
+3. **Bank linking (EnableBanking/GoCardLess)** – Server actions fire `EnableBankingLinkCreated`/`Reconnected` at launch and `...Failed` on errors; GoCardLess captures agreement/link creation metadata plus failure paths
+   `apps/dashboard/src/actions/institutions/create-enablebanking-link.ts:34`
+   `apps/dashboard/src/actions/institutions/reconnect-enablebanking-link.ts:25`
+   `apps/dashboard/src/actions/institutions/create-gocardless-link.ts:36`.
+
+4. **Connection maintenance** – Manual syncs, reconnect flows, and transaction exports/imports all log their respective events via action metadata before delegating to Trigger.dev jobs
+   `apps/dashboard/src/actions/transactions/manual-sync-transactions-action.ts:15`
+   `apps/dashboard/src/actions/transactions/reconnect-connection-action.ts:16`
+   `apps/dashboard/src/actions/export-transactions-action.ts:17`
+   `apps/dashboard/src/actions/transactions/import-transactions.ts:26`.
+
+5. **Security & feedback loops** – MFA verification, support requests, and feedback submissions automatically emit telemetry in tandem with Plain API calls
+   `apps/dashboard/src/actions/mfa-verify-action.ts:16`
+   `apps/dashboard/src/actions/send-support-action.tsx:37`
+   `apps/dashboard/src/actions/send-feedback-action.ts:18`.
+
+6. **Inbox ingestion** – The email webhook records each inbound message before processing attachments and triggering downstream notifications
+   `apps/dashboard/src/app/api/webhook/inbox/route.ts:86`.
+
+
+# Gaps & Notes
+
+- Many declared events remain unused (*SignOut*, *ChangeTeam*, vault CRUD, currency updates, etc.), suggesting future coverage or cleanup work
+  `packages/events/src/events.ts:6`.
+
+- Because `track` short-circuits outside production, staging environments need production-like env vars if analytics validation is required
+  `packages/events/src/client.tsx:21`.
+
+- Consent only influences `identify`; anonymous events still fire when the cookie is absent, so downstream filtering may be necessary
+  `packages/events/src/server.ts:14`.
+
+- Direct `analytics.track` calls omit `channel`, whereas metadata-driven tracks include it; aligning payload shapes would make OpenPanel dashboards more consistent
+  Compare:
+  `apps/dashboard/src/actions/institutions/create-enablebanking-link.ts:34` vs
+  `apps/dashboard/src/actions/send-support-action.tsx:39`.

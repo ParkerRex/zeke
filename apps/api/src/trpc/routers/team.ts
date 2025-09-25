@@ -1,128 +1,268 @@
 import {
-  teamDetailSchema,
-  teamIdInputSchema,
-  teamInvitesSchema,
-  teamListResponseSchema,
-  teamSetActiveInputSchema,
+  acceptTeamInviteSchema,
+  createTeamSchema,
+  declineTeamInviteSchema,
+  deleteTeamInviteSchema,
+  deleteTeamMemberSchema,
+  deleteTeamSchema,
+  inviteTeamMembersSchema,
+  leaveTeamSchema,
+  updateBaseCurrencySchema,
+  updateTeamByIdSchema,
+  updateTeamMemberSchema,
 } from "@api/schemas/team";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
-import {
-  getTeamInvitesByEmail,
-  getTeamSummaryById,
-  getTeamsForUser,
-} from "@zeke/db/queries";
-import { setActiveTeam } from "@zeke/db/queries";
+import { tasks } from "@trigger.dev/sdk";
 import { TRPCError } from "@trpc/server";
-import { z } from "@hono/zod-openapi";
+import {
+  acceptTeamInvite,
+  createTeam,
+  createTeamInvites,
+  declineTeamInvite,
+  deleteTeam,
+  deleteTeamInvite,
+  deleteTeamMember,
+  getAvailablePlans,
+  getBankConnections,
+  getInvitesByEmail,
+  getTeamById,
+  getTeamInvites,
+  getTeamMembersByTeamId,
+  getTeamsByUserId,
+  leaveTeam,
+  updateTeamById,
+  updateTeamMember,
+} from "@zeke/db/queries";
+import type {
+  DeleteTeamPayload,
+  InviteTeamMembersPayload,
+  UpdateBaseCurrencyPayload,
+} from "@zeke/jobs/schema";
 
 export const teamRouter = createTRPCRouter({
-  list: protectedProcedure
-    .output(teamListResponseSchema)
-    .query(async ({ ctx: { db, session } }) => {
-      const teams = await getTeamsForUser(db, { userId: session.user.id });
+  current: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
+    if (!teamId) {
+      return null;
+    }
 
-      return teams.map((team) => ({
-        id: team.id,
-        name: team.name ?? "Untitled Team",
-        slug: team.slug ?? null,
-        logoUrl: team.logoUrl ?? null,
-        planCode: team.planCode ?? null,
-      }));
+    return getTeamById(db, teamId!);
+  }),
+
+  update: protectedProcedure
+    .input(updateTeamByIdSchema)
+    .mutation(async ({ ctx: { db, teamId }, input }) => {
+      return updateTeamById(db, {
+        id: teamId!,
+        data: input,
+      });
     }),
 
-  current: protectedProcedure
-    .output(teamDetailSchema.nullable())
-    .query(async ({ ctx: { db, teamId } }) => {
-      if (!teamId) {
-        return null;
-      }
+  members: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
+    return getTeamMembersByTeamId(db, teamId!);
+  }),
 
-      const team = await getTeamSummaryById(db, teamId);
+  list: protectedProcedure.query(async ({ ctx: { db, session } }) => {
+    return getTeamsByUserId(db, session.user.id);
+  }),
 
-      if (!team) {
-        return null;
-      }
-
-      return {
-        id: team.id,
-        name: team.name,
-        slug: team.slug,
-        logoUrl: team.logoUrl,
-        planCode: team.planCode,
-        metadata: (team.metadata ?? null) as Record<string, unknown> | null,
-        createdAt: team.createdAt,
-        updatedAt: team.updatedAt,
-      };
-    }),
-
-  setActive: protectedProcedure
-    .input(teamSetActiveInputSchema)
-    .output(z.object({ success: z.literal(true) }))
+  create: protectedProcedure
+    .input(createTeamSchema)
     .mutation(async ({ ctx: { db, session }, input }) => {
-      await setActiveTeam(db, {
+      const requestId = `trpc_team_create_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      console.log(`[${requestId}] TRPC team creation request`, {
+        userId: session.user.id,
+        userEmail: session.user.email,
+        teamName: input.name,
+        baseCurrency: input.baseCurrency,
+        countryCode: input.countryCode,
+        switchTeam: input.switchTeam,
+        timestamp: new Date().toISOString(),
+      });
+
+      try {
+        const teamId = await createTeam(db, {
+          ...input,
+          userId: session.user.id,
+          email: session.user.email!,
+        });
+
+        console.log(`[${requestId}] TRPC team creation successful`, {
+          teamId,
+          userId: session.user.id,
+        });
+
+        return teamId;
+      } catch (error) {
+        console.error(`[${requestId}] TRPC team creation failed`, {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          userId: session.user.id,
+          input,
+        });
+        throw error;
+      }
+    }),
+
+  leave: protectedProcedure
+    .input(leaveTeamSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      const teamMembersData = await getTeamMembersByTeamId(db, input.teamId);
+
+      const currentUser = teamMembersData?.find(
+        (member) => member.user?.id === session.user.id,
+      );
+
+      const totalOwners = teamMembersData?.filter(
+        (member) => member.role === "owner",
+      ).length;
+
+      if (currentUser?.role === "owner" && totalOwners === 1) {
+        throw Error("Action not allowed");
+      }
+
+      return leaveTeam(db, {
         userId: session.user.id,
         teamId: input.teamId,
       });
-
-      return { success: true } as const;
     }),
 
-  get: protectedProcedure
-    .input(teamIdInputSchema)
-    .output(teamDetailSchema)
-    .query(async ({ ctx: { db, session }, input }) => {
-      const memberships = await getTeamsForUser(db, {
+  acceptInvite: protectedProcedure
+    .input(acceptTeamInviteSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return acceptTeamInvite(db, {
+        id: input.id,
+        userId: session.user.id,
+      });
+    }),
+
+  declineInvite: protectedProcedure
+    .input(declineTeamInviteSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return declineTeamInvite(db, {
+        id: input.id,
+        email: session.user.email!,
+      });
+    }),
+
+  delete: protectedProcedure
+    .input(deleteTeamSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      const data = await deleteTeam(db, {
+        teamId: input.teamId,
         userId: session.user.id,
       });
 
-      const hasAccess = memberships.some((team) => team.id === input.teamId);
-      if (!hasAccess) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "No team access" });
+      if (!data) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Team not found",
+        });
       }
 
-      const team = await getTeamSummaryById(db, input.teamId);
-      if (!team) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Team not found" });
+      const bankConnections = await getBankConnections(db, {
+        teamId: data.id,
+      });
+
+      if (bankConnections.length > 0) {
+        await tasks.trigger("delete-team", {
+          teamId: input.teamId!,
+          connections: bankConnections.map((connection) => ({
+            accessToken: connection.accessToken,
+            provider: connection.provider,
+            referenceId: connection.referenceId,
+          })),
+        } satisfies DeleteTeamPayload);
+      }
+    }),
+
+  deleteMember: protectedProcedure
+    .input(deleteTeamMemberSchema)
+    .mutation(async ({ ctx: { db }, input }) => {
+      return deleteTeamMember(db, {
+        teamId: input.teamId,
+        userId: input.userId,
+      });
+    }),
+
+  updateMember: protectedProcedure
+    .input(updateTeamMemberSchema)
+    .mutation(async ({ ctx: { db }, input }) => {
+      return updateTeamMember(db, input);
+    }),
+
+  teamInvites: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
+    return getTeamInvites(db, teamId!);
+  }),
+
+  invitesByEmail: protectedProcedure.query(async ({ ctx: { db, session } }) => {
+    return getInvitesByEmail(db, session.user.email!);
+  }),
+
+  invite: protectedProcedure
+    .input(inviteTeamMembersSchema)
+    .mutation(async ({ ctx: { db, session, teamId, geo }, input }) => {
+      const ip = geo.ip ?? "127.0.0.1";
+
+      const data = await createTeamInvites(db, {
+        teamId: teamId!,
+        invites: input.map((invite) => ({
+          ...invite,
+          invitedBy: session.user.id,
+        })),
+      });
+
+      const results = data?.results ?? [];
+      const skippedInvites = data?.skippedInvites ?? [];
+
+      const invites = results.map((invite) => ({
+        email: invite?.email!,
+        invitedBy: session.user.id!,
+        invitedByName: session.user.full_name!,
+        invitedByEmail: session.user.email!,
+        teamName: invite?.team?.name!,
+        inviteCode: invite?.code!,
+      }));
+
+      // Only trigger email sending if there are valid invites
+      if (invites.length > 0) {
+        await tasks.trigger("invite-team-members", {
+          teamId: teamId!,
+          invites,
+          ip,
+          locale: "en",
+        } satisfies InviteTeamMembersPayload);
       }
 
+      // Return information about the invitation process
       return {
-        id: team.id,
-        name: team.name,
-        slug: team.slug,
-        logoUrl: team.logoUrl,
-        planCode: team.planCode,
-        metadata: (team.metadata ?? null) as Record<string, unknown> | null,
-        createdAt: team.createdAt,
-        updatedAt: team.updatedAt,
+        sent: invites.length,
+        skipped: skippedInvites.length,
+        skippedInvites,
       };
     }),
 
-  invites: protectedProcedure
-    .output(z.array(teamInvitesSchema))
-    .query(async ({ ctx: { db, session } }) => {
-      if (!session.user.email) {
-        return [];
-      }
-
-      const invites = await getTeamInvitesByEmail(db, {
-        email: session.user.email,
+  deleteInvite: protectedProcedure
+    .input(deleteTeamInviteSchema)
+    .mutation(async ({ ctx: { db, teamId }, input }) => {
+      return deleteTeamInvite(db, {
+        teamId: teamId!,
+        id: input.id,
       });
+    }),
 
-      return invites.map((invite) => ({
-        id: invite.id,
-        email: invite.email,
-        role: invite.role ?? "member",
-        status: invite.status ?? "pending",
-        expiresAt: invite.expiresAt,
-        team: invite.team
-          ? {
-              id: invite.team.id,
-              name: invite.team.name,
-              slug: invite.team.slug,
-              logoUrl: invite.team.logoUrl,
-              planCode: invite.team.planCode,
-            }
-          : null,
-      }));
+  availablePlans: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
+    return getAvailablePlans(db, teamId!);
+  }),
+
+  updateBaseCurrency: protectedProcedure
+    .input(updateBaseCurrencySchema)
+    .mutation(async ({ ctx: { teamId }, input }) => {
+      const event = await tasks.trigger("update-base-currency", {
+        teamId: teamId!,
+        baseCurrency: input.baseCurrency,
+      } satisfies UpdateBaseCurrencyPayload);
+
+      return event;
     }),
 });

@@ -4,7 +4,7 @@ import { assistantRouter } from "./assistant";
 import { highlightRouter } from "./highlight";
 import { pipelineRouter } from "./pipeline";
 import { searchRouter } from "./search";
-import { storyRouter } from "./story";
+import { storiesRouter } from "./stories";
 import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
 import { userRouter } from "./user";
@@ -14,7 +14,7 @@ export const appRouter = createTRPCRouter({
   tags: tagsRouter,
   team: teamRouter,
   highlight: highlightRouter,
-  story: storyRouter,
+  stories: storiesRouter,
   user: userRouter,
   search: searchRouter,
   pipeline: pipelineRouter,

@@ -2,7 +2,7 @@
 
 import { setWeeklyCalendarAction } from "@/actions/set-weekly-calendar-action";
 import { useTrackerParams } from "@/hooks/use-tracker-params";
-import { Tabs, TabsList, TabsTrigger } from "@midday/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@zeke/ui/tabs";
 import { useAction } from "next-safe-action/hooks";
 
 const options = [

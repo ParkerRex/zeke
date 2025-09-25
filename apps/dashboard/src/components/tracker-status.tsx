@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/locales/client";
 import type { RouterOutputs } from "@api/trpc/routers/_app";
-import { cn } from "@midday/ui/cn";
+import { cn } from "@zeke/ui/cn";
 
 type Props = {
   status: NonNullable<RouterOutputs["trackerProjects"]["getById"]>["status"];

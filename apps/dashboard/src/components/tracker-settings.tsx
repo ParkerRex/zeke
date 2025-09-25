@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserMutation, useUserQuery } from "@/hooks/use-user";
-import { Button } from "@midday/ui/button";
+import { Button } from "@zeke/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@midday/ui/dropdown-menu";
-import { Icons } from "@midday/ui/icons";
+} from "@zeke/ui/dropdown-menu";
+import { Icons } from "@zeke/ui/icons";
 
 export function TrackerSettings() {
   const { data: user } = useUserQuery();

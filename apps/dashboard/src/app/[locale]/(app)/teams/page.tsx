@@ -1,28 +1,32 @@
+import { SelectTeamTable } from "@/components/tables/select-team/table";
+import { TeamInvites } from "@/components/team-invites";
+import { UserMenu } from "@/components/user-menu";
+import { HydrateClient, getQueryClient, prefetch, trpc } from "@/trpc/server";
 import { Button } from "@zeke/ui/button";
 import { Icons } from "@zeke/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTeamsViewData } from "@/actions/teams/get-teams-data";
-import { SelectTeamTable } from "@/components/tables/select-team/table";
-import { TeamInvites } from "@/components/team-invites";
-import { UserMenu } from "@/components/user-menu";
 
 export const metadata: Metadata = {
   title: "Teams | Zeke",
 };
-
 export default async function Teams() {
-  const { user, teams, invites } = await getTeamsViewData();
+  const queryClient = getQueryClient();
+  const teams = await queryClient.fetchQuery(trpc.team.list.queryOptions());
+  const invites = await queryClient.fetchQuery(
+    trpc.team.invitesByEmail.queryOptions(),
+  );
 
-  if (!teams.length && !invites.length) {
+  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
+
+  // If no teams and no invites, redirect to create team
+  if (!teams?.length && !invites?.length) {
     redirect("/teams/create");
   }
 
-  const firstName = user?.fullName?.split(" ").at(0);
-
   return (
-    <>
+    <HydrateClient>
       <header className="w-full absolute left-0 right-0 flex justify-between items-center">
         <div className="ml-5 mt-4 md:ml-10 md:mt-10">
           <Link href="/">
@@ -40,9 +44,9 @@ export default async function Teams() {
           <div>
             <div className="text-center">
               <h1 className="text-lg mb-2 font-serif">
-                Welcome{firstName ? `, ${firstName}` : ""}
+                Welcome, {user?.fullName?.split(" ").at(0)}
               </h1>
-              {invites.length > 0 ? (
+              {invites?.length > 0 ? (
                 <p className="text-[#878787] text-sm mb-8">
                   Join a team you’ve been invited to or create a new one.
                 </p>
@@ -54,16 +58,20 @@ export default async function Teams() {
             </div>
           </div>
 
-          {teams.length > 0 && (
+          {/* If there are teams, show them */}
+          {teams?.length && (
             <>
-              <span className="text-sm font-mono text-[#878787] mb-4">Teams</span>
+              <span className="text-sm font-mono text-[#878787] mb-4">
+                Teams
+              </span>
               <div className="max-h-[260px] overflow-y-auto">
                 <SelectTeamTable data={teams} />
               </div>
             </>
           )}
 
-          {invites.length > 0 && <TeamInvites invites={invites} />}
+          {/* If there are invites, show them */}
+          {invites?.length > 0 && <TeamInvites />}
 
           <div className="text-center mt-12 border-t-[1px] border-border pt-6 w-full relative border-dashed">
             <span className="absolute left-1/2 -translate-x-1/2 text-sm text-[#878787] bg-background -top-3 px-4">
@@ -77,6 +85,6 @@ export default async function Teams() {
           </div>
         </div>
       </div>
-    </>
+    </HydrateClient>
   );
 }

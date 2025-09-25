@@ -1,5 +1,5 @@
-import type { Context } from "@api/rest/types";
 import { protectedMiddleware, withRequiredScope } from "@api/rest/middleware";
+import type { Context } from "@api/rest/types";
 import {
   listStoriesInputSchema,
   listStoriesResponseSchema,
@@ -7,15 +7,15 @@ import {
   storyIdInputSchema,
   storyMetricsInputSchema,
   storyMetricsSchema,
-} from "@api/schemas/story";
+} from "@api/schemas/stories";
 import { validateResponse } from "@api/utils/validate-response";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import {
   getStoryForDisplay,
   getStoryMetrics,
   listStoriesForDisplay,
 } from "@zeke/db/queries";
+import { HTTPException } from "hono/http-exception";
 
 const app = new OpenAPIHono<Context>();
 
@@ -26,7 +26,8 @@ app.openapi(
     method: "get",
     path: "/",
     summary: "List stories",
-    description: "Paginated list of stories enriched with overlays and sources.",
+    description:
+      "Paginated list of stories enriched with overlays and sources.",
     operationId: "listStories",
     tags: ["Stories"],
     security: [{ bearerAuth: [] }],
@@ -61,9 +62,10 @@ app.openapi(
       offset: queries.offset?.[0] ? Number(queries.offset[0]) : undefined,
       kind: queries.kind?.[0],
       search: queries.search?.[0],
-      storyIds: queries.storyIds && queries.storyIds.length > 0
-        ? queries.storyIds
-        : undefined,
+      storyIds:
+        queries.storyIds && queries.storyIds.length > 0
+          ? queries.storyIds
+          : undefined,
     });
 
     const result = await listStoriesForDisplay(db, {

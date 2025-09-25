@@ -1,16 +1,14 @@
 "use client";
 
-import { TeamInvite } from "@/components/team-invite";
-import type { TeamInviteRow } from "./tables/select-team/types";
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { TeamInvite } from "./team-invite";
 
-type Props = {
-  invites: TeamInviteRow[];
-};
-
-export function TeamInvites({ invites }: Props) {
-  if (!invites.length) {
-    return null;
-  }
+export function TeamInvites() {
+  const trpc = useTRPC();
+  const { data: invites } = useSuspenseQuery(
+    trpc.team.invitesByEmail.queryOptions(),
+  );
 
   return (
     <div className="mt-4">

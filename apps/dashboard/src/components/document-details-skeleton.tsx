@@ -1,7 +1,7 @@
 "use client";
 
-import { SheetHeader } from "@midday/ui/sheet";
-import { Skeleton } from "@midday/ui/skeleton";
+import { SheetHeader } from "@zeke/ui/sheet";
+import { Skeleton } from "@zeke/ui/skeleton";
 import { VaultRelatedFilesSkeleton } from "./vault/vault-related-files-skeleton";
 
 export function DocumentDetailsSkeleton() {

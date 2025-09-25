@@ -2,9 +2,9 @@
 
 import { useTransactionParams } from "@/hooks/use-transaction-params";
 import { useTRPC } from "@/trpc/client";
-import { Icons } from "@midday/ui/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
+import { Icons } from "@zeke/ui/icons";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function TransactionShortcuts() {

@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@midday/ui/button";
-import { Icons } from "@midday/ui/icons";
+import { Button } from "@zeke/ui/button";
+import { Icons } from "@zeke/ui/icons";
 import {
   addMonths,
   format,

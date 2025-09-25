@@ -1,10 +1,10 @@
-import { Icons } from "@midday/ui/icons";
+import { Icons } from "@zeke/ui/icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@midday/ui/tooltip";
+} from "@zeke/ui/tooltip";
 
 type Props = {
   fullfilled: boolean;

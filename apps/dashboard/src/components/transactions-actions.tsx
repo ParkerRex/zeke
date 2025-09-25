@@ -5,6 +5,7 @@ import { BulkActions } from "@/components/bulk-actions";
 import { TransactionsColumnVisibility } from "@/components/transactions-column-visibility";
 import { useTransactionsStore } from "@/store/transactions";
 import { useTRPC } from "@/trpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@midday/ui/alert-dialog";
-import { Button } from "@midday/ui/button";
-import { Icons } from "@midday/ui/icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+} from "@zeke/ui/alert-dialog";
+import { Button } from "@zeke/ui/button";
+import { Icons } from "@zeke/ui/icons";
 import { Loader2 } from "lucide-react";
 
 export function TransactionsActions() {

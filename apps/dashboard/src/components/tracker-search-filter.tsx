@@ -3,8 +3,9 @@
 import { generateTrackerFilters } from "@/actions/ai/filters/generate-tracker-filters";
 import { useTrackerFilterParams } from "@/hooks/use-tracker-filter-params";
 import { useTRPC } from "@/trpc/client";
-import { Calendar } from "@midday/ui/calendar";
-import { cn } from "@midday/ui/cn";
+import { useQuery } from "@tanstack/react-query";
+import { Calendar } from "@zeke/ui/calendar";
+import { cn } from "@zeke/ui/cn";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,10 +17,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@midday/ui/dropdown-menu";
-import { Icons } from "@midday/ui/icons";
-import { Input } from "@midday/ui/input";
-import { useQuery } from "@tanstack/react-query";
+} from "@zeke/ui/dropdown-menu";
+import { Icons } from "@zeke/ui/icons";
+import { Input } from "@zeke/ui/input";
 import { readStreamableValue } from "ai/rsc";
 import { formatISO } from "date-fns";
 import { useRef, useState } from "react";

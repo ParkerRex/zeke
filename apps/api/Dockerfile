@@ -1,5 +1,5 @@
 # Base image with Bun
-FROM oven/bun:1.2.21 AS base
+FROM oven/bun:1.2.22 AS base
 
 # Install turbo CLI globally using Bun
 FROM base AS turbo-cli
@@ -11,7 +11,7 @@ WORKDIR /app
 # Copy all files
 COPY . .
 # Use turbo CLI from Bun global install to prune workspaces
-RUN turbo prune @zeke/api --docker
+RUN turbo prune @midday/api --docker
 
 # Installer stage
 FROM base AS installer
@@ -24,6 +24,9 @@ RUN bun install
 
 # Copy the full source code
 COPY --from=builder /app/out/full/ .
+
+# Copy the prebuilt engine dist from the build context (assumes CI built it)
+COPY apps/engine/dist /app/apps/engine/dist
 
 # Runner stage (same as installer to avoid another copy)
 FROM installer AS runner

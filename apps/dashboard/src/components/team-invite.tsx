@@ -1,72 +1,94 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
-import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@zeke/ui/avatar";
+import { useTRPC } from "@/trpc/client";
+import type { RouterOutputs } from "@api/trpc/routers/_app";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Avatar, AvatarFallback } from "@zeke/ui/avatar";
+import { AvatarImage } from "@zeke/ui/avatar";
 import { SubmitButton } from "@zeke/ui/submit-button";
-import { acceptTeamInviteAction } from "@/actions/teams/accept-team-invite-action";
-import { declineTeamInviteAction } from "@/actions/teams/decline-team-invite-action";
-import type { TeamInviteRow } from "./tables/select-team/types";
+import { useRouter } from "next/navigation";
 
 type Props = {
-  invite: TeamInviteRow;
+  invite: RouterOutputs["team"]["invitesByEmail"][number];
 };
 
 export function TeamInvite({ invite }: Props) {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const router = useRouter();
 
-  const acceptInvite = useAction(acceptTeamInviteAction, {
-    onSuccess: () => {
-      router.refresh();
-      router.push("/");
-    },
-  });
+  const updateUserMutation = useMutation(
+    trpc.user.update.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries();
+        router.push("/");
+      },
+    }),
+  );
 
-  const declineInvite = useAction(declineTeamInviteAction, {
-    onSuccess: () => {
-      router.refresh();
-    },
-  });
+  const acceptInviteMutation = useMutation(
+    trpc.team.acceptInvite.mutationOptions({
+      onSuccess: (data) => {
+        if (!data.teamId) {
+          return;
+        }
 
-  const teamName = invite.team?.name ?? "";
+        // Update the user's teamId
+        updateUserMutation.mutate({
+          teamId: data.teamId,
+        });
+      },
+    }),
+  );
+
+  const declineInviteMutation = useMutation(
+    trpc.team.declineInvite.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.team.invitesByEmail.queryKey(),
+        });
+      },
+    }),
+  );
 
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-4">
         <Avatar className="size-8 rounded-none">
-          {invite.team?.logoUrl ? (
-            <AvatarImage
-              src={invite.team.logoUrl}
-              alt={teamName}
-              className="rounded-none"
-            />
-          ) : null}
+          <AvatarImage
+            src={invite.team?.logoUrl ?? ""}
+            className="rounded-none"
+            width={32}
+            height={32}
+          />
           <AvatarFallback className="rounded-none">
-            <span className="text-xs">{teamName.charAt(0).toUpperCase()}</span>
+            <span className="text-xs">
+              {invite.team?.name?.charAt(0)?.toUpperCase()}
+            </span>
           </AvatarFallback>
         </Avatar>
 
-        <span className="text-sm font-medium">{teamName}</span>
+        <span className="text-sm font-medium">{invite.team?.name}</span>
       </div>
 
       <div className="flex gap-2">
         <SubmitButton
-          isSubmitting={acceptInvite.status === "executing"}
+          isSubmitting={acceptInviteMutation.isPending}
           variant="outline"
           onClick={() =>
-            acceptInvite.execute({
-              inviteId: invite.id,
+            acceptInviteMutation.mutate({
+              id: invite.id,
             })
           }
         >
           Accept
         </SubmitButton>
         <SubmitButton
-          isSubmitting={declineInvite.status === "executing"}
+          isSubmitting={declineInviteMutation.isPending}
           variant="outline"
           onClick={() =>
-            declineInvite.execute({
-              inviteId: invite.id,
+            declineInviteMutation.mutate({
+              id: invite.id,
             })
           }
         >

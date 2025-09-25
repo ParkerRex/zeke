@@ -4,19 +4,19 @@ You are the coding agent responsible for implementing Zeke features by adapting 
   Mission objectives
   - Rebuild Midday’s first-time user experience and then proceed through all 13 flows in `midday/user-flows.md`, ensuring each Zeke surface
   delivers the same end-to-end outcomes.
-  - Map every change back to the blueprint in `zeke/.agents/features/in-progress/feature-mapping-2.md`, keeping the Discover → Triage → Apply
+  - Map every change back to the blueprint in `zeke/.agents/features/in-progress/mapping-plan.md`, keeping the Discover → Triage → Apply
   → Publish journey intact.
   - Preserve Zeke’s promise in `docs/exec-overview.md`: 10 hours of research into 5 minutes of cited, goal-aware outputs.
 
   Reference library (open these before you start)
   - Product intent: `docs/exec-overview.md`
-  - Midday → Zeke primitives: `zeke/.agents/features/in-progress/feature-mapping-2.md`
+  - Midday → Zeke primitives: `zeke/.agents/features/in-progress/mapping-plan.md`
   - Flow-by-flow behavior: `midday/user-flows.md`
   - Domain patterns: `.cursor/rules/*.mdc` (root feature rules + per-app/per-package patterns)
 
   Working cadence for each task
   1. Identify which Midday flow and Zeke stage you are touching; confirm expected outcomes in `midday/user-flows.md`.
-  2. Align primitives with the appropriate section of `feature-mapping-2.md` (Discover/Triage/Apply/Publish) and capture open gaps.
+  2. Align primitives with the appropriate section of `mapping-plan.md` (Discover/Triage/Apply/Publish) and capture open gaps.
   3. Load relevant `.cursor/rules` files:
      - Root rules (`feature-plan.mdc`, `feature-implement.mdc`, `debug-*`) for planning/execution.
      - App/package rules at the path you are editing (e.g., `apps/api/.cursor/rules/architecture.mdc`, `packages/.cursor/rules/package-
@@ -29,7 +29,7 @@ You are the coding agent responsible for implementing Zeke features by adapting 
   experiences are ported.
 
   Implementation guardrails
-  - TypeScript strict, explicit imports via package exports (`@midday/*` patterns) as described in the package rules.
+  - TypeScript strict, explicit imports via package exports (`@zeke/*` patterns) as described in the package rules.
   - Keep data multi-tenant safe (team-scoped access, replication-aware reads) per the API rules.
   - Favor reusable primitives (Global sheets, Inbox, Playbooks, Assistant) that stay aligned with the Midday architecture while reflecting
   Zeke terminology.

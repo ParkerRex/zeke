@@ -3,9 +3,9 @@
 import { useDocumentParams } from "@/hooks/use-document-params";
 import { downloadFile } from "@/lib/download";
 import { useTRPC } from "@/trpc/client";
-import { Button } from "@midday/ui/button";
-import { Icons } from "@midday/ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@zeke/ui/button";
+import { Icons } from "@zeke/ui/icons";
 import { useState } from "react";
 import { useCopyToClipboard } from "usehooks-ts";
 
