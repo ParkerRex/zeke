@@ -296,9 +296,75 @@ export const highlightIdsInputSchema = z
     description: "Input payload for highlight engagement queries",
   });
 
+export const highlightKindSchema = z
+  .enum([
+    "insight",
+    "quote",
+    "action",
+    "question",
+    "code_example",
+    "code_change",
+    "api_change",
+    "metric",
+  ])
+  .openapi({
+    description: "Type of highlight content",
+    example: "code_example",
+  });
+
+export const prioritizedHighlightSchema = z
+  .object({
+    id: z.string().uuid(),
+    storyId: z.string().uuid(),
+    kind: z.string().nullable(),
+    title: z.string().nullable(),
+    summary: z.string().nullable(),
+    quote: z.string().nullable(),
+    confidence: z.string().nullable(),
+    metadata: z.record(z.unknown()).nullable(),
+    createdAt: z.string().nullable(),
+    storyTitle: z.string().nullable(),
+    storyPublishedAt: z.string().nullable(),
+  })
+  .openapi({
+    description: "Lightweight highlight with story context for dashboard",
+  });
+
+export const prioritizedHighlightsInputSchema = z
+  .object({
+    limit: z.number().int().min(1).max(100).default(20).openapi({
+      description: "Maximum number of highlights to return",
+      example: 20,
+    }),
+  })
+  .openapi({
+    description: "Parameters for fetching prioritized highlights",
+  });
+
+export const highlightsByKindInputSchema = z
+  .object({
+    kind: highlightKindSchema,
+    minRelevance: z.number().min(0).max(1).default(0.7).openapi({
+      description: "Minimum relevance score threshold",
+      example: 0.7,
+    }),
+    limit: z.number().int().min(1).max(50).default(10).openapi({
+      description: "Maximum number of highlights to return",
+      example: 10,
+    }),
+  })
+  .openapi({
+    description: "Parameters for fetching highlights by kind with relevance filtering",
+  });
+
 export type Highlight = z.infer<typeof highlightSchema>;
 export type HighlightEngagement = z.infer<typeof highlightEngagementSchema>;
 export type HighlightsByStoryInput = z.infer<
   typeof highlightsByStoryInputSchema
 >;
 export type HighlightIdsInput = z.infer<typeof highlightIdsInputSchema>;
+export type PrioritizedHighlight = z.infer<typeof prioritizedHighlightSchema>;
+export type PrioritizedHighlightsInput = z.infer<
+  typeof prioritizedHighlightsInputSchema
+>;
+export type HighlightsByKindInput = z.infer<typeof highlightsByKindInputSchema>;
