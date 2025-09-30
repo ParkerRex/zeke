@@ -11,6 +11,9 @@ export type StorySource = {
 
 export type StoryOverlaySummary = {
   whyItMatters: string | null;
+  briefOneLiner: string | null;
+  briefTwoLiner: string | null;
+  briefElevator: string | null;
   chili: number;
   confidence: number | null;
   sources: StorySource[];
@@ -152,6 +155,9 @@ export function mapStoryClusterStoryToView(
     embedUrl,
     overlays: {
       whyItMatters: overlay?.whyItMatters ?? null,
+      briefOneLiner: overlay?.briefOneLiner ?? null,
+      briefTwoLiner: overlay?.briefTwoLiner ?? null,
+      briefElevator: overlay?.briefElevator ?? null,
       chili,
       confidence,
       sources,

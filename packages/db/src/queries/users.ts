@@ -3,7 +3,7 @@ import { teamMembers, teams, users } from "@db/schema";
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 export const getUserById = async (db: Database, id: string) => {
-  const [row] = await db
+  const [result] = await db
     .select({
       id: users.id,
       email: users.email,
@@ -27,10 +27,9 @@ export const getUserById = async (db: Database, id: string) => {
     })
     .from(users)
     .leftJoin(teams, eq(users.teamId, teams.id))
-    .where(eq(users.id, id))
-    .limit(1);
+    .where(eq(users.id, id));
 
-  return row ?? null;
+  return result;
 };
 
 export type UpdateUserParams = {
@@ -46,24 +45,11 @@ export type UpdateUserParams = {
 };
 
 export const updateUser = async (db: Database, data: UpdateUserParams) => {
-  const { id, ...rest } = data;
-
-  const updatePayload: Record<string, unknown> = { updatedAt: sql`now()` };
-
-  if (rest.fullName !== undefined) updatePayload.fullName = rest.fullName;
-  if (rest.avatarUrl !== undefined) updatePayload.avatarUrl = rest.avatarUrl;
-  if (rest.locale !== undefined) updatePayload.locale = rest.locale;
-  if (rest.weekStartsOnMonday !== undefined)
-    updatePayload.weekStartsOnMonday = rest.weekStartsOnMonday;
-  if (rest.timezone !== undefined) updatePayload.timezone = rest.timezone;
-  if (rest.timezoneAutoSync !== undefined)
-    updatePayload.timezoneAutoSync = rest.timezoneAutoSync;
-  if (rest.timeFormat !== undefined) updatePayload.timeFormat = rest.timeFormat;
-  if (rest.dateFormat !== undefined) updatePayload.dateFormat = rest.dateFormat;
+  const { id, ...updateData } = data;
 
   const [result] = await db
     .update(users)
-    .set(updatePayload)
+    .set(updateData)
     .where(eq(users.id, id))
     .returning({
       id: users.id,
@@ -77,20 +63,18 @@ export const updateUser = async (db: Database, data: UpdateUserParams) => {
       timeFormat: users.timeFormat,
       dateFormat: users.dateFormat,
       teamId: users.teamId,
-      updatedAt: users.updatedAt,
     });
 
   return result;
 };
 
 export const getUserTeamId = async (db: Database, userId: string) => {
-  const result = await db
-    .select({ teamId: users.teamId })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
+  const result = await db.query.users.findFirst({
+    columns: { teamId: true },
+    where: eq(users.id, userId),
+  });
 
-  return result[0]?.teamId ?? null;
+  return result?.teamId || null;
 };
 
 export const deleteUser = async (db: Database, id: string) => {

@@ -1,13 +1,13 @@
 import { updateUserSchema, userSchema } from "@api/schemas/users";
 import { resend } from "@api/services/resend";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
+import { TRPCError } from "@trpc/server";
 import {
   deleteUser,
   getUserById,
   getUserInvites,
   updateUser,
 } from "@zeke/db/queries";
-import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   me: protectedProcedure

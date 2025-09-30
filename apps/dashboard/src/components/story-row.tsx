@@ -39,7 +39,12 @@ export default function StoryRow({ cluster }: { cluster: StoryClusterView }) {
         <div className="truncate font-medium text-gray-900 text-sm">
           {cluster.title}
         </div>
-        <div className="truncate text-[11px] text-gray-500">
+        {cluster.overlays?.whyItMatters && (
+          <div className="line-clamp-2 text-[11px] text-gray-600 mt-0.5">
+            {cluster.overlays.whyItMatters}
+          </div>
+        )}
+        <div className="truncate text-[11px] text-gray-500 mt-0.5">
           {domainFromUrl(cluster.primaryUrl)}
         </div>
       </div>

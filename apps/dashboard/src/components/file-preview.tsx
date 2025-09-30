@@ -70,7 +70,7 @@ const RenderComponent = ({
     );
   }
 
-  if (type === FileType.Pdf) {
+  if (type === "pdf") {
     return (
       <Iframe
         src={src}

@@ -1,5 +1,8 @@
-import { getUser } from "@zeke/supabase/cached-queries";
-import { Avatar, AvatarFallback } from "@zeke/ui/avatar";
+"use client";
+
+import { useUserQuery } from "@/hooks/use-user";
+import type { RouterOutputs } from "@zeke/api/trpc/routers/_app";
+import { Avatar, AvatarFallback, AvatarImageNext } from "@zeke/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,32 +10,35 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@zeke/ui/dropdown-menu";
-import Image from "next/image";
 import Link from "next/link";
 import { SignOut } from "./sign-out";
 import { ThemeSwitch } from "./theme-switch";
 
-export async function UserMenu({ onlySignOut }) {
-  const { data: userData } = await getUser();
+type Props = {
+  onlySignOut?: boolean;
+};
+
+export function UserMenu({ onlySignOut }: Props) {
+  const { data: user } = useUserQuery() as { data: RouterOutputs["user"]["me"] };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="rounded-full w-8 h-8 cursor-pointer">
-          {userData?.avatar_url && (
-            <Image
-              src={userData?.avatar_url}
-              alt={userData?.full_name}
+          {user?.avatarUrl && (
+            <AvatarImageNext
+              src={user?.avatarUrl}
+              alt={user?.fullName ?? ""}
               width={32}
               height={32}
+              quality={100}
             />
           )}
           <AvatarFallback>
             <span className="text-xs">
-              {userData?.full_name?.charAt(0)?.toUpperCase()}
+              {user?.fullName?.charAt(0)?.toUpperCase()}
             </span>
           </AvatarFallback>
         </Avatar>
@@ -43,9 +49,11 @@ export async function UserMenu({ onlySignOut }) {
             <DropdownMenuLabel>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="truncate">{userData.full_name}</span>
+                  <span className="truncate line-clamp-1 max-w-[155px] block">
+                    {user?.fullName}
+                  </span>
                   <span className="truncate text-xs text-[#606060] font-normal">
-                    {userData.email}
+                    {user?.email}
                   </span>
                 </div>
               </div>
@@ -55,14 +63,15 @@ export async function UserMenu({ onlySignOut }) {
 
             <DropdownMenuGroup>
               <Link prefetch href="/account">
-                <DropdownMenuItem>
-                  Account
-                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <DropdownMenuItem>Account</DropdownMenuItem>
               </Link>
 
               <Link prefetch href="/account/support">
                 <DropdownMenuItem>Support</DropdownMenuItem>
+              </Link>
+
+              <Link prefetch href="/account/teams">
+                <DropdownMenuItem>Teams</DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
 

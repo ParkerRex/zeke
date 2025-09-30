@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import type { RouterOutputs } from "@zeke/api/trpc/routers/_app";
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import {
 
 export function TimeFormatSettings() {
   const updateUserMutation = useUserMutation();
-  const { data: user } = useUserQuery();
+  const { data: user } = useUserQuery() as { data: RouterOutputs["user"]["me"] };
 
   return (
     <Card className="flex justify-between items-center">

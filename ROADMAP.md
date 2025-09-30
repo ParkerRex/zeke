@@ -5,13 +5,37 @@
 
 ---
 
+## 💡 Design Principle: AI as Enhancement, Not Dependency
+
+**Question**: How can we use string matching and regex where possible to match things without AI? How would we do this if we didn't have AI?
+
+**Philosophy**:
+- **Deterministic First**: Use regex, keyword matching, and rule-based systems for predictable patterns
+- **AI for Nuance**: Reserve LLM calls for subjective analysis, semantic understanding, and context-dependent decisions
+- **Cost Efficiency**: String operations are ~1000x faster and cheaper than AI API calls
+- **Reliability**: Regex patterns don't hallucinate or require API availability
+
+**Examples**:
+- ✅ **Use Regex**: Extract version numbers (`v\d+\.\d+\.\d+`), git commit hashes, API endpoint patterns
+- ✅ **Use String Matching**: Detect breaking changes via keywords ("BREAKING:", "deprecated", "removed")
+- ✅ **Use Rule-Based**: Score urgency by counting exclamation marks, detecting "urgent" keywords
+- ❌ **Use AI**: Analyze *why* a change matters, assess business impact, generate summaries
+
+**Implementation Strategy**:
+1. Start with regex/string matching for structure detection
+2. Use AI only when semantic understanding is required
+3. Cache AI results aggressively - never re-analyze the same content
+4. Consider hybrid approaches: regex extracts candidates, AI filters for relevance
+
+---
+
 ## <� Current State (Workable Prototype)
 
 ### What We Have
--  **Engine** - 5 content providers (YouTube, RSS, arXiv, Apple Podcasts, Semantic Scholar)
--  **Jobs** - Insight generation, story clustering, playbook execution
--  **Dashboard** - Story feeds, highlights, basic notifications (Novu)
--  **Database** - Stories, highlights, playbooks, teams schema
+- - **Engine** - 5 content providers (YouTube, RSS, arXiv, Apple Podcasts, Semantic Scholar)
+- **Jobs** - Insight generation, story clustering, playbook execution
+- **Dashboard** - Story feeds, highlights, basic notifications (Novu)
+- **Database** - Stories, highlights, playbooks, teams schema
 
 ### What's Working
 - Manual content ingestion via URL

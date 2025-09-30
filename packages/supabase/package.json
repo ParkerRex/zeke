@@ -7,7 +7,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
-    "db:generate": "supabase gen types --lang=typescript --local --schema public > src/types/db.ts"
+    "db:generate": "supabase gen types --lang=typescript --project-id hblelrtwdpukaymtpchv --schema public > src/types/db.ts"
   },
   "dependencies": {
     "@supabase/postgrest-js": "^1.21.3",

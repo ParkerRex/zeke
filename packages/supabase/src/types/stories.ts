@@ -13,7 +13,7 @@ export type Overlays = {
 
 export type EmbedKind =
   | "youtube"
-  | "article" // blogs/news
+  | "article"
   | "reddit"
   | "hn"
   | "podcast"

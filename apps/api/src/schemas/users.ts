@@ -69,7 +69,7 @@ export const userSchema = z.object({
     description: "Unique identifier of the user",
     example: "123e4567-e89b-12d3-a456-426614174000",
   }),
-  fullName: z.string().openapi({
+  fullName: z.string().nullable().openapi({
     description: "Full name of the user",
     example: "Jane Doe",
   }),
@@ -118,6 +118,18 @@ export const userSchema = z.object({
         "ddDotMMDotyyyy",
       ],
     }),
+  teamId: z.string().uuid().nullable().openapi({
+    description: "Unique identifier of the team the user belongs to",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+  createdAt: z.string().nullable().openapi({
+    description: "Timestamp when the user was created",
+    example: "2024-01-15T10:30:00Z",
+  }),
+  updatedAt: z.string().nullable().openapi({
+    description: "Timestamp when the user was last updated",
+    example: "2024-01-20T14:45:00Z",
+  }),
   team: z
     .object({
       id: z.string().uuid().openapi({
@@ -128,12 +140,12 @@ export const userSchema = z.object({
         description: "Name of the team or organization",
         example: "Acme Corporation",
       }),
-      logoUrl: z.string().url().openapi({
-        description: "URL to the team's logo image",
-        example: "https://cdn.zekehq.com/logos/acme-corp.png",
+      slug: z.string().openapi({
+        description: "URL-friendly slug for the team",
+        example: "acme-corporation",
       }),
-      plan: z.string().openapi({
-        description: "Current subscription plan of the team",
+      planCode: z.string().openapi({
+        description: "Current subscription plan code of the team",
         example: "pro",
       }),
     })

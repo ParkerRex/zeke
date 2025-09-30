@@ -1,13 +1,15 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { useTRPC } from "@/trpc/client";
+import type { RouterInputs, RouterOutputs } from "@zeke/api/trpc/routers/_app";
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+
+type User = RouterOutputs["user"]["me"];
+type UpdateUserInput = RouterInputs["user"]["update"];
 
 export function useUserQuery() {
   const trpc = useTRPC();
@@ -18,38 +20,44 @@ export function useUserMutation() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  return useMutation(
-    trpc.user.update.mutationOptions({
-      onMutate: async (newData) => {
-        // Cancel outgoing refetches
-        await queryClient.cancelQueries({
-          queryKey: trpc.user.me.queryKey(),
-        });
+  return useMutation({
+    ...trpc.user.update.mutationOptions(),
+    onMutate: async (newData: UpdateUserInput) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: trpc.user.me.queryKey(),
+      });
 
-        // Get current data
-        const previousData = queryClient.getQueryData(trpc.user.me.queryKey());
+      // Get current data
+      const previousData = queryClient.getQueryData<User>(
+        trpc.user.me.queryKey(),
+      );
 
-        // Optimistically update
-        queryClient.setQueryData(trpc.user.me.queryKey(), (old: any) => ({
-          ...old,
-          ...newData,
-        }));
+      // Optimistically update
+      queryClient.setQueryData<User>(trpc.user.me.queryKey(), (old: User | undefined) =>
+        old ? { ...old, ...newData } : old,
+      );
 
-        return { previousData };
-      },
-      onError: (_, __, context) => {
-        // Rollback on error
+      return { previousData };
+    },
+    onError: (
+      _error: unknown,
+      _variables: UpdateUserInput,
+      context: { previousData: User | undefined } | undefined,
+    ) => {
+      // Rollback on error
+      if (context?.previousData) {
         queryClient.setQueryData(
           trpc.user.me.queryKey(),
-          context?.previousData,
+          context.previousData,
         );
-      },
-      onSettled: () => {
-        // Refetch after error or success
-        queryClient.invalidateQueries({
-          queryKey: trpc.user.me.queryKey(),
-        });
-      },
-    }),
-  );
+      }
+    },
+    onSettled: () => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: trpc.user.me.queryKey(),
+      });
+    },
+  });
 }
