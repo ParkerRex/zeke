@@ -1,13 +1,13 @@
 import { fetchStats } from "@/lib/fetch-stats";
 
 export async function UsersChart() {
-  const { users } = await fetchStats();
+  const { stories } = await fetchStats();
 
   return (
     <div className="flex border flex-col items-center justify-center border-border bg-background px-6 pt-8 pb-6 space-y-4">
-      <h2 className="text-2xl">Businesses</h2>
+      <h2 className="text-2xl">Stories Analyzed</h2>
       <p className="text-[#878787] text-sm text-center">
-        This is the number of customers currently using Zeke.
+        Research content transformed into actionable insights.
       </p>
 
       <div className="flex items-center space-x-4">
@@ -21,7 +21,7 @@ export async function UsersChart() {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
             useGrouping: true,
-          }).format(users)}
+          }).format(stories ?? 0)}
         </span>
       </div>
     </div>

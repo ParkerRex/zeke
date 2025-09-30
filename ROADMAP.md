@@ -371,6 +371,38 @@ Playbooks (actionable next steps)
 **Status**: 🚧 In Progress (2025-09-30)
 **Priority**: CRITICAL - This is the foundation for the product vision
 
+### Authentication & Onboarding Setup - 🚧 TODO
+
+**Priority**: HIGH - Required for production launch
+
+**Tasks:**
+
+- [ ] **Setup OAuth Providers**
+  - [ ] Configure Apple Sign In (Apple Developer Console)
+  - [ ] Configure GitHub OAuth (GitHub App settings)
+  - [ ] Configure Google OAuth (Google Cloud Console)
+  - [ ] Update environment variables with client IDs/secrets
+  - [ ] Test OAuth flows in dashboard
+
+- [ ] **Setup OTP (One-Time Password) Authentication**
+  - [ ] Configure email-based OTP system
+  - [ ] Setup SMS OTP provider (optional fallback)
+  - [ ] Implement OTP verification UI
+  - [ ] Add rate limiting for OTP requests
+
+- [ ] **Transactional Email System**
+  - [ ] Setup email service provider (Resend/SendGrid/AWS SES)
+  - [ ] Design email templates:
+    - [ ] Welcome email (post-signup)
+    - [ ] OTP verification code
+    - [ ] Password reset
+    - [ ] Magic link authentication
+    - [ ] New brief notification
+    - [ ] Breaking change alert
+  - [ ] Configure email sending infrastructure
+  - [ ] Test email delivery and rendering
+  - [ ] Add unsubscribe management
+
 ### Backend: Fix OpenAI Responses API Integration - ✅ COMPLETE
 
 **Status**: ✅ Complete (2025-09-30)
