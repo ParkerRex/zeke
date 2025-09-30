@@ -12,7 +12,10 @@
       "Bash(lsof:*)",
       "Bash(curl -X POST http://localhost:8787/ingest -H \"Content-Type: application/json\" -d '{\"\"\"\"url\"\"\"\": \"\"\"\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\"\"\"}')",
       "Bash(curl:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(bun build:*)",
+      "Bash(node:*)",
+      "Bash(bun:*)"
     ],
     "deny": [],
     "ask": []

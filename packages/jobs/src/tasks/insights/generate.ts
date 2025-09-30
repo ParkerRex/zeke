@@ -103,6 +103,34 @@ export const analyzeStory = schemaTask({
         confidence: analysisResult.confidence,
         embeddingDimensions: embeddingResult.embedding.length,
       });
+
+      // Trigger downstream pipeline jobs
+      // We import these dynamically to avoid circular dependencies
+      const { generateBrief } = await import("../briefs/generate");
+      const { extractHighlights } = await import("./extract-highlights");
+      const { scoreRelevance } = await import("./score-relevance");
+
+      // Get system user ID for auto-generated highlights
+      // In production, this should be a dedicated system user
+      const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
+
+      // Trigger all downstream jobs in parallel
+      await Promise.all([
+        generateBrief.trigger({ storyId, reason: "new_story" }),
+        extractHighlights.trigger({
+          storyId,
+          userId: SYSTEM_USER_ID,
+          teamId: undefined,
+        }),
+      ]);
+
+      // Score relevance after highlights are extracted (slight delay)
+      setTimeout(() => {
+        scoreRelevance.trigger({ storyId }).catch(err =>
+          logger.error("score_relevance_trigger_failed", { storyId, error: err })
+        );
+      }, 2000); // 2 second delay to let highlights settle
+
     } catch (error) {
       logger.error("analyze_story_error", { storyId, trigger, error });
       throw error;

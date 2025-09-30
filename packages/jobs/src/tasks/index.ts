@@ -15,6 +15,10 @@ export { attachInsightToStory } from "./insights/attach-to-story";
 export { summarizeStory } from "./stories/summarize";
 export { updateStoryStatus } from "./stories/update-status";
 
+// Enhanced highlights
+export { extractHighlights } from "./insights/extract-highlights";
+export { scoreRelevance } from "./insights/score-relevance";
+
 // Brief generation
 export { generateBrief } from "./briefs/generate";
 
