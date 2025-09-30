@@ -8,6 +8,13 @@
       "when": 1758775738164,
       "tag": "0000_right_pet_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759200087578,
+      "tag": "0001_bitter_gauntlet",
+      "breakpoints": true
     }
   ]
 }

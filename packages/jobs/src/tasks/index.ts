@@ -1,12 +1,22 @@
+// Source ingestion
 export { ingestPull, ensureIngestPullSchedule } from "./sources/pull/rss";
+export { ingestPullYouTube, ensureYouTubePullSchedule } from "./sources/pull/youtube";
 export { ingestSource } from "./sources/ingest/from-feed";
+export { ingestYouTubeChannel } from "./sources/ingest/from-youtube";
 export { ingestFromUpload } from "./sources/ingest/from-upload";
 export { fetchContent } from "./sources/enrich/fetch-content";
 export { ingestOneOff } from "./sources/pull/manual";
+export { linkSourceToStory } from "./sources/link/to-stories";
+
+// Story analysis
 export { analyzeStory } from "./insights/generate";
 export { dedupeInsights } from "./insights/dedupe";
 export { attachInsightToStory } from "./insights/attach-to-story";
-export { linkSourceToStory } from "./sources/link/to-stories";
 export { summarizeStory } from "./stories/summarize";
 export { updateStoryStatus } from "./stories/update-status";
+
+// Brief generation
+export { generateBrief } from "./briefs/generate";
+
+// Playbooks
 export { runPlaybook } from "./playbooks/run";

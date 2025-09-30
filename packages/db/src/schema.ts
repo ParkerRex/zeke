@@ -76,6 +76,10 @@ export const highlightKind = pgEnum("highlight_kind", [
   "quote",
   "action",
   "question",
+  "code_example",  // Code snippets, implementation examples
+  "code_change",   // Git diffs, breaking changes
+  "api_change",    // API updates, new endpoints
+  "metric",        // Performance numbers, benchmarks
 ]);
 export const highlightOrigin = pgEnum("highlight_origin", [
   "user",
@@ -777,6 +781,12 @@ export const storyOverlays = pgTable("story_overlays", {
   citations: jsonb("citations"),
   analysis_state: text("analysis_state").default("pending"),
   analyzed_at: timestamp("analyzed_at", { withTimezone: true, mode: "string" }),
+  // Brief fields (40-second read summaries)
+  brief_one_liner: text("brief_one_liner"),        // Single sentence
+  brief_two_liner: text("brief_two_liner"),        // 2 sentences
+  brief_elevator: text("brief_elevator"),          // 30-40 second pitch
+  time_saved_seconds: integer("time_saved_seconds"), // Original read time - brief time
+  brief_generated_at: timestamp("brief_generated_at", { withTimezone: true, mode: "string" }),
 });
 
 // ============================================================================

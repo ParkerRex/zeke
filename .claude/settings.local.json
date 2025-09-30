@@ -11,7 +11,8 @@
       "Bash(find:*)",
       "Bash(lsof:*)",
       "Bash(curl -X POST http://localhost:8787/ingest -H \"Content-Type: application/json\" -d '{\"\"\"\"url\"\"\"\": \"\"\"\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\"\"\"}')",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
