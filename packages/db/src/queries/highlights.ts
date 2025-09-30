@@ -2,13 +2,16 @@ import type { Database } from "@db/client";
 import {
   type highlightCollaboratorRole,
   highlightCollaborators,
+  type highlightKind,
   type highlightOrigin,
   highlightReferences,
   type highlightShareScope,
   highlightTags,
   highlights,
+  stories,
   storyTurns,
   teamHighlightStates,
+  teamStoryStates,
 } from "@db/schema";
 import {
   and,
@@ -755,4 +758,104 @@ export async function getSharedHighlights(
   const rows = await fetchHighlights(db, inArray(highlights.id, highlightIds));
 
   return hydrateHighlights(db, rows, teamId);
+}
+
+/**
+ * Get prioritized highlights for team dashboard
+ * Ordered by relevance_score DESC, then recency
+ */
+export async function getPrioritizedHighlights(
+  db: Database,
+  teamId: string,
+  limit = 20,
+): Promise<
+  Array<{
+    id: string;
+    storyId: string;
+    kind: string | null;
+    title: string | null;
+    summary: string | null;
+    quote: string | null;
+    confidence: string | null;
+    metadata: Record<string, unknown> | null;
+    createdAt: string | null;
+    storyTitle: string | null;
+    storyPublishedAt: string | null;
+  }>
+> {
+  return db
+    .select({
+      id: highlights.id,
+      storyId: highlights.story_id,
+      kind: highlights.kind,
+      title: highlights.title,
+      summary: highlights.summary,
+      quote: highlights.quote,
+      confidence: highlights.confidence,
+      metadata: highlights.metadata,
+      createdAt: highlights.created_at,
+      storyTitle: stories.title,
+      storyPublishedAt: stories.published_at,
+    })
+    .from(highlights)
+    .innerJoin(stories, eq(highlights.story_id, stories.id))
+    .innerJoin(teamStoryStates, eq(teamStoryStates.story_id, stories.id))
+    .where(eq(teamStoryStates.team_id, teamId))
+    .orderBy(
+      sql`(${highlights.metadata}->>'relevance_score')::float DESC NULLS LAST`,
+      desc(stories.published_at),
+    )
+    .limit(limit);
+}
+
+/**
+ * Get highlights by kind with relevance filtering
+ */
+export async function getHighlightsByKind(
+  db: Database,
+  teamId: string,
+  kind: (typeof highlightKind.enumValues)[number],
+  minRelevance = 0.7,
+  limit = 10,
+): Promise<
+  Array<{
+    id: string;
+    storyId: string;
+    kind: string | null;
+    title: string | null;
+    summary: string | null;
+    quote: string | null;
+    confidence: string | null;
+    metadata: Record<string, unknown> | null;
+    createdAt: string | null;
+    storyTitle: string | null;
+    storyPublishedAt: string | null;
+  }>
+> {
+  return db
+    .select({
+      id: highlights.id,
+      storyId: highlights.story_id,
+      kind: highlights.kind,
+      title: highlights.title,
+      summary: highlights.summary,
+      quote: highlights.quote,
+      confidence: highlights.confidence,
+      metadata: highlights.metadata,
+      createdAt: highlights.created_at,
+      storyTitle: stories.title,
+      storyPublishedAt: stories.published_at,
+    })
+    .from(highlights)
+    .innerJoin(stories, eq(highlights.story_id, stories.id))
+    .innerJoin(teamStoryStates, eq(teamStoryStates.story_id, stories.id))
+    .where(
+      and(
+        eq(teamStoryStates.team_id, teamId),
+        eq(highlights.kind, kind),
+        sql`(${highlights.metadata}->>'relevance_score')::float >= ${minRelevance}`,
+      ),
+    )
+    .orderBy(sql`(${highlights.metadata}->>'relevance_score')::float DESC`)
+    .limit(limit);
 }
