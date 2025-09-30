@@ -1,11 +1,8 @@
 import { logger } from "@trigger.dev/sdk";
 import { withRetry } from "../async/withRetry";
-import { cleanAndParseJSON } from "./cleanJsonResponse";
 import {
-  CHILI_DEFAULT,
   CHILI_MAX,
   CHILI_MIN,
-  CONFIDENCE_DEFAULT,
   CONFIDENCE_MAX,
   CONFIDENCE_MIN,
 } from "./constants";
@@ -45,71 +42,73 @@ Consider factors like:
 Respond only with valid JSON, no other text.`;
 
   try {
-    const completion = await withRetry(
+    type LLMAnalysisJSON = {
+      why_it_matters: string;
+      chili: number;
+      confidence: number;
+      citations?: Record<string, unknown>;
+    };
+
+    const response = await withRetry(
       () =>
-        client.openai.chat.completions.create({
+        client.openai.responses.parse({
           model: client.chatModel,
-          messages: [{ role: "user", content: prompt }],
+          input: [{ role: "user", content: prompt }],
           temperature: 0.3,
           max_tokens: 500,
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "story_analysis",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  why_it_matters: {
+                    type: "string",
+                    description: "2-3 bullet points explaining why this story matters",
+                  },
+                  chili: {
+                    type: "number",
+                    description: "Hotness score from 0-5",
+                    minimum: 0,
+                    maximum: 5,
+                  },
+                  confidence: {
+                    type: "number",
+                    description: "Confidence score from 0-1",
+                    minimum: 0,
+                    maximum: 1,
+                  },
+                  citations: {
+                    type: "object",
+                    description: "Optional citations object",
+                    additionalProperties: true,
+                  },
+                },
+                required: ["why_it_matters", "chili", "confidence"],
+                additionalProperties: false,
+              },
+            },
+          },
         }),
       { maxRetries: 3 },
     );
 
-    const responseText = completion.choices[0]?.message?.content?.trim();
-    if (!responseText) {
-      throw new Error("Empty response from OpenAI");
+    const parsed = response.output_parsed as LLMAnalysisJSON | null;
+    if (!parsed) {
+      throw new Error("Failed to parse structured output from OpenAI");
     }
 
-    type LLMAnalysisJSON = {
-      why_it_matters?: unknown;
-      chili?: unknown;
-      confidence?: unknown;
-      citations?: unknown;
-    };
-
-    const parsed = cleanAndParseJSON(responseText) as LLMAnalysisJSON;
-
-    const toNumber = (value: unknown): number | null => {
-      if (typeof value === "number") return value;
-      if (typeof value === "string") {
-        const num = Number(value);
-        return Number.isFinite(num) ? num : null;
-      }
-      return null;
-    };
-
+    // Structured output is already validated by OpenAI's schema
     const clamp = (value: number, min: number, max: number) =>
       Math.max(min, Math.min(max, value));
 
-    const why =
-      typeof parsed.why_it_matters === "string" && parsed.why_it_matters.trim()
-        ? parsed.why_it_matters
-        : "• Analysis not available";
-
-    const chiliVal = clamp(
-      Math.round(toNumber(parsed.chili) ?? CHILI_DEFAULT),
-      CHILI_MIN,
-      CHILI_MAX,
-    );
-    const confidenceVal = clamp(
-      toNumber(parsed.confidence) ?? CONFIDENCE_DEFAULT,
-      CONFIDENCE_MIN,
-      CONFIDENCE_MAX,
-    );
-
-    const citationsVal =
-      typeof parsed.citations === "object" &&
-      parsed.citations !== null &&
-      !Array.isArray(parsed.citations)
-        ? (parsed.citations as Record<string, unknown>)
-        : {};
-
     return {
-      why_it_matters: String(why),
-      chili: chiliVal,
-      confidence: confidenceVal,
-      citations: citationsVal,
+      why_it_matters: parsed.why_it_matters || "• Analysis not available",
+      chili: clamp(Math.round(parsed.chili), CHILI_MIN, CHILI_MAX),
+      confidence: clamp(parsed.confidence, CONFIDENCE_MIN, CONFIDENCE_MAX),
+      citations: parsed.citations || {},
     };
   } catch (error) {
     logger.error("openai_analysis_error", {

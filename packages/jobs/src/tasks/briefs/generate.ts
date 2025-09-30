@@ -5,7 +5,7 @@ import { getDb } from "@jobs/init";
 import { stories, storyOverlays } from "@zeke/db/schema";
 import { eq } from "drizzle-orm";
 
-import { openaiClient } from "../../utils/openai/openaiClient";
+import { createOpenAIClient } from "../../utils/openai/openaiClient";
 
 const generateBriefSchema = z.object({
   storyId: z.string().uuid(),
@@ -64,7 +64,7 @@ export const generateBrief = schemaTask({
 
     try {
       // Use OpenAI to generate brief variants
-      const client = openaiClient();
+      const client = createOpenAIClient();
 
       const prompt = `You are a master of concise technical communication. Given a story analysis, create 3 brief variants:
 
@@ -86,9 +86,9 @@ ELEVATOR: [text]
 
 Focus on what developers/researchers need to know RIGHT NOW. Include specifics: version numbers, breaking changes, new capabilities, performance metrics.`;
 
-      const response = await client.chat.completions.create({
-        model: process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini",
-        messages: [
+      const response = await client.openai.responses.create({
+        model: client.chatModel,
+        input: [
           {
             role: "system",
             content: "You are a master of concise technical communication.",
@@ -99,7 +99,7 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
         temperature: 0.7,
       });
 
-      const briefText = response.choices[0]?.message?.content;
+      const briefText = response.output_text;
       if (!briefText) {
         throw new Error("No response from OpenAI");
       }
