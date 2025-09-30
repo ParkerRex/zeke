@@ -17,7 +17,7 @@ export default defineConfig({
     },
   },
   build: {
-    external: ["sharp", "canvas", "pino"],
+    external: ["sharp", "canvas", "pino", "jsdom", "@mozilla/readability"],
   },
   dirs: ["./src/tasks"],
 });
