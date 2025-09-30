@@ -10,9 +10,11 @@ import { config } from "dotenv";
 import { ICP_SOURCES } from "../src/config/icp-sources";
 import { createSourceQueries } from "@zeke/db/queries";
 import { db } from "@zeke/db/client";
+import { sources } from "@zeke/db/schema";
+import { eq } from "drizzle-orm";
 
 // Load environment variables
-config({ path: "../../apps/api/.env.local" });
+config({ path: "../../apps/api/.env" });
 
 async function seedICPSources() {
   console.log("🌱 Seeding ICP sources...\n");
