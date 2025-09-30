@@ -5,32 +5,33 @@ description: Generate a comprehensive technical specification document for a new
 allowed-tools: Bash(mkdir -p), Write
 ---
 
-# Feature Technical Specification Generator
-
 You are an expert technical product manager and solutions architect tasked with creating a comprehensive Technical Product Requirements Document (PRD) for a software feature.
 
-## Input
+<feature_description>
+{{FEATURE_DESCRIPTION}}
+</feature_description>
 
-Feature description: $1
+Your task is to analyze this feature description and generate a complete technical specification document that aligns with the existing project's technology stack and architectural patterns.
 
-## Process
+## Process Steps
 
-1. Analyze the existing project's tech stack by examining:
+Follow these steps in order:
+
+1. **Analyze Existing Project Tech Stack**: First, examine the current project by looking for:
    - package.json, package-lock.json, pnpm-lock.yaml, bun.lockb, or similar dependency files
-   - Existing code patterns and frameworks in use
-   - Current architectural patterns and conventions
+   - Existing code patterns, frameworks, and libraries in use
+   - Current architectural patterns and coding conventions
+   - Database technologies, API patterns, and deployment configurations
 
-2. Analyze the feature description and generate a 2-word kebab-case identifier (e.g., "user-auth", "payment-processing", "data-export")
+2. **Generate Feature Identifier**: Create a 2-word kebab-case identifier for this feature (e.g., "user-auth", "payment-processing", "data-export") based on the feature description.
 
-3. Create the directory structure: `.agents/features/[identifier]/`
+3. **Create Directory Structure**: Use the mkdir command to create: `.agents/features/[identifier]/`
 
-4. Generate a comprehensive technical PRD that aligns with the existing tech stack and save it to: `.agents/features/[identifier]/[identifier]-tech-spec.md`
+4. **Generate Technical PRD**: Create a comprehensive technical specification document and save it as: `.agents/features/[identifier]/[identifier]-tech-spec.md`
 
-5. Output the path to the created file so it can be used with `/feature-plan`
+## Technical PRD Content Requirements
 
-## Technical PRD Structure
-
-The document should include:
+Your document must include all of the following sections with detailed content:
 
 ### Executive Summary
 - Feature overview and primary purpose
@@ -39,8 +40,8 @@ The document should include:
 
 ### Problem Statement
 - Current state and limitations
-- User pain points with examples
-- Business impact of not solving
+- User pain points with specific examples
+- Business impact of not solving this problem
 - Market/competitive considerations
 
 ### Goals and Objectives
@@ -51,132 +52,125 @@ The document should include:
 ### Target Users and Use Cases
 - User personas and roles
 - User journey maps
-- Detailed use case scenarios
-- Edge cases and exception flows
+- Detailed use case scenarios with step-by-step flows
+- Edge cases and exception handling scenarios
 
 ### Functional Requirements
-- User stories format: "As a [user], I want [functionality] so that [benefit]"
-- Unique IDs (FR-001, FR-002, etc.)
-- Primary flows, alternative paths, error scenarios
-- Testable acceptance criteria
-- Authentication, authorization, data validation, error handling
+- User stories in format: "As a [user], I want [functionality] so that [benefit]"
+- Unique requirement IDs (FR-001, FR-002, etc.)
+- Primary flows, alternative paths, and error scenarios
+- Testable acceptance criteria for each requirement
+- Authentication, authorization, data validation, and error handling requirements
 
 ### Technical Requirements
-- **Technology Stack**: Build upon existing project stack - check package.json/lock files and current codebase patterns
-- **Platform Requirements**: OS, browsers, devices
-- **Development Environment**: Tools, IDEs, build systems - align with existing project setup
-- **Deployment Environment**: Cloud/on-premise, containers
-- **Scalability**: Concurrent users, data volume, growth
-- **Availability**: Uptime SLA, disaster recovery, backups
-- **Compatibility**: Backward compatibility, version support
+- **Technology Stack**: Build upon existing project technologies found in package files and codebase
+- **Platform Requirements**: Operating systems, browsers, devices supported
+- **Development Environment**: Tools, IDEs, build systems aligned with current project setup
+- **Deployment Environment**: Cloud/on-premise specifications, containerization
+- **Scalability**: Concurrent users, data volume, growth projections
+- **Availability**: Uptime SLA, disaster recovery, backup strategies
+- **Compatibility**: Backward compatibility, version support requirements
 
 ### System Architecture
 - **Architecture Pattern**: Microservices, monolithic, serverless, etc.
-- **Component Diagram**: System components and relationships
+- **Component Diagram**: System components and their relationships
 - **Data Flow**: How data moves through the system
-- **Technology Choices**: Specific tech for each component
-- **Communication Protocols**: REST, GraphQL, WebSockets, queues
-- **Caching Strategy**: Cache layers, TTL, invalidation
-- **State Management**: Session handling, distributed state
+- **Technology Choices**: Specific technologies for each component
+- **Communication Protocols**: REST, GraphQL, WebSockets, message queues
+- **Caching Strategy**: Cache layers, TTL policies, invalidation strategies
+- **State Management**: Session handling, distributed state management
 
 ### Data Requirements
-- **Data Models**: Entity relationships, schemas
+- **Data Models**: Entity relationships and schemas
 - **Database Design**: Tables, indexes, relationships
-- **Data Storage**: Primary DB, caching, file storage
-- **Data Volume**: Growth, retention policies
-- **Data Migration**: From existing systems if applicable
-- **Data Privacy**: PII handling, encryption
+- **Data Storage**: Primary database, caching layers, file storage
+- **Data Volume**: Expected growth and retention policies
+- **Data Migration**: Requirements for migrating from existing systems
+- **Data Privacy**: PII handling, encryption requirements
 
 ### API Specifications
-For each endpoint:
+For each API endpoint, provide:
 ```
 Endpoint: [METHOD] /path
 Purpose: [Description]
 Request:
   - Headers: [Required headers]
   - Body: [JSON schema/example]
-  - Query Parameters: [Optional params]
+  - Query Parameters: [Optional parameters]
 Response:
   - Success (200): [Response schema]
-  - Error Codes: [Possible errors]
-Rate Limiting: [Limits]
-Authentication: [Auth method]
+  - Error Codes: [Possible error responses]
+Rate Limiting: [Rate limits]
+Authentication: [Authentication method]
 ```
 
 ### Security Requirements
-- **Authentication**: OAuth, JWT, SAML, etc.
-- **Authorization**: RBAC, ABAC, permissions
-- **Data Encryption**: TLS, algorithms
+- **Authentication**: OAuth, JWT, SAML, or other methods
+- **Authorization**: RBAC, ABAC, permission models
+- **Data Encryption**: TLS requirements, encryption algorithms
 - **Input Validation**: Sanitization, injection prevention
-- **Audit Logging**: What to log, retention
-- **Compliance**: GDPR, HIPAA, PCI-DSS, etc.
-- **Security Testing**: Penetration testing, scanning
+- **Audit Logging**: What to log, retention policies
+- **Compliance**: GDPR, HIPAA, PCI-DSS, or other relevant standards
+- **Security Testing**: Penetration testing, vulnerability scanning
 
 ### Performance Requirements
-- **Response Time**: P50, P95, P99 latency
-- **Throughput**: Requests per second
-- **Concurrent Users**: Expected and peak
-- **Data Processing**: Batch times, real-time needs
+- **Response Time**: P50, P95, P99 latency targets
+- **Throughput**: Requests per second capacity
+- **Concurrent Users**: Expected and peak user loads
+- **Data Processing**: Batch processing times, real-time requirements
 - **Resource Utilization**: CPU, memory, storage limits
-- **Network Requirements**: Bandwidth, latency
+- **Network Requirements**: Bandwidth, latency specifications
 
 ### Integration Requirements
-- **Third-party Services**: APIs, SDKs
-- **Internal Systems**: Dependencies
-- **Data Exchange**: JSON, XML, Protocol Buffers
-- **Integration Patterns**: Sync/async, webhooks
-- **Error Handling**: Retry logic, circuit breakers
-- **Version Management**: API versioning
+- **Third-party Services**: External APIs, SDKs, services
+- **Internal Systems**: Dependencies on existing systems
+- **Data Exchange**: Formats (JSON, XML, Protocol Buffers)
+- **Integration Patterns**: Synchronous/asynchronous, webhooks
+- **Error Handling**: Retry logic, circuit breakers, fallback mechanisms
+- **Version Management**: API versioning strategies
 
 ### Testing Strategy
-- **Unit Testing**: Coverage, frameworks
-- **Integration Testing**: API, contract testing
-- **Performance Testing**: Load testing
-- **Security Testing**: Vulnerability scanning
-- **User Acceptance**: Test scenarios
-- **Regression Testing**: Automated suites
+- **Unit Testing**: Coverage requirements, testing frameworks
+- **Integration Testing**: API testing, contract testing
+- **Performance Testing**: Load testing, stress testing
+- **Security Testing**: Vulnerability scanning, penetration testing
+- **User Acceptance Testing**: Test scenarios and criteria
+- **Regression Testing**: Automated test suites
 
 ### Success Metrics and KPIs
-- **Business Metrics**: Revenue, cost savings, efficiency
-- **Technical Metrics**: Performance, error rates, uptime
-- **User Metrics**: Adoption, satisfaction, completion
-- **Quality Metrics**: Defect density, coverage, tech debt
+- **Business Metrics**: Revenue impact, cost savings, efficiency gains
+- **Technical Metrics**: Performance benchmarks, error rates, uptime
+- **User Metrics**: Adoption rates, satisfaction scores, task completion
+- **Quality Metrics**: Defect density, test coverage, technical debt
 
 ### Risk Assessment
-- **Technical Risks**: Technology, complexity, performance
-- **Integration Risks**: Third-party dependencies
-- **Security Risks**: Vulnerabilities, breaches
-- **Business Risks**: Market changes, resources
-- **Mitigation Strategies**: Specific actions
-- **Contingency Plans**: Fallback approaches
+- **Technical Risks**: Technology challenges, complexity, performance risks
+- **Integration Risks**: Third-party dependencies, system integration
+- **Security Risks**: Potential vulnerabilities, data breaches
+- **Business Risks**: Market changes, resource constraints
+- **Mitigation Strategies**: Specific actions for each risk
+- **Contingency Plans**: Fallback approaches and alternatives
 
 ### Dependencies and Constraints
-- **External Dependencies**: Third-party services, APIs
-- **Internal Dependencies**: Teams, systems, projects
-- **Technical Constraints**: Platform limitations
-- **Business Constraints**: Budget
-- **Assumptions**: Key design assumptions
+- **External Dependencies**: Third-party services, APIs, vendors
+- **Internal Dependencies**: Other teams, systems, projects
+- **Technical Constraints**: Platform limitations, legacy system constraints
+- **Business Constraints**: Budget limitations, timeline constraints
+- **Key Assumptions**: Critical assumptions underlying the design
 
-## Important Notes
+## Critical Requirements
 
-- **ALWAYS examine the existing project's package.json, lock files, and codebase first**
-- **Recommend technologies that are already in use in the project when possible**
-- **Only suggest new dependencies if absolutely necessary for the feature**
-- **Follow existing architectural patterns and conventions found in the codebase**
+- **ALWAYS examine existing project files first** (package.json, lock files, codebase)
+- **Recommend technologies already in use** when possible
+- **Only suggest new dependencies when absolutely necessary**
+- **Follow existing architectural patterns** found in the codebase
+- **Provide sufficient detail** for architects, developers, QA, DevOps, and security teams
 
-## Output
+## Output Format
 
-Create a complete technical PRD that:
-- Aligns with the existing project's technology choices and patterns
-- Provides enough detail for architects to create implementation plans
-- Gives developers clear specifications to build against
-- Enables QA teams to create comprehensive test plans
-- Allows DevOps to plan infrastructure and deployment
-- Helps security teams assess and address risks
+1. Create the directory structure using mkdir
+2. Write the complete technical PRD to the specified file path
+3. After saving the file, output exactly: "✅ Created tech spec: `.agents/features/[identifier]/[identifier]-tech-spec.md`"
+4. Then provide the next step command: "📋 To create an implementation plan, run: `/feature-plan .agents/features/[identifier]/[identifier]-tech-spec.md`"
 
-Save the completed specification to `.agents/features/[identifier]/[identifier]-tech-spec.md`
-
-After saving, output: "✅ Created tech spec: `.agents/features/[identifier]/[identifier]-tech-spec.md`"
-
-Then provide the command for the next step:
-"📋 To create an implementation plan, run: `/feature-plan .agents/features/[identifier]/[identifier]-tech-spec.md`"
+Your final output should only include the directory creation command, the file writing, the success message, and the next step command. Do not include any additional commentary or explanations beyond what is specified above.

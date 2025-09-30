@@ -341,6 +341,184 @@ Playbooks (actionable next steps)
 
 ---
 
+## =🔧 Phase 2.5: OpenAI Responses API Migration & 3-Column Research UI (Current Sprint)
+
+**Goal**: Complete OpenAI migration + Build the core research interface (wireframe vision)
+**Status**: 🚧 In Progress (2025-09-30)
+**Priority**: CRITICAL - This is the foundation for the product vision
+
+### Backend: Fix OpenAI Responses API Integration
+
+**Current Situation:**
+- ✅ `analyze-story` works perfectly with `responses.parse()` for structured JSON
+- ❌ `generate-brief` failing with COULD_NOT_FIND_EXECUTOR error
+- ❌ `extract-highlights` failing with COULD_NOT_FIND_EXECUTOR error
+- Root cause: Trigger.dev bundler issue with module imports
+
+**Tasks:**
+
+- [x] **Convert generateAnalysis to OpenAI Responses API** ✅
+  - Successfully using `client.openai.responses.parse()` with JSON schema
+  - Validated with 2 successful test runs (13.4s and 10.1s)
+  - File: `packages/jobs/src/utils/openai/generateAnalysis.ts:52-96`
+
+- [ ] **Debug Trigger.dev bundler issue for generate-brief**
+  - Current error: `COULD_NOT_FIND_EXECUTOR` (0ms execution)
+  - File: `packages/jobs/src/tasks/briefs/generate.ts:89-102`
+  - Uses `client.openai.responses.create()` correctly
+  - Hypothesis: Import resolution or bundler externals issue
+  - **Action**: Investigate trigger.config.ts build.external settings
+  - **Action**: Check if module is being bundled correctly
+  - **Action**: Test with simplified inline code to isolate issue
+
+- [ ] **Debug extract-highlights task failure**
+  - Current error: `COULD_NOT_FIND_EXECUTOR` (0ms execution)
+  - File: `packages/jobs/src/tasks/insights/extract-highlights.ts:57`
+  - Calls pure function `extractStructuredHighlights()` (no AI)
+  - File: `packages/jobs/src/tasks/insights/extract-structured.ts`
+  - **Action**: Verify extract-structured.ts is being bundled
+  - **Action**: Check for circular dependencies or import issues
+
+- [ ] **Validate complete pipeline with test story**
+  - Trigger full ingest → fetch → analyze → brief → highlights → score
+  - Verify database has:
+    - `story_overlays.brief_one_liner`, `brief_two_liner`, `brief_elevator`
+    - `highlights` table populated with code_example, api_change, metric
+  - Target: Complete pipeline in <30 seconds
+
+### Frontend: 3-Column Research Interface (Wireframe Implementation)
+
+**Vision** (from wire-updated.png and wireframe.png):
+```
+┌─────────────┬──────────────────────────────────┬────────────────┐
+│   STORIES   │        SOURCE VIEWER             │  CHAT ASSIST   │
+│  (briefing) │    (with AI highlights)          │   (context)    │
+├─────────────┼──────────────────────────────────┼────────────────┤
+│             │                                  │                │
+│ • Story 1   │  [Article/Video Content]        │  Chat with     │
+│   One-liner │                                  │  assistant     │
+│   Badge     │  ╔══════════════════════════╗   │  about this    │
+│             │  ║ HIGHLIGHT: Code Example ║   │  story         │
+│ • Story 2   │  ╚══════════════════════════╝   │                │
+│   One-liner │                                  │  > Ask about   │
+│             │  More content...                 │    breaking    │
+│ • Story 3   │                                  │    changes     │
+│             │  ╔══════════════════════════╗   │                │
+│             │  ║ HIGHLIGHT: API Change   ║   │                │
+│             │  ╚══════════════════════════╝   │                │
+└─────────────┴──────────────────────────────────┴────────────────┘
+```
+
+**Components to Build:**
+
+- [ ] **LEFT: Story Feed Sidebar**
+  - File: `apps/dashboard/src/components/research/story-feed-sidebar.tsx`
+  - Shows stories with:
+    - `brief_one_liner` (title/hook)
+    - `brief_two_liner` (preview on hover)
+    - Time saved badge ("Saved 3m 20s")
+    - Publication time ("2h ago")
+    - Source icon (Anthropic/OpenAI/etc)
+  - State: Selected story ID
+  - Click → Load story content in CENTER panel
+
+- [ ] **CENTER: Source Content Viewer with Highlight Overlay**
+  - File: `apps/dashboard/src/components/research/content-viewer.tsx`
+  - Displays:
+    - Original article HTML/text (from `contents.text_body`)
+    - OR video player with transcript (from `contents.transcript_vtt`)
+    - OR PDF viewer (from `contents.pdf_url`)
+  - Highlight overlay:
+    - Parse `highlights.quote` to find text position in content
+    - Render colored overlays (yellow=insight, green=code, red=breaking)
+    - Hover highlight → Show `highlight.summary` in tooltip
+    - Click highlight → Expand details in sidebar or modal
+  - File: `apps/dashboard/src/components/research/highlight-overlay.tsx`
+
+- [ ] **RIGHT: Chat Assistant Panel**
+  - File: `apps/dashboard/src/components/research/chat-panel.tsx`
+  - Reuse existing `<Chat />` component from `apps/dashboard/src/components/chat/index.tsx`
+  - Context: Current selected story
+  - Pre-filled suggestions:
+    - "Explain this code example"
+    - "What are the breaking changes?"
+    - "How does this affect my project?"
+    - "Create a brief for my team"
+
+- [ ] **Layout Container: 3-Column Grid**
+  - File: `apps/dashboard/src/app/[locale]/(app)/(sidebar)/research/page.tsx`
+  - Replace current Overview (chat-centric) with research layout
+  - Responsive: Mobile stacks vertically, desktop shows 3 columns
+  - State management: Zustand store or URL params for selected story
+
+- [ ] **Brief Expansion Panel**
+  - File: `apps/dashboard/src/components/research/brief-panel.tsx`
+  - Shows `brief_elevator` (40-sec read)
+  - "Read full story" → Expands CENTER panel
+  - Time saved counter: `time_saved_seconds` from overlay
+
+**State Management:**
+
+- [ ] **Create Research Store**
+  - File: `apps/dashboard/src/store/research.ts`
+  - State:
+    ```typescript
+    {
+      selectedStoryId: string | null;
+      viewMode: 'brief' | 'full' | 'highlights';
+      chatContext: StoryContext | null;
+    }
+    ```
+  - Actions:
+    - `selectStory(storyId)`
+    - `toggleViewMode()`
+    - `updateChatContext(story, highlights)`
+
+**tRPC Queries Needed:**
+
+- [ ] **Story with full data**
+  - File: `apps/api/src/trpc/routers/stories.ts`
+  - Procedure: `stories.getWithContent`
+  - Returns:
+    ```typescript
+    {
+      story: Story;
+      overlay: StoryOverlay; // brief fields
+      content: Content; // text_body, html_url, etc
+      highlights: Highlight[]; // with kind, quote, summary
+    }
+    ```
+
+- [ ] **Recent stories for feed**
+  - Procedure: `stories.getRecent`
+  - Returns: Story[] with brief_one_liner, brief_two_liner, time_saved
+
+**Design System Components:**
+
+- [ ] **HighlightBadge** - Color-coded by kind (code_example, api_change, etc)
+- [ ] **TimeSavedBadge** - Shows "Saved 3m 20s" with icon
+- [ ] **SourceIcon** - Logo for Anthropic/OpenAI/arXiv/etc
+- [ ] **BriefCard** - Story card with one-liner and hover preview
+
+### Testing & Validation
+
+- [ ] **Create test data generator script**
+  - File: `packages/jobs/scripts/generate-test-stories.ts`
+  - Ingest 5 diverse URLs (blog, video, arxiv, podcast)
+  - Validate all have briefs + highlights
+
+- [ ] **Manual QA Checklist**
+  - [ ] Story list loads with briefs
+  - [ ] Clicking story loads content in center
+  - [ ] Highlights render as overlays on content
+  - [ ] Hover highlight shows tooltip
+  - [ ] Click highlight opens detail
+  - [ ] Chat assistant responds with story context
+  - [ ] Time saved badges display correctly
+  - [ ] Responsive layout works on mobile
+
+---
+
 ## =� Phase 3: Story Clustering & Timeline (Week 5)
 
 **Goal**: Connect the dots across multiple sources

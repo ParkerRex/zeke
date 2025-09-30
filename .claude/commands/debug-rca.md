@@ -15,8 +15,14 @@ You are an expert Incident Response Engineer tasked with conducting thorough inc
 Here is the problem report you need to analyze:
 
 <problem_report>
-$1
+{{PROBLEM_REPORT}}
 </problem_report>
+
+Here is the bug name to use for file organization:
+
+<bug_name>
+{{BUG_NAME}}
+</bug_name>
 
 Your goal is to get to the bottom of this issue as quickly as possible through systematic analysis. Follow this methodology:
 
@@ -44,43 +50,26 @@ Use your scratchpad to work through your analysis systematically before providin
 [Use this space to work through your analysis step by step, examining the problem report, identifying key events, tracing through potential causes, and organizing your findings before writing your formal response]
 </scratchpad>
 
-Create your analysis output in a markdown file at `.agents/debugging/$2/$2-rca.md` where $2 is a 3-word hyphenated description of the bug (e.g., "auth-token-expiry", "database-connection-timeout", "memory-leak-issue"). Use lowercase words separated by hyphens. The file should have the following format:
+Your analysis should be structured as a markdown file that would be saved at `.agents/debugging/{bug_name}/{bug_name}-rca.md`. The file should contain the following sections:
 
-<event_sequence>
-Create a sequence diagram using markdown that shows the exact chain of events leading to the incident. Include timestamps if available, system components involved, and the flow of actions/failures.
-</event_sequence>
+**Event Sequence Section**: Create a sequence diagram using markdown that shows the exact chain of events leading to the incident. Include timestamps if available, system components involved, and the flow of actions/failures.
 
-<multi_angle_analysis>
-Examine the issue from multiple angles:
+**Multi-Angle Analysis Section**: Examine the issue from multiple angles:
 1. **Technical Analysis**: Code-level issues, system architecture problems, configuration errors
 2. **Operational Analysis**: Process failures, human errors, procedural gaps
 3. **Environmental Analysis**: Infrastructure issues, resource constraints, external dependencies
 4. **Monitoring Analysis**: Detection gaps, alerting failures, observability issues
 
 For each angle, identify specific contributing factors and evidence from the problem report.
-</multi_angle_analysis>
 
-<root_cause_analysis>
-Provide a comprehensive root cause analysis that includes:
-
-**Primary Root Cause**: The fundamental issue that directly caused the incident
-
-**Contributing Factors**: Secondary issues that enabled or amplified the primary cause
-
-**Timeline of Failure**: Step-by-step breakdown of how the issue manifested
-
-**Impact Assessment**: What systems/users were affected and to what degree
-
-**Prevention Recommendations**: Specific, actionable measures to prevent recurrence, including:
-- Immediate fixes required
-- Process improvements needed
-- Monitoring/alerting enhancements
-- Code/architecture changes
-- Training or documentation updates
-
-**Lessons Learned**: Key insights for improving incident response and system reliability
-</root_cause_analysis>
+**Root Cause Analysis Section**: Provide a comprehensive root cause analysis that includes:
+- **Primary Root Cause**: The fundamental issue that directly caused the incident
+- **Contributing Factors**: Secondary issues that enabled or amplified the primary cause
+- **Timeline of Failure**: Step-by-step breakdown of how the issue manifested
+- **Impact Assessment**: What systems/users were affected and to what degree
+- **Prevention Recommendations**: Specific, actionable measures to prevent recurrence, including immediate fixes, process improvements, monitoring enhancements, code/architecture changes, and training updates
+- **Lessons Learned**: Key insights for improving incident response and system reliability
 
 Be thorough, systematic, and focus on actionable insights that will prevent similar incidents in the future.
 
-Save all your analysis results to `.agents/debugging/$2/$2-rca.md` where $2 is your 3-word bug description.
+Your final output should be the complete markdown content for the RCA file, formatted properly with appropriate headers and sections. Do not include the scratchpad in your final response - only provide the structured markdown analysis that would be saved to the file.

@@ -5,115 +5,100 @@ description: Generate an actionable implementation plan from a technical specifi
 allowed-tools: Read, Write, Bash(mkdir -p)
 ---
 
-# Feature Implementation Plan Generator
+You are an expert solutions architect and technical lead. Your task is to read a technical specification document and generate a comprehensive, actionable implementation plan with specific atomic tasks.
 
-You are an expert solutions architect and technical lead tasked with analyzing a technical product requirements document and creating a comprehensive implementation plan with specific atomic tasks.
+<tech_spec_path>
+{{TECH_SPEC_PATH}}
+</tech_spec_path>
 
-## Input
+## Process Overview
 
-Technical specification file path: $1
+1. Read the technical specification file at the provided path
+2. Extract the feature identifier from the file path (the directory name in `.agents/features/[identifier]/`)
+3. Systematically analyze all requirements in the tech spec
+4. Generate atomic, implementable tasks based on what's actually specified
+5. Save the implementation plan to the same directory with `-plan.md` suffix
 
-## Process
+## Analysis Requirements
 
-1. Read the tech spec file at the provided path (should be in format `.agents/features/[identifier]/[identifier]-tech-spec.md`)
-2. Extract the feature identifier from the file path
-3. Analyze the requirements to create atomic, implementable tasks (1-4 hours each)
-4. Save the implementation plan to: `.agents/features/[identifier]/[identifier]-plan.md`
+Carefully read through the entire tech spec and identify:
+- All functional requirements and user stories
+- Technical specifications and constraints
+- API endpoints, data models, and integrations mentioned
+- Performance, security, and scalability requirements
+- Any specific technology stack or framework requirements
+- Success metrics and acceptance criteria
 
-## Analysis Steps
+## Task Generation Guidelines
 
-Systematically analyze the tech spec to:
-- Extract all functional requirements and user stories
-- Identify technical specifications and constraints  
-- Map out API endpoints, data models, and integrations
-- Note performance, security, and scalability requirements
-- Design component architecture based on requirements
-- Decompose each requirement into atomic, implementable tasks
+Create tasks that are:
+- **Atomic**: Each task should be completable in 1-4 hours
+- **Specific**: Reference actual endpoints, models, and features from the tech spec
+- **Actionable**: A developer should be able to start immediately
+- **Traceable**: Every task must relate to a specific requirement in the tech spec
+- **Ordered**: Arrange by logical dependencies
 
 ## Implementation Plan Structure
 
-### Executive Summary
-Brief overview of what needs to be built and the implementation approach.
+Your plan must follow this exact structure:
 
-### Implementation Tasks
-
-Generate ONLY the tasks that are actually needed based on the tech spec. Each task should be:
-- Atomic and independently completable (1-4 hours of work)
-- Specific enough for a developer to start immediately
-- Properly ordered by dependencies
-- Numbered sequentially (TASK-001, TASK-002, etc.)
-
-Organize tasks into logical phases:
-
-#### Phase 1: Foundation
-Include only necessary setup tasks based on the tech stack specified:
-- Repository initialization if needed
-- Required development environment setup
-- Database setup if data storage is required
-- Authentication setup if auth is specified
-
-#### Phase 2: Core Implementation
-Generate tasks for each functional requirement:
-- One or more tasks per user story/functional requirement
-- API endpoint implementation tasks (one per endpoint specified)
-- Data model implementation tasks
-- Business logic tasks
-
-#### Phase 3: Integration
-Only include if integrations are specified:
-- Third-party service integrations
-- Internal system connections
-- API client setup
-
-#### Phase 4: Testing & Quality
-Generate test tasks based on specified requirements:
-- Unit tests for business logic
-- Integration tests for APIs
-- Security tests if security requirements exist
-- Performance tests if performance metrics are specified
-
-#### Phase 5: Deployment Preparation
-Only if deployment requirements are mentioned:
-- Configuration setup
-- Documentation tasks
-- Monitoring setup
-
-### Task Format
-
-Each task should follow this format:
 ```markdown
-- [ ] TASK-XXX: [Specific action verb] [what to implement/create/configure]
-  - Details: [Any specific requirements from tech spec]
-  - Acceptance: [How to verify completion]
-  - Dependencies: [Other tasks that must complete first]
+# [Feature Name] Implementation Plan
+
+## Executive Summary
+[Brief overview of what needs to be built and implementation approach]
+
+## Implementation Tasks
+
+### Phase 1: Foundation
+[Only include setup tasks that are actually needed based on tech spec]
+
+### Phase 2: Core Implementation
+[Tasks for each functional requirement - one or more tasks per user story]
+
+### Phase 3: Integration
+[Only if integrations are specified in tech spec]
+
+### Phase 4: Testing & Quality
+[Test tasks based on specified requirements]
+
+### Phase 5: Deployment Preparation
+[Only if deployment requirements are mentioned]
+
+## Dependencies and Blockers
+[Any external dependencies identified from tech spec]
+
+## Success Criteria
+[Extract success metrics directly from tech spec]
 ```
 
-### Dependencies and Blockers
-List any external dependencies or potential blockers identified from the tech spec.
+## Task Format
 
-### Success Criteria
-Extract success metrics directly from the tech spec's Success Metrics section.
+Each task must follow this exact format:
+```markdown
+- [ ] TASK-XXX: [Specific action verb] [what to implement/create/configure]
+  - Details: [Specific requirements from tech spec]
+  - Acceptance: [How to verify completion]
+  - Dependencies: [Other tasks that must complete first, or "None"]
+```
 
-## Important Guidelines
+Number tasks sequentially starting with TASK-001.
 
-1. **Generate only necessary tasks** - Don't create placeholder or generic items
-2. **Base everything on the tech spec** - Every task must trace back to a requirement
-3. **Be specific** - Reference actual endpoints, models, and features from the spec
-4. **Maintain atomicity** - Each task should be completable in 1-4 hours
-5. **Order by dependency** - Foundation before features, features before testing
-6. **Track progress** - Use checkbox format for easy completion tracking
+## Important Rules
 
-## Output
+- **Generate only necessary tasks** - Do not create generic placeholder items
+- **Base everything on the tech spec** - Every task must trace back to a specific requirement
+- **Don't assume requirements** - Only include what's explicitly mentioned in the tech spec
+- **Maintain proper dependencies** - Foundation tasks before implementation, implementation before testing
+- **Use checkbox format** - All tasks must start with `- [ ]` for progress tracking
 
-Create a focused, actionable plan that directly implements what's specified in the tech requirements document. 
+## Output Requirements
 
-Save the completed plan to the same directory as the tech spec with `-plan.md` suffix.
+1. Save the completed implementation plan to: `.agents/features/[identifier]/[identifier]-plan.md`
+2. After saving, display exactly:
+   - "✅ Created implementation plan: `.agents/features/[identifier]/[identifier]-plan.md`"
+   - "📊 Generated X tasks across Y phases"
+   - "🚀 To start implementation, run: `/feature-implement .agents/features/[identifier]/[identifier]-plan.md`"
+   - "💡 Add 'true' for batch mode: `/feature-implement .agents/features/[identifier]/[identifier]-plan.md true`"
 
-After saving, output: "✅ Created implementation plan: `.agents/features/[identifier]/[identifier]-plan.md`"
-
-Display task summary:
-"📊 Generated X tasks across Y phases"
-
-Then provide the command for the next step:
-"🚀 To start implementation, run: `/feature-implement .agents/features/[identifier]/[identifier]-plan.md`"
-"💡 Add 'true' for batch mode: `/feature-implement .agents/features/[identifier]/[identifier]-plan.md true`"
+Your final output should only include the confirmation messages above - do not repeat the entire plan content in your response.

@@ -23,7 +23,8 @@
       "Bash(DATABASE_URL=\"$DATABASE_SESSION_POOLER_URL\" bun run packages/jobs/scripts/seed-icp-sources.ts)",
       "Bash(npx trigger.dev@latest dev)",
       "Bash(pkill:*)",
-      "WebFetch(domain:trigger.dev)"
+      "WebFetch(domain:trigger.dev)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

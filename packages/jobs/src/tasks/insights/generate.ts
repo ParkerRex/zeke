@@ -1,5 +1,5 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
-import type { z } from "zod";
+import { logger, schemaTask, tasks } from "@trigger.dev/sdk";
+import type { z} from "zod";
 
 import { getDb } from "@jobs/init";
 import { analyzeStorySchema } from "@jobs/schema";
@@ -104,20 +104,15 @@ export const analyzeStory = schemaTask({
         embeddingDimensions: embeddingResult.embedding.length,
       });
 
-      // Trigger downstream pipeline jobs
-      // We import these dynamically to avoid circular dependencies
-      const { generateBrief } = await import("../briefs/generate");
-      const { extractHighlights } = await import("./extract-highlights");
-      const { scoreRelevance } = await import("./score-relevance");
-
+      // Trigger downstream pipeline jobs using task IDs to avoid circular imports
       // Get system user ID for auto-generated highlights
       // In production, this should be a dedicated system user
       const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
 
-      // Trigger all downstream jobs in parallel
+      // Trigger all downstream jobs in parallel using tasks.trigger with task IDs
       await Promise.all([
-        generateBrief.trigger({ storyId, reason: "new_story" }),
-        extractHighlights.trigger({
+        tasks.trigger("generate-brief", { storyId, reason: "new_story" }),
+        tasks.trigger("extract-highlights", {
           storyId,
           userId: SYSTEM_USER_ID,
           teamId: undefined,
@@ -126,7 +121,7 @@ export const analyzeStory = schemaTask({
 
       // Score relevance after highlights are extracted (slight delay)
       setTimeout(() => {
-        scoreRelevance.trigger({ storyId }).catch(err =>
+        tasks.trigger("score-relevance", { storyId }).catch(err =>
           logger.error("score_relevance_trigger_failed", { storyId, error: err })
         );
       }, 2000); // 2 second delay to let highlights settle
