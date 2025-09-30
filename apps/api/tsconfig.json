@@ -24,12 +24,6 @@
     "paths": {
       "@api/*": [
         "src/*"
-      ],
-      "@engine/*": [
-        "../engine/src/*"
-      ],
-      "@jobs/*": [
-        "../../packages/jobs/src/*"
       ]
     },
     "types": [
@@ -37,7 +31,12 @@
     ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "migrations"
   ],
   "include": [
     "src/**/*.ts"

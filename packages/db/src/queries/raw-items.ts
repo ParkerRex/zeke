@@ -1,6 +1,6 @@
 import type { Database } from "@db/client";
 import { rawItems } from "@db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 
 export function createRawItemQueries(db: Database) {
   return {
@@ -73,7 +73,7 @@ export function createRawItemQueries(db: Database) {
           metadata: rawItems.metadata,
         })
         .from(rawItems)
-        .where(sql`${rawItems.id} = any(${ids}::uuid[])`);
+        .where(inArray(rawItems.id, ids));
 
       return results;
     },

@@ -3,22 +3,29 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@api/*": ["../api/src/*"],
-      "@engine/*": ["../engine/src/*"],
-      "@jobs/*": ["../../packages/jobs/src/*"],
-      "@db/*": ["../../packages/db/src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "strict": true
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "../../types",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "next-env.d.ts",
-    "next.config.js",
+    "next.config.mjs",
     "tailwind.config.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "e2e"
+  ]
 }

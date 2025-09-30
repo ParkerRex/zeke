@@ -3,7 +3,7 @@ import { defineConfig } from "@trigger.dev/sdk";
 export default defineConfig({
   project: process.env.TRIGGER_PROJECT_ID!,
   runtime: "node",
-  logLevel: "log",
+  logLevel: "debug",
   maxDuration: 60,
   experimental_processKeepAlive: true,
   retries: {

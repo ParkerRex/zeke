@@ -6,12 +6,12 @@
  * Run with: bun run packages/jobs/scripts/seed-icp-sources.ts
  */
 
-import { config } from "dotenv";
-import { ICP_SOURCES } from "../src/config/icp-sources";
-import { createSourceQueries } from "@zeke/db/queries";
 import { db } from "@zeke/db/client";
+import { createSourceQueries } from "@zeke/db/queries";
 import { sources } from "@zeke/db/schema";
+import { config } from "dotenv";
 import { eq } from "drizzle-orm";
+import { ICP_SOURCES } from "../src/config/icp-sources";
 
 // Load environment variables
 config({ path: "../../apps/api/.env" });
@@ -36,7 +36,7 @@ async function seedICPSources() {
         .limit(1);
 
       if (existing.length > 0) {
-        console.log(`     ⏭️  Already exists: ${existing[0].id}`);
+        console.log(`     ⏭️  Already exists: ${existing[0]?.id}`);
         skipped++;
         continue;
       }
@@ -64,21 +64,19 @@ async function seedICPSources() {
         created++;
       }
     } catch (error) {
-      console.error(`     ❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(
+        `     ❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
-  console.log(`\n✨ Seeding complete!`);
+  console.log("\n✨ Seeding complete!");
   console.log(`   Created: ${created}`);
   console.log(`   Skipped: ${skipped}`);
   console.log(`   Total ICP sources: ${ICP_SOURCES.length}`);
 
   process.exit(0);
 }
-
-// Import sources table for direct update
-import { sources } from "@zeke/db/schema";
-import { eq } from "drizzle-orm";
 
 seedICPSources().catch((error) => {
   console.error("❌ Seeding failed:", error);

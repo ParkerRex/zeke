@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
@@ -64,10 +63,8 @@ export const generateBrief = schemaTask({
     }
 
     try {
-      // Use Claude to generate brief variants
-      const client = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY!,
-      });
+      // Use OpenAI to generate brief variants
+      const client = openaiClient();
 
       const prompt = `You are a master of concise technical communication. Given a story analysis, create 3 brief variants:
 
@@ -89,19 +86,25 @@ ELEVATOR: [text]
 
 Focus on what developers/researchers need to know RIGHT NOW. Include specifics: version numbers, breaking changes, new capabilities, performance metrics.`;
 
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-20250514",
+      const response = await client.chat.completions.create({
+        model: process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are a master of concise technical communication.",
+          },
+          { role: "user", content: prompt },
+        ],
         max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
       });
 
-      const content = response.content[0];
-      if (content.type !== "text") {
-        throw new Error("Unexpected response type from Claude");
+      const briefText = response.choices[0]?.message?.content;
+      if (!briefText) {
+        throw new Error("No response from OpenAI");
       }
 
       // Parse response
-      const briefText = content.text;
       const oneLinerMatch = briefText.match(/ONE_LINER:\s*(.+?)(?=\n|TWO_LINER|$)/s);
       const twoLinerMatch = briefText.match(/TWO_LINER:\s*(.+?)(?=\n|ELEVATOR|$)/s);
       const elevatorMatch = briefText.match(/ELEVATOR:\s*(.+?)$/s);

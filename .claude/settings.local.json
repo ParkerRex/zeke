@@ -15,7 +15,13 @@
       "Bash(cat:*)",
       "Bash(bun build:*)",
       "Bash(node:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(psql:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)",
+      "Bash(DATABASE_URL=\"$DATABASE_SESSION_POOLER_URL\" bun run packages/jobs/scripts/seed-icp-sources.ts)",
+      "Bash(npx trigger.dev@latest dev)"
     ],
     "deny": [],
     "ask": []

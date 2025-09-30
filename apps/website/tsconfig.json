@@ -3,17 +3,23 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "next-env.d.ts",
-    "next.config.js",
-    "**/*.ts",
-    "**/*.tsx",
+    "next.config.mjs",
     ".next/types/**/*.ts",
-    "tailwind.config.ts",
-    "../dashboard/src/actions/tracking-consent-action.ts"
+    "tailwind.config.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    ".turbo"
+  ]
 }

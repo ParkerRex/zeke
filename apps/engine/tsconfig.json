@@ -3,20 +3,38 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
-      "@engine/*": ["src/*"]
+      "@engine/*": [
+        "src/*"
+      ]
     },
     "strict": true,
-    "types": ["@cloudflare/workers-types", "bun-types"],
+    "types": [
+      "@cloudflare/workers-types",
+      "bun-types"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
     "allowJs": true,
     "skipLibCheck": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noEmit": true
   },
-  "include": ["src"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    ".wrangler",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "tasks"
+  ]
 }
