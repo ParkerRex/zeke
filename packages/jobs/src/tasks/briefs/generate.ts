@@ -95,7 +95,6 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
           },
           { role: "user", content: prompt },
         ],
-        temperature: 0.7,
       });
 
       const briefText = response.output_text;

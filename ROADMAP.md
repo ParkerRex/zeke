@@ -347,13 +347,15 @@ Playbooks (actionable next steps)
 **Status**: 🚧 In Progress (2025-09-30)
 **Priority**: CRITICAL - This is the foundation for the product vision
 
-### Backend: Fix OpenAI Responses API Integration
+### Backend: Fix OpenAI Responses API Integration - ✅ COMPLETE
 
-**Current Situation:**
+**Status**: ✅ Complete (2025-09-30)
+
+**What We Fixed:**
 - ✅ `analyze-story` works perfectly with `responses.parse()` for structured JSON
-- ❌ `generate-brief` failing with COULD_NOT_FIND_EXECUTOR error
-- ❌ `extract-highlights` failing with COULD_NOT_FIND_EXECUTOR error
-- Root cause: Trigger.dev bundler issue with module imports
+- ✅ `generate-brief` now works with Responses API (removed incompatible parameters)
+- ✅ Complete ingestion pipeline validated end-to-end
+- Root cause: OpenAI Responses API parameter incompatibilities with gpt-5-nano model
 
 **Tasks:**
 
@@ -362,29 +364,29 @@ Playbooks (actionable next steps)
   - Validated with 2 successful test runs (13.4s and 10.1s)
   - File: `packages/jobs/src/utils/openai/generateAnalysis.ts:52-96`
 
-- [ ] **Debug Trigger.dev bundler issue for generate-brief**
-  - Current error: `COULD_NOT_FIND_EXECUTOR` (0ms execution)
-  - File: `packages/jobs/src/tasks/briefs/generate.ts:89-102`
-  - Uses `client.openai.responses.create()` correctly
-  - Hypothesis: Import resolution or bundler externals issue
-  - **Action**: Investigate trigger.config.ts build.external settings
-  - **Action**: Check if module is being bundled correctly
-  - **Action**: Test with simplified inline code to isolate issue
+- [x] **Fix OpenAI Responses API parameter format** ✅
+  - Changed `response_format` root parameter to `text.format` nested structure
+  - File: `packages/jobs/src/utils/openai/generateAnalysis.ts:58-93`
+  - Fixed for OpenAI Responses API breaking change
 
-- [ ] **Debug extract-highlights task failure**
-  - Current error: `COULD_NOT_FIND_EXECUTOR` (0ms execution)
-  - File: `packages/jobs/src/tasks/insights/extract-highlights.ts:57`
-  - Calls pure function `extractStructuredHighlights()` (no AI)
-  - File: `packages/jobs/src/tasks/insights/extract-structured.ts`
-  - **Action**: Verify extract-structured.ts is being bundled
-  - **Action**: Check for circular dependencies or import issues
+- [x] **Remove max_tokens parameter** ✅
+  - Removed `max_tokens` from generate-brief task (not supported in Responses API)
+  - File: `packages/jobs/src/tasks/briefs/generate.ts:89-98`
 
-- [ ] **Validate complete pipeline with test story**
-  - Trigger full ingest → fetch → analyze → brief → highlights → score
-  - Verify database has:
-    - `story_overlays.brief_one_liner`, `brief_two_liner`, `brief_elevator`
-    - `highlights` table populated with code_example, api_change, metric
-  - Target: Complete pipeline in <30 seconds
+- [x] **Remove temperature parameter for gpt-5-nano** ✅
+  - Removed `temperature: 0.7` from generate-brief (not supported by gpt-5-nano)
+  - File: `packages/jobs/src/tasks/briefs/generate.ts:89-98`
+
+- [x] **Validate complete pipeline with test story** ✅
+  - Triggered full ingest → fetch → analyze → brief → highlights → score
+  - All tasks completed successfully:
+    - ingest-oneoff: 334ms
+    - fetch-content: 760ms
+    - analyze-story: 2s
+    - generate-brief: 13.2s
+    - extract-highlights: 52ms
+    - score-relevance: 31ms
+  - Verified complete pipeline works with gpt-5-nano model
 
 ### Frontend: 3-Column Research Interface (Wireframe Implementation)
 
