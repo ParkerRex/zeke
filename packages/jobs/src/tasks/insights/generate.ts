@@ -119,12 +119,10 @@ export const analyzeStory = schemaTask({
         }),
       ]);
 
-      // Score relevance after highlights are extracted (slight delay)
-      setTimeout(() => {
-        tasks.trigger("score-relevance", { storyId }).catch(err =>
-          logger.error("score_relevance_trigger_failed", { storyId, error: err })
-        );
-      }, 2000); // 2 second delay to let highlights settle
+      // Score relevance after highlights are extracted
+      // Note: This triggers immediately; if highlights need to complete first,
+      // use tasks.triggerAndWait on extract-highlights instead
+      await tasks.trigger("score-relevance", { storyId });
 
     } catch (error) {
       logger.error("analyze_story_error", { storyId, trigger, error });

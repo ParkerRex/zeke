@@ -1,5 +1,4 @@
-export const DEFAULT_CHAT_MODEL =
-  process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini";
+export const DEFAULT_CHAT_MODEL = process.env.OPENAI_CHAT_MODEL || "gpt-5-nano";
 export const DEFAULT_EMBEDDING_MODEL =
   process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 

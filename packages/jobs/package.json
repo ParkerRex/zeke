@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "trigger dev",
+    "dev": "./scripts/dev.sh",
     "deploy": "trigger deploy",
     "typecheck": "tsc --noEmit",
     "schedules:ingest": "bun run scripts/ensure-ingest-schedule.ts",

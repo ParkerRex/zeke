@@ -55,39 +55,40 @@ Respond only with valid JSON, no other text.`;
           model: client.chatModel,
           input: [{ role: "user", content: prompt }],
           temperature: 0.3,
-          max_tokens: 500,
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "story_analysis",
-              strict: true,
+          text: {
+            format: {
+              type: "json_schema",
               schema: {
-                type: "object",
-                properties: {
-                  why_it_matters: {
-                    type: "string",
-                    description: "2-3 bullet points explaining why this story matters",
+                name: "story_analysis",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    why_it_matters: {
+                      type: "string",
+                      description: "2-3 bullet points explaining why this story matters",
+                    },
+                    chili: {
+                      type: "number",
+                      description: "Hotness score from 0-5",
+                      minimum: 0,
+                      maximum: 5,
+                    },
+                    confidence: {
+                      type: "number",
+                      description: "Confidence score from 0-1",
+                      minimum: 0,
+                      maximum: 1,
+                    },
+                    citations: {
+                      type: "object",
+                      description: "Optional citations object",
+                      additionalProperties: true,
+                    },
                   },
-                  chili: {
-                    type: "number",
-                    description: "Hotness score from 0-5",
-                    minimum: 0,
-                    maximum: 5,
-                  },
-                  confidence: {
-                    type: "number",
-                    description: "Confidence score from 0-1",
-                    minimum: 0,
-                    maximum: 1,
-                  },
-                  citations: {
-                    type: "object",
-                    description: "Optional citations object",
-                    additionalProperties: true,
-                  },
+                  required: ["why_it_matters", "chili", "confidence"],
+                  additionalProperties: false,
                 },
-                required: ["why_it_matters", "chili", "confidence"],
-                additionalProperties: false,
               },
             },
           },

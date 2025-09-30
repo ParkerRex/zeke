@@ -24,7 +24,9 @@
       "Bash(npx trigger.dev@latest dev)",
       "Bash(pkill:*)",
       "WebFetch(domain:trigger.dev)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(awk:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []
