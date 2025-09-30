@@ -1,7 +1,6 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useScrollAnchor = () => {
@@ -58,13 +57,13 @@ export const useScrollAnchor = () => {
   useEffect(() => {
     if (visibilityRef.current) {
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           if (entry.isIntersecting) {
             setIsVisible(true);
           } else {
             setIsVisible(false);
           }
-        });
+        }
       });
 
       observer.observe(visibilityRef.current);

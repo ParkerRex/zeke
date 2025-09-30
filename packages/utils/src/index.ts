@@ -9,4 +9,5 @@ export function stripSpecialCharacters(inputString: string) {
 export {
   getExtensionFromMimeType,
   ensureFileExtension,
+  type FileType,
 } from "./mime-to-extension";

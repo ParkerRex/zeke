@@ -1,13 +1,13 @@
-'use client';
-import { toast } from 'sonner';
+"use client";
+import { toast } from "sonner";
 
 function showUndoToast(count: number, onUndo: () => void) {
   if (count <= 0) {
     return;
   }
-  toast(`Closed ${count} tab${count > 1 ? 's' : ''}`, {
+  toast(`Closed ${count} tab${count > 1 ? "s" : ""}`, {
     action: {
-      label: 'Undo',
+      label: "Undo",
       onClick: onUndo,
     },
   });

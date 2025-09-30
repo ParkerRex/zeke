@@ -1,5 +1,5 @@
-import type { Database } from "@zeke/supabase/types";
 import { createServerClient } from "@supabase/ssr";
+import type { Database } from "@zeke/supabase/types";
 import Link from "next/link";
 
 const currency = "USD";
@@ -49,17 +49,13 @@ export async function Ticker() {
       </span>
       <span className="text-[#878787]">
         Through our system{" "}
-        <Link href="/open-startup" className="underline">
-          {Intl.NumberFormat("en-US", {
-            maximumFractionDigits: 0,
-          }).format(transactionCount ?? 0)}
-        </Link>{" "}
+        {Intl.NumberFormat("en-US", {
+          maximumFractionDigits: 0,
+        }).format(transactionCount ?? 0)}{" "}
         transactions across{" "}
-        <Link href="/open-startup" className="underline">
-          {Intl.NumberFormat("en-US", {
-            maximumFractionDigits: 0,
-          }).format(businessCount ?? 0)}
-        </Link>{" "}
+        {Intl.NumberFormat("en-US", {
+          maximumFractionDigits: 0,
+        }).format(businessCount ?? 0)}{" "}
         businesses.
       </span>
     </div>

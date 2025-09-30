@@ -7,23 +7,23 @@ import { z } from "zod";
 import { authActionClient } from "../safe-action";
 
 export const getTaxRateAction = authActionClient
-	.schema(
-		z.object({
-			name: z.string().min(2),
-		}),
-	)
-	.metadata({
-		name: "get-tax-rate",
-	})
-	.action(async ({ parsedInput: { name } }) => {
-		const country = await getCountry();
+  .schema(
+    z.object({
+      name: z.string().min(2),
+    }),
+  )
+  .metadata({
+    name: "get-tax-rate",
+  })
+  .action(async ({ parsedInput: { name } }) => {
+    const country = await getCountry();
 
-		const { object } = await generateObject({
-			model: openai("gpt-5-mini"),
-			schema: z.object({
-				taxRate: z.number().min(5).max(50),
-			}),
-			prompt: `
+    const { object } = await generateObject({
+      model: openai("gpt-5-mini"),
+      schema: z.object({
+        taxRate: z.number().min(5).max(50),
+      }),
+      prompt: `
         You are an expert tax consultant specializing in VAT/GST rates for businesses across different countries and industries.
 
         Please determine the standard VAT/GST rate that applies to businesses operating in the "${name}" category/industry in ${country?.name}.
@@ -38,11 +38,11 @@ export const getTaxRateAction = authActionClient
         Country: ${country?.name}
         Business Category: ${name}
       `,
-			// temperature: 0,
-		});
+      // temperature: 0,
+    });
 
-		return {
-			taxRate: object.taxRate,
-			country: country?.name,
-		};
-	});
+    return {
+      taxRate: object.taxRate,
+      country: country?.name,
+    };
+  });

@@ -1,7 +1,6 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
 export const readLines = async (file: File, count = 4): Promise<string> => {
   const reader = file.stream().getReader();
   const decoder = new TextDecoder("utf-8");

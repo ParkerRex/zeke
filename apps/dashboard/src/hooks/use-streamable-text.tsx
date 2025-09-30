@@ -1,15 +1,14 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
 import { type StreamableValue, readStreamableValue } from "ai/rsc";
 import { useEffect, useState } from "react";
 
 export const useStreamableText = (
-  content: string | StreamableValue<string>
+  content: string | StreamableValue<string>,
 ) => {
   const [rawContent, setRawContent] = useState(
-    typeof content === "string" ? content : ""
+    typeof content === "string" ? content : "",
   );
 
   useEffect(() => {
@@ -18,7 +17,8 @@ export const useStreamableText = (
         let value = "";
         for await (const delta of readStreamableValue(content)) {
           if (typeof delta === "string") {
-            setRawContent((value = value + delta));
+            value += delta;
+            setRawContent(value);
           }
         }
       }

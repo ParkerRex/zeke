@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch the latest release info from GitHub API to get version
     const releaseResponse = await fetch(
-      "https://api.github.com/repos/midday-ai/midday/releases/latest",
+      "https://api.github.com/repos/zeke-ai/zeke/releases/latest",
       {
         headers: {
           "User-Agent": "Zeke-Desktop-Downloader",
@@ -129,14 +129,14 @@ export async function GET(request: NextRequest) {
 
     const { tag_name } = releaseValidation.data;
 
-    // Extract version number from tag (remove 'midday-v' prefix)
-    const version = tag_name.replace(/^midday-v?/, "");
+    // Extract version number from tag (remove 'zeke-v' prefix)
+    const version = tag_name.replace(/^zeke-v?/, "");
 
     // Construct DMG filename based on version and platform
     const filename = `Zeke_${version}_${platform}.dmg`;
 
     // Construct download URL using the full tag name
-    const downloadUrl = `https://github.com/midday-ai/midday/releases/download/${tag_name}/${filename}`;
+    const downloadUrl = `https://github.com/zeke-ai/zeke/releases/download/${tag_name}/${filename}`;
 
     // Fetch the DMG file from GitHub
     const fileResponse = await fetch(downloadUrl, {

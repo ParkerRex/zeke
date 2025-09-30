@@ -72,7 +72,7 @@ export const TrialExpiringEmail = ({ fullName = "" }: Props) => {
             claim it before your trial ends.
           </Text>
           <Section className="text-center mt-[50px] mb-[50px]">
-            <Button href="https://app.midday.ai/settings/billing">
+            <Button href="https://app.zekehq.com/settings/billing">
               Claim your discount
             </Button>
           </Section>
@@ -83,7 +83,7 @@ export const TrialExpiringEmail = ({ fullName = "" }: Props) => {
             If you're unsure or have any questions, we'd love to hear from you.
             You can reply to this email or schedule a quick{" "}
             <Link
-              href="https://cal.com/pontus-midday/15min"
+              href="https://cal.com/zeke-team/intro"
               className={`underline ${themeClasses.link}`}
               style={{ color: lightStyles.text.color }}
             >

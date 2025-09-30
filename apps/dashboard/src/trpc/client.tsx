@@ -10,7 +10,13 @@ import { useState } from "react";
 import superjson from "superjson";
 import { makeQueryClient } from "./query-client";
 
-export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
+const { TRPCProvider: InternalTRPCProvider, useTRPC } =
+  createTRPCContext<AppRouter>();
+
+// Export both api and useTRPC for compatibility
+export { useTRPC as api };
+export { useTRPC };
+export const TRPCProvider = InternalTRPCProvider;
 
 let browserQueryClient: QueryClient;
 
@@ -64,9 +70,9 @@ export function TRPCReactProvider(
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+      <InternalTRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         {props.children}
-      </TRPCProvider>
+      </InternalTRPCProvider>
     </QueryClientProvider>
   );
 }

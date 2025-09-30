@@ -65,9 +65,10 @@ export const assistantRouter = createTRPCRouter({
     .input(assistantCreateMessageInputSchema)
     .output(assistantMessageSchema)
     .mutation(async ({ ctx: { db, session }, input }) => {
-      const senderId = input.role === "assistant" || input.role === "system"
-        ? null
-        : session.user.id;
+      const senderId =
+        input.role === "assistant" || input.role === "system"
+          ? null
+          : session.user.id;
 
       const message = await createAssistantMessage(db, {
         threadId: input.threadId,

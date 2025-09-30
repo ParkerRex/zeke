@@ -29,3 +29,4 @@ export * from "./tags";
 export * from "./team-access";
 export * from "./transcripts";
 export * from "./playbooks";
+export * from "./chat";

@@ -1,47 +1,47 @@
 export const chatExamples = [
-	{
-		title: "Turn this podcast into a brief",
-		content:
-			"Paste the link and ask for a 10-bullet executive summary with citations and timestamps for every claim.",
-	},
-	{
-		title: "Surface what's new in this launch",
-		content:
-			"Drop the announcement deck and docs, then request what's novel versus last quarter with proof snippets.",
-	},
-	{
-		title: "Build a playbook from research",
-		content:
-			"Give Zeke the paper plus our Growth SOP and ask for a ready-to-run experiment plan with sources.",
-	},
-	{
-		title: "Check hype versus reality",
-		content:
-			"Compare these two AI launch posts and list the claims, metrics, and contradictions with original receipts.",
-	},
-	{
-		title: "Prep my leadership update",
-		content:
-			"Combine these three links and synthesize the two-minute exec briefing, highlighting KPIs impacted.",
-	},
-	{
-		title: "Find the timestamp that matters",
-		content:
-			"Paste the three-hour interview and ask where the competitor talks pricing, with direct jump links.",
-	},
-	{
-		title: "Generate cited content",
-		content:
-			"Use this thread and report to draft a LinkedIn post grounded in sources, appended with a citation list.",
-	},
-	{
-		title: "Sanity-check this claim",
-		content:
-			"Verify that 'Model X cut inference costs 40%' across docs, flag uncertainty, and cite the evidence.",
-	},
-	{
-		title: "Spin up a trend briefing",
-		content:
-			"Ask for the top signals this week on multimodal agents, with why it matters and a source appendix.",
-	},
+  {
+    title: `What's my burn rate`,
+    content:
+      "Based on your historical data, your average burn rate is $8,933.33 per month. Your expected runway is 7 months, ending on January 5, 2025.",
+  },
+  {
+    title: `What's my runway`,
+    content:
+      "Based on your historical data, your expected runway is 7 months, ending in Jan 5, 2025.",
+  },
+  {
+    title: "What is my spending on Software",
+    content:
+      "You have spent $8,933.33 on Software between Jun 1, 2023 and Jun 5, 2024",
+  },
+  {
+    title: "Find a receipt or invoice",
+    content:
+      "Please provide the name of the receipt or invoice you are looking for.",
+  },
+  {
+    title: "Find a transaction",
+    content:
+      "Could you please provide more details about the transaction you are looking for?",
+  },
+  {
+    title: `What's my profit for last year`,
+    content:
+      "Based on the period from Jun 1, 2022 and Jun 1, 2023 your current profit is $18,933.33. In the previous period, your profit was $3,422.33",
+  },
+  {
+    title: `What's my revenue`,
+    content:
+      "Based on the period from Jun 1, 2023 and Jun 5, 2024 your revenue is $18,933.33. In the previous period, your profit was $20,933.33.",
+  },
+  {
+    title: "Forecast profit",
+    content:
+      "Based on the last 12 months profit data, the forecasted profit for the next month is approximately $18,933.33. This is an indication of the forecast and should be verified.",
+  },
+  {
+    title: "Forecast revenue",
+    content:
+      "Based on the last 12 months revenue data, the average monthly revenue is $3,422.33. Therefore, the forecasted revenue for the next month is approximately $18,933.33. This is an indication of the forecast and should be verified.",
+  },
 ];

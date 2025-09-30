@@ -3,21 +3,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@api/*": [
-        "../api/src/*"
-      ],
-      "@engine/*": [
-        "../engine/src/*"
-      ],
-      "@jobs/*": [
-        "../../packages/jobs/src/*"
-      ],
-      "@db/*": [
-        "../../packages/db/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@api/*": ["../api/src/*"],
+      "@engine/*": ["../engine/src/*"],
+      "@jobs/*": ["../../packages/jobs/src/*"],
+      "@db/*": ["../../packages/db/src/*"]
     },
     "strict": true
   },
@@ -30,8 +20,5 @@
     "tailwind.config.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    ".next"
-  ]
+  "exclude": ["node_modules", ".next"]
 }

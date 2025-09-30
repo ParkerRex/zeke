@@ -13,8 +13,8 @@ A Tauri-based desktop application for Zeke that supports multiple environments w
 The desktop app supports three environments, each loading a different URL:
 
 - **Development**: `http://localhost:3001`
-- **Staging**: `https://beta.midday.ai`
-- **Production**: `https://app.midday.ai`
+- **Staging**: `https://beta.zekehq.com`
+- **Production**: `https://app.zekehq.com`
 
 ## Running the App
 
@@ -26,13 +26,13 @@ bun run tauri:dev
 
 ### Staging Mode
 ```bash
-# Run in staging environment (loads beta.midday.ai)
+# Run in staging environment (loads beta.zekehq.com)
 bun run tauri:staging
 ```
 
 ### Production Mode
 ```bash
-# Run in production environment (loads app.midday.ai)
+# Run in production environment (loads app.zekehq.com)
 bun run tauri:prod
 ```
 
@@ -55,11 +55,11 @@ bun run tauri:build:prod
 
 ## Environment Variable
 
-The environment is controlled by the `MIDDAY_ENV` environment variable:
+The environment is controlled by the `ZEKE_ENV` environment variable:
 
 - `development` or `dev` → `http://localhost:3001`
-- `staging` → `https://beta.midday.ai`
-- `production` or `prod` → `https://app.midday.ai`
+- `staging` → `https://beta.zekehq.com`
+- `production` or `prod` → `https://app.zekehq.com`
 
 If no environment is specified, it defaults to development mode.
 
@@ -69,11 +69,11 @@ You can also set the environment manually:
 
 ```bash
 # macOS/Linux
-MIDDAY_ENV=staging tauri dev
+ZEKE_ENV=staging tauri dev
 
 # Windows (PowerShell)
-$env:MIDDAY_ENV="staging"; tauri dev
+$env:ZEKE_ENV="staging"; tauri dev
 
 # Windows (Command Prompt)
-set MIDDAY_ENV=staging && tauri dev
+set ZEKE_ENV=staging && tauri dev
 ```

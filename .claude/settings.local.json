@@ -5,7 +5,13 @@
       "Bash(chmod:*)",
       "Bash(/tmp/add_todo_components_bulk.sh:*)",
       "Bash(pnpm typecheck:*)",
-      "Bash(bun typecheck:*)"
+      "Bash(bun typecheck:*)",
+      "Bash(pnpm build:*)",
+      "Bash(bun run:*)",
+      "Bash(find:*)",
+      "Bash(lsof:*)",
+      "Bash(curl -X POST http://localhost:8787/ingest -H \"Content-Type: application/json\" -d '{\"\"\"\"url\"\"\"\": \"\"\"\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\"\"\"}')",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

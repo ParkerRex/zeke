@@ -2,11 +2,7 @@
 
 import { Button } from "@zeke/ui/button";
 import { cn } from "@zeke/ui/cn";
-import {
-  Dialog,
-  DialogContentFrameless,
-  DialogTrigger,
-} from "@zeke/ui/dialog";
+import { Dialog, DialogContentFrameless, DialogTrigger } from "@zeke/ui/dialog";
 import { Icons } from "@zeke/ui/icons";
 import { Skeleton } from "@zeke/ui/skeleton";
 import { FileType } from "@zeke/utils";

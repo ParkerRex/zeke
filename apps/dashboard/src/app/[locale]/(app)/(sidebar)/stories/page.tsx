@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 // Stories route is primarily rendered via the app layout's TabsContentViewport.
 // We still provide metadata here for SEO/sharing and a minimal SSR shell.
 export const metadata: Metadata = {
-  title: 'Stories • ZEKE',
+  title: "Stories • ZEKE",
   description:
-    'Browse AI‑powered news stories with contextual insights and summaries.',
-  alternates: { canonical: '/stories' },
+    "Browse AI‑powered news stories with contextual insights and summaries.",
+  alternates: { canonical: "/stories" },
 };
 
 export default function StoriesPage() {

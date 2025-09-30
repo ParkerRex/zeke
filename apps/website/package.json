@@ -1,41 +1,41 @@
 {
-	"name": "@zeke/website",
-	"version": "1.0.0",
-	"private": true,
-	"scripts": {
-		"build": "NODE_ENV=production next build",
-		"clean": "git clean -xdf .next .turbo node_modules",
-		"dev": "TZ=UTC next dev --turbopack -p 3000",
-		"lint": "biome check .",
-		"format": "biome format --write .",
-		"start": "next start",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"@zeke/supabase": "workspace:*",
-		"@zeke/ui": "workspace:*",
-		"@openpanel/nextjs": "^1.0.8",
-		"@openstatus/react": "^0.0.3",
-		"@team-plain/typescript-sdk": "5.9.0",
-		"@uidotdev/usehooks": "^2.4.1",
-		"date-fns": "^4.1.0",
-		"framer-motion": "^12.15.0",
-		"geist": "^1.4.2",
-		"next": "15.5.2",
-		"next-mdx-remote": "^5.0.0",
-		"next-safe-action": "^7.10.8",
-		"react": "19.1.1",
-		"react-dom": "19.1.1",
-		"react-hls-player": "^3.0.7",
-		"react-use-draggable-scroll": "^0.4.7",
-		"resend": "^4.6.0",
-		"server-only": "^0.0.1",
-		"sharp": "0.34.1",
-		"sugar-high": "^0.9.3"
-	},
-	"devDependencies": {
-		"@zeke/tsconfig": "workspace:*",
-		"@types/node": "^22.15.29",
-		"@types/react": "19.1.6"
-	}
+  "name": "@zeke/website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "NODE_ENV=production next build",
+    "clean": "git clean -xdf .next .turbo node_modules",
+    "dev": "TZ=UTC next dev --turbopack -p 3000",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zeke/supabase": "workspace:*",
+    "@zeke/ui": "workspace:*",
+    "@openpanel/nextjs": "^1.0.8",
+    "@openstatus/react": "^0.0.3",
+    "@team-plain/typescript-sdk": "5.9.0",
+    "@uidotdev/usehooks": "^2.4.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.15.0",
+    "geist": "^1.4.2",
+    "next": "15.5.2",
+    "next-mdx-remote": "^5.0.0",
+    "next-safe-action": "^7.10.8",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "react-hls-player": "^3.0.7",
+    "react-use-draggable-scroll": "^0.4.7",
+    "resend": "^4.6.0",
+    "server-only": "^0.0.1",
+    "sharp": "0.34.1",
+    "sugar-high": "^0.9.3"
+  },
+  "devDependencies": {
+    "@zeke/tsconfig": "workspace:*",
+    "@types/node": "^22.15.29",
+    "@types/react": "19.1.6"
+  }
 }

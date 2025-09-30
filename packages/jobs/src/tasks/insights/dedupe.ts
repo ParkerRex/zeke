@@ -2,10 +2,7 @@ import { logger, schemaTask } from "@trigger.dev/sdk";
 
 import { getDb } from "@jobs/init";
 import { dedupeInsightsSchema } from "@jobs/schema";
-import {
-  createStoryQueries,
-  getStoryHighlights,
-} from "@zeke/db/queries";
+import { createStoryQueries, getStoryHighlights } from "@zeke/db/queries";
 
 import { buildInsightKey } from "./helpers";
 import { attachInsightToStory } from "./attach-to-story";

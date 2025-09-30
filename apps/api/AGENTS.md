@@ -1,5 +1,5 @@
 # API Agent Preferences
-<!-- TODO: Update this from being the midday plumbing to our app. -->
+<!-- TODO: Align this with the current Zeke architecture. -->
 ## Coding Preferences
 - Build REST endpoints with `OpenAPIHono` and `createRoute`, pairing each route with Zod schemas and a call to `validateResponse` so OpenAPI docs and runtime validation stay in sync.
 - Register routes through `rest/routers/index.ts` and always include the right middleware stack (`publicMiddleware` for OAuth flows, `protectedMiddleware` for authenticated traffic) rather than wiring handlers directly onto the app.
@@ -70,7 +70,7 @@ apps/api/
     │   ├── notifications.ts             # Notification payload schemas.
     │   ├── oauth-applications.ts        # OAuth client registration schemas.
     │   ├── oauth-flow.ts                # OAuth authorization and token exchange schemas.
-    │   ├── polar.ts                     # Polar integration product/subscription schemas.
+    │   ├── stripe.ts                    # Stripe integration subscription and billing schemas.
     │   ├── reports.ts                   # Report filter/result schemas.
     │   ├── search.ts                    # Search request/response schemas.
     │   ├── short-links.ts               # Schemas for short link management.
@@ -128,7 +128,7 @@ apps/api/
         ├── health.ts                    # Delegates health checks to the database layer.
         ├── oauth.ts                     # OAuth client credential helper functions.
         ├── parse.ts                     # JSON parsing helper for query/body values.
-        ├── polar.ts                     # Polar API client instantiation.
+        ├── stripe.ts                    # Stripe API client instantiation.
         ├── scopes.ts                    # Scope constants and helpers for access control.
         ├── search-filters.ts            # LLM-powered natural language to search filter converter.
         ├── search.ts                    # Utility to build ts_vector search queries.

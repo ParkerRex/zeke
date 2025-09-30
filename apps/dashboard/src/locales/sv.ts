@@ -25,11 +25,13 @@ export default {
   },
   today: {
     title: "Dagens viktigaste nyheter",
-    description: "Dagens främsta AI- och teknikhistorier med kontextuella insikter.",
+    description:
+      "Dagens främsta AI- och teknikhistorier med kontextuella insikter.",
   },
   stories: {
     title: "Nyheter",
-    description: "Utforska AI-drivna nyhetsartiklar med sammanhang och sammanfattningar.",
+    description:
+      "Utforska AI-drivna nyhetsartiklar med sammanhang och sammanfattningar.",
     discoverHeading: "Utforska nyheter",
     searchPlaceholder: "Sök efter artiklar (titel eller URL)…",
     filter: {
@@ -44,7 +46,8 @@ export default {
     loadMore: "Ladda fler",
     showingCount: "Visar {shown} av {total} nyheter",
     personalizedTitle: "Personligt nyhetsflöde",
-    gatedTitle: "Registrera dig för att låsa upp det personliga nyhetsflödet och mycket mer",
+    gatedTitle:
+      "Registrera dig för att låsa upp det personliga nyhetsflödet och mycket mer",
     signupCta: "Registrera dig",
     settingsAria: "Inställningar",
   },
@@ -137,7 +140,8 @@ export default {
     trigger: "Feedback",
     thanksTitle: "Tack för din feedback!",
     thanksBody: "Vi återkommer så snart som möjligt",
-    textareaPlaceholder: "Idéer för att förbättra sidan eller problem du upplever.",
+    textareaPlaceholder:
+      "Idéer för att förbättra sidan eller problem du upplever.",
     send: "Skicka",
   },
-}
+};

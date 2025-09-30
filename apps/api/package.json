@@ -7,7 +7,13 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "test:watch": "bun test --watch"
+    "test:watch": "bun test --watch",
+    "test:perf": "cd k6 && ./run-performance-tests.sh",
+    "test:perf:bootstrap": "k6 run -e API_URL=http://localhost:3003 k6/bootstrap-performance.js",
+    "test:perf:chat": "k6 run -e API_URL=http://localhost:3003 k6/chat-streaming-performance.js",
+    "test:security": "./scripts/security-scan.sh",
+    "test:rbac": "bun test src/security/rbac-validation.test.ts",
+    "test:security:scan": "bun test src/security/security-scan.test.ts"
   },
   "exports": {
     "./trpc/routers/_app": "./src/trpc/routers/_app.ts"

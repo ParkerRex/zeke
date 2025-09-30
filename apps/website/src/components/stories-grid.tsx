@@ -2,13 +2,13 @@
  * Reusable stories grid component
  */
 
-import type { StoryClusterView } from '../lib/stories';
-import { cn } from '@zeke/ui/lib/utils';
-import { StoryCard } from './story-card';
+import { cn } from "@zeke/ui/lib/utils";
+import type { StoryClusterView } from "../lib/stories";
+import { StoryCard } from "./story-card";
 
 interface StoriesGridProps {
   stories: StoryClusterView[];
-  variant?: 'default' | 'featured' | 'compact';
+  variant?: "default" | "featured" | "compact";
   showHype?: boolean;
   showImage?: boolean;
   showTimestamp?: boolean;
@@ -23,7 +23,7 @@ interface StoriesGridProps {
 
 export function StoriesGrid({
   stories,
-  variant = 'default',
+  variant = "default",
   showHype = false,
   showImage = true,
   showTimestamp = true,
@@ -31,12 +31,12 @@ export function StoriesGrid({
   className,
 }: StoriesGridProps) {
   const gridClasses = cn(
-    'grid grid-cols-1 gap-4',
+    "grid grid-cols-1 gap-4",
     columns.sm && `sm:grid-cols-${columns.sm}`,
     columns.md && `md:grid-cols-${columns.md}`,
     columns.lg && `lg:grid-cols-${columns.lg}`,
     columns.xl && `xl:grid-cols-${columns.xl}`,
-    className
+    className,
   );
 
   return (

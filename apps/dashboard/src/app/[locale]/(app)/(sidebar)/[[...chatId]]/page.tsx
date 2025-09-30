@@ -1,7 +1,7 @@
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { Widgets } from "@/components/widgets";
+import { ChatProvider } from "@/lib/chat-store";
 import { HydrateClient, getQueryClient, trpc } from "@/trpc/server";
-import { Provider as ChatProvider } from "@ai-sdk-tools/store";
 import { geolocation } from "@vercel/functions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -30,11 +30,14 @@ export default async function Overview(props: Props) {
 
   const chat = currentChatId
     ? await queryClient.fetchQuery(
-        trpc.chats.get.queryOptions({ chatId: currentChatId }),
+        trpc.chats.get.queryOptions({
+          chatId: currentChatId,
+          includeMessages: true,
+        }),
       )
     : null;
 
-  if (currentChatId && !chat?.messages) {
+  if (currentChatId && !chat) {
     redirect("/");
   }
 

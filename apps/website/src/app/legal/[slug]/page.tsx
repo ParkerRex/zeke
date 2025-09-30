@@ -1,13 +1,13 @@
-import { Sidebar } from '@/components/sidebar';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
-import { legal } from '@zeke/cms';
-import { Body } from '@zeke/cms/components/body';
-import { Feed } from '@zeke/cms/components/feed';
-import { TableOfContents } from '@zeke/cms/components/toc';
-import { createMetadata } from '@zeke/seo/metadata';
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { Sidebar } from "@/components/sidebar";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { legal } from "@zeke/cms";
+import { Body } from "@zeke/cms/components/body";
+import { Feed } from "@zeke/cms/components/feed";
+import { TableOfContents } from "@zeke/cms/components/toc";
+import { createMetadata } from "@zeke/seo/metadata";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 type LegalPageProperties = {
   readonly params: Promise<{
@@ -44,7 +44,7 @@ const LegalPage = async ({ params }: LegalPageProperties) => {
     <Feed queries={[legal.postQuery(slug)]}>
       {/* biome-ignore lint/suspicious/useAwait: "Server Actions must be async" */}
       {async ([data]) => {
-        'use server';
+        "use server";
 
         const page = data.legalPages.item;
 

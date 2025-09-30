@@ -1,13 +1,8 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
-
-
 
 import { motion } from "framer-motion";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
-import { chatExamples } from "./examples";
 
 const listVariant = {
   hidden: { y: 45, opacity: 0 },
@@ -26,47 +21,54 @@ const itemVariant = {
   show: { y: 0, opacity: 1 },
 };
 
-type Props = {
-  handleSubmit: (example: string) => void;
-};
+interface ChatExamplesProps {
+  examples: string[];
+  onExampleClick: (example: string) => void;
+}
 
-export function ChatExamples({ handleSubmit }: Props) {
+export function ChatExamples({ examples, onExampleClick }: ChatExamplesProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   // @ts-expect-error: react-use-draggable-scroll expects a MutableRefObject<HTMLElement>
   const { events } = useDraggable(ref);
 
-  const totalLength = chatExamples.reduce((accumulator, currentString) => {
+  const totalLength = examples.reduce((accumulator, currentString) => {
     return accumulator + currentString.length * 8.2 + 20;
   }, 0);
 
   return (
-    <div
-      className="absolute z-10 bottom-[100px] left-0 right-0 overflow-scroll scrollbar-hide cursor-grabbing hidden md:block"
-      {...events}
-      ref={ref}
-    >
-      <motion.ul
-        variants={listVariant}
-        initial="hidden"
-        animate="show"
-        className="flex space-x-4 ml-4 items-center"
-        style={{ width: `${totalLength}px` }}
+    <div className="mt-8">
+      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3 text-center">
+        Try asking:
+      </p>
+      <div
+        className="overflow-x-auto scrollbar-hide cursor-grabbing"
+        {...events}
+        ref={ref}
       >
-        {chatExamples.map((example) => (
-          <button
-            key={example}
-            type="button"
-            onClick={() => handleSubmit(example)}
-          >
-            <motion.li
-              variants={itemVariant}
-              className="font-mono text-[#878787] bg-[#F2F1EF] text-xs dark:bg-[#1D1D1D] px-3 py-2 rounded-full cursor-default"
+        <motion.ul
+          variants={listVariant}
+          initial="hidden"
+          animate="show"
+          className="flex gap-3 items-center justify-center flex-wrap md:flex-nowrap"
+          style={{ width: `${totalLength}px`, minWidth: "100%" }}
+        >
+          {examples.map((example) => (
+            <button
+              key={example}
+              type="button"
+              onClick={() => onExampleClick(example)}
+              className="flex-shrink-0"
             >
-              {example}
-            </motion.li>
-          </button>
-        ))}
-      </motion.ul>
+              <motion.li
+                variants={itemVariant}
+                className="text-xs bg-secondary hover:bg-accent transition-colors px-3 py-2 rounded-full cursor-pointer"
+              >
+                {example}
+              </motion.li>
+            </button>
+          ))}
+        </motion.ul>
+      </div>
     </div>
   );
 }

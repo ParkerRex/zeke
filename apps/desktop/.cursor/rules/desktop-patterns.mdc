@@ -9,7 +9,7 @@ alwaysApply: true
 ### Overview
 
 - **What it is**: A thin Tauri v2 shell that hosts the Midday web app with native desktop affordances (global shortcut search, deep links, updater, system tray, external URL handling).
-- **How it renders**: The main window loads an external URL based on `MIDDAY_ENV` (development, staging, production). The React `src/` bundle is not the primary UI; the shell points at the web app.
+- **How it renders**: The main window loads an external URL based on `ZEKE_ENV` (development, staging, production). The React `src/` bundle is not the primary UI; the shell points at the web app.
 - **Key behaviors**: Global shortcut `Shift+Alt+K` toggles a lightweight search window, deep links trigger in-app navigation, external links open in the system browser, updater is user‑driven via tray.
 
 ### Entrypoints and layout
@@ -17,17 +17,17 @@ alwaysApply: true
 - `apps/desktop/src-tauri/src/main.rs`: Rust entrypoint; delegates to `midday_lib::run()`.
 - `apps/desktop/src-tauri/src/lib.rs`: Core shell – creates windows, registers plugins/commands, wires events, tray, and shortcuts.
 - `apps/desktop/tauri.conf.json` (+ `tauri.dev.conf.json`, `tauri.staging.conf.json`): Bundle/plugins configuration and per‑env overrides.
-- `apps/desktop/package.json`: Dev/build scripts that set `MIDDAY_ENV` for local runs and builds.
+- `apps/desktop/package.json`: Dev/build scripts that set `ZEKE_ENV` for local runs and builds.
 
 #### Environment selection (URL routing)
-The shell selects which web app to load via `MIDDAY_ENV`:
+The shell selects which web app to load via `ZEKE_ENV`:
 
 ```312:346:apps/desktop/src-tauri/src/lib.rs
 fn get_app_url() -> String {
     // Try runtime environment variable first, then fall back to compile-time
-    let env = env::var("MIDDAY_ENV")
+    let env = env::var("ZEKE_ENV")
         .unwrap_or_else(|_| {
-            option_env!("MIDDAY_ENV")
+            option_env!("ZEKE_ENV")
                 .unwrap_or("development")
                 .to_string()
         });
@@ -41,12 +41,12 @@ fn get_app_url() -> String {
             url
         },
         "staging" => {
-            let url = "https://beta.midday.ai".to_string();
+            let url = "https://beta.zekehq.com".to_string();
             println!("🌍 Using staging URL: {}", url);
             url
         },
         "production" | "prod" => {
-            let url = "https://app.midday.ai".to_string();
+            let url = "https://app.zekehq.com".to_string();
             println!("🌍 Using production URL: {}", url);
             url
         },
@@ -60,13 +60,13 @@ fn get_app_url() -> String {
 }
 ```
 
-Local scripts that set `MIDDAY_ENV` for dev/builds:
+Local scripts that set `ZEKE_ENV` for dev/builds:
 
 ```10:16:apps/desktop/package.json
     "tauri": "tauri",
-    "tauri:dev": "MIDDAY_ENV=development tauri dev --config src-tauri/tauri.dev.conf.json",
-    "tauri:staging": "MIDDAY_ENV=staging tauri dev --config src-tauri/tauri.staging.conf.json",
-    "tauri:prod": "MIDDAY_ENV=production tauri dev",
+    "tauri:dev": "ZEKE_ENV=development tauri dev --config src-tauri/tauri.dev.conf.json",
+    "tauri:staging": "ZEKE_ENV=staging tauri dev --config src-tauri/tauri.staging.conf.json",
+    "tauri:prod": "ZEKE_ENV=production tauri dev",
     "tauri:build:dev": "tauri build --config src-tauri/tauri.dev.conf.json",
     "tauri:build:staging": "tauri build --config src-tauri/tauri.staging.conf.json",
     "tauri:build:prod": "tauri build"
@@ -219,15 +219,15 @@ Auto‑hide search on blur and reposition/center helpers exist in the same file.
 
 ### Deep links
 
-- macOS deep link scheme: `midday://...` (see `tauri.conf.json`).
+- macOS deep link scheme: `zeke://...` (see `tauri.conf.json`).
 - Rust emits `deep-link-navigate` events with a cleaned path for the front end to handle.
 
 ```362:381:apps/desktop/src-tauri/src/lib.rs
 fn handle_deep_link_event(app_handle: &tauri::AppHandle, urls: Vec<String>) {
     for url in &urls {
-        if url.starts_with("midday://") {
+        if url.starts_with("zeke://") {
             // Extract the path from the deep link
-            let path = url.strip_prefix("midday://").unwrap_or("");
+            let path = url.strip_prefix("zeke://").unwrap_or("");
 
             // Remove any leading slashes
             let clean_path = path.trim_start_matches('/');
@@ -273,7 +273,7 @@ export async function listenForDeepLinks(handler: DeepLinkHandler) {
 ```43:46:packages/desktop-client/src/platform.ts
 export function createDeepLink(path: string): string {
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  return `midday://${cleanPath}`;
+  return `zeke://${cleanPath}`;
 }
 ```
 
@@ -372,7 +372,7 @@ Rust side listeners for search events:
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkwNzNERjA3NzVBNDM3QkMKUldTOE42UjFCOTl6a0IrZW1EcEhhRHlUZ0Z2YW5sT0N4aVdQVE5aOEVTem9GTE1QRzJPM2JaUmMK",
       "endpoints": [
-        "https://github.com/midday-ai/midday/releases/latest/download/latest.json"
+        "https://github.com/zeke-ai/zeke/releases/latest/download/latest.json"
       ],
       "createUpdaterArtifacts": true,
       "dangerousInsecureTransportProtocol": true
@@ -441,7 +441,7 @@ Rust side listeners for search events:
 
 ### Quick checklist
 
-- [ ] Pick the right env (`MIDDAY_ENV`) and confirm the URL resolves.
+- [ ] Pick the right env (`ZEKE_ENV`) and confirm the URL resolves.
 - [ ] If adding a command, wire Rust `#[tauri::command]` + TS `invoke` wrapper.
 - [ ] If adding UI affordances, consider desktop Tailwind variants and root HTML classes.
 - [ ] For events, document payloads and add both emitter and listener.

@@ -1,21 +1,24 @@
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
-
-
+import { api } from "@/trpc/client";
 import { Icons } from "@zeke/ui/icons";
+import { Sparkles } from "lucide-react";
 
-type Props = {
-	firstName: string;
-};
+export function ChatEmpty() {
+  const { data: bootstrap } = api.workspace.bootstrap.useQuery();
+  const firstName = bootstrap?.user?.fullName?.split(" ")[0] || "there";
 
-export function ChatEmpty({ firstName }: Props) {
-	return (
-		<div className="w-full mt-[200px] desktop:mt-24 md:mt-24 flex flex-col items-center justify-center text-center">
-			<Icons.LogoSmall />
-			<span className="font-medium text-xl mt-6">
-				Hi {firstName}, how can I help <br />
-				you today?
-			</span>
-		</div>
-	);
+  return (
+    <div className="w-full flex flex-col items-center justify-center text-center">
+      <div className="relative">
+        <Icons.LogoSmall />
+        <Sparkles className="absolute -bottom-1 -right-1 h-4 w-4 text-primary animate-pulse" />
+      </div>
+      <h2 className="font-semibold text-xl mt-6">
+        Hi {firstName}, how can I help you today?
+      </h2>
+      <p className="text-sm text-muted-foreground mt-2 max-w-md">
+        I can help you discover insights, analyze stories, run playbooks, or
+        answer questions about your research data.
+      </p>
+    </div>
+  );
 }

@@ -311,9 +311,9 @@ async fn create_preloaded_search_window(
 
 fn get_app_url() -> String {
     // Try runtime environment variable first, then fall back to compile-time
-    let env = env::var("MIDDAY_ENV")
+    let env = env::var("ZEKE_ENV")
         .unwrap_or_else(|_| {
-            option_env!("MIDDAY_ENV")
+            option_env!("ZEKE_ENV")
                 .unwrap_or("development")
                 .to_string()
         });
@@ -327,12 +327,12 @@ fn get_app_url() -> String {
             url
         },
         "staging" => {
-            let url = "https://beta.midday.ai".to_string();
+            let url = "https://beta.zekehq.com".to_string();
             println!("🌍 Using staging URL: {}", url);
             url
         },
         "production" | "prod" => {
-            let url = "https://app.midday.ai".to_string();
+            let url = "https://app.zekehq.com".to_string();
             println!("🌍 Using production URL: {}", url);
             url
         },
@@ -361,9 +361,9 @@ fn is_external_url(url: &str, app_url: &str) -> bool {
 
 fn handle_deep_link_event(app_handle: &tauri::AppHandle, urls: Vec<String>) {
     for url in &urls {
-        if url.starts_with("midday://") {
+        if url.starts_with("zeke://") {
             // Extract the path from the deep link
-            let path = url.strip_prefix("midday://").unwrap_or("");
+            let path = url.strip_prefix("zeke://").unwrap_or("");
 
             // Remove any leading slashes
             let clean_path = path.trim_start_matches('/');

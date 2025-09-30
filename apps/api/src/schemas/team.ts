@@ -13,7 +13,7 @@ export const teamResponseSchema = z.object({
   logoUrl: z.string().url().nullable().openapi({
     description:
       "Visual identity for the team's published insights and research outputs",
-    example: "https://cdn.midday.ai/logos/acme-corp.png",
+    example: "https://cdn.zekehq.com/logos/acme-corp.png",
   }),
   plan: z.enum(["trial", "starter", "pro"]).openapi({
     description:
@@ -77,14 +77,14 @@ export const updateTeamByIdSchema = z.object({
   logoUrl: z
     .string()
     .url()
-    .refine((url) => url.includes("midday.ai"), {
-      message: "logoUrl must be a midday.ai domain URL",
+    .refine((url) => url.includes("zekehq.com"), {
+      message: "logoUrl must be a zekehq.com domain URL",
     })
     .optional()
     .openapi({
       description:
-        "Team branding for published research outputs. Must be hosted on midday.ai domain",
-      example: "https://cdn.midday.ai/logos/acme-corp.png",
+        "Team branding for published research outputs. Must be hosted on zekehq.com domain",
+      example: "https://cdn.zekehq.com/logos/acme-corp.png",
     }),
   baseCurrency: z.string().optional().openapi({
     description:
@@ -114,7 +114,7 @@ export const createTeamSchema = z.object({
   }),
   logoUrl: z.string().url().optional().openapi({
     description: "Visual identity for published research and applied playbooks",
-    example: "https://cdn.midday.ai/logos/acme-corp.png",
+    example: "https://cdn.zekehq.com/logos/acme-corp.png",
   }),
   switchTeam: z.boolean().optional().default(false).openapi({
     description:
@@ -233,7 +233,7 @@ export const teamMemberResponseSchema = z.object({
   avatarUrl: z.string().url().nullable().openapi({
     description:
       "Visual identity for research collaboration and citation tracking",
-    example: "https://cdn.midday.ai/avatars/john-doe.png",
+    example: "https://cdn.zekehq.com/avatars/john-doe.png",
   }),
 });
 
@@ -241,5 +241,59 @@ export const teamMembersResponseSchema = z.object({
   data: z.array(teamMemberResponseSchema).openapi({
     description:
       "Research collaborators with their discovery and publishing permissions",
+  }),
+});
+
+export const teamSetActiveInputSchema = z.object({
+  teamId: z.string().uuid().openapi({
+    description: "Research workspace to activate for discovery and analysis",
+    example: "123e4567-e89b-12d3-a456-426614174000",
+  }),
+});
+
+export const teamIdInputSchema = z.object({
+  id: z
+    .string()
+    .uuid()
+    .openapi({
+      description: "Unique identifier for the research team workspace",
+      example: "123e4567-e89b-12d3-a456-426614174000",
+      param: {
+        in: "path",
+        name: "id",
+        required: true,
+      },
+    }),
+});
+
+export const teamDetailSchema = teamResponseSchema
+  .extend({
+    members: z.array(teamMemberResponseSchema).openapi({
+      description: "Research collaborators in the workspace",
+    }),
+  })
+  .openapi({
+    description: "Detailed research workspace information with team members",
+  });
+
+export const teamInvitesSchema = z.object({
+  data: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        email: z.string().email(),
+        role: z.enum(["owner", "member"]),
+        createdAt: z.string(),
+      }),
+    )
+    .openapi({
+      description: "Pending research collaboration invitations",
+    }),
+});
+
+export const updateBaseCurrencySchema = z.object({
+  baseCurrency: z.string().length(3).openapi({
+    description: "ISO 4217 currency code for financial research analysis",
+    example: "USD",
   }),
 });

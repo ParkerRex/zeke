@@ -1,5 +1,6 @@
 import type { Database } from "@db/client";
-import { shortLinks, teams } from "@db/schema";
+// import { shortLinks, teams } from "@db/schema"; // TODO: Create short_links table when needed
+import { teams } from "@db/schema";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
@@ -13,27 +14,9 @@ export type ShortLink = {
 };
 
 export async function getShortLinkByShortId(db: Database, shortId: string) {
-  const [result] = await db
-    .select({
-      id: shortLinks.id,
-      shortId: shortLinks.shortId,
-      url: shortLinks.url,
-      teamId: shortLinks.teamId,
-      userId: shortLinks.userId,
-      createdAt: shortLinks.createdAt,
-      fileName: shortLinks.fileName,
-      teamName: teams.name,
-      type: shortLinks.type,
-      size: shortLinks.size,
-      mimeType: shortLinks.mimeType,
-      expiresAt: shortLinks.expiresAt,
-    })
-    .from(shortLinks)
-    .leftJoin(teams, eq(shortLinks.teamId, teams.id))
-    .where(eq(shortLinks.shortId, shortId))
-    .limit(1);
-
-  return result;
+  // TODO: Implement when short_links table is created
+  // For now, return null (no short link found)
+  return null;
 }
 
 type CreateShortLinkData = {
@@ -48,32 +31,19 @@ type CreateShortLinkData = {
 };
 
 export async function createShortLink(db: Database, data: CreateShortLinkData) {
+  // TODO: Implement when short_links table is created
+  // For now, return a mock short link
   const shortId = nanoid(8);
 
-  const [result] = await db
-    .insert(shortLinks)
-    .values({
-      shortId,
-      url: data.url,
-      teamId: data.teamId,
-      userId: data.userId,
-      type: data.type,
-      fileName: data.fileName,
-      mimeType: data.mimeType,
-      size: data.size,
-      expiresAt: data.expiresAt,
-    })
-    .returning({
-      id: shortLinks.id,
-      shortId: shortLinks.shortId,
-      url: shortLinks.url,
-      type: shortLinks.type,
-      fileName: shortLinks.fileName,
-      mimeType: shortLinks.mimeType,
-      size: shortLinks.size,
-      createdAt: shortLinks.createdAt,
-      expiresAt: shortLinks.expiresAt,
-    });
-
-  return result;
+  return {
+    id: crypto.randomUUID(),
+    shortId,
+    url: data.url,
+    type: data.type,
+    fileName: data.fileName || null,
+    mimeType: data.mimeType || null,
+    size: data.size || null,
+    createdAt: new Date().toISOString(),
+    expiresAt: data.expiresAt || null,
+  };
 }

@@ -1,141 +1,364 @@
-import { upsertUserSubscription } from "@/src/actions/account/upsert-user-subscription";
-import { getEnvVar } from "@/src/utils/get-env-var";
-import { stripeAdmin } from "@/src/utils/stripe-admin";
-import {
-  softDeleteProduct,
-  upsertPrice,
-  upsertProduct,
-} from "@zeke/supabase/mutations";
+import { stripe } from "@/utils/stripe";
+import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
+
+import { createClient } from "@zeke/supabase/server";
+import type { Client } from "@zeke/supabase/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const relevantEvents = new Set([
-  "product.created",
-  "product.updated",
-  "price.created",
-  "price.updated",
-  "product.deleted",
-  "checkout.session.completed",
+const PLAN_CODES = ["trial", "starter", "pro", "enterprise"] as const;
+type PlanCode = (typeof PLAN_CODES)[number];
+
+const SUBSCRIPTION_EVENT_TYPES = new Set<Stripe.Event.Type>([
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
 ]);
 
-export async function POST(req: Request): Promise<Response> {
-  const body = await req.text();
-  const sig = req.headers.get("stripe-signature") as string;
-  const webhookSecret = getEnvVar(
-    process.env.STRIPE_WEBHOOK_SECRET,
-    "STRIPE_WEBHOOK_SECRET",
-  );
+export async function POST(req: NextRequest) {
+  const signature = req.headers.get("stripe-signature");
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!signature || !secret) {
+    console.error("Missing Stripe webhook signature or secret");
+    return new NextResponse("Webhook configuration error", { status: 400 });
+  }
+
+  const rawBody = await req.text();
+
   let event: Stripe.Event;
 
   try {
-    if (!sig) {
-      return Response.json("Missing stripe-signature header", { status: 400 });
-    }
-    event = stripeAdmin.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (error: unknown) {
-    const { safeErrorMessage } = await import("@/src/utils/errors");
-    return Response.json(`Webhook Error: ${safeErrorMessage(error)}`, {
-      status: 400,
-    });
+    event = stripe.webhooks.constructEvent(rawBody, signature, secret);
+  } catch (error) {
+    console.error("Stripe webhook signature verification failed", error);
+    return new NextResponse("Invalid signature", { status: 400 });
   }
 
-  if (relevantEvents.has(event.type)) {
-    try {
-      switch (event.type) {
-        case "product.created":
-        case "product.updated":
-          await upsertProduct(event.data.object as Stripe.Product);
-          break;
-        case "product.deleted": {
-          // Stripe sends a DeletedProduct object with { id, deleted: true }
-          const deleted = event.data.object as { id: string };
-          await softDeleteProduct(deleted.id);
-          break;
-        }
-        case "price.created":
-        case "price.updated": {
-          const price = event.data.object as Stripe.Price;
-          await ensureProductThenUpsertPrice(price);
-          break;
-        }
-        case "customer.subscription.created":
-        case "customer.subscription.updated":
-        case "customer.subscription.deleted": {
-          const subscription = event.data.object as Stripe.Subscription;
-          await upsertUserSubscription({
-            subscriptionId: subscription.id,
-            customerId: subscription.customer as string,
-            isCreateAction: false,
-          });
-          break;
-        }
-        case "checkout.session.completed": {
-          const checkoutSession = event.data.object as Stripe.Checkout.Session;
-
-          if (checkoutSession.mode === "subscription") {
-            const subscriptionId = checkoutSession.subscription;
-            await upsertUserSubscription({
-              subscriptionId: subscriptionId as string,
-              customerId: checkoutSession.customer as string,
-              isCreateAction: true,
-            });
-          }
-          break;
-        }
-        default:
-          throw new Error("Unhandled relevant event!");
-      }
-    } catch (error: unknown) {
-      const { safeErrorMessage } = await import("@/src/utils/errors");
-      return Response.json(
-        `Webhook handler failed: ${safeErrorMessage(error)}`,
-        {
-          status: 400,
-        },
-      );
-    }
-  }
-  return Response.json({ received: true });
-}
-
-function isForeignKeyViolation(error: unknown): boolean {
-  const anyErr = error as any;
-  const code = anyErr?.code ?? anyErr?.data?.code;
-  const message: string | undefined =
-    anyErr?.message ?? anyErr?.error ?? anyErr?.data?.message;
-  // Postgres FK violation code is 23503; PostgREST often returns 409 with this code.
-  if (code === "23503") {
-    return true;
-  }
-  if (
-    typeof message === "string" &&
-    /foreign key|violates foreign key/i.test(message)
-  ) {
-    return true;
-  }
-  return false;
-}
-
-async function ensureProductThenUpsertPrice(price: Stripe.Price) {
   try {
-    await upsertPrice(price);
+    if (event.type === "checkout.session.completed") {
+      await handleCheckoutSessionCompleted(
+        event.data.object as Stripe.Checkout.Session,
+      );
+    } else if (SUBSCRIPTION_EVENT_TYPES.has(event.type)) {
+      await handleSubscriptionEvent(
+        event.data.object as Stripe.Subscription,
+        event.type,
+      );
+    } else {
+      console.log(`Unhandled Stripe event type: ${event.type}`);
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error("Error processing Stripe webhook", error);
+    return new NextResponse("Webhook processing failed", { status: 500 });
+  }
+}
+
+async function handleCheckoutSessionCompleted(
+  session: Stripe.Checkout.Session,
+) {
+  const teamId = extractTeamId(session.metadata);
+  const customerId = extractCustomerId(session.customer);
+
+  if (!teamId || !customerId) {
     return;
-  } catch (err) {
-    if (!isForeignKeyViolation(err)) {
-      throw err;
+  }
+
+  const supabase = await createClient({ admin: true });
+  const { error } = await supabase
+    .from("teams")
+    .update({
+      stripe_customer_id: customerId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", teamId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function handleSubscriptionEvent(
+  subscription: Stripe.Subscription,
+  eventType: Stripe.Event.Type,
+) {
+  const supabase = await createClient({ admin: true });
+
+  const teamId = await resolveTeamId(supabase, subscription);
+  if (!teamId) {
+    console.error(`Unable to resolve team for subscription ${subscription.id}`);
+    return;
+  }
+
+  const planCode = await resolvePlanCode(supabase, subscription);
+  const stripeCustomerId = extractCustomerId(subscription.customer);
+
+  await upsertSubscriptionRecord(supabase, subscription, teamId, planCode);
+
+  const shouldDowngrade =
+    subscription.status === "canceled" ||
+    eventType === "customer.subscription.deleted";
+
+  await updateTeamBillingState(supabase, {
+    teamId,
+    planCode: shouldDowngrade ? "trial" : planCode,
+    stripeCustomerId,
+  });
+}
+
+async function resolveTeamId(
+  supabase: Client,
+  subscription: Stripe.Subscription,
+): Promise<string | null> {
+  const metadataTeamId = extractTeamId(subscription.metadata);
+  if (metadataTeamId) {
+    return metadataTeamId;
+  }
+
+  const customerId = extractCustomerId(subscription.customer);
+  if (!customerId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("teams")
+    .select("id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.id ?? null;
+}
+
+async function resolvePlanCode(
+  supabase: Client,
+  subscription: Stripe.Subscription,
+): Promise<PlanCode> {
+  const metadataPlan = extractPlanCode(subscription.metadata);
+  if (metadataPlan) {
+    return metadataPlan;
+  }
+
+  const firstItem = subscription.items?.data?.[0];
+
+  const pricePlan = extractPlanCode(firstItem?.price?.metadata);
+  if (pricePlan) {
+    return pricePlan;
+  }
+
+  const priceId = firstItem?.price?.id;
+
+  if (priceId) {
+    const { data, error } = await supabase
+      .from("prices")
+      .select(
+        `
+          metadata,
+          products (
+            metadata
+          )
+        `,
+      )
+      .eq("id", priceId)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    const priceMetadataPlan = extractPlanCode(
+      (data?.metadata ?? null) as Record<string, unknown> | null,
+    );
+
+    if (priceMetadataPlan) {
+      return priceMetadataPlan;
+    }
+
+    const productMetadataPlan = extractPlanCode(
+      (data?.products?.metadata ?? null) as Record<string, unknown> | null,
+    );
+
+    if (productMetadataPlan) {
+      return productMetadataPlan;
     }
   }
 
-  // If we get here, we likely tried to upsert a price whose product doesn't exist yet.
-  const productId =
-    typeof price.product === "string" ? price.product : price.product.id;
-  const product = await stripeAdmin.products.retrieve(productId);
-  await upsertProduct(product);
-  // Retry once after ensuring the product row exists
-  await upsertPrice(price);
+  return "starter";
+}
+
+async function upsertSubscriptionRecord(
+  supabase: Client,
+  subscription: Stripe.Subscription,
+  teamId: string,
+  planCode: PlanCode,
+) {
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+
+  if (!priceId) {
+    console.error(
+      `Subscription ${subscription.id} is missing an associated price`,
+    );
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  const record = {
+    id: subscription.id,
+    team_id: teamId,
+    price_id: priceId,
+    status: subscription.status,
+    plan_code: planCode,
+    current_period_start: toIsoDate(subscription.current_period_start),
+    current_period_end: toIsoDate(subscription.current_period_end),
+    trial_ends_at: toIsoDate(subscription.trial_end),
+    canceled_at: toIsoDate(subscription.canceled_at),
+    metadata: normalizeMetadata(subscription.metadata),
+    updated_at: now,
+  };
+
+  const { error } = await supabase.from("subscriptions").upsert(record);
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function updateTeamBillingState(
+  supabase: Client,
+  params: {
+    teamId: string;
+    planCode: PlanCode;
+    stripeCustomerId: string | null;
+  },
+) {
+  const updates: Record<string, unknown> = {
+    plan_code: params.planCode,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (params.stripeCustomerId) {
+    updates.stripe_customer_id = params.stripeCustomerId;
+  }
+
+  const { error } = await supabase
+    .from("teams")
+    .update(updates)
+    .eq("id", params.teamId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+function extractTeamId(
+  metadata: Stripe.Metadata | null | undefined,
+): string | null {
+  if (!metadata) {
+    return null;
+  }
+
+  const candidates = [
+    metadata.teamId,
+    metadata.team_id,
+    metadata.teamID,
+    metadata.team,
+  ];
+
+  for (const value of candidates) {
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function extractPlanCode(
+  metadata: Stripe.Metadata | Record<string, unknown> | null | undefined,
+): PlanCode | null {
+  if (!metadata) {
+    return null;
+  }
+
+  const lookup = metadata as Record<string, unknown>;
+
+  const candidates = [
+    lookup.plan,
+    lookup.plan_code,
+    lookup.planCode,
+    lookup.plan_type,
+    lookup.planType,
+    lookup.price_card_variant,
+    lookup.priceCardVariant,
+    lookup.key,
+  ];
+
+  for (const candidate of candidates) {
+    const plan = normalizePlanCode(candidate);
+    if (plan) {
+      return plan;
+    }
+  }
+
+  return null;
+}
+
+function normalizePlanCode(value: unknown): PlanCode | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+
+  if (PLAN_CODES.includes(normalized as PlanCode)) {
+    return normalized as PlanCode;
+  }
+
+  return null;
+}
+
+function extractCustomerId(
+  customer:
+    | Stripe.Subscription["customer"]
+    | Stripe.Checkout.Session["customer"],
+): string | null {
+  if (!customer) {
+    return null;
+  }
+
+  if (typeof customer === "string") {
+    return customer;
+  }
+
+  if ("deleted" in customer && customer.deleted) {
+    return null;
+  }
+
+  return customer.id;
+}
+
+function toIsoDate(value: number | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return new Date(value * 1000).toISOString();
+}
+
+function normalizeMetadata(metadata: Stripe.Metadata | null | undefined) {
+  if (!metadata) {
+    return null;
+  }
+
+  return Object.fromEntries(
+    Object.entries(metadata).map(([key, value]) => [key, value ?? null]),
+  );
 }

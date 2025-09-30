@@ -75,7 +75,7 @@ export const WelcomeEmail = ({ fullName = "" }: Props) => {
             Take your time to explore Zeke at your own pace. If you ever want to
             chat with us founders, you can schedule a time{" "}
             <Link
-              href="https://cal.com/pontus-midday/15min"
+              href="https://cal.com/zeke-team/intro"
               className={`underline ${themeClasses.link}`}
               style={{ color: lightStyles.text.color }}
             >

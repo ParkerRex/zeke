@@ -1,6 +1,6 @@
 {
   "productName": "Zeke Dev",
-  "identifier": "ai.midday.app.dev",
+  "identifier": "com.zekehq.app.dev",
   "bundle": {
     "icon": [
       "icons/dev/32x32.png",

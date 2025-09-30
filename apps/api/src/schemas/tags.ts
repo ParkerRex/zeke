@@ -23,15 +23,10 @@ export const tagSchema = z
 
 export const createTagInputSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1)
-      .max(48)
-      .openapi({
-        description: "Name for the new tag",
-        example: "Key Insight",
-      }),
+    name: z.string().trim().min(1).max(48).openapi({
+      description: "Name for the new tag",
+      example: "Key Insight",
+    }),
   })
   .openapi({ description: "Payload for creating a tag" });
 
@@ -41,15 +36,10 @@ export const updateTagInputSchema = z
       description: "Tag identifier",
       example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
     }),
-    name: z
-      .string()
-      .trim()
-      .min(1)
-      .max(48)
-      .openapi({
-        description: "Updated tag name",
-        example: "Urgent",
-      }),
+    name: z.string().trim().min(1).max(48).openapi({
+      description: "Updated tag name",
+      example: "Urgent",
+    }),
   })
   .openapi({ description: "Payload for updating a tag" });
 

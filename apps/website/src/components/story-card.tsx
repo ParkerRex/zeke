@@ -1,108 +1,53 @@
-import type { StoryClusterView } from "../lib/stories";
-import { Badge } from "@zeke/ui/badge";
-import { Card, CardContent, CardHeader } from "@zeke/ui/card";
-import { cn } from "@zeke/ui/cn";
-import Image from "next/image";
-import Link from "next/link";
-import {
-	deterministicPercent,
-	domainFromUrl,
-	getKindLabel,
-	hypePercent,
-	imageFor,
-	MIN_SOURCES_COUNT,
-} from "@/lib/stories-utils";
-import { CoverageBar } from "./coverage-bar";
-import { HypeBar } from "./hype-bar";
-import { SourcesBadge } from "./sources-badge";
+"use client";
 
-interface StoryCardProps {
-	story: StoryClusterView;
-	variant?: "default" | "featured" | "compact";
-	showHype?: boolean;
-	showImage?: boolean;
-	showTimestamp?: boolean;
-	className?: string;
-}
+import { Avatar, AvatarImageNext } from "@zeke/ui/avatar";
+import { Icons } from "@zeke/ui/icons";
+
+export type Story = {
+  id: number;
+  title: string;
+  description: string;
+  name: string;
+  company: string;
+  country: string;
+  src: string;
+  video?: string;
+};
 
 export function StoryCard({
-	story,
-	variant = "default",
-	showHype = false,
-	showImage = true,
-	showTimestamp = true,
-	className,
-}: StoryCardProps) {
-	const img = imageFor(story);
-	const coverage = deterministicPercent(story.id);
-	const hype = hypePercent(story);
-	const sources = story.overlays?.sources?.length ?? 0;
-	const kind = story.embedKind;
-	const domain = domainFromUrl(story.primaryUrl);
+  title,
+  description,
+  name,
+  company,
+  country,
+  src,
+  video,
+}: Story) {
+  return (
+    <div className="w-[300px] cursor-pointer">
+      <div className="p-6 bg-background border border-border">
+        {video && (
+          <div className="flex items-center justify-center size-8 bg-primary rounded-full mb-2">
+            <Icons.Play size={16} className="text-background" />
+          </div>
+        )}
+        <h3 className="text-lg font-medium mb-2">{title}</h3>
+        <p className="text-sm text-[#878787]">{description}</p>
 
-	const isCompact = variant === "compact";
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Avatar className="size-4">
+              <AvatarImageNext src={src} alt={name} width={16} height={16} />
+            </Avatar>
+            <p className="text-sm">{name}</p>
+          </div>
 
-	return (
-		<Card
-			className={cn(
-				"overflow-hidden transition-all duration-200 hover:shadow-md",
-				isCompact && "h-fit",
-				className,
-			)}
-		>
-			<CardContent className={cn("p-3", isCompact && "p-2")}>
-				{/* Header with metadata */}
-				<div className="mb-2 flex items-start justify-between">
-					<Badge variant="outline" className="text-xs">
-						{getKindLabel(kind)}
-						{domain && `, ${domain}`}
-					</Badge>
-				</div>
-
-				{/* Title */}
-				<CardHeader className="p-0 pb-2">
-					<h3
-						className={cn(
-							"font-semibold leading-snug",
-							isCompact ? "text-sm" : "text-base",
-						)}
-					>
-						<Link
-							className="hover:underline"
-							href={`/stories/${encodeURIComponent(story.id)}`}
-						>
-							{story.title}
-						</Link>
-					</h3>
-				</CardHeader>
-
-				{/* Metrics */}
-				<div className="mb-3 flex items-center justify-between gap-3">
-					{showHype ? (
-						<HypeBar value={hype} />
-					) : (
-						<CoverageBar value={coverage} />
-					)}
-					<SourcesBadge count={Math.max(MIN_SOURCES_COUNT, sources)} />
-				</div>
-
-				{/* Image */}
-				{showImage && (
-					<div
-						className={cn(
-							"relative overflow-hidden rounded",
-							isCompact ? "h-[100px]" : "h-[150px]",
-						)}
-					>
-						<Image alt={story.title} className="object-cover" fill src={img} />
-						{showTimestamp && (
-							<div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-white text-xs">
-								1 hour ago
-							</div>
-						)}
-					</div>
-				)}
-			</CardContent>
-		</Card>
-	);
+          <div className="flex items-center gap-2 text-[#878787]">
+            <p className="text-sm text-[#878787]">{company}</p> •
+            <p className="text-sm text-[#878787]">{country}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

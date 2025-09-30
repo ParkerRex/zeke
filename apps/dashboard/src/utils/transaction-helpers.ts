@@ -1,8 +1,11 @@
-import { createSupabaseServerClient } from '@zeke/auth';
-import { supabaseAdminClient } from '@zeke/supabase/client/admin';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '@zeke/supabase/types';
-import { logDatabaseError, measurePerformance } from '@/src/utils/sentry-config';
+import {
+  logDatabaseError,
+  measurePerformance,
+} from "@/src/utils/sentry-config";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@zeke/auth";
+import { supabaseAdminClient } from "@zeke/supabase/client/admin";
+import type { Database } from "@zeke/supabase/types";
 
 export type TransactionClient = SupabaseClient<Database>;
 
@@ -23,7 +26,7 @@ export async function withTransaction<T>(
   options: {
     useAdminClient?: boolean;
     userId?: string;
-  } = {}
+  } = {},
 ): Promise<TransactionResult<T>> {
   const { useAdminClient = false, userId } = options;
 
@@ -42,7 +45,8 @@ export async function withTransaction<T>(
           data: result,
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
 
         logDatabaseError(error as Error, {
           operation,
@@ -55,7 +59,7 @@ export async function withTransaction<T>(
         };
       }
     },
-    { operation, userId }
+    { operation, userId },
   );
 }
 
@@ -72,21 +76,23 @@ export async function createUserWithCustomer(
   },
   customerData: {
     stripe_customer_id: string;
-  }
+  },
 ): Promise<TransactionResult<{ userId: string; customerId: string }>> {
   return withTransaction(
-    'create_user_with_customer',
+    "create_user_with_customer",
     async (client) => {
       // Step 1: Create user record
       const { data: user, error: userError } = await client
-        .from('users')
-        .insert([{
-          id: userData.id,
-          email: userData.email,
-          full_name: userData.full_name,
-          avatar_url: userData.avatar_url,
-        }])
-        .select('id')
+        .from("users")
+        .insert([
+          {
+            id: userData.id,
+            email: userData.email,
+            full_name: userData.full_name,
+            avatar_url: userData.avatar_url,
+          },
+        ])
+        .select("id")
         .single();
 
       if (userError) {
@@ -95,20 +101,19 @@ export async function createUserWithCustomer(
 
       // Step 2: Create customer record
       const { data: customer, error: customerError } = await client
-        .from('customers')
-        .insert([{
-          id: userData.id,
-          stripe_customer_id: customerData.stripe_customer_id,
-        }])
-        .select('id')
+        .from("customers")
+        .insert([
+          {
+            id: userData.id,
+            stripe_customer_id: customerData.stripe_customer_id,
+          },
+        ])
+        .select("id")
         .single();
 
       if (customerError) {
         // Rollback: Delete the user record
-        await client
-          .from('users')
-          .delete()
-          .eq('id', userData.id);
+        await client.from("users").delete().eq("id", userData.id);
 
         throw new Error(`Failed to create customer: ${customerError.message}`);
       }
@@ -118,7 +123,7 @@ export async function createUserWithCustomer(
         customerId: customer.id,
       };
     },
-    { useAdminClient: true, userId: userData.id }
+    { useAdminClient: true, userId: userData.id },
   );
 }
 
@@ -134,16 +139,16 @@ export async function updateUserSubscription(
     current_period_start?: string;
     current_period_end?: string;
     cancel_at_period_end?: boolean;
-  }
+  },
 ): Promise<TransactionResult<{ subscriptionId: string }>> {
   return withTransaction(
-    'update_user_subscription',
+    "update_user_subscription",
     async (client) => {
       // Step 1: Ensure user exists
       const { data: user, error: userError } = await client
-        .from('users')
-        .select('id')
-        .eq('id', userId)
+        .from("users")
+        .select("id")
+        .eq("id", userId)
         .single();
 
       if (userError || !user) {
@@ -152,7 +157,7 @@ export async function updateUserSubscription(
 
       // Step 2: Upsert subscription
       const { data: subscription, error: subscriptionError } = await client
-        .from('subscriptions')
+        .from("subscriptions")
         .upsert({
           id: subscriptionData.subscription_id,
           user_id: userId,
@@ -162,18 +167,20 @@ export async function updateUserSubscription(
           current_period_end: subscriptionData.current_period_end || null,
           cancel_at_period_end: subscriptionData.cancel_at_period_end || null,
         })
-        .select('id')
+        .select("id")
         .single();
 
       if (subscriptionError) {
-        throw new Error(`Failed to update subscription: ${subscriptionError.message}`);
+        throw new Error(
+          `Failed to update subscription: ${subscriptionError.message}`,
+        );
       }
 
       return {
         subscriptionId: subscription.id,
       };
     },
-    { useAdminClient: true, userId }
+    { useAdminClient: true, userId },
   );
 }
 
@@ -202,16 +209,16 @@ export async function createStoryWithContent(
     confidence?: number;
     citations?: any;
     model_version?: string;
-  }
+  },
 ): Promise<TransactionResult<{ storyId: string; contentId: string }>> {
   return withTransaction(
-    'create_story_with_content',
+    "create_story_with_content",
     async (client) => {
       // Step 1: Create content
       const { data: content, error: contentError } = await client
-        .from('contents')
+        .from("contents")
         .insert([contentData])
-        .select('id')
+        .select("id")
         .single();
 
       if (contentError) {
@@ -220,20 +227,19 @@ export async function createStoryWithContent(
 
       // Step 2: Create story
       const { data: story, error: storyError } = await client
-        .from('stories')
-        .insert([{
-          ...storyData,
-          content_id: content.id,
-        }])
-        .select('id')
+        .from("stories")
+        .insert([
+          {
+            ...storyData,
+            content_id: content.id,
+          },
+        ])
+        .select("id")
         .single();
 
       if (storyError) {
         // Rollback: Delete the content record
-        await client
-          .from('contents')
-          .delete()
-          .eq('id', content.id);
+        await client.from("contents").delete().eq("id", content.id);
 
         throw new Error(`Failed to create story: ${storyError.message}`);
       }
@@ -241,19 +247,23 @@ export async function createStoryWithContent(
       // Step 3: Create overlay if provided
       if (overlayData) {
         const { error: overlayError } = await client
-          .from('story_overlays')
-          .insert([{
-            story_id: story.id,
-            ...overlayData,
-            analyzed_at: new Date().toISOString(),
-          }]);
+          .from("story_overlays")
+          .insert([
+            {
+              story_id: story.id,
+              ...overlayData,
+              analyzed_at: new Date().toISOString(),
+            },
+          ]);
 
         if (overlayError) {
           // Rollback: Delete story and content
-          await client.from('stories').delete().eq('id', story.id);
-          await client.from('contents').delete().eq('id', content.id);
+          await client.from("stories").delete().eq("id", story.id);
+          await client.from("contents").delete().eq("id", content.id);
 
-          throw new Error(`Failed to create story overlay: ${overlayError.message}`);
+          throw new Error(
+            `Failed to create story overlay: ${overlayError.message}`,
+          );
         }
       }
 
@@ -262,7 +272,7 @@ export async function createStoryWithContent(
         contentId: content.id,
       };
     },
-    { useAdminClient: true }
+    { useAdminClient: true },
   );
 }
 
@@ -277,13 +287,17 @@ export async function batchOperation<T, R>(
     batchSize?: number;
     useAdminClient?: boolean;
     continueOnError?: boolean;
-  } = {}
+  } = {},
 ): Promise<{
   success: boolean;
   results: R[];
   errors: Array<{ item: T; error: string }>;
 }> {
-  const { batchSize = 10, useAdminClient = false, continueOnError = false } = options;
+  const {
+    batchSize = 10,
+    useAdminClient = false,
+    continueOnError = false,
+  } = options;
   const results: R[] = [];
   const errors: Array<{ item: T; error: string }> = [];
 
@@ -295,13 +309,13 @@ export async function batchOperation<T, R>(
       const result = await withTransaction(
         `${operation}_batch_item`,
         (client) => processor(item, client),
-        { useAdminClient }
+        { useAdminClient },
       );
 
       if (result.success && result.data) {
         results.push(result.data);
       } else {
-        errors.push({ item, error: result.error || 'Unknown error' });
+        errors.push({ item, error: result.error || "Unknown error" });
 
         if (!continueOnError) {
           throw new Error(`Batch operation failed: ${result.error}`);

@@ -276,3 +276,50 @@ export async function getTeamActiveSubscription(
     price,
   } satisfies BillingSubscriptionRecord;
 }
+
+// Stub function for research system - plans are simplified to trial/starter/pro
+export async function getAvailablePlans(db: Database, teamId: string) {
+  // TODO: Implement proper plan management for research system
+  // For now, return basic research plan options
+  return [
+    {
+      id: "trial",
+      name: "Research Trial",
+      description: "7-day trial with basic discovery capabilities",
+      price: 0,
+      interval: "month" as const,
+      features: [
+        "Basic insight discovery",
+        "Up to 100 sources",
+        "Email support",
+      ],
+    },
+    {
+      id: "starter",
+      name: "Research Starter",
+      description: "Essential research tools for small teams",
+      price: 29,
+      interval: "month" as const,
+      features: [
+        "Advanced discovery",
+        "Up to 1,000 sources",
+        "Priority support",
+        "Basic playbooks",
+      ],
+    },
+    {
+      id: "pro",
+      name: "Research Pro",
+      description: "Full research platform with publishing capabilities",
+      price: 99,
+      interval: "month" as const,
+      features: [
+        "Unlimited sources",
+        "Custom playbooks",
+        "Team collaboration",
+        "API access",
+        "White-label publishing",
+      ],
+    },
+  ];
+}

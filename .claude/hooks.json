@@ -1,37 +1,37 @@
 {
-	"hooks": {
-		"PostToolUse": [
-			{
-				"matcher": "Write|Edit|MultiEdit|NotebookEdit",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "cd \"$CLAUDE_PROJECT_DIR\" && bun biome check --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true"
-					}
-				]
-			}
-		],
-		"UserPromptSubmit": [
-			{
-				"matcher": ".*\\b(fix|format|lint|clean)\\b.*",
-				"hooks": [
-					{
-						"type": "notification",
-						"message": "💡 Tip: Files will be auto-formatted with Biome after edits"
-					}
-				]
-			}
-		],
-		"Stop": [
-			{
-				"matcher": ".*",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "cd \"$CLAUDE_PROJECT_DIR\" && bun lint --reporter=compact 2>/dev/null || true"
-					}
-				]
-			}
-		]
-	}
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && bun biome check --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*\\b(fix|format|lint|clean)\\b.*",
+        "hooks": [
+          {
+            "type": "notification",
+            "message": "💡 Tip: Files will be auto-formatted with Biome after edits"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && bun lint --reporter=compact 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
 }

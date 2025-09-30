@@ -1,23 +1,24 @@
-import { blog } from '@zeke/cms'
-import { Feed } from '@zeke/cms/components/feed'
-import { Image } from '@zeke/cms/components/image'
-import { cn } from '@zeke/ui/lib/utils'
-import type { Blog, WithContext } from '@zeke/seo/json-ld'
-import { JsonLd } from '@zeke/seo/json-ld'
-import { createMetadata } from '@zeke/seo/metadata'
-import type { Metadata } from 'next'
-import Link from 'next/link'
+import { blog } from "@zeke/cms";
+import { Feed } from "@zeke/cms/components/feed";
+import { Image } from "@zeke/cms/components/image";
+import { cn } from "@zeke/ui/lib/utils";
+import type { Blog, WithContext } from "@zeke/seo/json-ld";
+import { JsonLd } from "@zeke/seo/json-ld";
+import { createMetadata } from "@zeke/seo/metadata";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: 'ZEKE Blog',
-  description: 'Research intelligence updates, product releases, and operator playbooks from the ZEKE team.',
-})
+  title: "ZEKE Blog",
+  description:
+    "Research intelligence updates, product releases, and operator playbooks from the ZEKE team.",
+});
 
 export default function BlogIndex(): JSX.Element {
   const jsonLd: WithContext<Blog> = {
-    '@type': 'Blog',
-    '@context': 'https://schema.org',
-  }
+    "@type": "Blog",
+    "@context": "https://schema.org",
+  };
 
   return (
     <>
@@ -32,33 +33,33 @@ export default function BlogIndex(): JSX.Element {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <Feed queries={[blog.postsQuery]}>
               {async ([data]) => {
-                'use server'
+                "use server";
 
                 if (!data.blog.posts.items.length) {
-                  return null
+                  return null;
                 }
 
                 return data.blog.posts.items.map((post, index) => (
                   <Link
                     href={`/blog/${post._slug}`}
                     className={cn(
-                      'flex cursor-pointer flex-col gap-4 hover:opacity-75',
-                      !index && 'md:col-span-2'
+                      "flex cursor-pointer flex-col gap-4 hover:opacity-75",
+                      !index && "md:col-span-2",
                     )}
                     key={post._slug}
                   >
                     <Image
                       src={post.image.url}
-                      alt={post.image.alt ?? ''}
+                      alt={post.image.alt ?? ""}
                       width={post.image.width}
                       height={post.image.height}
                     />
                     <div className="flex flex-row items-center gap-4">
                       <p className="text-muted-foreground text-sm">
-                        {new Date(post.date).toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
+                        {new Date(post.date).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
                         })}
                       </p>
                     </div>
@@ -71,12 +72,12 @@ export default function BlogIndex(): JSX.Element {
                       </p>
                     </div>
                   </Link>
-                ))
+                ));
               }}
             </Feed>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }

@@ -34,7 +34,8 @@ app.openapi(
     method: "post",
     path: "/threads",
     summary: "Create or fetch assistant thread",
-    description: "Get or create a thread anchored to a story, playbook, or goal.",
+    description:
+      "Get or create a thread anchored to a story, playbook, or goal.",
     operationId: "createAssistantThread",
     tags: ["Assistant"],
     security: [{ bearerAuth: [] }],
@@ -96,7 +97,8 @@ app.openapi(
     method: "get",
     path: "/threads/{threadId}/messages",
     summary: "List assistant messages",
-    description: "Return messages for a thread ordered by creation time descending.",
+    description:
+      "Return messages for a thread ordered by creation time descending.",
     operationId: "listAssistantMessages",
     tags: ["Assistant"],
     security: [{ bearerAuth: [] }],
@@ -182,9 +184,10 @@ app.openapi(
       });
     }
 
-    const senderId = body.role === "assistant" || body.role === "system"
-      ? null
-      : session.user.id;
+    const senderId =
+      body.role === "assistant" || body.role === "system"
+        ? null
+        : session.user.id;
 
     const message = await createAssistantMessage(db, {
       threadId,
@@ -203,7 +206,8 @@ app.openapi(
     method: "get",
     path: "/threads/{threadId}/sources",
     summary: "List thread sources",
-    description: "Return highlight and transcript sources attached to a thread.",
+    description:
+      "Return highlight and transcript sources attached to a thread.",
     operationId: "listAssistantThreadSources",
     tags: ["Assistant"],
     security: [{ bearerAuth: [] }],
@@ -228,7 +232,9 @@ app.openapi(
 
     const sources = await getAssistantThreadSources(db, threadId);
 
-    return c.json(validateResponse(sources, z.array(assistantThreadSourceSchema)));
+    return c.json(
+      validateResponse(sources, z.array(assistantThreadSourceSchema)),
+    );
   },
 );
 
@@ -324,7 +330,8 @@ app.openapi(
     method: "post",
     path: "/messages/{messageId}/sources",
     summary: "Link message sources",
-    description: "Associate highlights or transcript turns with a specific message.",
+    description:
+      "Associate highlights or transcript turns with a specific message.",
     operationId: "linkAssistantMessageSources",
     tags: ["Assistant"],
     security: [{ bearerAuth: [] }],
@@ -333,7 +340,9 @@ app.openapi(
       body: {
         content: {
           "application/json": {
-            schema: assistantLinkMessageSourcesInputSchema.omit({ messageId: true }),
+            schema: assistantLinkMessageSourcesInputSchema.omit({
+              messageId: true,
+            }),
           },
         },
       },
@@ -361,7 +370,9 @@ app.openapi(
       turnIds: body.turnIds,
     });
 
-    return c.json(validateResponse(sources, z.array(assistantMessageSourceSchema)));
+    return c.json(
+      validateResponse(sources, z.array(assistantMessageSourceSchema)),
+    );
   },
 );
 

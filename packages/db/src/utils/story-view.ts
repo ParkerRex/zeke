@@ -1,4 +1,7 @@
-import type { StoryClusterRecord, StoryClusterStory } from "@db/src/queries/story-clusters";
+import type {
+  StoryClusterRecord,
+  StoryClusterStory,
+} from "@db/src/queries/story-clusters";
 
 export type StorySource = {
   title: string;
@@ -77,8 +80,8 @@ function normalizeCitations(input: unknown): StorySource[] {
       typeof record.domain === "string" && record.domain.length > 0
         ? record.domain
         : url
-        ? domainFromUrl(url)
-        : "unknown";
+          ? domainFromUrl(url)
+          : "unknown";
 
     entries.push({
       title,
@@ -100,7 +103,8 @@ function normalizeCitations(input: unknown): StorySource[] {
 }
 
 function toChili(confidence: unknown): number {
-  const value = typeof confidence === "number" ? confidence : Number(confidence);
+  const value =
+    typeof confidence === "number" ? confidence : Number(confidence);
   if (Number.isFinite(value)) {
     const scaled = value * 5;
     return Math.max(0, Math.min(5, Math.round(scaled)));
@@ -123,7 +127,9 @@ function domainFromUrl(url: string): string {
   }
 }
 
-export function mapStoryClusterStoryToView(story: StoryClusterStory): StoryClusterView {
+export function mapStoryClusterStoryToView(
+  story: StoryClusterStory,
+): StoryClusterView {
   const overlay = story.overlay ?? null;
   const sources = normalizeCitations(overlay?.citations);
   const confidence =

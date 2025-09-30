@@ -1,7 +1,7 @@
-'use client';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useMemo } from 'react';
+"use client";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
 
 type Node = {
   name: string;
@@ -10,39 +10,39 @@ type Node = {
 
 const DATA: Node[] = [
   {
-    name: 'Marketing',
-    children: ['Performance', 'Brand', 'Content', 'SEO', 'Growth'],
+    name: "Marketing",
+    children: ["Performance", "Brand", "Content", "SEO", "Growth"],
   },
   {
-    name: 'Design',
-    children: ['Product Design', 'UX Research', 'Visual / Branding', 'Motion'],
+    name: "Design",
+    children: ["Product Design", "UX Research", "Visual / Branding", "Motion"],
   },
   {
-    name: 'Creative',
-    children: ['Video', 'Editing', 'Copywriting', 'Illustration'],
+    name: "Creative",
+    children: ["Video", "Editing", "Copywriting", "Illustration"],
   },
   {
-    name: 'Software Development',
-    children: ['Web', 'Mobile', 'Data/ML', 'Infrastructure', 'Hardware'],
+    name: "Software Development",
+    children: ["Web", "Mobile", "Data/ML", "Infrastructure", "Hardware"],
   },
   {
-    name: 'AI/ML Tools',
-    children: ['Agents', 'LLMOps', 'Vector DBs', 'Eval/Benchmarking'],
+    name: "AI/ML Tools",
+    children: ["Agents", "LLMOps", "Vector DBs", "Eval/Benchmarking"],
   },
   {
-    name: 'Research',
-    children: ['NLP', 'Vision', 'Robotics', 'Reinforcement Learning'],
+    name: "Research",
+    children: ["NLP", "Vision", "Robotics", "Reinforcement Learning"],
   },
 ];
 
 function slugify(label: string) {
   return label
     .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[/]/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/&/g, "and")
+    .replace(/[/]/g, " ")
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, '-');
+    .replace(/\s+/g, "-");
 }
 
 export default function IndustryPanel() {
@@ -72,8 +72,8 @@ export default function IndustryPanel() {
   return (
     <div>
       <div className="border-b bg-background/50 p-4 backdrop-blur">
-        Sector{selectedSectorLabel ? ` › ${selectedSectorLabel}` : ''}
-        {selectedSubLabel ? ` › ${selectedSubLabel}` : ''}
+        Sector{selectedSectorLabel ? ` › ${selectedSectorLabel}` : ""}
+        {selectedSubLabel ? ` › ${selectedSubLabel}` : ""}
       </div>
       <div className="space-y-4 p-4">
         {DATA.map((n) => {

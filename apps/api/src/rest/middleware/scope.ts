@@ -1,6 +1,5 @@
 import type { Scope } from "@api/utils/scopes";
 import type { MiddlewareHandler } from "hono";
-import { HTTPException } from "hono/http-exception";
 
 export const withRequiredScope = (
   ...requiredScopes: Scope[]
@@ -9,19 +8,31 @@ export const withRequiredScope = (
     const scopes = c.get("scopes") as Scope[] | undefined;
 
     if (!scopes) {
-      throw new HTTPException(401, {
-        message: "Missing scopes for authenticated user",
-      });
+      return c.json(
+        {
+          error: "Unauthorized",
+          description:
+            "No access permissions found. Please authenticate with a valid API key or access token.",
+        },
+        401,
+      );
     }
 
-    const hasScope = requiredScopes.length
-      ? requiredScopes.some((scope) => scopes.includes(scope))
-      : true;
+    // Check if user has at least one of the required scopes
+    const hasRequiredScope = requiredScopes.some((requiredScope) =>
+      scopes.includes(requiredScope),
+    );
 
-    if (!hasScope) {
-      throw new HTTPException(403, {
-        message: `Insufficient permissions. Required: ${requiredScopes.join(", ")}`,
-      });
+    if (!hasRequiredScope) {
+      return c.json(
+        {
+          error: "Forbidden",
+          description: `Insufficient permissions for this research operation. Required: ${requiredScopes.join(
+            ", ",
+          )}. Available: ${scopes.join(", ")}`,
+        },
+        403,
+      );
     }
 
     await next();

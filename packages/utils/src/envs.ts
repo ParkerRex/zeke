@@ -3,7 +3,7 @@ export function getAppUrl() {
     process.env.VERCEL_ENV === "production" ||
     process.env.NODE_ENV === "production"
   ) {
-    return "https://app.midday.ai";
+    return "https://app.zekehq.com";
   }
 
   if (process.env.VERCEL_ENV === "preview") {
@@ -37,5 +37,5 @@ export function getWebsiteUrl() {
 }
 
 export function getCdnUrl() {
-  return "https://cdn.midday.ai";
+  return "https://cdn.zekehq.com";
 }

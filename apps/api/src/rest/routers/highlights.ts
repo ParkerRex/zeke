@@ -1,5 +1,5 @@
-import type { Context } from "@api/rest/types";
 import { protectedMiddleware, withRequiredScope } from "@api/rest/middleware";
+import type { Context } from "@api/rest/types";
 import {
   highlightEngagementSchema,
   highlightIdsInputSchema,
@@ -7,12 +7,9 @@ import {
   highlightsByStoryInputSchema,
 } from "@api/schemas/highlight";
 import { validateResponse } from "@api/utils/validate-response";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { getHighlightEngagement, getStoryHighlights } from "@zeke/db/queries";
 import { HTTPException } from "hono/http-exception";
-import {
-  getHighlightEngagement,
-  getStoryHighlights,
-} from "@zeke/db/queries";
 
 const app = new OpenAPIHono<Context>();
 
@@ -23,7 +20,8 @@ app.openapi(
     method: "get",
     path: "/",
     summary: "Story highlights",
-    description: "Return highlights associated with a story, optionally including global ones.",
+    description:
+      "Return highlights associated with a story, optionally including global ones.",
     operationId: "listHighlights",
     tags: ["Highlights"],
     security: [{ bearerAuth: [] }],

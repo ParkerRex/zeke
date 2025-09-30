@@ -1,69 +1,56 @@
+// Customer analytics temporarily disabled during migration to Zeke
+// This file will be reimplemented with the new analytics system
+
 import type { Database } from "@db/client";
-import { customers, invoiceStatusEnum, invoices } from "@db/schema";
-import { and, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
 export type GetTopRevenueClientParams = {
-	teamId: string;
+  teamId: string;
 };
 
 export async function getTopRevenueClient(
-	db: Database,
-	params: GetTopRevenueClientParams,
+  db: Database,
+  params: GetTopRevenueClientParams,
 ) {
-	const { teamId } = params;
-
-	const thirtyDaysAgo = new Date();
-	thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-	const result = await db
-		.select({
-			customerId: customers.id,
-			customerName: customers.name,
-			totalRevenue: sql<number>`SUM(${invoices.amount})::float`,
-			currency: invoices.currency,
-			invoiceCount: sql<number>`COUNT(${invoices.id})::int`,
-		})
-		.from(customers)
-		.innerJoin(
-			invoices,
-			and(
-				eq(invoices.customerId, customers.id),
-				gte(invoices.createdAt, thirtyDaysAgo.toISOString()),
-				inArray(invoices.status, ["paid", "unpaid", "overdue"]), // Exclude drafts
-			),
-		)
-		.where(eq(customers.teamId, teamId))
-		.groupBy(customers.id, customers.name, invoices.currency)
-		.orderBy(sql`SUM(${invoices.amount}) DESC`)
-		.limit(1);
-
-	return result[0] || null;
+  // Temporarily return null during migration
+  return null;
 }
 
-export type GetNewCustomersCountParams = {
-	teamId: string;
+export type GetCustomerRevenueParams = {
+  teamId: string;
+  customerId: string;
+  startDate?: Date;
+  endDate?: Date;
 };
 
-export async function getNewCustomersCount(
-	db: Database,
-	params: GetNewCustomersCountParams,
+export async function getCustomerRevenue(
+  db: Database,
+  params: GetCustomerRevenueParams,
 ) {
-	const { teamId } = params;
+  // Temporarily return 0 during migration
+  return {
+    totalRevenue: 0,
+    paidRevenue: 0,
+    pendingRevenue: 0,
+    overdueRevenue: 0,
+  };
+}
 
-	const thirtyDaysAgo = new Date();
-	thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+export type GetCustomerMetricsParams = {
+  teamId: string;
+  customerId: string;
+};
 
-	const [result] = await db
-		.select({
-			count: sql<number>`COUNT(*)::int`,
-		})
-		.from(customers)
-		.where(
-			and(
-				eq(customers.teamId, teamId),
-				gte(customers.createdAt, thirtyDaysAgo.toISOString()),
-			),
-		);
-
-	return result?.count || 0;
+export async function getCustomerMetrics(
+  db: Database,
+  params: GetCustomerMetricsParams,
+) {
+  // Temporarily return empty metrics during migration
+  return {
+    totalInvoices: 0,
+    paidInvoices: 0,
+    pendingInvoices: 0,
+    overdueInvoices: 0,
+    averagePaymentTime: null,
+    lifetimeValue: 0,
+  };
 }

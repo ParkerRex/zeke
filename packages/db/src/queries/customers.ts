@@ -2,15 +2,15 @@ import type { Database } from "@db/client";
 import {
   customers,
   customerTags,
-  invoices,
-  tags,
-  trackerProjects,
+  // invoices, // REMOVED: invoices table removed in migration to Zeke
+  // tags, // REMOVED: tags table removed in migration to Zeke
+  // trackerProjects, // REMOVED: trackerProjects table removed in migration to Zeke
 } from "@db/schema";
 import { buildSearchQuery } from "@zeke/db/utils/search-query";
-import { generateToken } from "@zeke/invoice/token";
+// import { generateToken } from "@zeke/invoice/token"; // REMOVED: invoice module dependency
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm/sql/sql";
-import { createActivity } from "./activities";
+// import { createActivity } from "./activities"; // TODO: Re-enable when activities module is created
 
 type GetCustomerByIdParams = {
   id: string;
@@ -42,28 +42,18 @@ export const getCustomerById = async (
       countryCode: customers.countryCode,
       token: customers.token,
       contact: customers.contact,
-      invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`,
-      projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`,
-      tags: sql<CustomerTag[]>`
-        coalesce(
-          json_agg(
-            distinct jsonb_build_object(
-              'id', ${tags.id},
-              'name', ${tags.name}
-            )
-          ) filter (where ${tags.id} is not null),
-          '[]'
-        )
-      `.as("tags"),
+      // invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`, // REMOVED: invoices table removed
+      // projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`, // REMOVED: trackerProjects table removed
+      tags: sql<CustomerTag[]>`'[]'`.as("tags"), // REMOVED: tags table removed, returning empty array
     })
     .from(customers)
     .where(
       and(eq(customers.id, params.id), eq(customers.teamId, params.teamId)),
     )
-    .leftJoin(invoices, eq(invoices.customerId, customers.id))
-    .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id))
+    // .leftJoin(invoices, eq(invoices.customerId, customers.id)) // REMOVED: invoices table removed
+    // .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id)) // REMOVED: trackerProjects table removed
     .leftJoin(customerTags, eq(customerTags.customerId, customers.id))
-    .leftJoin(tags, eq(tags.id, customerTags.tagId))
+    // .leftJoin(tags, eq(tags.id, customerTags.tagId)) // REMOVED: tags table removed
     .groupBy(customers.id);
 
   return result;
@@ -128,25 +118,15 @@ export const getCustomers = async (
       countryCode: customers.countryCode,
       token: customers.token,
       contact: customers.contact,
-      invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`,
-      projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`,
-      tags: sql<CustomerTag[]>`
-        coalesce(
-          json_agg(
-            distinct jsonb_build_object(
-              'id', ${tags.id},
-              'name', ${tags.name}
-            )
-          ) filter (where ${tags.id} is not null),
-          '[]'
-        )
-      `.as("tags"),
+      // invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`, // REMOVED: invoices table removed
+      // projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`, // REMOVED: trackerProjects table removed
+      tags: sql<CustomerTag[]>`'[]'`.as("tags"), // REMOVED: tags table removed, returning empty array
     })
     .from(customers)
-    .leftJoin(invoices, eq(invoices.customerId, customers.id))
-    .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id))
+    // .leftJoin(invoices, eq(invoices.customerId, customers.id)) // REMOVED: invoices table removed
+    // .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id)) // REMOVED: trackerProjects table removed
     .leftJoin(customerTags, eq(customerTags.customerId, customers.id))
-    .leftJoin(tags, eq(tags.id, customerTags.tagId))
+    // .leftJoin(tags, eq(tags.id, customerTags.tagId)) // REMOVED: tags table removed
     .where(and(...whereConditions))
     .groupBy(customers.id);
 
@@ -171,22 +151,8 @@ export const getCustomers = async (
       isAscending
         ? query.orderBy(asc(customers.email))
         : query.orderBy(desc(customers.email));
-    } else if (column === "invoices") {
-      // Sort by invoice count
-      isAscending
-        ? query.orderBy(asc(sql`count(${invoices.id})`))
-        : query.orderBy(desc(sql`count(${invoices.id})`));
-    } else if (column === "projects") {
-      // Sort by project count
-      isAscending
-        ? query.orderBy(asc(sql`count(${trackerProjects.id})`))
-        : query.orderBy(desc(sql`count(${trackerProjects.id})`));
-    } else if (column === "tags") {
-      // Sort by first tag name (alphabetically)
-      isAscending
-        ? query.orderBy(asc(sql`min(${tags.name})`))
-        : query.orderBy(desc(sql`min(${tags.name})`));
     }
+    // REMOVED: invoice, project, and tag sorting since those tables are removed
     // Add other sorting options as needed
   } else {
     // Default sort by created_at descending
@@ -244,7 +210,8 @@ export const upsertCustomer = async (
 ) => {
   const { id, tags: inputTags, teamId, userId, ...rest } = params;
 
-  const token = id ? await generateToken(id) : undefined;
+  // const token = id ? await generateToken(id) : undefined; // REMOVED: generateToken dependency
+  const token = undefined; // Placeholder since generateToken is removed
 
   const isNewCustomer = !id;
 
@@ -287,73 +254,28 @@ export const upsertCustomer = async (
 
   // Create activity for new customers only
   if (isNewCustomer) {
-    createActivity(db, {
-      teamId,
-      userId,
-      type: "customer_created",
-      source: "user",
-      priority: 7,
-      metadata: {
-        customerId: customerId,
-        customerName: customer.name,
-        customerEmail: customer.email,
-        website: customer.website,
-        country: customer.country,
-        city: customer.city,
-      },
-    });
+    // TODO: Re-enable when activities module is created
+    // createActivity(db, {
+    //   teamId,
+    //   userId,
+    //   type: "customer_created",
+    //   source: "user",
+    //   priority: 7,
+    //   metadata: {
+    //     customerId: customerId,
+    //     customerName: customer.name,
+    //     customerEmail: customer.email,
+    //     website: customer.website,
+    //     country: customer.country,
+    //     city: customer.city,
+    //   },
+    // });
   }
 
-  // Get current tags for the customer
-  const currentCustomerTags = await db
-    .select({
-      id: customerTags.id,
-      tagId: customerTags.tagId,
-      tag: {
-        id: tags.id,
-        name: tags.name,
-      },
-    })
-    .from(customerTags)
-    .where(eq(customerTags.customerId, customerId))
-    .leftJoin(tags, eq(tags.id, customerTags.tagId));
+  // REMOVED: Tag association logic since tags table is removed
+  // Previously would handle tag insertions and deletions here
 
-  const currentTagIds = new Set(currentCustomerTags.map((ct) => ct.tagId));
-  const inputTagIds = new Set(inputTags?.map((t) => t.id) || []);
-
-  // Tags to insert (in input but not current)
-  const tagsToInsert =
-    inputTags?.filter((tag) => !currentTagIds.has(tag.id)) || [];
-
-  // Tags to delete (in current but not input)
-  const tagIdsToDelete = Array.from(currentTagIds).filter(
-    (tagId) => !inputTagIds.has(tagId),
-  );
-
-  // Insert new tag associations
-  if (tagsToInsert.length > 0) {
-    await db.insert(customerTags).values(
-      tagsToInsert.map((tag) => ({
-        customerId,
-        tagId: tag.id,
-        teamId,
-      })),
-    );
-  }
-
-  // Delete removed tag associations
-  if (tagIdsToDelete.length > 0) {
-    await db
-      .delete(customerTags)
-      .where(
-        and(
-          eq(customerTags.customerId, customerId),
-          inArray(customerTags.tagId, tagIdsToDelete),
-        ),
-      );
-  }
-
-  // Return the customer with updated tags
+  // Return the customer with empty tags
   const [result] = await db
     .select({
       id: customers.id,
@@ -375,26 +297,16 @@ export const upsertCustomer = async (
       countryCode: customers.countryCode,
       token: customers.token,
       contact: customers.contact,
-      invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`,
-      projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`,
-      tags: sql<CustomerTag[]>`
-          coalesce(
-            json_agg(
-              distinct jsonb_build_object(
-                'id', ${tags.id},
-                'name', ${tags.name}
-              )
-            ) filter (where ${tags.id} is not null),
-            '[]'
-          )
-        `.as("tags"),
+      // invoiceCount: sql<number>`cast(count(${invoices.id}) as int)`, // REMOVED: invoices table removed
+      // projectCount: sql<number>`cast(count(${trackerProjects.id}) as int)`, // REMOVED: trackerProjects table removed
+      tags: sql<CustomerTag[]>`'[]'`.as("tags"), // REMOVED: tags table removed, returning empty array
     })
     .from(customers)
     .where(and(eq(customers.id, customerId), eq(customers.teamId, teamId)))
-    .leftJoin(invoices, eq(invoices.customerId, customers.id))
-    .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id))
+    // .leftJoin(invoices, eq(invoices.customerId, customers.id)) // REMOVED: invoices table removed
+    // .leftJoin(trackerProjects, eq(trackerProjects.customerId, customers.id)) // REMOVED: trackerProjects table removed
     .leftJoin(customerTags, eq(customerTags.customerId, customers.id))
-    .leftJoin(tags, eq(tags.id, customerTags.tagId))
+    // .leftJoin(tags, eq(tags.id, customerTags.tagId)) // REMOVED: tags table removed
     .groupBy(customers.id);
 
   return result;

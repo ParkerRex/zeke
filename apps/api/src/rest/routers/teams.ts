@@ -4,7 +4,7 @@ import {
   teamDetailSchema,
   teamIdInputSchema,
   teamInvitesSchema,
-  teamListResponseSchema,
+  teamsResponseSchema as teamListResponseSchema,
   teamSetActiveInputSchema,
 } from "@api/schemas/team";
 import { validateResponse } from "@api/utils/validate-response";

@@ -21,9 +21,13 @@ export const runPlaybook = schemaTask({
     concurrencyLimit: 2,
   },
   run: async (
-    { playbookId, teamId, triggeredBy, triggerSource, metadata }: z.infer<
-      typeof runPlaybookSchema
-    >,
+    {
+      playbookId,
+      teamId,
+      triggeredBy,
+      triggerSource,
+      metadata,
+    }: z.infer<typeof runPlaybookSchema>,
     { ctx },
   ) => {
     const db = getDb();
@@ -54,14 +58,13 @@ export const runPlaybook = schemaTask({
       },
     });
 
-    const runningRun =
-      (await updatePlaybookRunStatus(db, {
-        runId: run.id,
-        status: "running",
-      })) ?? {
-        ...run,
-        status: "running",
-      };
+    const runningRun = (await updatePlaybookRunStatus(db, {
+      runId: run.id,
+      status: "running",
+    })) ?? {
+      ...run,
+      status: "running",
+    };
 
     await recordPlaybookRunEvent(db, {
       runId: runningRun.id,

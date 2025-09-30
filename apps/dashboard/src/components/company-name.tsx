@@ -1,90 +1,90 @@
 "use client";
 
+import { useTeamMutation, useTeamQuery } from "@/hooks/use-team";
+import { useZodForm } from "@/hooks/use-zod-form";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@zeke/ui/card";
 import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
 } from "@zeke/ui/form";
 import { Input } from "@zeke/ui/input";
 import { SubmitButton } from "@zeke/ui/submit-button";
 import { z } from "zod";
-import { useTeamMutation, useTeamQuery } from "@/hooks/use-team";
-import { useZodForm } from "@/hooks/use-zod-form";
 
 const formSchema = z.object({
-	name: z.string().min(2).max(32),
+  name: z.string().min(2).max(32),
 });
 
 export function CompanyName() {
-	const { data } = useTeamQuery();
-	const updateTeamMutation = useTeamMutation();
+  const { data } = useTeamQuery();
+  const updateTeamMutation = useTeamMutation();
 
-	const form = useZodForm(formSchema, {
-		defaultValues: {
-			name: data?.name ?? "",
-		},
-	});
+  const form = useZodForm(formSchema, {
+    defaultValues: {
+      name: data?.name ?? "",
+    },
+  });
 
-	const onSubmit = form.handleSubmit((data) => {
-		updateTeamMutation.mutate(data);
-	});
+  const onSubmit = form.handleSubmit((data) => {
+    updateTeamMutation.mutate(data);
+  });
 
-	return (
-		<Form {...form}>
-			<form onSubmit={onSubmit}>
-				<Card>
-					<CardHeader>
-						<CardTitle>Company name</CardTitle>
-						<CardDescription>
-							This is your company's visible name within zeke. For example, the
-							name of your company or department.
-						</CardDescription>
-					</CardHeader>
+  return (
+    <Form {...form}>
+      <form onSubmit={onSubmit}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Company name</CardTitle>
+            <CardDescription>
+              This is your company's visible name within zeke. For example, the
+              name of your company or department.
+            </CardDescription>
+          </CardHeader>
 
-					<CardContent>
-						<FormField
-							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormControl>
-										<Input
-											{...field}
-											className="max-w-[300px]"
-											autoComplete="off"
-											autoCapitalize="none"
-											autoCorrect="off"
-											spellCheck="false"
-											maxLength={32}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</CardContent>
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      className="max-w-[300px]"
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck="false"
+                      maxLength={32}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
 
-					<CardFooter className="flex justify-between">
-						<div>Please use 32 characters at maximum.</div>
-						<SubmitButton
-							isSubmitting={updateTeamMutation.isPending}
-							disabled={updateTeamMutation.isPending}
-						>
-							Save
-						</SubmitButton>
-					</CardFooter>
-				</Card>
-			</form>
-		</Form>
-	);
+          <CardFooter className="flex justify-between">
+            <div>Please use 32 characters at maximum.</div>
+            <SubmitButton
+              isSubmitting={updateTeamMutation.isPending}
+              disabled={updateTeamMutation.isPending}
+            >
+              Save
+            </SubmitButton>
+          </CardFooter>
+        </Card>
+      </form>
+    </Form>
+  );
 }

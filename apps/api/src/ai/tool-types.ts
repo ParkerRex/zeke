@@ -1,19 +1,22 @@
 import { openai } from "@ai-sdk/openai";
 import type { InferUITools } from "ai";
 import { getContext } from "./context";
-import { getBurnRateTool } from "./tools/get-burn-rate";
-import { getBurnRateAnalysisTool } from "./tools/get-burn-rate-analysis";
-import { getTransactionsTool } from "./tools/get-transactions";
+import { researchTools } from "./tools";
 
 // Tool registry function - this creates the actual tool implementations
 export const createToolRegistry = () => {
   const context = getContext();
 
   return {
-    getBurnRate: getBurnRateTool,
-    getBurnRateAnalysis: getBurnRateAnalysisTool,
-    getTransactions: getTransactionsTool,
-    web_search: openai.tools.webSearch({
+    // Research tools for stories, insights, and briefs
+    getStoryHighlights: researchTools.getStoryHighlights,
+    summarizeSources: researchTools.summarizeSources,
+    draftBrief: researchTools.draftBrief,
+    planPlaybook: researchTools.planPlaybook,
+    linkInsights: researchTools.linkInsights,
+
+    // Web search with location context
+    webSearch: openai.tools.webSearch({
       searchContextSize: "medium",
       userLocation: {
         type: "approximate",

@@ -30,9 +30,6 @@
       ],
       "@jobs/*": [
         "../../packages/jobs/src/*"
-      ],
-      "@db/*": [
-        "../../packages/db/src/*"
       ]
     },
     "types": [

@@ -20,7 +20,7 @@ alwaysApply: true
 - Local dev: `wrangler dev` (see `package.json`), secrets in `.dev.vars` (sample in `.dev.vars-example`).
 
 ### App entry & middleware
-- Entry: `src/index.ts` creates `OpenAPIHono` with a `defaultHook` (422 on validation errors), installs middlewares, mounts routes, and redirects `/` to `https://midday.ai`.
+- Entry: `src/index.ts` creates `OpenAPIHono` with a `defaultHook` (422 on validation errors), installs middlewares, mounts routes, and redirects `/` to `https://zekehq.com`.
 - Middlewares (`src/middleware.ts`):
   - `authMiddleware`: bearer auth with `API_SECRET_KEY`. Public paths: `/`, `/openapi`, `/health`.
   - `securityMiddleware`: `secureHeaders()`.

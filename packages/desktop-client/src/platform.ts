@@ -2,29 +2,29 @@ import { isTauri } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 
 export function isDesktopApp() {
-	return isTauri();
+  return isTauri();
 }
 
 export type DeepLinkHandler = (path: string) => void;
 
 export async function listenForDeepLinks(handler: DeepLinkHandler) {
-	if (!isDesktopApp()) {
-		console.log("Deep links are only available in desktop app");
-		return () => {}; // No-op cleanup for non-desktop environments
-	}
+  if (!isDesktopApp()) {
+    console.log("Deep links are only available in desktop app");
+    return () => {}; // No-op cleanup for non-desktop environments
+  }
 
-	try {
-		const unlisten = await listen<string>("deep-link-navigate", (event) => {
-			console.log("🎯 Deep link navigation received:", event.payload);
-			handler(event.payload);
-		});
+  try {
+    const unlisten = await listen<string>("deep-link-navigate", (event) => {
+      console.log("🎯 Deep link navigation received:", event.payload);
+      handler(event.payload);
+    });
 
-		console.log("✅ Deep link listener registered");
-		return unlisten;
-	} catch (error) {
-		console.error("Failed to listen for deep links:", error);
-		return () => {};
-	}
+    console.log("✅ Deep link listener registered");
+    return unlisten;
+  } catch (error) {
+    console.error("Failed to listen for deep links:", error);
+    return () => {};
+  }
 }
 
 /**
@@ -41,6 +41,6 @@ export async function listenForDeepLinks(handler: DeepLinkHandler) {
  * ```
  */
 export function createDeepLink(path: string): string {
-	const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-	return `zeke://${cleanPath}`;
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  return `zeke://${cleanPath}`;
 }

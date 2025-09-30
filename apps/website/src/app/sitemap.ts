@@ -1,38 +1,18 @@
-import fs from 'node:fs';
-import { env } from '@/env';
-import { blog, legal } from '@zeke/cms';
-import type { MetadataRoute } from 'next';
+import { getBlogPosts } from "@/lib/blog";
+import type { MetadataRoute } from "next";
 
-const appFolders = fs.readdirSync('app', { withFileTypes: true });
-const pages = appFolders
-  .filter((file) => file.isDirectory())
-  .filter((folder) => !folder.name.startsWith('_'))
-  .filter((folder) => !folder.name.startsWith('('))
-  .map((folder) => folder.name);
-const blogs = (await blog.getPosts()).map((post) => post._slug);
-const legals = (await legal.getPosts()).map((post) => post._slug);
-const protocol = env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith('https')
-  ? 'https'
-  : 'http';
-const url = new URL(`${protocol}://${env.VERCEL_PROJECT_PRODUCTION_URL}`);
+export const baseUrl = "https://zekehq.com";
 
-const sitemap = async (): Promise<MetadataRoute.Sitemap> => [
-  {
-    url: new URL('/', url).href,
-    lastModified: new Date(),
-  },
-  ...pages.map((page) => ({
-    url: new URL(page, url).href,
-    lastModified: new Date(),
-  })),
-  ...blogs.map((blog) => ({
-    url: new URL(`blog/${blog}`, url).href,
-    lastModified: new Date(),
-  })),
-  ...legals.map((legal) => ({
-    url: new URL(`legal/${legal}`, url).href,
-    lastModified: new Date(),
-  })),
-];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const blogs = getBlogPosts().map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: post.metadata.publishedAt,
+  }));
 
-export default sitemap;
+  const routes = ["", "/updates"].map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date().toISOString().split("T")[0],
+  }));
+
+  return [...routes, ...blogs];
+}

@@ -1,16 +1,5 @@
 import type { Database } from "@db/client";
-import {
-  bankConnections,
-  teams,
-  transactionCategories,
-  users,
-  usersOnTeam,
-} from "@db/schema";
-import {
-  CATEGORIES,
-  getTaxRateForCategory,
-  getTaxTypeForCountry,
-} from "@zeke/categories";
+import { teams, teamMembers, users, usersOnTeam } from "@db/schema";
 import { and, eq } from "drizzle-orm";
 
 export const getTeamById = async (db: Database, id: string) => {
@@ -22,7 +11,6 @@ export const getTeamById = async (db: Database, id: string) => {
       email: teams.email,
       inboxId: teams.inboxId,
       plan: teams.plan,
-      // subscriptionStatus: teams.subscriptionStatus,
       baseCurrency: teams.baseCurrency,
       countryCode: teams.countryCode,
     })
@@ -51,18 +39,12 @@ export const updateTeamById = async (
       id: teams.id,
       name: teams.name,
       logoUrl: teams.logoUrl,
-      email: teams.email,
-      inboxId: teams.inboxId,
-      plan: teams.plan,
-      // subscriptionStatus: teams.subscriptionStatus,
-      baseCurrency: teams.baseCurrency,
-      countryCode: teams.countryCode,
     });
 
   return result;
 };
 
-type CreateTeamParams = {
+export type CreateTeamParams = {
   name: string;
   userId: string;
   email: string;
@@ -71,85 +53,6 @@ type CreateTeamParams = {
   logoUrl?: string;
   switchTeam?: boolean;
 };
-
-// Helper function to create system categories for a new team
-async function createSystemCategoriesForTeam(
-  db: Database,
-  teamId: string,
-  countryCode: string | null | undefined,
-) {
-  // Since teams have no previous categories on creation, we can insert all categories directly
-  const categoriesToInsert: Array<typeof transactionCategories.$inferInsert> =
-    [];
-
-  // First, add all parent categories
-  for (const parent of CATEGORIES) {
-    const taxRate = getTaxRateForCategory(countryCode, parent.slug);
-    const taxType = getTaxTypeForCountry(countryCode);
-
-    categoriesToInsert.push({
-      teamId,
-      name: parent.name,
-      slug: parent.slug,
-      color: parent.color,
-      system: parent.system,
-      excluded: parent.excluded,
-      taxRate: taxRate > 0 ? taxRate : null,
-      taxType: taxRate > 0 ? taxType : null,
-      taxReportingCode: undefined,
-      description: undefined,
-      parentId: undefined, // Parent categories have no parent
-    });
-  }
-
-  // Insert all parent categories first
-  const insertedParents = await db
-    .insert(transactionCategories)
-    .values(categoriesToInsert)
-    .returning({
-      id: transactionCategories.id,
-      slug: transactionCategories.slug,
-    });
-
-  // Create a map of parent slug to parent ID for child category references
-  const parentSlugToId = new Map(
-    insertedParents.map((parent) => [parent.slug, parent.id]),
-  );
-
-  // Now add all child categories with proper parent references
-  const childCategoriesToInsert: Array<
-    typeof transactionCategories.$inferInsert
-  > = [];
-
-  for (const parent of CATEGORIES) {
-    const parentId = parentSlugToId.get(parent.slug);
-    if (parentId) {
-      for (const child of parent.children) {
-        const taxRate = getTaxRateForCategory(countryCode, child.slug);
-        const taxType = getTaxTypeForCountry(countryCode);
-
-        childCategoriesToInsert.push({
-          teamId,
-          name: child.name,
-          slug: child.slug,
-          color: child.color,
-          system: child.system,
-          excluded: child.excluded,
-          taxRate: taxRate > 0 ? taxRate : null,
-          taxType: taxRate > 0 ? taxType : null,
-          taxReportingCode: undefined,
-          description: undefined,
-          parentId: parentId,
-        });
-      }
-    }
-  }
-
-  // Insert all child categories
-  if (childCategoriesToInsert.length > 0) {
-    await db.insert(transactionCategories).values(childCategoriesToInsert);
-  }
-}
 
 export const createTeam = async (db: Database, params: CreateTeamParams) => {
   try {
@@ -175,8 +78,7 @@ export const createTeam = async (db: Database, params: CreateTeamParams) => {
       role: "owner",
     });
 
-    // Create system categories for the new team
-    await createSystemCategoriesForTeam(db, newTeam.id, params.countryCode);
+    // Note: System categories removed during migration to Zeke
 
     // Optionally switch user to the new team
     if (params.switchTeam) {
@@ -197,136 +99,84 @@ export async function getTeamMembers(db: Database, teamId: string) {
   const result = await db
     .select({
       id: usersOnTeam.id,
+      teamId: usersOnTeam.teamId,
+      userId: usersOnTeam.userId,
       role: usersOnTeam.role,
-      team_id: usersOnTeam.teamId,
+      createdAt: usersOnTeam.createdAt,
+      invitedBy: usersOnTeam.invitedBy,
       user: {
         id: users.id,
+        email: users.email,
         fullName: users.fullName,
         avatarUrl: users.avatarUrl,
-        email: users.email,
       },
     })
     .from(usersOnTeam)
     .innerJoin(users, eq(usersOnTeam.userId, users.id))
-    .where(eq(usersOnTeam.teamId, teamId))
-    .orderBy(usersOnTeam.createdAt);
-
-  return result.map((item) => ({
-    id: item.user.id,
-    role: item.role,
-    fullName: item.user.fullName,
-    avatarUrl: item.user.avatarUrl,
-    email: item.user.email,
-  }));
-}
-
-type LeaveTeamParams = {
-  userId: string;
-  teamId: string;
-};
-
-export async function leaveTeam(db: Database, params: LeaveTeamParams) {
-  // Set team_id to null for the user
-  await db
-    .update(users)
-    .set({ teamId: null })
-    .where(and(eq(users.id, params.userId), eq(users.teamId, params.teamId)));
-
-  // Delete the user from users_on_team and return the deleted row
-  const [deleted] = await db
-    .delete(usersOnTeam)
-    .where(
-      and(
-        eq(usersOnTeam.teamId, params.teamId),
-        eq(usersOnTeam.userId, params.userId),
-      ),
-    )
-    .returning();
-
-  return deleted;
-}
-
-export async function deleteTeam(db: Database, id: string) {
-  const [result] = await db.delete(teams).where(eq(teams.id, id)).returning({
-    id: teams.id,
-  });
+    .where(eq(usersOnTeam.teamId, teamId));
 
   return result;
 }
 
-type DeleteTeamMemberParams = {
-  userId: string;
-  teamId: string;
-};
+export async function deleteTeam(db: Database, teamId: string) {
+  // First delete all team memberships
+  await db.delete(usersOnTeam).where(eq(usersOnTeam.teamId, teamId));
+
+  // Then delete the team
+  await db.delete(teams).where(eq(teams.id, teamId));
+
+  return { success: true };
+}
+
+export async function updateTeamLogo(
+  db: Database,
+  teamId: string,
+  logoUrl: string | null,
+) {
+  const [result] = await db
+    .update(teams)
+    .set({ logoUrl })
+    .where(eq(teams.id, teamId))
+    .returning({ logoUrl: teams.logoUrl });
+
+  return result;
+}
+
+export async function leaveTeam(db: Database, userId: string, teamId: string) {
+  // Remove user from team by deleting their team membership
+  const [removedMember] = await db
+    .delete(teamMembers)
+    .where(and(eq(teamMembers.userId, userId), eq(teamMembers.teamId, teamId)))
+    .returning();
+
+  return removedMember;
+}
 
 export async function deleteTeamMember(
   db: Database,
-  params: DeleteTeamMemberParams,
+  params: { teamId: string; userId: string },
 ) {
-  const [deleted] = await db
-    .delete(usersOnTeam)
-    .where(
-      and(
-        eq(usersOnTeam.userId, params.userId),
-        eq(usersOnTeam.teamId, params.teamId),
-      ),
-    )
+  const { teamId, userId } = params;
+
+  const [deletedMember] = await db
+    .delete(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)))
     .returning();
 
-  return deleted;
+  return deletedMember;
 }
-
-type UpdateTeamMemberParams = {
-  userId: string;
-  teamId: string;
-  role: "owner" | "member";
-};
 
 export async function updateTeamMember(
   db: Database,
-  params: UpdateTeamMemberParams,
+  params: { teamId: string; userId: string; role: string },
 ) {
-  const { userId, teamId, role } = params;
+  const { teamId, userId, role } = params;
 
-  const [updated] = await db
-    .update(usersOnTeam)
-    .set({ role })
-    .where(and(eq(usersOnTeam.userId, userId), eq(usersOnTeam.teamId, teamId)))
+  const [updatedMember] = await db
+    .update(teamMembers)
+    .set({ role: role as "owner" | "member" })
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)))
     .returning();
 
-  return updated;
-}
-
-type GetAvailablePlansResult = {
-  starter: boolean;
-  pro: boolean;
-};
-
-export async function getAvailablePlans(
-  db: Database,
-  teamId: string,
-): Promise<GetAvailablePlansResult> {
-  const [teamMembersCountResult, bankConnectionsCountResult] =
-    await Promise.all([
-      db.query.usersOnTeam.findMany({
-        where: eq(usersOnTeam.teamId, teamId),
-        columns: { id: true },
-      }),
-      db.query.bankConnections.findMany({
-        where: eq(bankConnections.teamId, teamId),
-        columns: { id: true },
-      }),
-    ]);
-
-  const teamMembersCount = teamMembersCountResult.length;
-  const bankConnectionsCount = bankConnectionsCountResult.length;
-
-  // Can choose starter if team has 2 or fewer members and 2 or fewer bank connections
-  const starter = teamMembersCount <= 2 && bankConnectionsCount <= 2;
-
-  // Can always choose pro plan
-  return {
-    starter,
-    pro: true,
-  };
+  return updatedMember;
 }

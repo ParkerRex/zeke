@@ -30,7 +30,7 @@ export function Footer() {
         className={`text-[21px] font-regular ${themeClasses.text}`}
         style={{ color: lightStyles.text.color }}
       >
-        Run your business smarter.
+        Turn research into applied outcomes.
       </Text>
 
       <br />
@@ -47,14 +47,14 @@ export function Footer() {
           </Text>
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://go.midday.ai/bOp4NOx"
+            href="https://go.zekehq.com/bOp4NOx"
             style={{ color: lightStyles.mutedText.color }}
           >
             Overview
           </Link>
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://go.midday.ai/VFcNsmQ"
+            href="https://go.zekehq.com/VFcNsmQ"
             style={{ color: lightStyles.mutedText.color }}
           >
             Inbox
@@ -62,14 +62,14 @@ export function Footer() {
 
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://go.midday.ai/x7Fow9L"
+            href="https://go.zekehq.com/x7Fow9L"
             style={{ color: lightStyles.mutedText.color }}
           >
             Tracker
           </Link>
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://go.midday.ai/fkYXc95"
+            href="https://go.zekehq.com/fkYXc95"
             style={{ color: lightStyles.mutedText.color }}
           >
             Invoice
@@ -108,7 +108,7 @@ export function Footer() {
           </Link>
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://github.com/zekehq"
+            href="https://github.com/zeke-ai/zeke"
             style={{ color: lightStyles.mutedText.color }}
           >
             Github
@@ -152,7 +152,7 @@ export function Footer() {
           </Link>
           <Link
             className={`text-[14px] block mb-1.5 ${themeClasses.mutedLink}`}
-            href="https://go.midday.ai/M2Hv420"
+            href="https://go.zekehq.com/M2Hv420"
             style={{ color: lightStyles.mutedText.color }}
           >
             OSS Friends
@@ -175,7 +175,7 @@ export function Footer() {
           </Link>
         </Column>
         {/* <Column className="align-middle w-[40px]">
-          <Link href="https://go.midday.ai/7rhA3rz">
+          <Link href="https://go.zekehq.com/7rhA3rz">
             <Img
               src={`${baseUrl}/email/producthunt.png`}
               width="22"
@@ -185,7 +185,7 @@ export function Footer() {
           </Link>
         </Column> */}
         {/* <Column className="align-middle">
-          <Link href="https://go.midday.ai/Ct3xybK">
+          <Link href="https://go.zekehq.com/Ct3xybK">
             <Img
               src={`${baseUrl}/email/linkedin.png`}
               width="22"

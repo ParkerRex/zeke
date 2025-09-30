@@ -1,16 +1,12 @@
-import { ExportStatus } from "@/components/export-status";
-import { GlobalTimerProvider } from "@/components/global-timer-provider";
 import { Header } from "@/components/header";
 import { GlobalSheets } from "@/components/sheets/global-sheets";
 import { Sidebar } from "@/components/sidebar";
-import { TimezoneDetector } from "@/components/timezone-detector";
 import {
   HydrateClient,
   batchPrefetch,
   getQueryClient,
   trpc,
 } from "@/trpc/server";
-import { getCountryCode, getCurrency } from "@zeke/location";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -20,31 +16,31 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const queryClient = getQueryClient();
-  const currencyPromise = getCurrency();
-  const countryCodePromise = getCountryCode();
 
-  // NOTE: These are used in the global sheets
-  batchPrefetch([
-    trpc.team.current.queryOptions(),
-    trpc.invoice.defaultSettings.queryOptions(),
-    trpc.search.global.queryOptions({ searchTerm: "" }),
-  ]);
+  // Fetch bootstrap data - single query for all initial data
+  const bootstrap = await queryClient
+    .fetchQuery(trpc.workspace.bootstrap.queryOptions())
+    .catch(() => null);
 
-  // NOTE: Right now we want to fetch the user and hydrate the client
-  // Next steps would be to prefetch and suspense
-  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
-
-  if (!user) {
+  if (!bootstrap) {
     redirect("/login");
   }
+
+  const { user, team } = bootstrap;
 
   if (!user.fullName) {
     redirect("/setup");
   }
 
-  if (!user.teamId) {
+  if (!team) {
     redirect("/teams");
   }
+
+  // Prefetch additional data for global sheets (research-focused)
+  batchPrefetch([
+    trpc.team.current.queryOptions(),
+    trpc.search.global.queryOptions({ searchTerm: "" }),
+  ]);
 
   return (
     <HydrateClient>
@@ -56,17 +52,9 @@ export default async function Layout({
           <div className="px-6">{children}</div>
         </div>
 
-        <ExportStatus />
-
         <Suspense>
-          <GlobalSheets
-            currencyPromise={currencyPromise}
-            countryCodePromise={countryCodePromise}
-          />
+          <GlobalSheets />
         </Suspense>
-
-        <GlobalTimerProvider />
-        <TimezoneDetector />
       </div>
     </HydrateClient>
   );

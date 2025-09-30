@@ -1,7 +1,7 @@
-'use client';
-import { COMPANIES } from '@/src/utils/constants';
-import Image from 'next/image';
-import Link from 'next/link';
+"use client";
+import { COMPANIES } from "@/src/utils/constants";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function CompanyPanel() {
   return (

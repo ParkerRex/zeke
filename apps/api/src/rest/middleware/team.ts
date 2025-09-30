@@ -8,7 +8,7 @@ export const withTeamContext: MiddlewareHandler = async (c, next) => {
 
   if (!session || !session.user?.id) {
     throw new HTTPException(401, {
-      message: "Authentication required",
+      message: "Authentication required to access research team resources",
     });
   }
 
@@ -31,7 +31,7 @@ export const withTeamContext: MiddlewareHandler = async (c, next) => {
     }
 
     throw new HTTPException(500, {
-      message: "Failed to resolve team access",
+      message: "Failed to resolve research team access",
     });
   }
 

@@ -59,5 +59,5 @@ app.get("/health", async (c) => {
 export default {
   port: process.env.PORT ? Number.parseInt(process.env.PORT) : 3000,
   fetch: app.fetch,
-  host: "::", // Listen on all interfaces
+  host: "127.0.0.1", // Use IPv4 localhost
 };

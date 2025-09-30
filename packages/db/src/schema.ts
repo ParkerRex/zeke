@@ -22,12 +22,7 @@ import type { PgNumericConfig } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm/relations";
 
 const numericCasted = (name: string, config?: PgNumericConfig) =>
-  numeric(name, config)
-    .$type<number | null>()
-    .transform({
-      from: (value) => (value === null ? null : Number(value)),
-      to: (value) => value,
-    });
+  numeric(name, config);
 
 // ============================================================================
 // ENUMS

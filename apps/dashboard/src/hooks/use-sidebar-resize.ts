@@ -1,11 +1,10 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
-import React from 'react';
+import React from "react";
 
 export type UseSidebarResizeProps = {
-  direction?: 'left' | 'right';
+  direction?: "left" | "right";
   currentWidth: string;
   onResize: (width: string) => void;
   onToggle?: () => void;
@@ -25,14 +24,14 @@ export type UseSidebarResizeProps = {
 
 type WidthUnit = {
   value: number;
-  unit: 'rem' | 'px';
+  unit: "rem" | "px";
 };
 
 /**
  * Parse width string into value and unit
  */
 function parseWidth(width: string): WidthUnit {
-  const unit = width.endsWith('rem') ? 'rem' : 'px';
+  const unit = width.endsWith("rem") ? "rem" : "px";
   const value = Number.parseFloat(width);
   return { value, unit };
 }
@@ -42,15 +41,14 @@ function parseWidth(width: string): WidthUnit {
  */
 function toPx(width: string): number {
   const { value, unit } = parseWidth(width);
-  // biome-ignore lint: simple multiplication
-  return unit === 'rem' ? value * 16 : value;
+  return unit === "rem" ? value * 16 : value;
 }
 
 /**
  * Format width value with unit
  */
-function formatWidth(value: number, unit: 'rem' | 'px'): string {
-  return `${unit === 'rem' ? value.toFixed(1) : Math.round(value)}${unit}`;
+function formatWidth(value: number, unit: "rem" | "px"): string {
+  return `${unit === "rem" ? value.toFixed(1) : Math.round(value)}${unit}`;
 }
 
 /**
@@ -59,22 +57,20 @@ function formatWidth(value: number, unit: 'rem' | 'px'): string {
  * Supports VS Code-like continuous drag to collapse/expand
  */
 export function useSidebarResize({
-  direction = 'right',
+  direction = "right",
   currentWidth,
   onResize,
   onToggle,
   isCollapsed = false,
-  minResizeWidth = '14rem',
-  maxResizeWidth = '24rem',
+  minResizeWidth = "14rem",
+  maxResizeWidth = "24rem",
   enableToggle = true,
   enableAutoCollapse = true,
   autoCollapseThreshold = 1.5, // Default to collapsing at minWidth + 50%
   expandThreshold = 0.2,
   enableDrag = true,
-  // biome-ignore lint: no-empty-function
   setIsDraggingRail = () => {},
   widthCookieName,
-  // biome-ignore lint: reasonable-number-constant
   widthCookieMaxAge = 60 * 60 * 24 * 7, // 1 week default
   isNested = false,
 }: UseSidebarResizeProps) {
@@ -87,7 +83,7 @@ export function useSidebarResize({
   const lastWidth = React.useRef(0);
   const lastLoggedWidth = React.useRef(0);
   const dragStartPoint = React.useRef(0);
-  const lastDragDirection = React.useRef<'expand' | 'collapse' | null>(null);
+  const lastDragDirection = React.useRef<"expand" | "collapse" | null>(null);
   const lastTogglePoint = React.useRef(0);
   const lastToggleWidth = React.useRef(0);
   const toggleCooldown = React.useRef(false);
@@ -102,21 +98,21 @@ export function useSidebarResize({
   // Memoize min/max width calculations for performance
   const minWidthPx = React.useMemo(
     () => toPx(minResizeWidth),
-    [minResizeWidth]
+    [minResizeWidth],
   );
   const maxWidthPx = React.useMemo(
     () => toPx(maxResizeWidth),
-    [maxResizeWidth]
+    [maxResizeWidth],
   );
 
   // Helper function to determine if width is increasing based on direction and mouse movement
   const isIncreasingWidth = React.useCallback(
     (currentX: number, referenceX: number): boolean => {
-      return direction === 'left'
+      return direction === "left"
         ? currentX < referenceX // For left-positioned handle, moving left increases width
         : currentX > referenceX; // For right-positioned handle, moving right increases width
     },
-    [direction]
+    [direction],
   );
 
   // Helper function to calculate width based on mouse position and direction
@@ -125,13 +121,13 @@ export function useSidebarResize({
       e: MouseEvent,
       initialX: number,
       initialWidth: number,
-      currentRailRect: DOMRect | null
+      currentRailRect: DOMRect | null,
     ): number => {
       if (isNested && currentRailRect) {
         // For nested sidebars, use the delta from start position for precise tracking
         const deltaX = e.clientX - initialX;
 
-        if (direction === 'left') {
+        if (direction === "left") {
           // For left-positioned handle (right panel)
           // Width increases as mouse moves left (negative deltaX)
           return initialWidth - deltaX;
@@ -141,14 +137,14 @@ export function useSidebarResize({
         return initialWidth + deltaX;
       }
       // For standard sidebars at window edges
-      if (direction === 'left') {
+      if (direction === "left") {
         // For left-positioned handle (right panel)
         return window.innerWidth - e.clientX;
       }
       // For right-positioned handle (left panel)
       return e.clientX;
     },
-    [direction, isNested]
+    [direction, isNested],
   );
 
   // Update auto-collapse threshold when dependencies change
@@ -162,11 +158,10 @@ export function useSidebarResize({
   const persistWidth = React.useCallback(
     (width: string) => {
       if (widthCookieName) {
-        // biome-ignore lint: cookie-string
         document.cookie = `${widthCookieName}=${width}; path=/; max-age=${widthCookieMaxAge}`;
       }
     },
-    [widthCookieName, widthCookieMaxAge]
+    [widthCookieName, widthCookieMaxAge],
   );
 
   // Handle mouse down on resize handle
@@ -204,18 +199,15 @@ export function useSidebarResize({
 
       e.preventDefault();
     },
-    [enableDrag, isCollapsed, currentWidth, isNested]
+    [enableDrag, isCollapsed, currentWidth, isNested],
   );
 
   // Handle mouse movement and resizing
   React.useEffect(() => {
-    // biome-ignore lint: no-inner-declarations
     const handleMouseMove = (e: MouseEvent) => {
-      // biome-ignore lint: early-return
       if (!isInteractingWithRail.current) return;
 
       const deltaX = Math.abs(e.clientX - startX.current);
-      // biome-ignore lint: no-lonely-if
       if (!isDragging.current && deltaX > 5) {
         isDragging.current = true;
         setIsDraggingRail(true);
@@ -234,10 +226,10 @@ export function useSidebarResize({
         // Determine current drag direction
         const currentDragDirection = isIncreasingWidth(
           e.clientX,
-          lastTogglePoint.current
+          lastTogglePoint.current,
         )
-          ? 'expand'
-          : 'collapse';
+          ? "expand"
+          : "collapse";
 
         // Update direction tracking
         if (lastDragDirection.current !== currentDragDirection) {
@@ -246,12 +238,11 @@ export function useSidebarResize({
 
         // Calculate distance from last toggle point
         dragDistanceFromToggle.current = Math.abs(
-          e.clientX - lastTogglePoint.current
+          e.clientX - lastTogglePoint.current,
         );
 
         // Check for toggle cooldown (prevent rapid toggling)
         const now = Date.now();
-        // biome-ignore lint: early-return
         if (toggleCooldown.current && now - lastToggleTime.current > 200) {
           toggleCooldown.current = false;
         }
@@ -265,13 +256,12 @@ export function useSidebarResize({
               e,
               startX.current,
               startWidth.current,
-              currentRailRect
+              currentRailRect,
             );
 
             // Determine if we should collapse based on threshold
             let shouldCollapse = false;
             // For thresholds <= 1.0, collapse when width is below minWidth * threshold
-            // biome-ignore lint: reasonable-number-constant
             if (autoCollapseThreshold <= 1.0) {
               shouldCollapse =
                 currentDragWidth <= minWidthPx * autoCollapseThreshold;
@@ -279,14 +269,13 @@ export function useSidebarResize({
             } else if (currentDragWidth <= minWidthPx) {
               // Calculate how much beyond minWidth we need to drag
               const extraDragNeeded =
-                // biome-ignore lint: reasonable-number-constant
                 minWidthPx * (autoCollapseThreshold - 1.0);
               // Only collapse if we've dragged far enough beyond minWidth
               const distanceBeyondMin = minWidthPx - currentDragWidth;
               shouldCollapse = distanceBeyondMin >= extraDragNeeded;
             }
 
-            if (currentDragDirection === 'collapse' && shouldCollapse) {
+            if (currentDragDirection === "collapse" && shouldCollapse) {
               onToggle(); // Collapse
               lastTogglePoint.current = e.clientX;
               lastToggleWidth.current = 0; // Width is 0 when collapsed
@@ -300,7 +289,7 @@ export function useSidebarResize({
           if (
             onToggle &&
             isCollapsed &&
-            currentDragDirection === 'expand' &&
+            currentDragDirection === "expand" &&
             dragDistanceFromToggle.current > minWidthPx * expandThreshold
           ) {
             onToggle(); // Expand
@@ -310,20 +299,19 @@ export function useSidebarResize({
               e,
               startX.current,
               startWidth.current,
-              currentRailRect
+              currentRailRect,
             );
 
             // Clamp to min/max
             const clampedWidth = Math.max(
               minWidthPx,
-              Math.min(maxWidthPx, initialWidth)
+              Math.min(maxWidthPx, initialWidth),
             );
 
             // Set initial width when expanding
             const formattedWidth = formatWidth(
-              // biome-ignore lint: simple multiplication
-              unit === 'rem' ? clampedWidth / 16 : clampedWidth,
-              unit
+              unit === "rem" ? clampedWidth / 16 : clampedWidth,
+              unit,
             );
             onResize(formattedWidth);
             persistWidth(formattedWidth);
@@ -346,18 +334,17 @@ export function useSidebarResize({
           e,
           startX.current,
           startWidth.current,
-          currentRailRect
+          currentRailRect,
         );
 
         // Clamp width between min and max
         const clampedWidthPx = Math.max(
           minWidthPx,
-          Math.min(maxWidthPx, newWidthPx)
+          Math.min(maxWidthPx, newWidthPx),
         );
 
         // Convert to the target unit
-        // biome-ignore lint: simple multiplication
-        const newWidth = unit === 'rem' ? clampedWidthPx / 16 : clampedWidthPx;
+        const newWidth = unit === "rem" ? clampedWidthPx / 16 : clampedWidthPx;
 
         // Format and update width
         const formattedWidth = formatWidth(newWidth, unit);
@@ -370,7 +357,6 @@ export function useSidebarResize({
     };
 
     const handleMouseUp = () => {
-      // biome-ignore lint: early-return
       if (!isInteractingWithRail.current) return;
 
       // Handle click (not drag) behavior
@@ -394,12 +380,12 @@ export function useSidebarResize({
       setIsDraggingRail(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [
     onResize,

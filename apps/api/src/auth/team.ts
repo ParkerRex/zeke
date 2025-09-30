@@ -50,7 +50,10 @@ export async function ensureTeamAccess(
   }
 
   if (!hasAccess) {
-    throw new TeamAccessError("No permission to access this team", "TEAM_FORBIDDEN");
+    throw new TeamAccessError(
+      "No permission to access this team",
+      "TEAM_FORBIDDEN",
+    );
   }
 
   return teamId;

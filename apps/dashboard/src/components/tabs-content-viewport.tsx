@@ -1,10 +1,10 @@
-'use client';
-import { STRINGS } from '@/src/utils/constants';
-import { useTabs } from '@/src/hooks/use-tabs';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import StoriesGridClient from './stories-grid-client';
-import StoryTab from './story-tab';
+"use client";
+import { useTabs } from "@/src/hooks/use-tabs";
+import { STRINGS } from "@/src/utils/constants";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import StoriesGridClient from "./stories-grid-client";
+import StoryTab from "./story-tab";
 
 const STORIES_PATH_RE = /^\/stories\/(.+)$/;
 
@@ -57,7 +57,7 @@ export default function TabsContentViewport() {
         <StoryTab tab={active} />
       </div>
     );
-  } else if (pathname === '/stories') {
+  } else if (pathname === "/stories") {
     content = <StoriesGridClient variant="full" />;
   } else {
     content = (

@@ -2,12 +2,12 @@ import z from "zod";
 
 import { connectDb } from "@zeke/db/src/client";
 import {
-  getActiveProductsWithPrices,
-  getTeamActiveSubscription,
+  type BillingInterval,
+  type BillingPriceSummary,
   type BillingProductWithPrices,
   type BillingSubscriptionRecord,
-  type BillingPriceSummary,
-  type BillingInterval,
+  getActiveProductsWithPrices,
+  getTeamActiveSubscription,
 } from "@zeke/db/src/queries/billing";
 
 export type {

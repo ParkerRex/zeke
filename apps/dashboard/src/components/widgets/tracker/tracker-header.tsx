@@ -2,8 +2,6 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
-
 import { TrackerPeriodSelect } from "@/components/tracker-period-select";
 import NumberFlow from "@number-flow/react";
 

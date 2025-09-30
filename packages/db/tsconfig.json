@@ -1,17 +1,11 @@
 {
-    "extends": "@zeke/tsconfig/base.json",
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules"
-    ],
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@db/*": [
-                "./src/*"
-            ]
-        }
+  "extends": "@zeke/tsconfig/base.json",
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@db/*": ["./src/*"]
     }
+  }
 }

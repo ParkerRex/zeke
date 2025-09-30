@@ -1,9 +1,9 @@
-'use client';
-import { useTabs } from '@/src/hooks/use-tabs';
-import { domainFromUrl } from '@/src/utils/url';
-import type { StoryClusterView } from '@/utils/stories';
-import { useRouter } from 'next/navigation';
-import { StoryKindIcon } from './story-kind-icon';
+"use client";
+import { useTabs } from "@/src/hooks/use-tabs";
+import { domainFromUrl } from "@/src/utils/url";
+import type { StoryClusterView } from "@/utils/stories";
+import { useRouter } from "next/navigation";
+import { StoryKindIcon } from "./story-kind-icon";
 
 export default function StoryRow({ cluster }: { cluster: StoryClusterView }) {
   const { openTab } = useTabs();
@@ -44,7 +44,7 @@ export default function StoryRow({ cluster }: { cluster: StoryClusterView }) {
         </div>
       </div>
       <span aria-label="spiciness" className="flex-shrink-0 text-xs" role="img">
-        {'🌶'.repeat(cluster.overlays.chili)}
+        {"🌶".repeat(cluster.overlays.chili)}
       </span>
     </button>
   );

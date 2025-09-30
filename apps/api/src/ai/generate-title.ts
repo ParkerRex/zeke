@@ -1,24 +1,31 @@
 import { openai } from "@ai-sdk/openai";
 import { safeValue } from "@api/ai/utils/safe-value";
 import { TZDate } from "@date-fns/tz";
-import type { ChatUserContext } from "@midday/cache/chat-cache";
-import { logger } from "@midday/logger";
+import type { ChatUserContext } from "./context";
+import { logger } from "@zeke/logger";
 import { generateObject } from "ai";
 import { z } from "zod";
 import type { UIChatMessage } from "./types";
 
 const MIN_CONTEXT_LENGTH = 10;
 
-type Params = Omit<ChatUserContext, "teamId" | "userId"> & {
+type Params = {
   message: string;
+  teamName?: string;
+  country?: string;
+  fullName?: string | null;
+  baseCurrency?: string;
+  city?: string;
+  timezone?: string;
+  countryCode?: string;
 };
 
 export const generateTitle = async ({
   message,
-  teamName,
+  teamName = "Team",
   country,
   fullName,
-  baseCurrency,
+  baseCurrency = "USD",
   city,
   timezone,
   countryCode,

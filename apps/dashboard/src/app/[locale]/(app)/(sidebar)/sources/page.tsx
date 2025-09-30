@@ -13,15 +13,15 @@ export default function SourcesPage() {
       <div className="max-w-xl space-y-3">
         <h1 className="font-medium text-foreground">Sources</h1>
         <p>
-          This is where teams will connect RSS feeds, newsletters, research hubs, and
-          other inputs for the ingestion pipeline. We&apos;re still wiring the new
-          Trigger.dev tasks and Cloudflare worker routes, so the UI is a placeholder
-          for now.
+          This is where teams will connect RSS feeds, newsletters, research
+          hubs, and other inputs for the ingestion pipeline. We&apos;re still
+          wiring the new Trigger.dev tasks and Cloudflare worker routes, so the
+          UI is a placeholder for now.
         </p>
         <p>
-          As soon as the provider onboarding flow lands, you&apos;ll be able to add
-          sources here and watch ZEKE collect, normalize, and route stories through
-          the new job system.
+          As soon as the provider onboarding flow lands, you&apos;ll be able to
+          add sources here and watch ZEKE collect, normalize, and route stories
+          through the new job system.
         </p>
       </div>
     </section>

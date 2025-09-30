@@ -1,4 +1,5 @@
-import { getBurnRate, getRunway, getSpending } from "@db/queries";
+// Legacy Midday tool - replaced with research analytics
+// import { getBurnRate, getRunway, getSpending } from "@zeke/db/queries";
 import { formatAmount } from "@zeke/utils/format";
 import { tool } from "ai";
 import { followupQuestionsArtifact } from "../artifacts/followup-questions";
@@ -6,11 +7,16 @@ import { getContext } from "../context";
 import { generateFollowupQuestions } from "../utils/generate-followup-questions";
 import { getBurnRateSchema } from "./schema";
 
+// Legacy Midday burn rate tool - disabled for Zeke research focus
 export const getBurnRateTool = tool({
-  description:
-    "Calculate and analyze monthly cash burn rate, showing how much money the business spends each month. Use this tool when users ask about spending patterns, cash flow analysis, or want to understand their monthly expenses and financial runway.",
+  description: "Legacy financial tool - disabled in Zeke research platform",
   inputSchema: getBurnRateSchema.omit({ showCanvas: true }),
   execute: async function* ({ from, to, currency }) {
+    yield {
+      text: "Financial burn rate analysis is not available in the research platform.",
+    };
+    return { error: "Tool disabled" };
+    /*
     try {
       const context = getContext();
 
@@ -127,5 +133,6 @@ export const getBurnRateTool = tool({
       console.error(error);
       throw error;
     }
+    */
   },
 });

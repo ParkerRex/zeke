@@ -2,15 +2,9 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
-
-import {
-	useMutation,
-	useQuery,
-	useSuspenseQuery,
-} from "@tanstack/react-query";
-import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@zeke/api/trpc/routers/_app";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
@@ -21,28 +15,28 @@ export type TeamDetail = RouterOutputs["team"]["get"];
 export type TeamInvite = RouterOutputs["team"]["invites"][number];
 
 export function useTeamsQuery() {
-	const trpc = useTRPC();
-	return useSuspenseQuery(trpc.team.list.queryOptions());
+  const trpc = useTRPC();
+  return useSuspenseQuery(trpc.team.list.queryOptions());
 }
 
 export function useCurrentTeam() {
-	const trpc = useTRPC();
-	return useQuery(trpc.team.current.queryOptions(), {
-		staleTime: 30_000,
-	});
+  const trpc = useTRPC();
+  return useQuery(trpc.team.current.queryOptions(), {
+    staleTime: 30_000,
+  });
 }
 
 export function useTeamById(teamId: string) {
-	const trpc = useTRPC();
-	return useSuspenseQuery(trpc.team.get.queryOptions({ teamId }));
+  const trpc = useTRPC();
+  return useSuspenseQuery(trpc.team.get.queryOptions({ teamId }));
 }
 
 export function useSetActiveTeam() {
-	const trpc = useTRPC();
-	return useMutation(trpc.team.setActive.mutationOptions());
+  const trpc = useTRPC();
+  return useMutation(trpc.team.setActive.mutationOptions());
 }
 
 export function useTeamInvites() {
-	const trpc = useTRPC();
-	return useQuery(trpc.team.invites.queryOptions());
+  const trpc = useTRPC();
+  return useQuery(trpc.team.invites.queryOptions());
 }

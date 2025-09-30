@@ -1,60 +1,60 @@
-import { legal } from '@zeke/cms'
-import { Feed } from '@zeke/cms/components/feed'
-import Link from 'next/link'
+import { legal } from "@zeke/cms";
+import { Feed } from "@zeke/cms/components/feed";
+import Link from "next/link";
 
 interface FooterLink {
-  title: string
-  href: string
+  title: string;
+  href: string;
 }
 
 interface FooterNavigationItem {
-  title: string
-  description: string
-  href?: string
-  items?: FooterLink[]
+  title: string;
+  description: string;
+  href?: string;
+  items?: FooterLink[];
 }
 
 const baseNavigation: FooterNavigationItem[] = [
   {
-    title: 'Home',
-    description: 'Discover the ZEKE research intelligence platform.',
-    href: '/',
+    title: "Home",
+    description: "Discover the ZEKE research intelligence platform.",
+    href: "/",
   },
   {
-    title: 'Pages',
-    description: 'Explore our updates, releases, and customer stories.',
+    title: "Pages",
+    description: "Explore our updates, releases, and customer stories.",
     items: [
       {
-        title: 'Blog',
-        href: '/blog',
+        title: "Blog",
+        href: "/blog",
       },
     ],
   },
-]
+];
 
 export function SiteFooter(): JSX.Element {
   return (
     <Feed queries={[legal.postsQuery]}>
       {async ([data]) => {
-        'use server'
+        "use server";
 
         const navigationItems: FooterNavigationItem[] = [
           ...baseNavigation,
           {
-            title: 'Legal',
-            description: 'Stay informed about our policies and commitments.',
+            title: "Legal",
+            description: "Stay informed about our policies and commitments.",
             items: data.legalPages.items.map((post) => ({
               title: post._title,
               href: `/legal/${post._slug}`,
             })),
           },
-        ]
+        ];
 
         if (env.NEXT_PUBLIC_DOCS_URL) {
           navigationItems.at(1)?.items?.push({
-            title: 'Docs',
+            title: "Docs",
             href: env.NEXT_PUBLIC_DOCS_URL,
-          })
+          });
         }
 
         return (
@@ -84,11 +84,13 @@ export function SiteFooter(): JSX.Element {
                               href={item.href}
                               className="flex items-center justify-between"
                               target={
-                                item.href.includes('http') ? '_blank' : undefined
+                                item.href.includes("http")
+                                  ? "_blank"
+                                  : undefined
                               }
                               rel={
-                                item.href.includes('http')
-                                  ? 'noopener noreferrer'
+                                item.href.includes("http")
+                                  ? "noopener noreferrer"
                                   : undefined
                               }
                             >
@@ -106,13 +108,13 @@ export function SiteFooter(): JSX.Element {
                               href={subItem.href}
                               className="flex items-center justify-between"
                               target={
-                                subItem.href.includes('http')
-                                  ? '_blank'
+                                subItem.href.includes("http")
+                                  ? "_blank"
                                   : undefined
                               }
                               rel={
-                                subItem.href.includes('http')
-                                  ? 'noopener noreferrer'
+                                subItem.href.includes("http")
+                                  ? "noopener noreferrer"
                                   : undefined
                               }
                             >
@@ -129,8 +131,8 @@ export function SiteFooter(): JSX.Element {
               </div>
             </div>
           </section>
-        )
+        );
       }}
     </Feed>
-  )
+  );
 }

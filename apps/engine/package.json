@@ -3,7 +3,7 @@
   "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "dev": "NODE_ENV=development wrangler dev src/index.ts --port 3002",
+    "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "clean": "rm -rf .turbo node_modules",
     "lint": "biome check .",

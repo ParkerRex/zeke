@@ -191,18 +191,12 @@ export const highlightSchema = z
       description: "Whether the highlight was AI generated",
       example: true,
     }),
-    metadata: z
-      .record(z.unknown())
-      .nullable()
-      .openapi({
-        description: "Additional AI metadata",
-      }),
-    originMetadata: z
-      .record(z.unknown())
-      .nullable()
-      .openapi({
-        description: "Metadata from the originating system",
-      }),
+    metadata: z.record(z.unknown()).nullable().openapi({
+      description: "Additional AI metadata",
+    }),
+    originMetadata: z.record(z.unknown()).nullable().openapi({
+      description: "Metadata from the originating system",
+    }),
     createdAt: z.string().nullable().openapi({
       description: "Creation timestamp",
       example: "2024-05-12T16:45:00Z",
@@ -211,33 +205,25 @@ export const highlightSchema = z
       description: "Last update timestamp",
       example: "2024-05-16T10:23:00Z",
     }),
-    tags: z
-      .array(z.string())
-      .openapi({
-        description: "Associated tag slugs",
-        example: ["novel-claim", "key-insight"],
-      }),
-    references: z
-      .array(highlightReferenceSchema)
-      .openapi({
-        description: "Transcript references backing the highlight",
-      }),
-    collaborators: z
-      .array(highlightCollaboratorSchema)
-      .openapi({
-        description: "Collaboration metadata for the highlight",
-      }),
+    tags: z.array(z.string()).openapi({
+      description: "Associated tag slugs",
+      example: ["novel-claim", "key-insight"],
+    }),
+    references: z.array(highlightReferenceSchema).openapi({
+      description: "Transcript references backing the highlight",
+    }),
+    collaborators: z.array(highlightCollaboratorSchema).openapi({
+      description: "Collaboration metadata for the highlight",
+    }),
     state: teamHighlightStateSchema.nullable(),
   })
   .openapi({
     description: "Full highlight payload including references and team state",
   });
 
-export const highlightListResponseSchema = z
-  .array(highlightSchema)
-  .openapi({
-    description: "Highlights returned for a story or query",
-  });
+export const highlightListResponseSchema = z.array(highlightSchema).openapi({
+  description: "Highlights returned for a story or query",
+});
 
 export const highlightEngagementSchema = z
   .object({
@@ -284,13 +270,10 @@ export const highlightsByStoryInputSchema = z
       description: "Story to fetch highlights for",
       example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
     }),
-    includeGlobal: z
-      .boolean()
-      .default(true)
-      .openapi({
-        description: "Include highlights shared globally",
-        example: true,
-      }),
+    includeGlobal: z.boolean().default(true).openapi({
+      description: "Include highlights shared globally",
+      example: true,
+    }),
   })
   .openapi({
     description: "Parameters for fetching highlights tied to a story",
@@ -315,5 +298,7 @@ export const highlightIdsInputSchema = z
 
 export type Highlight = z.infer<typeof highlightSchema>;
 export type HighlightEngagement = z.infer<typeof highlightEngagementSchema>;
-export type HighlightsByStoryInput = z.infer<typeof highlightsByStoryInputSchema>;
+export type HighlightsByStoryInput = z.infer<
+  typeof highlightsByStoryInputSchema
+>;
 export type HighlightIdsInput = z.infer<typeof highlightIdsInputSchema>;

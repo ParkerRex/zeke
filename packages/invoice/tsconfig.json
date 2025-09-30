@@ -1,12 +1,7 @@
 {
   "extends": "@zeke/tsconfig/base.json",
-  "include": [
-    "src",
-    "../../types"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["src", "../../types"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -14,12 +9,8 @@
     "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@api/*": [
-        "../../apps/api/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@api/*": ["../../apps/api/src/*"]
     }
   }
 }

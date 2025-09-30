@@ -2,6 +2,11 @@
   "name": "@zeke/db",
   "private": true,
   "scripts": {
+    "migrate": "./scripts/migrate.sh",
+    "migrate:dev": "./scripts/dev-migrate.sh",
+    "migrate:generate": "bunx drizzle-kit generate --config drizzle.config.ts",
+    "migrate:push": "bunx drizzle-kit push --config drizzle.config.ts",
+    "migrate:studio": "bunx drizzle-kit studio --config drizzle.config.ts",
     "test": "bun test",
     "test:matching": "bun test src/test/transaction-matching.test.ts",
     "test:performance": "bun test src/test/transaction-matching.performance.test.ts",

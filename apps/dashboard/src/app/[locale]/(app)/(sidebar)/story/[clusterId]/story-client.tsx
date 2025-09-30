@@ -1,7 +1,7 @@
-'use client';
-import { useEffect } from 'react';
+"use client";
+import { useEffect } from "react";
 
-import { useTabs } from '@/src/hooks/use-tabs';
+import { useTabs } from "@/hooks/use-tabs";
 
 export default function StoryClient({ id }: { id: string }) {
   const { restoreFromUrl, setActive } = useTabs();

@@ -48,7 +48,7 @@ alwaysApply: true
 ### Images
 
 - `next.config.mjs` sets `images.loader = "custom"` and `images.loaderFile = "./image-loader.ts"`.
-- `image-loader.ts` rewrites to `https://midday.ai/cdn-cgi/image/width={w},quality={q}/{src}`.
+- `image-loader.ts` rewrites to `https://zekehq.com/cdn-cgi/image/width={w},quality={q}/{src}`.
 - Prefer `next/image` for post images and marketing assets to benefit from the loader and responsive sizing.
 
 ### Server Actions

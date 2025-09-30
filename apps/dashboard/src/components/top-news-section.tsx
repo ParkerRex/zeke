@@ -1,5 +1,8 @@
-import { fetchStoriesForDashboard, type StoryClusterView } from "@/utils/stories";
-import { domainFromUrl } from "@/src/utils/url";
+import {
+  type StoryClusterView,
+  fetchStoriesForDashboard,
+} from "@/utils/stories";
+import { domainFromUrl } from "@/utils/url";
 import Image from "next/image";
 import Link from "next/link";
 import { IoCalendarClear } from "react-icons/io5";
@@ -83,8 +86,7 @@ export default async function TopNewsSection({
   showDate = true,
   stories,
 }: Props) {
-  const items =
-    stories ?? (await fetchStoriesForDashboard({ limit })).stories;
+  const items = stories ?? (await fetchStoriesForDashboard({ limit })).stories;
   const grid = items.slice(0, limit);
   return (
     <section>

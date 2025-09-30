@@ -32,24 +32,17 @@ export const storyOverlaySchema = z
       description: "AI-generated executive summary for the story",
       example: "Highlights the strategic impact of GPT-5 training leaks.",
     }),
-    chili: z
-      .number()
-      .int()
-      .min(0)
-      .max(5)
-      .openapi({
-        description: "Normalized alert level for the story (0-5)",
-        example: 4,
-      }),
+    chili: z.number().int().min(0).max(5).openapi({
+      description: "Normalized alert level for the story (0-5)",
+      example: 4,
+    }),
     confidence: z.number().nullable().openapi({
       description: "Model confidence score for the overlay",
       example: 0.82,
     }),
-    sources: z
-      .array(storySourceSchema)
-      .openapi({
-        description: "Supporting citations used to generate the overlay",
-      }),
+    sources: z.array(storySourceSchema).openapi({
+      description: "Supporting citations used to generate the overlay",
+    }),
   })
   .openapi({
     description: "Summarized overlay metadata for a story",
@@ -121,11 +114,9 @@ export const storyClusterSummarySchema = z
 
 export const storyClusterSchema = storyClusterSummarySchema
   .extend({
-    stories: z
-      .array(storyListItemSchema)
-      .openapi({
-        description: "All stories associated with the cluster",
-      }),
+    stories: z.array(storyListItemSchema).openapi({
+      description: "All stories associated with the cluster",
+    }),
   })
   .openapi({
     description: "Story cluster with nested story views",
@@ -200,25 +191,14 @@ export const storyDetailSchema = z
 
 export const listStoriesInputSchema = z
   .object({
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(50)
-      .default(20)
-      .openapi({
-        description: "Max number of stories to fetch",
-        example: 20,
-      }),
-    offset: z
-      .number()
-      .int()
-      .min(0)
-      .default(0)
-      .openapi({
-        description: "Offset for pagination",
-        example: 40,
-      }),
+    limit: z.number().int().min(1).max(50).default(20).openapi({
+      description: "Max number of stories to fetch",
+      example: 20,
+    }),
+    offset: z.number().int().min(0).default(0).openapi({
+      description: "Offset for pagination",
+      example: 40,
+    }),
     kind: z
       .enum(["all", "article", "video", "podcast", "pdf", "tweet"], {
         description: "Filter stories by underlying content kind",
@@ -227,16 +207,10 @@ export const listStoriesInputSchema = z
       .openapi({
         example: "article",
       }),
-    search: z
-      .string()
-      .trim()
-      .min(1)
-      .max(120)
-      .optional()
-      .openapi({
-        description: "Full-text search term",
-        example: "GPT-5",
-      }),
+    search: z.string().trim().min(1).max(120).optional().openapi({
+      description: "Full-text search term",
+      example: "GPT-5",
+    }),
     storyIds: z
       .array(z.string().uuid())
       .nonempty()

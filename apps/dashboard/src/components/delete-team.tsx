@@ -28,8 +28,6 @@ export function DeleteTeam() {
   const [value, setValue] = useState("");
   const { data: user } = useUserQuery();
 
-  const [value, setValue] = useState("");
-
   return (
     <Card className="border-destructive">
       <CardHeader>
@@ -74,9 +72,7 @@ export function DeleteTeam() {
 
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction disabled>
-                Coming Soon
-              </AlertDialogAction>
+              <AlertDialogAction disabled>Coming Soon</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

@@ -1,11 +1,11 @@
-'use client';
-import type { StoryClusterView } from '@/utils/stories';
-import type { Tab } from '@/src/hooks/use-tabs';
-import { useEffect, useMemo, useState } from 'react';
-import StoryRow from './story-row';
+"use client";
+import type { Tab } from "@/src/hooks/use-tabs";
+import type { StoryClusterView } from "@/utils/stories";
+import { useEffect, useMemo, useState } from "react";
+import StoryRow from "./story-row";
 
 export default function IndustryTab({ tab }: { tab: Tab }) {
-  const industry = (tab.context?.industry as string | undefined) ?? 'All';
+  const industry = (tab.context?.industry as string | undefined) ?? "All";
   const sub = tab.context?.subindustry as string | undefined;
 
   const [clusters, setClusters] = useState<StoryClusterView[]>([]);
@@ -13,31 +13,31 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
     const ac = new AbortController();
     (async () => {
       try {
-        const res = await fetch('/api/stories', { signal: ac.signal });
+        const res = await fetch("/api/stories", { signal: ac.signal });
         const json = await res.json();
         if (!ac.signal.aborted) {
           setClusters(json.stories ?? []);
         }
       } catch (e: unknown) {
-        const { isAbortError } = await import('@/src/utils/errors');
+        const { isAbortError } = await import("@/src/utils/errors");
         if (isAbortError(e)) {
           return;
         }
         // Placeholder for error reporting (e.g., Sentry). Avoid console per lint rules.
       }
     })();
-    return () => ac.abort('IndustryTab unmounted');
+    return () => ac.abort("IndustryTab unmounted");
   }, []);
 
   const filtered = useMemo(
     () => filterByIndustry(clusters, industry, sub),
-    [clusters, industry, sub]
+    [clusters, industry, sub],
   );
 
   return (
     <div className="h-full overflow-auto">
       <div className="border-b bg-background/50 p-3 font-medium text-sm">
-        Sector {industry ? `› ${industry}` : ''} {sub ? `› ${sub}` : ''}
+        Sector {industry ? `› ${industry}` : ""} {sub ? `› ${sub}` : ""}
       </div>
       <div className="space-y-2 p-4">
         {filtered.length ? (
@@ -55,26 +55,26 @@ export default function IndustryTab({ tab }: { tab: Tab }) {
 function filterByIndustry(
   list: StoryClusterView[],
   industry?: string,
-  sub?: string
+  sub?: string,
 ) {
-  if (!industry || industry === 'All') {
+  if (!industry || industry === "All") {
     return list;
   }
-  const t = `${industry} ${sub ?? ''}`.toLowerCase();
+  const t = `${industry} ${sub ?? ""}`.toLowerCase();
   // very light stub: filter by simple keywords in title/url
   const KEYWORDS: Record<string, string[]> = {
-    marketing: ['marketing', 'brand', 'growth', 'seo', 'ads'],
-    design: ['design', 'ux', 'ui', 'figma'],
-    creative: ['video', 'youtube', 'podcast', 'creator'],
-    'software development': [
-      'github',
-      'framework',
-      'react',
-      'open source',
-      'dev',
+    marketing: ["marketing", "brand", "growth", "seo", "ads"],
+    design: ["design", "ux", "ui", "figma"],
+    creative: ["video", "youtube", "podcast", "creator"],
+    "software development": [
+      "github",
+      "framework",
+      "react",
+      "open source",
+      "dev",
     ],
-    'ai/ml tools': ['agent', 'llm', 'vector', 'embedding', 'benchmark'],
-    research: ['arxiv', 'paper', 'study'],
+    "ai/ml tools": ["agent", "llm", "vector", "embedding", "benchmark"],
+    research: ["arxiv", "paper", "study"],
   };
   const keys = Object.entries(KEYWORDS).find(([k]) => t.includes(k))?.[1] ?? [];
   if (!keys.length) {
@@ -84,7 +84,7 @@ function filterByIndustry(
     keys.some(
       (k) =>
         c.title.toLowerCase().includes(k) ||
-        c.primaryUrl.toLowerCase().includes(k)
-    )
+        c.primaryUrl.toLowerCase().includes(k),
+    ),
   );
 }

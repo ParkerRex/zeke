@@ -1,4 +1,3 @@
-import { getSubscriberPreferences } from "@zeke/notification";
 import { getUser } from "@zeke/supabase/cached-queries";
 import { Skeleton } from "@zeke/ui/skeleton";
 import { NotificationSetting } from "./notification-setting";
@@ -11,46 +10,52 @@ export function NotificationSettingsSkeleton() {
 
 export async function NotificationSettings() {
   const { data: userData } = await getUser();
-  const { data: subscriberPreferences } = await getSubscriberPreferences({
-    subscriberId: userData.id,
-    teamId: userData.team_id,
-  });
+  const subscriberPreferences = [
+    {
+      id: "insights-digest",
+      name: "Insights Digest",
+      preference: {
+        channels: {
+          in_app: true,
+          email: false,
+        },
+      },
+    },
+    {
+      id: "weekly-roundup",
+      name: "Weekly Roundup",
+      preference: {
+        channels: {
+          in_app: true,
+          email: true,
+        },
+      },
+    },
+  ];
 
-  const inAppSettings = subscriberPreferences
-    ?.filter((setting) =>
-      Object.keys(setting.preference.channels).includes("in_app"),
-    )
-    .map((setting) => {
-      return (
-        <NotificationSetting
-          key={setting.template._id}
-          id={setting.template._id}
-          name={setting.template.name}
-          enabled={setting.preference.channels?.in_app}
-          subscriberId={userData.id}
-          teamId={userData.team_id}
-          type="in_app"
-        />
-      );
-    });
+  const inAppSettings = subscriberPreferences.map((setting) => (
+    <NotificationSetting
+      key={setting.id}
+      id={setting.id}
+      name={setting.name}
+      enabled={setting.preference.channels.in_app}
+      subscriberId={userData.id}
+      teamId={userData.team_id}
+      type="in_app"
+    />
+  ));
 
-  const emailSettings = subscriberPreferences
-    ?.filter((setting) =>
-      Object.keys(setting.preference.channels).includes("email"),
-    )
-    .map((setting) => {
-      return (
-        <NotificationSetting
-          key={setting.template._id}
-          id={setting.template._id}
-          name={setting.template.name}
-          enabled={setting.preference.channels?.email}
-          subscriberId={userData.id}
-          teamId={userData.team_id}
-          type="email"
-        />
-      );
-    });
+  const emailSettings = subscriberPreferences.map((setting) => (
+    <NotificationSetting
+      key={`${setting.id}-email`}
+      id={setting.id}
+      name={setting.name}
+      enabled={setting.preference.channels.email}
+      subscriberId={userData.id}
+      teamId={userData.team_id}
+      type="email"
+    />
+  ));
 
   return (
     <div className="flex space-y-4 flex-col">

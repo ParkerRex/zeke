@@ -2,22 +2,22 @@ import { timingSafeEqual } from "node:crypto";
 import { hash } from "@zeke/encryption";
 
 export type OAuthApplication = {
-	id: string;
-	active: boolean | null;
-	clientSecret: string;
+  id: string;
+  active: boolean | null;
+  clientSecret: string;
 };
 
 export function validateClientCredentials(
-	application: OAuthApplication | null | undefined,
-	clientSecret: string,
+  application: OAuthApplication | null | undefined,
+  clientSecret: string,
 ): boolean {
-	if (!application || !application.active) {
-		return false;
-	}
+  if (!application || !application.active) {
+    return false;
+  }
 
-	const hashedSecret = hash(clientSecret);
-	const storedSecret = application.clientSecret;
+  const hashedSecret = hash(clientSecret);
+  const storedSecret = application.clientSecret;
 
-	// Use timing-safe comparison to prevent timing attacks
-	return timingSafeEqual(Buffer.from(storedSecret), Buffer.from(hashedSecret));
+  // Use timing-safe comparison to prevent timing attacks
+  return timingSafeEqual(Buffer.from(storedSecret), Buffer.from(hashedSecret));
 }

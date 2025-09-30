@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { format } from 'date-fns';
+import type { ReactNode } from "react";
+import { format } from "date-fns";
 
 interface SidebarProps {
   readonly toc?: ReactNode;
@@ -15,7 +15,7 @@ export function Sidebar({ toc, readingTime, date }: SidebarProps) {
           <div>
             <p className="text-foreground font-medium">Published</p>
             <time dateTime={date.toISOString()}>
-              {format(date, 'MMMM d, yyyy')}
+              {format(date, "MMMM d, yyyy")}
             </time>
           </div>
         ) : null}

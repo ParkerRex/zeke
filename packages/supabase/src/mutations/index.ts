@@ -1,23 +1,22 @@
-import type Stripe from 'stripe';
-import type { Database } from '../types/db';
+import type Stripe from "stripe";
+import type { Database } from "../types/db";
 import type { Client } from "../types";
-type Product = Database['public']['Tables']['products']['Row'];
-type SourceRow = Database['public']['Tables']['sources']['Row'];
+type Product = Database["public"]["Tables"]["products"]["Row"];
+type SourceRow = Database["public"]["Tables"]["sources"]["Row"];
 
 export type CreateSourceParams = Pick<
   SourceRow,
-  'kind' | 'name' | 'url' | 'domain' | 'metadata' | 'active'
+  "kind" | "name" | "url" | "domain" | "metadata" | "active"
 >;
 
 export type UpdateSourceParams = {
-  id: SourceRow['id'];
+  id: SourceRow["id"];
 } & Partial<
-  Pick<SourceRow, 'kind' | 'name' | 'url' | 'domain' | 'metadata' | 'active'>
+  Pick<SourceRow, "kind" | "name" | "url" | "domain" | "metadata" | "active">
 >;
 
-const normalizeOptionalField = <T>(
-  value: T | null | undefined,
-): T | null => (value === undefined ? null : value);
+const normalizeOptionalField = <T>(value: T | null | undefined): T | null =>
+  value === undefined ? null : value;
 
 export async function createSource(
   supabase: Client,
@@ -33,9 +32,9 @@ export async function createSource(
   };
 
   const { data } = await supabase
-    .from('sources')
+    .from("sources")
     .insert([insertData])
-    .select('id')
+    .select("id")
     .maybeSingle()
     .throwOnError();
 
@@ -71,10 +70,10 @@ export async function updateSource(
   }
 
   const { data } = await supabase
-    .from('sources')
+    .from("sources")
     .update(updateData)
-    .eq('id', id)
-    .select('id')
+    .eq("id", id)
+    .select("id")
     .maybeSingle()
     .throwOnError();
 
@@ -98,7 +97,6 @@ export async function updateUser(supabase: Client, data: any) {
     .single();
 }
 
-
 export async function deleteUser(supabase: Client) {
   const {
     data: { session },
@@ -117,20 +115,19 @@ export async function deleteUser(supabase: Client) {
   return session.user.id;
 }
 
-
 export async function softDeleteProduct(productId: string): Promise<void> {
   const { error: pricesError } = await supabaseAdminClient
-    .from('prices')
+    .from("prices")
     .update({ active: false })
-    .eq('product_id', productId);
+    .eq("product_id", productId);
   if (pricesError) {
     throw pricesError;
   }
 
   const { error: productError } = await supabaseAdminClient
-    .from('products')
+    .from("products")
     .update({ active: false })
-    .eq('id', productId);
+    .eq("id", productId);
   if (productError) {
     throw productError;
   }
@@ -138,12 +135,12 @@ export async function softDeleteProduct(productId: string): Promise<void> {
   // Product soft-deactivated: ${productId}
 }
 
-type Price = Database['public']['Tables']['prices']['Row'];
+type Price = Database["public"]["Tables"]["prices"]["Row"];
 
 export async function upsertPrice(price: Stripe.Price): Promise<void> {
   const priceData: Price = {
     id: price.id,
-    product_id: typeof price.product === 'string' ? price.product : null,
+    product_id: typeof price.product === "string" ? price.product : null,
     active: price.active,
     currency: price.currency,
     description: price.nickname ?? null,
@@ -156,7 +153,7 @@ export async function upsertPrice(price: Stripe.Price): Promise<void> {
   };
 
   const { error } = await supabaseAdminClient
-    .from('prices')
+    .from("prices")
     .upsert([priceData]);
   if (error) {
     throw error;
@@ -174,7 +171,7 @@ export async function upsertProduct(product: Stripe.Product): Promise<void> {
   };
 
   const { error } = await supabaseAdminClient
-    .from('products')
+    .from("products")
     .upsert([productData]);
   if (error) {
     throw error;

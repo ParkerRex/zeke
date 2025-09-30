@@ -138,12 +138,8 @@
           "name": "activities_team_id_teams_id_fk",
           "tableFrom": "activities",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -151,12 +147,8 @@
           "name": "activities_actor_id_users_id_fk",
           "tableFrom": "activities",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -164,12 +156,8 @@
           "name": "activities_story_id_stories_id_fk",
           "tableFrom": "activities",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -177,12 +165,8 @@
           "name": "activities_highlight_id_highlights_id_fk",
           "tableFrom": "activities",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -190,12 +174,8 @@
           "name": "activities_playbook_id_playbooks_id_fk",
           "tableFrom": "activities",
           "tableTo": "playbooks",
-          "columnsFrom": [
-            "playbook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playbook_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -203,12 +183,8 @@
           "name": "activities_thread_id_assistant_threads_id_fk",
           "tableFrom": "activities",
           "tableTo": "assistant_threads",
-          "columnsFrom": [
-            "thread_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["thread_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -216,12 +192,8 @@
           "name": "activities_goal_id_team_goals_id_fk",
           "tableFrom": "activities",
           "tableTo": "team_goals",
-          "columnsFrom": [
-            "goal_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["goal_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -319,12 +291,8 @@
           "name": "assistant_messages_thread_id_assistant_threads_id_fk",
           "tableFrom": "assistant_messages",
           "tableTo": "assistant_threads",
-          "columnsFrom": [
-            "thread_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["thread_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -332,12 +300,8 @@
           "name": "assistant_messages_sender_id_users_id_fk",
           "tableFrom": "assistant_messages",
           "tableTo": "users",
-          "columnsFrom": [
-            "sender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sender_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -420,12 +384,8 @@
           "name": "assistant_thread_sources_thread_id_assistant_threads_id_fk",
           "tableFrom": "assistant_thread_sources",
           "tableTo": "assistant_threads",
-          "columnsFrom": [
-            "thread_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["thread_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -433,12 +393,8 @@
           "name": "assistant_thread_sources_highlight_id_highlights_id_fk",
           "tableFrom": "assistant_thread_sources",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -446,12 +402,8 @@
           "name": "assistant_thread_sources_turn_id_story_turns_id_fk",
           "tableFrom": "assistant_thread_sources",
           "tableTo": "story_turns",
-          "columnsFrom": [
-            "turn_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["turn_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -459,12 +411,8 @@
           "name": "assistant_thread_sources_added_by_users_id_fk",
           "tableFrom": "assistant_thread_sources",
           "tableTo": "users",
-          "columnsFrom": [
-            "added_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["added_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -590,12 +538,8 @@
           "name": "assistant_threads_team_id_teams_id_fk",
           "tableFrom": "assistant_threads",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -603,12 +547,8 @@
           "name": "assistant_threads_story_id_stories_id_fk",
           "tableFrom": "assistant_threads",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -616,12 +556,8 @@
           "name": "assistant_threads_playbook_id_playbooks_id_fk",
           "tableFrom": "assistant_threads",
           "tableTo": "playbooks",
-          "columnsFrom": [
-            "playbook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playbook_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -629,12 +565,8 @@
           "name": "assistant_threads_goal_id_team_goals_id_fk",
           "tableFrom": "assistant_threads",
           "tableTo": "team_goals",
-          "columnsFrom": [
-            "goal_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["goal_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -642,12 +574,8 @@
           "name": "assistant_threads_created_by_users_id_fk",
           "tableFrom": "assistant_threads",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -894,12 +822,8 @@
           "name": "contents_raw_item_id_raw_items_id_fk",
           "tableFrom": "contents",
           "tableTo": "raw_items",
-          "columnsFrom": [
-            "raw_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["raw_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -933,12 +857,8 @@
           "name": "customer_tag_assignments_customer_id_customers_id_fk",
           "tableFrom": "customer_tag_assignments",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -946,12 +866,8 @@
           "name": "customer_tag_assignments_tag_id_customer_tags_id_fk",
           "tableFrom": "customer_tag_assignments",
           "tableTo": "customer_tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tag_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -959,10 +875,7 @@
       "compositePrimaryKeys": {
         "customer_tag_assignments_customer_id_tag_id_pk": {
           "name": "customer_tag_assignments_customer_id_tag_id_pk",
-          "columns": [
-            "customer_id",
-            "tag_id"
-          ]
+          "columns": ["customer_id", "tag_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1028,12 +941,8 @@
           "name": "customer_tags_team_id_teams_id_fk",
           "tableFrom": "customer_tags",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1144,12 +1053,8 @@
           "name": "customers_team_id_teams_id_fk",
           "tableFrom": "customers",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1157,12 +1062,8 @@
           "name": "customers_owner_id_users_id_fk",
           "tableFrom": "customers",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1240,12 +1141,8 @@
           "name": "highlight_references_highlight_id_highlights_id_fk",
           "tableFrom": "highlight_references",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1253,12 +1150,8 @@
           "name": "highlight_references_turn_id_story_turns_id_fk",
           "tableFrom": "highlight_references",
           "tableTo": "story_turns",
-          "columnsFrom": [
-            "turn_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["turn_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1330,12 +1223,8 @@
           "name": "highlight_tags_highlight_id_highlights_id_fk",
           "tableFrom": "highlight_tags",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1505,12 +1394,8 @@
           "name": "highlights_story_id_stories_id_fk",
           "tableFrom": "highlights",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1518,12 +1403,8 @@
           "name": "highlights_team_id_teams_id_fk",
           "tableFrom": "highlights",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1531,12 +1412,8 @@
           "name": "highlights_created_by_users_id_fk",
           "tableFrom": "highlights",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1544,12 +1421,8 @@
           "name": "highlights_chapter_id_story_chapters_id_fk",
           "tableFrom": "highlights",
           "tableTo": "story_chapters",
-          "columnsFrom": [
-            "chapter_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chapter_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1596,10 +1469,7 @@
       "compositePrimaryKeys": {
         "job_metrics_name_state_pk": {
           "name": "job_metrics_name_state_pk",
-          "columns": [
-            "name",
-            "state"
-          ]
+          "columns": ["name", "state"]
         }
       },
       "uniqueConstraints": {},
@@ -1665,12 +1535,8 @@
           "name": "message_source_links_message_id_assistant_messages_id_fk",
           "tableFrom": "message_source_links",
           "tableTo": "assistant_messages",
-          "columnsFrom": [
-            "message_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["message_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1678,12 +1544,8 @@
           "name": "message_source_links_highlight_id_highlights_id_fk",
           "tableFrom": "message_source_links",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1691,12 +1553,8 @@
           "name": "message_source_links_turn_id_story_turns_id_fk",
           "tableFrom": "message_source_links",
           "tableTo": "story_turns",
-          "columnsFrom": [
-            "turn_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["turn_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1822,12 +1680,8 @@
           "name": "playbook_outputs_playbook_id_playbooks_id_fk",
           "tableFrom": "playbook_outputs",
           "tableTo": "playbooks",
-          "columnsFrom": [
-            "playbook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playbook_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1890,12 +1744,8 @@
           "name": "playbook_step_highlights_playbook_step_id_playbook_steps_id_fk",
           "tableFrom": "playbook_step_highlights",
           "tableTo": "playbook_steps",
-          "columnsFrom": [
-            "playbook_step_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playbook_step_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1903,12 +1753,8 @@
           "name": "playbook_step_highlights_highlight_id_highlights_id_fk",
           "tableFrom": "playbook_step_highlights",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2013,12 +1859,8 @@
           "name": "playbook_steps_playbook_id_playbooks_id_fk",
           "tableFrom": "playbook_steps",
           "tableTo": "playbooks",
-          "columnsFrom": [
-            "playbook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playbook_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2026,12 +1868,8 @@
           "name": "playbook_steps_template_step_id_playbook_template_steps_id_fk",
           "tableFrom": "playbook_steps",
           "tableTo": "playbook_template_steps",
-          "columnsFrom": [
-            "template_step_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["template_step_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2039,12 +1877,8 @@
           "name": "playbook_steps_assigned_to_users_id_fk",
           "tableFrom": "playbook_steps",
           "tableTo": "users",
-          "columnsFrom": [
-            "assigned_to"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assigned_to"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2135,12 +1969,8 @@
           "name": "playbook_template_steps_template_id_playbook_templates_id_fk",
           "tableFrom": "playbook_template_steps",
           "tableTo": "playbook_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["template_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2242,12 +2072,8 @@
           "name": "playbook_templates_created_by_users_id_fk",
           "tableFrom": "playbook_templates",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2394,12 +2220,8 @@
           "name": "playbooks_team_id_teams_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2407,12 +2229,8 @@
           "name": "playbooks_story_id_stories_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2420,12 +2238,8 @@
           "name": "playbooks_template_id_playbook_templates_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "playbook_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["template_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2433,12 +2247,8 @@
           "name": "playbooks_customer_id_customers_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2446,12 +2256,8 @@
           "name": "playbooks_goal_id_team_goals_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "team_goals",
-          "columnsFrom": [
-            "goal_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["goal_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2459,12 +2265,8 @@
           "name": "playbooks_created_by_users_id_fk",
           "tableFrom": "playbooks",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2574,12 +2376,8 @@
           "name": "prices_product_id_products_id_fk",
           "tableFrom": "prices",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2769,12 +2567,8 @@
           "name": "raw_items_source_id_sources_id_fk",
           "tableFrom": "raw_items",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2856,12 +2650,8 @@
           "name": "source_connections_team_id_teams_id_fk",
           "tableFrom": "source_connections",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2869,12 +2659,8 @@
           "name": "source_connections_source_id_sources_id_fk",
           "tableFrom": "source_connections",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2934,12 +2720,8 @@
           "name": "source_health_source_id_sources_id_fk",
           "tableFrom": "source_health",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3195,12 +2977,8 @@
           "name": "stories_content_id_contents_id_fk",
           "tableFrom": "stories",
           "tableTo": "contents",
-          "columnsFrom": [
-            "content_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3208,12 +2986,8 @@
           "name": "stories_cluster_id_story_clusters_id_fk",
           "tableFrom": "stories",
           "tableTo": "story_clusters",
-          "columnsFrom": [
-            "cluster_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["cluster_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -3221,12 +2995,8 @@
           "name": "stories_primary_source_id_sources_id_fk",
           "tableFrom": "stories",
           "tableTo": "sources",
-          "columnsFrom": [
-            "primary_source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["primary_source_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3310,12 +3080,8 @@
           "name": "story_assets_story_id_stories_id_fk",
           "tableFrom": "story_assets",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3363,12 +3129,8 @@
           "name": "story_authors_story_id_stories_id_fk",
           "tableFrom": "story_authors",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3376,12 +3138,8 @@
           "name": "story_authors_author_id_authors_id_fk",
           "tableFrom": "story_authors",
           "tableTo": "authors",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3389,10 +3147,7 @@
       "compositePrimaryKeys": {
         "story_authors_story_id_author_id_pk": {
           "name": "story_authors_story_id_author_id_pk",
-          "columns": [
-            "story_id",
-            "author_id"
-          ]
+          "columns": ["story_id", "author_id"]
         }
       },
       "uniqueConstraints": {},
@@ -3477,12 +3232,8 @@
           "name": "story_category_links_story_id_stories_id_fk",
           "tableFrom": "story_category_links",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3490,12 +3241,8 @@
           "name": "story_category_links_category_id_story_categories_id_fk",
           "tableFrom": "story_category_links",
           "tableTo": "story_categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3503,10 +3250,7 @@
       "compositePrimaryKeys": {
         "story_category_links_story_id_category_id_pk": {
           "name": "story_category_links_story_id_category_id_pk",
-          "columns": [
-            "story_id",
-            "category_id"
-          ]
+          "columns": ["story_id", "category_id"]
         }
       },
       "uniqueConstraints": {},
@@ -3600,12 +3344,8 @@
           "name": "story_chapters_story_id_stories_id_fk",
           "tableFrom": "story_chapters",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3741,12 +3481,8 @@
           "name": "story_embeddings_story_id_stories_id_fk",
           "tableFrom": "story_embeddings",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3842,12 +3578,8 @@
           "name": "story_notes_story_id_stories_id_fk",
           "tableFrom": "story_notes",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3855,12 +3587,8 @@
           "name": "story_notes_team_id_teams_id_fk",
           "tableFrom": "story_notes",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3868,12 +3596,8 @@
           "name": "story_notes_user_id_users_id_fk",
           "tableFrom": "story_notes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3932,12 +3656,8 @@
           "name": "story_overlays_story_id_stories_id_fk",
           "tableFrom": "story_overlays",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4000,12 +3720,8 @@
           "name": "story_tag_embeddings_tag_id_story_tags_id_fk",
           "tableFrom": "story_tag_embeddings",
           "tableTo": "story_tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tag_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4090,12 +3806,8 @@
           "name": "story_tags_story_id_stories_id_fk",
           "tableFrom": "story_tags",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4103,12 +3815,8 @@
           "name": "story_tags_created_by_users_id_fk",
           "tableFrom": "story_tags",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -4226,12 +3934,8 @@
           "name": "story_turns_story_id_stories_id_fk",
           "tableFrom": "story_turns",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4239,12 +3943,8 @@
           "name": "story_turns_chapter_id_story_chapters_id_fk",
           "tableFrom": "story_turns",
           "tableTo": "story_chapters",
-          "columnsFrom": [
-            "chapter_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chapter_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -4388,12 +4088,8 @@
           "name": "subscriptions_team_id_teams_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4401,12 +4097,8 @@
           "name": "subscriptions_price_id_prices_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "prices",
-          "columnsFrom": [
-            "price_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["price_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4529,12 +4221,8 @@
           "name": "team_goals_team_id_teams_id_fk",
           "tableFrom": "team_goals",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4542,12 +4230,8 @@
           "name": "team_goals_customer_id_customers_id_fk",
           "tableFrom": "team_goals",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -4555,12 +4239,8 @@
           "name": "team_goals_created_by_users_id_fk",
           "tableFrom": "team_goals",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4643,12 +4323,8 @@
           "name": "team_highlight_states_team_id_teams_id_fk",
           "tableFrom": "team_highlight_states",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4656,12 +4332,8 @@
           "name": "team_highlight_states_highlight_id_highlights_id_fk",
           "tableFrom": "team_highlight_states",
           "tableTo": "highlights",
-          "columnsFrom": [
-            "highlight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["highlight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4669,12 +4341,8 @@
           "name": "team_highlight_states_pinned_by_users_id_fk",
           "tableFrom": "team_highlight_states",
           "tableTo": "users",
-          "columnsFrom": [
-            "pinned_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pinned_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -4787,12 +4455,8 @@
           "name": "team_invites_team_id_teams_id_fk",
           "tableFrom": "team_invites",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4800,12 +4464,8 @@
           "name": "team_invites_invited_by_users_id_fk",
           "tableFrom": "team_invites",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -4905,12 +4565,8 @@
           "name": "team_members_team_id_teams_id_fk",
           "tableFrom": "team_members",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4918,12 +4574,8 @@
           "name": "team_members_user_id_users_id_fk",
           "tableFrom": "team_members",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5027,12 +4679,8 @@
           "name": "team_story_states_team_id_teams_id_fk",
           "tableFrom": "team_story_states",
           "tableTo": "teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -5040,12 +4688,8 @@
           "name": "team_story_states_story_id_stories_id_fk",
           "tableFrom": "team_story_states",
           "tableTo": "stories",
-          "columnsFrom": [
-            "story_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["story_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5172,12 +4816,8 @@
           "name": "teams_owner_id_users_id_fk",
           "tableFrom": "teams",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5238,12 +4878,8 @@
           "name": "user_profiles_user_id_users_id_fk",
           "tableFrom": "user_profiles",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5359,108 +4995,57 @@
     "public.activity_visibility": {
       "name": "activity_visibility",
       "schema": "public",
-      "values": [
-        "team",
-        "personal",
-        "system"
-      ]
+      "values": ["team", "personal", "system"]
     },
     "public.health_status": {
       "name": "health_status",
       "schema": "public",
-      "values": [
-        "ok",
-        "warn",
-        "error"
-      ]
+      "values": ["ok", "warn", "error"]
     },
     "public.highlight_kind": {
       "name": "highlight_kind",
       "schema": "public",
-      "values": [
-        "insight",
-        "quote",
-        "action",
-        "question"
-      ]
+      "values": ["insight", "quote", "action", "question"]
     },
     "public.invite_status": {
       "name": "invite_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "accepted",
-        "expired",
-        "revoked"
-      ]
+      "values": ["pending", "accepted", "expired", "revoked"]
     },
     "public.message_role": {
       "name": "message_role",
       "schema": "public",
-      "values": [
-        "user",
-        "assistant",
-        "system"
-      ]
+      "values": ["user", "assistant", "system"]
     },
     "public.plan_code": {
       "name": "plan_code",
       "schema": "public",
-      "values": [
-        "trial",
-        "starter",
-        "pro",
-        "enterprise"
-      ]
+      "values": ["trial", "starter", "pro", "enterprise"]
     },
     "public.playbook_status": {
       "name": "playbook_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "active",
-        "published",
-        "archived"
-      ]
+      "values": ["draft", "active", "published", "archived"]
     },
     "public.pricing_plan_interval": {
       "name": "pricing_plan_interval",
       "schema": "public",
-      "values": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
+      "values": ["day", "week", "month", "year"]
     },
     "public.pricing_type": {
       "name": "pricing_type",
       "schema": "public",
-      "values": [
-        "one_time",
-        "recurring"
-      ]
+      "values": ["one_time", "recurring"]
     },
     "public.step_status": {
       "name": "step_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "in_progress",
-        "completed",
-        "skipped"
-      ]
+      "values": ["pending", "in_progress", "completed", "skipped"]
     },
     "public.story_kind": {
       "name": "story_kind",
       "schema": "public",
-      "values": [
-        "article",
-        "video",
-        "podcast",
-        "pdf",
-        "tweet"
-      ]
+      "values": ["article", "video", "podcast", "pdf", "tweet"]
     },
     "public.subscription_status": {
       "name": "subscription_status",
@@ -5479,21 +5064,12 @@
     "public.team_role": {
       "name": "team_role",
       "schema": "public",
-      "values": [
-        "owner",
-        "admin",
-        "member",
-        "viewer"
-      ]
+      "values": ["owner", "admin", "member", "viewer"]
     },
     "public.thread_status": {
       "name": "thread_status",
       "schema": "public",
-      "values": [
-        "active",
-        "resolved",
-        "archived"
-      ]
+      "values": ["active", "resolved", "archived"]
     }
   },
   "schemas": {},

@@ -1,4 +1,4 @@
-import StoryClient from '../../story/[clusterId]/story-client';
+import StoryClient from "../../story/[clusterId]/story-client";
 
 export default function StoriesClusterRoute({
   params,

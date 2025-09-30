@@ -1,7 +1,6 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-
 export function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-[300px] border border-border">

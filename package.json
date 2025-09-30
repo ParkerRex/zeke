@@ -1,7 +1,7 @@
 {
   "name": "zeke",
   "private": true,
-  "workspaces": ["packages/*", "apps/*", "packages/email/*"],
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
@@ -16,6 +16,9 @@
     "dev:website": "turbo dev --filter=@zeke/website ",
     "dev:desktop": "turbo dev --filter=@zeke/desktop",
     "jobs:dashboard": "turbo jobs --filter=@zeke/jobs",
+    "db:migrate": "cd packages/db && bun run migrate:dev",
+    "db:migrate:prod": "cd packages/db && bun run migrate",
+    "db:studio": "cd packages/db && bun run migrate:studio",
     "format": "biome format --write .",
     "lint": "turbo lint && manypkg check",
     "typecheck": "turbo typecheck"

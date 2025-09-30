@@ -1,10 +1,9 @@
 "use client";
 
+import { type UnifiedApp, apps as appStoreApps } from "@/data/app-store";
 import { useUserQuery } from "@/hooks/use-user";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { apps as appStoreApps } from "@zeke/app-store";
-import type { UnifiedApp } from "@zeke/app-store/types";
 import { Button } from "@zeke/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { UnifiedAppComponent } from "./unified-app";
@@ -39,8 +38,8 @@ export function Apps() {
     active: app.active,
     logo: app.logo,
     short_description: app.short_description,
-    description: app.description || undefined,
-    images: app.images || [],
+    description: app.description ?? undefined,
+    images: app.images ?? undefined,
     installed:
       installedOfficialApps?.some((installed) => installed.app_id === app.id) ??
       false,
@@ -58,7 +57,7 @@ export function Apps() {
         : undefined,
     userSettings:
       (installedOfficialApps?.find((installed) => installed.app_id === app.id)
-        ?.settings as Record<string, any>) || undefined,
+        ?.settings as Record<string, unknown>) || undefined,
   }));
 
   // Transform external apps (only approved ones)

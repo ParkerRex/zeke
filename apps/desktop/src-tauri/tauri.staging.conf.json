@@ -1,7 +1,7 @@
 {
   "productName": "Zeke Staging",
   "version": "0.1.0",
-  "identifier": "ai.midday.app.staging",
+  "identifier": "com.zekehq.app.staging",
   "bundle": {
     "icon": [
       "icons/staging/32x32.png",

@@ -29,7 +29,8 @@ export default {
   },
   stories: {
     title: "Stories",
-    description: "Browse AI-powered news stories with contextual insights and summaries.",
+    description:
+      "Browse AI-powered news stories with contextual insights and summaries.",
     discoverHeading: "Discover stories",
     searchPlaceholder: "Search stories (title or URL)…",
     filter: {
@@ -44,7 +45,8 @@ export default {
     loadMore: "Load More",
     showingCount: "Showing {shown} of {total} stories",
     personalizedTitle: "Personalized News Feed",
-    gatedTitle: "Sign up to unlock access to the Personalized News Feed and much more",
+    gatedTitle:
+      "Sign up to unlock access to the Personalized News Feed and much more",
     signupCta: "Sign Up",
     settingsAria: "Settings",
   },
@@ -137,7 +139,8 @@ export default {
     trigger: "Feedback",
     thanksTitle: "Thank you for your feedback!",
     thanksBody: "We will be back with you as soon as possible",
-    textareaPlaceholder: "Ideas to improve this page or issues you are experiencing.",
+    textareaPlaceholder:
+      "Ideas to improve this page or issues you are experiencing.",
     send: "Send",
   },
-}
+};

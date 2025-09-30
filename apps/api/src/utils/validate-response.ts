@@ -1,22 +1,16 @@
-// Utility to enforce response shape via Zod and log mismatches before returning errors.
 import { logger } from "@zeke/logger";
 import type { ZodSchema } from "zod";
-// TODO: UPDATE THIS TO ZEKE LOGIC
-export const validateResponse = (data: any, schema: ZodSchema) => {
-	const result = schema.safeParse(data);
 
-	if (!result.success) {
-		const cause = result.error.flatten();
+export const validateResponse = <T>(data: any, schema: ZodSchema<T>): T => {
+  const result = schema.safeParse(data);
 
-		logger.error(cause);
+  if (!result.success) {
+    const cause = result.error.flatten();
 
-		return {
-			success: false,
-			error: "Response validation failed",
-			details: cause,
-			data: null,
-		};
-	}
+    logger.error(cause);
 
-	return result.data;
+    throw new Error(`Response validation failed: ${JSON.stringify(cause)}`);
+  }
+
+  return result.data;
 };

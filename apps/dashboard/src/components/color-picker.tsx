@@ -1,6 +1,6 @@
+import { useClickAway } from "@uidotdev/usehooks";
 import { cn } from "@zeke/ui/cn";
 import { Popover, PopoverContent, PopoverTrigger } from "@zeke/ui/popover";
-import { useClickAway } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 

@@ -1,5 +1,5 @@
-import { Toolbar } from '@zeke/cms/components/toolbar';
-import type { ReactNode } from 'react';
+import { Toolbar } from "@zeke/cms/components/toolbar";
+import type { ReactNode } from "react";
 
 type LegalLayoutProps = {
   children: ReactNode;

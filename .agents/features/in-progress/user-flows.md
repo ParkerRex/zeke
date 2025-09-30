@@ -6,7 +6,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 1. **Locale-aware request gatekeeping** – `apps/dashboard/src/middleware.ts` removes the locale prefix, caches the intended deep link as `return_to`, and redirects unauthenticated visitors to `/login` unless the path matches public resources (`/i/`, `/s/`, `/verify`, `/all-done`, `/desktop/search`); Supabase session reads and cookie writes happen here.
 2. **Sign-in surface renders providers** – `apps/dashboard/src/app/[locale]/(public)/login/page.tsx` chooses the primary button (Google, Apple, GitHub, OTP) using `Cookies.PreferredSignInProvider`, device vendor, and EU geo checks via `isEU()`; supporting components include `GoogleSignIn`, `AppleSignIn`, `GithubSignIn`, `OTPSignIn`, and the optional `ConsentBanner`.
 3. **OAuth/OTP completion exchanges a session** – `apps/dashboard/src/app/api/auth/callback/route.ts` calls `supabase.**auth**.exchangeCodeForSession(code)` and stores the chosen provider cookie; desktop clients are bounced to `/verify?code=…`, while invite-based `return_to` targets get normalized to `/teams`.
-4. **Desktop deep link bridge** – `/verify` (`apps/dashboard/src/app/[locale]/(public)/verify/page.tsx`) mounts `DesktopSignInVerifyCode`, which replaces `window.location` with `midday://api/auth/callback` and exposes a manual retry link; state guarded by `hasRunned` ref to prevent loops.
+4. **Desktop deep link bridge** – `/verify` (`apps/dashboard/src/app/[locale]/(public)/verify/page.tsx`) mounts `DesktopSignInVerifyCode`, which replaces `window.location` with `zeke://api/auth/callback` and exposes a manual retry link; state guarded by `hasRunned` ref to prevent loops.
 5. **Mandatory MFA enrollment** – lacking the `Cookies.MfaSetupVisited` flag from the callback route pushes first-time devices to `/mfa/setup`, where `SetupMfa` + `EnrollMFA` guide the QR scan, TOTP verification, Supabase MFA enrollment (`auth.mfa.enroll`, `challenge`, `verify`), and optional unenroll-on-cancel.
 6. **Authenticated route guard** – `apps/dashboard/src/app/[locale]/(app)/(sidebar)/layout.tsx` fetches `trpc.user.me`; missing `fullName` triggers `redirect("/setup")`, missing `teamId` triggers `redirect("/teams")`, ensuring downstream layout always has identity & context.
 7. **Profile completion form** – `/setup` (`apps/dashboard/src/app/[locale]/(app)/setup/page.tsx`) wraps `SetupForm`, which updates `user.fullName` through `useUserMutation`, invalidates the React Query cache, and pushes the router to `/teams` on success; avatar uploads are optional via `AvatarUpload`.
@@ -257,7 +257,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 ## 12. Desktop Shell & Integration
 
 1. **Bootstraps Midday shell & main window**
-   Tauri exposes `show_window` and `check_for_updates` commands, resolves the hosted URL per `MIDDAY_ENV`, and builds the primary webview with custom chrome plus external-link guarding
+   Tauri exposes `show_window` and `check_for_updates` commands, resolves the hosted URL per `ZEKE_ENV`, and builds the primary webview with custom chrome plus external-link guarding
    *(apps/desktop/src-tauri/src/lib.rs:20, :312, :384, :465, :486)*
 
 2. **Global search window lifecycle**
@@ -277,7 +277,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
    *(apps/dashboard/src/app/[locale]/layout.tsx:79, apps/dashboard/src/utils/desktop.ts:3, apps/dashboard/src/components/desktop-header.tsx:7, apps/dashboard/src/components/desktop-traffic-light.tsx:5)*
 
 6. **Authentication deep-link loop**
-   OAuth buttons append `client=desktop`, the callback route detours to `/verify`, and `DesktopSignInVerifyCode` pushes a `midday://` URL that the desktop listener picks up to resume the session
+   OAuth buttons append `client=desktop`, the callback route detours to `/verify`, and `DesktopSignInVerifyCode` pushes a `zeke://` URL that the desktop listener picks up to resume the session
    *(apps/dashboard/src/components/google-sign-in.tsx:11, apps/dashboard/src/app/api/auth/callback/route.ts:20, apps/dashboard/src/app/[locale]/(public)/verify/page.tsx:7, apps/dashboard/src/components/desktop-sign-in-verify-code.tsx:11, apps/desktop/src-tauri/src/lib.rs:362)*
 
 7. **Deep-link & navigation handling**
@@ -293,7 +293,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
    *(apps/desktop/src-tauri/src/lib.rs:486, apps/dashboard/src/lib/download.ts:4, apps/dashboard/src/components/open-url.tsx:7)*
 
 10. **Banking & checkout return paths**
-    Institution actions tag state with `desktop:*`, server routes translate provider callbacks into `midday://` destinations, and the checkout hand-off mirrors the same pattern before bouncing users back into the shell
+    Institution actions tag state with `desktop:*`, server routes translate provider callbacks into `zeke://` destinations, and the checkout hand-off mirrors the same pattern before bouncing users back into the shell
     *(apps/dashboard/src/actions/institutions/create-enablebanking-link.ts:10, apps/dashboard/src/actions/institutions/reconnect-enablebanking-link.ts:9, apps/dashboard/src/app/api/enablebanking/session/route.ts:6, apps/dashboard/src/actions/institutions/reconnect-gocardless-link.ts:9, apps/dashboard/src/app/api/gocardless/reconnect/route.ts:6, apps/dashboard/src/app/api/checkout/success/route.ts:3, apps/dashboard/src/app/[locale]/(app)/desktop/checkout/success/page.tsx:3, apps/dashboard/src/components/checkout-success-desktop.tsx:11)*
 
 ---
@@ -309,7 +309,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 3. Accept OAuth on the desktop client and finish sign-in through the `/verify` bridge
    *(apps/dashboard/src/components/google-sign-in.tsx:17, apps/dashboard/src/components/desktop-sign-in-verify-code.tsx:16)*
 
-4. Paste or trigger `midday://` links (auth callbacks, checkout success, banking reconnect) to jump straight into the desired screen
+4. Paste or trigger `zeke://` links (auth callbacks, checkout success, banking reconnect) to jump straight into the desired screen
    *(apps/desktop/src-tauri/src/lib.rs:362, apps/dashboard/src/app/api/checkout/success/route.ts:3)*
 
 5. Manage the window chrome — hide, minimize, or toggle full-screen — using the app’s traffic-light controls
@@ -318,7 +318,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 6. Fire a global search result to open customers, invoices, tracker projects, or documents within the main window
    *(apps/dashboard/src/components/search/search.tsx:245)*
 
-7. Kick off or resume bank connector flows marked for desktop, returning through `midday://settings/accounts` or `/`
+7. Kick off or resume bank connector flows marked for desktop, returning through `zeke://settings/accounts` or `/`
    *(apps/dashboard/src/app/api/enablebanking/session/route.ts:21, apps/dashboard/src/app/api/gocardless/reconnect/route.ts:25)*
 
 8. Complete a billing checkout in the browser and re-enter the app through the `desktop/checkout/success` deep link

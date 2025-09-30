@@ -1,7 +1,12 @@
+name = "zeke-engine-dev"
 compatibility_date = "2024-11-11"
-workers_dev = false
-logpush = true
+workers_dev = true
+logpush = false
 compatibility_flags = ["nodejs_compat_v2"]
+
+# Local development settings
+[env.development]
+name = "zeke-engine-dev"
 
 [vars]
 # Set via `wrangler secret put` per environment; empty defaults enable local dev.

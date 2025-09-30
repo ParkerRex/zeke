@@ -50,7 +50,7 @@ export function ConnectGmail() {
             standard procedure for all apps requesting Gmail access. You may see
             a warning screen - this is normal. Simply click{" "}
             <strong>Advanced</strong> →{" "}
-            <strong>Go to midday.ai (unsafe)</strong> to safely proceed.
+            <strong>Go to zekehq.com (unsafe)</strong> to safely proceed.
           </p>
         </TooltipContent>
       </Tooltip>

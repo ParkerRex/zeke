@@ -1,3 +1,23 @@
+export type FileType =
+  | "pdf"
+  | "csv"
+  | "xls"
+  | "xlsx"
+  | "doc"
+  | "docx"
+  | "pptx"
+  | "jpg"
+  | "png"
+  | "gif"
+  | "webp"
+  | "svg"
+  | "tiff"
+  | "bmp"
+  | "txt"
+  | "json"
+  | "xml"
+  | "bin";
+
 /**
  * Maps MIME types to file extensions
  */

@@ -10,17 +10,17 @@ import {
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-  me: protectedProcedure.output(userSchema).query(async ({
-    ctx: { db, session },
-  }) => {
-    const user = await getUserById(db, session.user.id);
+  me: protectedProcedure
+    .output(userSchema)
+    .query(async ({ ctx: { db, session } }) => {
+      const user = await getUserById(db, session.user.id);
 
-    if (!user) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-    }
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
 
-    return user;
-  }),
+      return user;
+    }),
 
   update: protectedProcedure
     .input(updateUserSchema)

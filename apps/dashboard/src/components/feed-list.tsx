@@ -1,6 +1,6 @@
-import { fetchStoriesForDashboard } from '@/utils/stories';
+import { fetchStoriesForDashboard } from "@/utils/stories";
 
-import StoryRow from './feed/story-row';
+import StoryRow from "./feed/story-row";
 
 export default async function FeedList() {
   const { stories: clusters } = await fetchStoriesForDashboard();

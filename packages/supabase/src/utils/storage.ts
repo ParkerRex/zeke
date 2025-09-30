@@ -3,67 +3,67 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = ".emptyFolderPlaceholder";
 
 type UploadParams = {
-	file: File;
-	path: string[];
-	bucket: string;
+  file: File;
+  path: string[];
+  bucket: string;
 };
 
 export async function upload(
-	client: SupabaseClient,
-	{ file, path, bucket }: UploadParams,
+  client: SupabaseClient,
+  { file, path, bucket }: UploadParams,
 ) {
-	const storage = client.storage.from(bucket);
+  const storage = client.storage.from(bucket);
 
-	const result = await storage.upload(path.join("/"), file, {
-		upsert: true,
-		cacheControl: "3600",
-	});
+  const result = await storage.upload(path.join("/"), file, {
+    upsert: true,
+    cacheControl: "3600",
+  });
 
-	if (!result.error) {
-		return storage.getPublicUrl(path.join("/")).data.publicUrl;
-	}
+  if (!result.error) {
+    return storage.getPublicUrl(path.join("/")).data.publicUrl;
+  }
 
-	throw result.error;
+  throw result.error;
 }
 
 type RemoveParams = {
-	path: string[];
-	bucket: string;
+  path: string[];
+  bucket: string;
 };
 
 export async function remove(
-	client: SupabaseClient,
-	{ bucket, path }: RemoveParams,
+  client: SupabaseClient,
+  { bucket, path }: RemoveParams,
 ) {
-	return client.storage
-		.from(bucket)
-		.remove([decodeURIComponent(path.join("/"))]);
+  return client.storage
+    .from(bucket)
+    .remove([decodeURIComponent(path.join("/"))]);
 }
 
 type DownloadParams = {
-	path: string;
-	bucket: string;
+  path: string;
+  bucket: string;
 };
 
 export async function download(
-	client: SupabaseClient,
-	{ bucket, path }: DownloadParams,
+  client: SupabaseClient,
+  { bucket, path }: DownloadParams,
 ) {
-	return client.storage.from(bucket).download(path);
+  return client.storage.from(bucket).download(path);
 }
 
 type SignedUrlParams = {
-	path: string;
-	bucket: string;
-	expireIn: number;
-	options?: {
-		download?: boolean;
-	};
+  path: string;
+  bucket: string;
+  expireIn: number;
+  options?: {
+    download?: boolean;
+  };
 };
 
 export async function signedUrl(
-	client: SupabaseClient,
-	{ bucket, path, expireIn, options }: SignedUrlParams,
+  client: SupabaseClient,
+  { bucket, path, expireIn, options }: SignedUrlParams,
 ) {
-	return client.storage.from(bucket).createSignedUrl(path, expireIn, options);
+  return client.storage.from(bucket).createSignedUrl(path, expireIn, options);
 }
