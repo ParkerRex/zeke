@@ -34,5 +34,29 @@ export function useHighlightEngagement(highlightIds: string[]) {
   );
 }
 
+export function usePrioritizedHighlights(limit = 20) {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.highlight.prioritized.queryOptions({
+      limit,
+    }),
+  );
+}
+
+export function useHighlightsByKind(
+  kind: "insight" | "quote" | "action" | "question" | "code_example" | "code_change" | "api_change" | "metric",
+  minRelevance = 0.7,
+  limit = 10,
+) {
+  const trpc = useTRPC();
+  return useQuery(
+    trpc.highlight.byKind.queryOptions({
+      kind,
+      minRelevance,
+      limit,
+    }),
+  );
+}
+
 export type HighlightList = HighlightsByStory;
 export type HighlightEngagement = HighlightEngagementRows[number];
