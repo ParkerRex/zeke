@@ -6,6 +6,26 @@ Zeke is an AI-powered research assistant that transforms overwhelming content (p
 
 **The Promise**: Go from 10 hours of research → 5 minutes of cited, goal-aware outputs.
 
+## What Makes This Architecture Work
+
+**Pattern-Based Intelligence over ML Everything**
+
+The key insight behind Zeke's performance is knowing when NOT to use AI:
+
+- **Regex patterns** extract code blocks, git diffs, API endpoints → sub-100ms, zero cost
+- **Keyword matching** scores relevance → deterministic, instant
+- **Claude/OpenAI** only for creative work → brief generation, semantic analysis
+
+This means we can process **thousands of highlights per day** at minimal cost, because expensive LLM calls are reserved for summarization while extraction is pure string matching.
+
+**The Scoring Algorithm** (40-30-20-10):
+- 40% keyword match (what developers search for)
+- 30% highlight kind (breaking changes > quotes)
+- 20% source authority (Anthropic announcements > random blogs)
+- 10% freshness (recent matters, but not as much as relevance)
+
+Result: Breaking API changes (0.95+ score) automatically surface above generic quotes (0.4 score).
+
 ## Why This Codebase Looks Weird
 
 **Honest context**: We forked this from Midday (an open-source finance app) because their architecture was exactly what we needed - just for research content instead of bank transactions. So yes, you'll find references to invoices, bank accounts, and transactions throughout the code. We're systematically replacing these with research concepts (sources, stories, insights) but kept the patterns because they work.

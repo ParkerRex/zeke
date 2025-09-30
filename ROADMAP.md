@@ -73,11 +73,13 @@ Playbooks (actionable next steps)
 
 ---
 
-## =� Phase 1: Automatic Content Discovery (Weeks 1-2)
+## =✅ Phase 1: Automatic Content Discovery (Weeks 1-2) - COMPLETE
 
 **Goal**: Prove the "set it and forget it" value prop
+**Status**: ✅ Complete (2025-09-30)
+**Commits**: ee8b3b5, 612f591, 3f72792, 63b4d7f, 8320a85
 
-### Week 1: Source Monitoring
+### Week 1: Source Monitoring - ✅ DONE
 
 **Leverage existing architecture:**
 - ✅ `sources` table exists
@@ -87,7 +89,9 @@ Playbooks (actionable next steps)
 
 **Tasks:**
 
-- [ ] **Seed ICP sources** (migration or seed script)
+- [x] **Seed ICP sources** (migration or seed script) ✅
+  - Created `packages/jobs/src/config/icp-sources.ts` with 9 sources
+  - Created `packages/jobs/scripts/seed-icp-sources.ts` seeding script
   ```typescript
   // packages/db/seed/icp-sources.ts
   const ICP_SOURCES = [
@@ -98,7 +102,10 @@ Playbooks (actionable next steps)
   ];
   ```
 
-- [ ] **Jobs: Source Monitor Task**
+- [x] **Jobs: Source Monitor Task** ✅
+  - Created `packages/jobs/src/tasks/sources/pull/youtube.ts`
+  - Created `packages/jobs/src/tasks/sources/ingest/from-youtube.ts`
+  - Implemented scheduled YouTube channel monitoring
   ```typescript
   // packages/jobs/src/tasks/sources/monitor-sources.ts
   export const monitorSources = schemaTask({
@@ -139,7 +146,7 @@ Playbooks (actionable next steps)
   ]
   ```
 
-### Week 2: Brief Generation
+### Week 2: Brief Generation - ✅ DONE
 
 **Leverage existing:**
 - ✅ `storyOverlays` table with `why_it_matters`, `citations`
@@ -148,7 +155,10 @@ Playbooks (actionable next steps)
 
 **Tasks:**
 
-- [ ] **Extend storyOverlays** (Drizzle schema)
+- [x] **Extend storyOverlays** (Drizzle schema) ✅
+  - Added brief_one_liner, brief_two_liner, brief_elevator
+  - Added time_saved_seconds, brief_generated_at
+  - Migration: `packages/db/migrations/0001_bitter_gauntlet.sql`
   ```typescript
   // packages/db/src/schema.ts - Add to storyOverlays table
   export const storyOverlays = pgTable("story_overlays", {
@@ -165,7 +175,10 @@ Playbooks (actionable next steps)
   });
   ```
 
-- [ ] **Jobs: Enhance insight generation**
+- [x] **Jobs: Brief generation** ✅
+  - Created `packages/jobs/src/tasks/briefs/generate.ts`
+  - Integrated Claude Sonnet 4.5 for 3-variant brief generation
+  - Wired into `analyzeStory` pipeline (parallel execution)
   ```typescript
   // packages/jobs/src/tasks/insights/generate.ts
   // Add to existing generateAnalysis() prompt:
@@ -198,11 +211,13 @@ Playbooks (actionable next steps)
 
 ---
 
-## =� Phase 2: Personalized Highlights (Weeks 3-4)
+## =✅ Phase 2: Personalized Highlights (Weeks 3-4) - COMPLETE
 
 **Goal**: Surface the exact details users care about (like manual highlights)
+**Status**: ✅ Complete (2025-09-30)
+**Commits**: 3f72792, 63b4d7f, 8320a85
 
-### Week 3: Enhanced Insight Extraction
+### Week 3: Enhanced Insight Extraction - ✅ DONE
 
 **Leverage existing:**
 - ✅ `highlights` table with `kind` enum (insight, quote, action, question)
@@ -211,7 +226,9 @@ Playbooks (actionable next steps)
 
 **Tasks:**
 
-- [ ] **Extend highlight kinds** (Drizzle enum)
+- [x] **Extend highlight kinds** (Drizzle enum) ✅
+  - Added code_example, code_change, api_change, metric to enum
+  - Migration applied successfully
   ```typescript
   // packages/db/src/schema.ts
   export const highlightKind = pgEnum("highlight_kind", [
@@ -226,7 +243,10 @@ Playbooks (actionable next steps)
   ]);
   ```
 
-- [ ] **Jobs: Enhanced extraction**
+- [x] **Jobs: Enhanced extraction** ✅
+  - Created `packages/jobs/src/tasks/insights/extract-structured.ts`
+  - Created `packages/jobs/src/tasks/insights/extract-highlights.ts`
+  - Pattern-based extraction (regex, no ML needed)
   ```typescript
   // packages/jobs/src/tasks/insights/helpers.ts
   function extractStructuredHighlights(content: string) {
@@ -260,7 +280,13 @@ Playbooks (actionable next steps)
   // Merge into allNotificationTypes array
   ```
 
-### Week 4: Smart Relevance Scoring
+### Week 4: Smart Relevance Scoring - ✅ DONE
+
+**Dashboard Integration**: ✅ DONE
+- Added `getPrioritizedHighlights()` and `getHighlightsByKind()` query helpers
+- Added tRPC procedures: `highlight.prioritized` and `highlight.byKind`
+- Created React hooks: `usePrioritizedHighlights()`, `useHighlightsByKind()`
+- Wired into `/insights` page with relevance score display
 
 **Leverage existing:**
 - ✅ `sources.authority_score` field exists
@@ -269,7 +295,10 @@ Playbooks (actionable next steps)
 
 **Tasks:**
 
-- [ ] **Add relevance scoring to highlights**
+- [x] **Add relevance scoring to highlights** ✅
+  - Created `packages/jobs/src/tasks/insights/score-relevance.ts`
+  - Algorithm: 40% keyword + 30% kind + 20% authority + 10% freshness
+  - Wired into pipeline with 2s delay after extraction
   ```typescript
   // packages/jobs/src/tasks/insights/score-relevance.ts
   export const scoreHighlights = schemaTask({
