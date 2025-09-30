@@ -95,7 +95,6 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
           },
           { role: "user", content: prompt },
         ],
-        max_tokens: 1024,
         temperature: 0.7,
       });
 
