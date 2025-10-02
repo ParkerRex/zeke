@@ -1,10 +1,9 @@
-import { env } from "@/env";
 import type { MetadataRoute } from "next";
 
-const protocol = env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith("https")
-  ? "https"
-  : "http";
-const url = new URL(`${protocol}://${env.VERCEL_PROJECT_PRODUCTION_URL}`);
+const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+const url = new URL(baseUrl);
 
 export default function robots(): MetadataRoute.Robots {
   return {

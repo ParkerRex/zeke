@@ -2,7 +2,7 @@
  * Hype bar component for displaying story hype/excitement level
  */
 
-import { cn } from "@zeke/ui/lib/utils";
+import { cn } from "@zeke/ui/cn";
 
 interface HypeBarProps {
   value: number;

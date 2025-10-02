@@ -55,13 +55,9 @@ export function WhiteLabelPlans() {
           </div>
 
           <div className="mt-8 pt-8 border-t">
-            <a
-              href="https://cal.com/zeke-team/white-label"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://app.zekehq.com">
               <Button variant="outline" className="w-full h-12">
-                Schedule a call
+                Get started
               </Button>
             </a>
           </div>
@@ -105,12 +101,8 @@ export function WhiteLabelPlans() {
           </div>
 
           <div className="mt-16 pt-8 border-t">
-            <a
-              href="https://cal.com/zeke-team/white-label"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button className="w-full h-12">Schedule a call</Button>
+            <a href="https://app.zekehq.com">
+              <Button className="w-full h-12">Get started</Button>
             </a>
           </div>
         </div>
@@ -154,13 +146,9 @@ export function WhiteLabelPlans() {
           </div>
 
           <div className="mt-8 pt-8 border-t">
-            <a
-              href="https://cal.com/zeke-team/white-label"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://app.zekehq.com">
               <Button variant="outline" className="w-full h-12">
-                Schedule a call
+                Get started
               </Button>
             </a>
           </div>

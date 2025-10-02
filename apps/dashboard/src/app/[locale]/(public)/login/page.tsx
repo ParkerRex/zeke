@@ -1,4 +1,3 @@
-import { AppleSignIn } from "@/components/apple-sign-in";
 import { ConsentBanner } from "@/components/consent-banner";
 import { GithubSignIn } from "@/components/github-sign-in";
 import { GoogleSignIn } from "@/components/google-sign-in";
@@ -32,34 +31,14 @@ export default async function Page() {
   const { device } = userAgent({ headers: await headers() });
 
   let moreSignInOptions = null;
-  let preferredSignInOption =
-    device?.vendor === "Apple" ? (
-      <div className="flex flex-col space-y-2">
-        <GoogleSignIn />
-        <AppleSignIn />
-      </div>
-    ) : (
-      <GoogleSignIn />
-    );
+  let preferredSignInOption = <GoogleSignIn />;
 
   switch (preferred?.value) {
-    case "apple":
-      preferredSignInOption = <AppleSignIn />;
-      moreSignInOptions = (
-        <>
-          <GoogleSignIn />
-          <GithubSignIn />
-          <OTPSignIn className="border-t-[1px] border-border pt-8" />
-        </>
-      );
-      break;
-
     case "github":
       preferredSignInOption = <GithubSignIn />;
       moreSignInOptions = (
         <>
           <GoogleSignIn />
-          <AppleSignIn />
           <OTPSignIn className="border-t-[1px] border-border pt-8" />
         </>
       );
@@ -69,7 +48,6 @@ export default async function Page() {
       preferredSignInOption = <GoogleSignIn />;
       moreSignInOptions = (
         <>
-          <AppleSignIn />
           <GithubSignIn />
           <OTPSignIn className="border-t-[1px] border-border pt-8" />
         </>
@@ -81,29 +59,18 @@ export default async function Page() {
       moreSignInOptions = (
         <>
           <GoogleSignIn />
-          <AppleSignIn />
           <GithubSignIn />
         </>
       );
       break;
 
     default:
-      if (device?.vendor === "Apple") {
-        moreSignInOptions = (
-          <>
-            <GithubSignIn />
-            <OTPSignIn className="border-t-[1px] border-border pt-8" />
-          </>
-        );
-      } else {
-        moreSignInOptions = (
-          <>
-            <AppleSignIn />
-            <GithubSignIn />
-            <OTPSignIn className="border-t-[1px] border-border pt-8" />
-          </>
-        );
-      }
+      moreSignInOptions = (
+        <>
+          <GithubSignIn />
+          <OTPSignIn className="border-t-[1px] border-border pt-8" />
+        </>
+      );
   }
 
   return (

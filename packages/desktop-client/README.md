@@ -18,7 +18,7 @@ The desktop-client package demonstrates a pattern of progressive enhancement - i
 ## Installation
 
 ```bash
-pnpm add @zeke/desktop-client
+bun add @zeke/desktop-client
 ```
 
 ## Usage
@@ -155,24 +155,24 @@ if (typeof window !== 'undefined' && window.__TAURI__) {
 
 ```bash
 # Run the Tauri development server
-pnpm tauri dev
+bun tauri dev
 ```
 
 ### Testing in Web Mode
 
 ```bash
 # Run the web development server
-pnpm dev
+bun dev
 ```
 
 ### Building
 
 ```bash
 # Build for web
-pnpm build:web
+bun build:web
 
 # Build for desktop
-pnpm build:desktop
+bun build:desktop
 ```
 
 ## Debugging

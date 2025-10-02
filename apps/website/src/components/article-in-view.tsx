@@ -13,7 +13,7 @@ export function ArticleInView({ slug, firstPost }: Props) {
   const { ref, inView } = useInView();
 
   const pathname = usePathname();
-  const fullSlug = `/updates/${slug}`;
+  const fullSlug = `/blog/${slug}`;
 
   useEffect(() => {
     if (inView && pathname !== fullSlug) {

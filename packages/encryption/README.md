@@ -17,7 +17,7 @@ This encryption package exemplifies the principle of doing one thing well - it's
 ## Installation
 
 ```bash
-pnpm add @zeke/encryption
+bun add @zeke/encryption
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ const hashed = hash('data to hash');
 ## Testing
 
 ```bash
-pnpm test
+bun test
 ```
 
 Tests cover encryption/decryption round trips, edge cases, and tampering detection.

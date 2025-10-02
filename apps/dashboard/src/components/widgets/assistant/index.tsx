@@ -44,8 +44,8 @@ export function Assistant() {
   const { track } = useAnalytics();
   const [question, setQuestion] = useState("");
 
-  const { data: bootstrap, isLoading: bootstrapLoading } =
-    api.workspace.bootstrap.useQuery(undefined, {
+  const { data: workspace, isLoading: workspaceLoading } =
+    api.workspace.get.useQuery(undefined, {
       staleTime: 5 * 60 * 1000,
     });
 
@@ -55,7 +55,7 @@ export function Assistant() {
   );
 
   const assistantSummary: AssistantSummary | undefined =
-    bootstrap?.assistantSummary;
+    workspace?.assistantSummary;
 
   const prompts = useMemo(() => {
     if (assistantSummary?.suggestedPrompts?.length) {
@@ -118,7 +118,7 @@ export function Assistant() {
       <div className="flex h-full flex-col gap-6">
         <AssistantHeader
           summary={assistantSummary}
-          loading={bootstrapLoading}
+          loading={workspaceLoading}
           onOpenAssistant={handleOpenAssistant}
         />
 
@@ -130,7 +130,7 @@ export function Assistant() {
 
         <AssistantPrompts
           prompts={prompts}
-          loading={bootstrapLoading}
+          loading={workspaceLoading}
           onSelect={handlePromptSelect}
         />
 

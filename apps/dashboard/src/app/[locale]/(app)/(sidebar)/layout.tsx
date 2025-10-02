@@ -17,16 +17,16 @@ export default async function Layout({
 }) {
   const queryClient = getQueryClient();
 
-  // Fetch bootstrap data - single query for all initial data
-  const bootstrap = await queryClient
-    .fetchQuery(trpc.workspace.bootstrap.queryOptions())
+  // Fetch current workspace - single query for all initial data
+  const workspace = await queryClient
+    .fetchQuery(trpc.workspace.get.queryOptions())
     .catch(() => null);
 
-  if (!bootstrap) {
+  if (!workspace) {
     redirect("/login");
   }
 
-  const { user, team } = bootstrap;
+  const { user, team } = workspace;
 
   if (!user.fullName) {
     redirect("/setup");

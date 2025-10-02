@@ -131,11 +131,10 @@ export function SupportForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Transactions">Transactions</SelectItem>
-                    <SelectItem value="Vault">Vault</SelectItem>
-                    <SelectItem value="Inbox">Inbox</SelectItem>
-                    <SelectItem value="Invoicing">Invoicing</SelectItem>
-                    <SelectItem value="Tracker">Tracker</SelectItem>
+                    <SelectItem value="Content Sources">Content Sources</SelectItem>
+                    <SelectItem value="Library">Library</SelectItem>
+                    <SelectItem value="Insights">Insights</SelectItem>
+                    <SelectItem value="Playbooks">Playbooks</SelectItem>
                     <SelectItem value="AI">AI</SelectItem>
                     <SelectItem value="General">General</SelectItem>
                   </SelectContent>

@@ -3,23 +3,64 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 /**
- * Workspace router - provides bootstrap data for the dashboard
+ * Workspace router - provides current workspace state for the dashboard
  */
 export const workspaceRouter = createTRPCRouter({
   /**
-   * Bootstrap endpoint - returns all initial data needed for dashboard hydration
+   * Get current workspace - returns all initial data needed for dashboard hydration
    * This reduces multiple API calls on initial page load
    */
-  bootstrap: protectedProcedure.query(async ({ ctx }) => {
+  get: protectedProcedure.query(async ({ ctx }) => {
     const { db, session } = ctx;
     const userId = session.user.id;
     const teamId = ctx.teamId;
 
+    // Allow bootstrap for users without teams (they'll be redirected to team creation)
     if (!teamId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "No team context available",
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, userId),
+        with: {
+          profile: true,
+        },
       });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+          locale: user.locale || "en",
+          timezone: user.timezone || "UTC",
+          preferences: user.profile?.preferences || {},
+        },
+        team: null,
+        navCounts: {
+          stories: 0,
+          highlights: 0,
+          playbooks: 0,
+          chats: 0,
+          notifications: 0,
+        },
+        banners: [],
+        assistantSummary: {
+          recentChatIds: [],
+          messageCount30d: 0,
+          lastChatDate: null,
+          suggestedPrompts: [
+            "What are the latest trends in AI research?",
+            "Summarize this week's important stories",
+            "Help me create a competitive analysis",
+          ],
+        },
+      };
     }
 
     try {
@@ -153,10 +194,10 @@ export const workspaceRouter = createTRPCRouter({
         team: {
           id: team.id,
           name: team.name,
-          slug: team.slug,
-          planCode: team.planCode,
+          slug: team.slug, // Now exists in schema
+          plan: team.plan, // Use 'plan' field from schema
           memberCount: team.members.length,
-          isOwner: team.ownerId === userId,
+          isOwner: team.ownerId === userId, // Now works with ownerId column
           subscriptionStatus,
           trialDaysLeft,
         },

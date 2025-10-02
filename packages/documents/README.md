@@ -19,7 +19,7 @@ The documents package is a sophisticated document processing system that handles
 ## Installation
 
 ```bash
-pnpm add @zeke/documents
+bun add @zeke/documents
 ```
 
 ## Usage
@@ -140,10 +140,10 @@ try {
 
 ```bash
 # Run all tests
-pnpm test
+bun test
 
 # Run specific test suite
-pnpm test src/processors
+bun test src/processors
 ```
 
 ## Configuration

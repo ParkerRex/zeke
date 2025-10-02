@@ -109,23 +109,23 @@ export function Header() {
           icon: <Icons.Overview size={20} />,
         },
         {
-          path: "/inbox",
-          title: "Inbox",
+          path: "/sources",
+          title: "Content Sources",
           icon: <Icons.Inbox2 size={20} />,
         },
         {
-          path: "/vault",
-          title: "Vault",
+          path: "/library",
+          title: "Library",
           icon: <Icons.Files size={20} />,
         },
         {
-          path: "/tracker",
-          title: "Tracker",
+          path: "/insights",
+          title: "Insights",
           icon: <Icons.Tracker size={20} />,
         },
         {
-          path: "/invoice",
-          title: "Invoice",
+          path: "/playbooks",
+          title: "Playbooks",
           icon: <Icons.Invoice size={20} />,
         },
       ],
@@ -135,12 +135,8 @@ export function Header() {
       path: "/pricing",
     },
     {
-      title: "Updates",
-      path: "/updates",
-    },
-    {
-      title: "Story",
-      path: "/story",
+      title: "Blog",
+      path: "/blog",
     },
     {
       title: "Download",
@@ -382,8 +378,8 @@ export function Header() {
             >
               {links.map(({ path, title, children }, index) => {
                 const isActive =
-                  path === "/updates"
-                    ? pathname.includes("updates")
+                  path === "/blog"
+                    ? pathname.includes("blog")
                     : path === lastPath;
 
                 if (path) {

@@ -9,9 +9,8 @@ export type GetTeamsForUserParams = {
 export type TeamForUser = {
   id: string;
   name: string | null;
-  slug: string | null;
   logoUrl: string | null;
-  planCode: string | null;
+  plan: string | null;
   role: string | null;
 };
 
@@ -25,9 +24,8 @@ export async function getTeamsForUser(
     .select({
       id: teams.id,
       name: teams.name,
-      slug: teams.slug,
       logoUrl: teams.logoUrl,
-      planCode: teams.planCode,
+      plan: teams.plan,
       role: teamMembers.role,
     })
     .from(teamMembers)
@@ -51,9 +49,8 @@ export type TeamInviteWithTeam = {
   team: {
     id: string;
     name: string | null;
-    slug: string | null;
     logoUrl: string | null;
-    planCode: string | null;
+    plan: string | null;
   } | null;
 };
 
@@ -72,9 +69,8 @@ export async function getTeamInvitesByEmail(
       expiresAt: teamInvites.expiresAt,
       teamId: teams.id,
       teamName: teams.name,
-      teamSlug: teams.slug,
       teamLogoUrl: teams.logoUrl,
-      teamPlanCode: teams.planCode,
+      teamPlan: teams.plan,
     })
     .from(teamInvites)
     .innerJoin(teams, eq(teamInvites.teamId, teams.id))
@@ -91,9 +87,8 @@ export async function getTeamInvitesByEmail(
       ? {
           id: row.teamId,
           name: row.teamName,
-          slug: row.teamSlug,
           logoUrl: row.teamLogoUrl,
-          planCode: row.teamPlanCode,
+          plan: row.teamPlan,
         }
       : null,
   }));
@@ -104,12 +99,9 @@ export async function getTeamSummaryById(db: Database, teamId: string) {
     .select({
       id: teams.id,
       name: teams.name,
-      slug: teams.slug,
       logoUrl: teams.logoUrl,
-      planCode: teams.planCode,
-      metadata: teams.metadata,
+      plan: teams.plan,
       createdAt: teams.createdAt,
-      updatedAt: teams.updatedAt,
     })
     .from(teams)
     .where(eq(teams.id, teamId))

@@ -14,40 +14,40 @@
   --sh-entity: #a7a7a7;
 }
 
-.updates p {
+.blog p {
   min-height: 1.87em;
   margin-top: 1px;
   margin-bottom: 1px;
   padding: 3px 2px;
 }
 
-.updates h2 {
+.blog h2 {
   font-size: 26px;
   margin-top: .8em;
   margin-bottom: 10px;
   font-weight: 500;
 }
 
-.updates h4 {
+.blog h4 {
   display: block;
   font-weight: 600;
   color: var(--text-primary);
   margin-top: 15px;
 }
 
-.updates h3 {
+.blog h3 {
   font-size: 1.25em;
   margin-top: .8em;
   margin-bottom: 1px;
   font-weight: 500;
 }
 
-.updates p,
-.updates li {
+.blog p,
+.blog li {
   color: #707070;
 }
 
-.updates ul li {
+.blog ul li {
   margin-top: 1px;
   margin-bottom: 1px;
   padding-left: 12px;
@@ -55,30 +55,30 @@
   padding-bottom: 2px;
 }
 
-.updates ul {
+.blog ul {
   list-style-type: disc;
   list-style-position: inside;
 }
 
-.updates p code span {
+.blog p code span {
   font-family: var(--font-geist-mono);
   color: #eb5757 !important;
   font-size: 85%;
   font-weight: 600;
 }
 
-.updates p code {
+.blog p code {
   border-radius: 4px;
   background: hsla(44, 6%, 50%, 0.15);
   padding: 0 .4em 3px .4em;
   line-height: normal;
 }
 
-.updates a {
+.blog a {
   text-decoration: underline;
 }
 
-.updates blockquote p {
+.blog blockquote p {
   margin: 7px 2px;
   padding-left: 14px;
   padding-right: 14px;
@@ -86,8 +86,8 @@
   color: hsl(var(--foreground));
 }
 
-.updates b,
-.updates strong {
+.blog b,
+.blog strong {
   font-weight: 500;
 }
 

@@ -73,7 +73,6 @@ export const teamRouter = createTRPCRouter({
         userId: session.user.id,
         userEmail: session.user.email,
         teamName: input.name,
-        baseCurrency: input.baseCurrency,
         countryCode: input.countryCode,
         switchTeam: input.switchTeam,
         timestamp: new Date().toISOString(),

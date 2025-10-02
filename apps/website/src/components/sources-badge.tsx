@@ -1,5 +1,5 @@
 import { Badge } from "@zeke/ui/badge";
-import { cn } from "@zeke/ui/utils";
+import { cn } from "@zeke/ui/cn";
 
 interface SourcesBadgeProps {
   count: number;

@@ -5,194 +5,171 @@ This guide covers deploying Drizzle schema changes to both local and production 
 ## 🏠 Local Development
 
 ### Prerequisites
-- Local Supabase running (`supabase start`)
+- Local Supabase running (`supabase start` from `apps/api`)
 - Environment variables set in `.env.local`
+
+> **💡 Note:** The Supabase config lives in `apps/api/supabase/config.toml`, not in the packages. This is where you run `supabase start`. The `packages/supabase/` contains client libraries, and `packages/db/` contains Drizzle schemas/migrations.
 
 ### Quick Commands
 
 ```bash
-# From project root
-bun db:migrate        # Push to local database
-bun db:studio         # Open Drizzle Studio UI
-
-# Or from packages/db
-bun run migrate:dev   # Development migration (uses local DB)
-bun run migrate:push  # Direct push (no migration files)
+# From packages/db directory
+bun run migrate:dev   # Migrates to local Supabase automatically
 ```
 
-### Step-by-Step Process
+That's it! The script handles everything:
+- Checks if local Supabase is running
+- Generates migrations from schema changes
+- Applies them to local database
 
-1. **Start Local Supabase**
-   ```bash
-   cd packages/db
-   supabase start
-   ```
+### What It Does
 
-2. **Generate Migration from Schema Changes**
-   ```bash
-   bunx drizzle-kit generate --config drizzle.config.ts
-   ```
+1. Verifies local Supabase is running at `http://127.0.0.1:54321`
+2. Connects to `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+3. Runs `drizzle-kit generate` to create migration files
+4. Runs `drizzle-kit push` to apply changes
+5. Prompts for column rename confirmations (select "create column" for new fields)
 
-3. **Push to Local Database**
-   ```bash
-   DATABASE_SESSION_POOLER="postgresql://postgres:postgres@localhost:54322/postgres" \
-     bunx drizzle-kit push --config drizzle.config.ts
-   ```
+### Manual Process (if needed)
 
-4. **Verify Schema**
-   ```bash
-   psql postgresql://postgres:postgres@localhost:54322/postgres -c "\d users"
-   ```
-
-5. **Generate Supabase Types**
-   ```bash
-   cd ../supabase
-   bun run db:generate
-   ```
-   This creates `src/types/db.ts` with TypeScript types for all tables
+```bash
+cd packages/db
+export DATABASE_SESSION_POOLER_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+bunx drizzle-kit generate --config drizzle.config.ts
+bunx drizzle-kit push --config drizzle.config.ts
+```
 
 ## 🚀 Production Deployment
 
 ### Prerequisites
-- Production `DATABASE_SESSION_POOLER_URL` environment variable
-- Supabase project ID in package.json
+- Production database URL in `packages/db/.env`
+- SSL certificate (`prod-ca-2021.crt`) in project root
 - Database backup recommended before major changes
 
-### Deployment Process
-
-1. **Set Production Database URL**
-   ```bash
-   export DATABASE_SESSION_POOLER_URL="your-production-pooler-url"
-   ```
-
-2. **Review Schema Changes**
-   ```bash
-   cd packages/db
-   bunx drizzle-kit generate --config drizzle.config.ts
-   # Review generated SQL in migrations/ directory
-   ```
-
-3. **Push to Production**
-   ```bash
-   bun run migrate    # Uses production URL from env
-   ```
-
-4. **Generate Production Types** (optional - usually same as local)
-   ```bash
-   cd ../supabase
-   supabase gen types --lang=typescript \
-     --project-id hblelrtwdpukaymtpchv \
-     --schema public > src/types/db.ts
-   ```
-
-5. **Verify Production Deployment**
-   ```bash
-   psql "$DATABASE_SESSION_POOLER_URL" -c "SELECT count(*) FROM users;"
-   ```
-
-## 📊 Schema Verification Checklist
-
-After any schema push, verify:
-
-- [ ] All tables created with correct columns
-- [ ] Foreign key constraints in place
-- [ ] Indexes created properly
-- [ ] Enums defined correctly
-- [ ] TypeScript types generated successfully
-- [ ] User menu component displays data correctly
-
-### Quick Verification Commands
+### Production Commands
 
 ```bash
-# Check specific table
-psql $DATABASE_URL -c "\d users"
-psql $DATABASE_URL -c "\d teams"
-
-# Verify relationships
-psql $DATABASE_URL -c "\d+ users" | grep "Foreign-key"
-
-# Check enum types
-psql $DATABASE_URL -c "\dT+ plan_code"
+# From packages/db directory
+export DATABASE_SESSION_POOLER_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
+bun run migrate
 ```
 
-## 🔄 User Data Flow Verification
+The script automatically:
+- Uses SSL with the certificate in `prod-ca-2021.crt`
+- Generates migrations
+- Applies to production database
+- Prompts for column confirmations
 
-Test the complete data flow from component to database:
+### SSL Configuration
 
-1. **Component** → `apps/dashboard/src/components/user-menu.tsx`
-   - Uses `useUserQuery()` hook
+The `drizzle.config.ts` automatically handles SSL for Supabase production:
 
-2. **Hook** → `apps/dashboard/src/hooks/use-user.ts`
-   - Calls `trpc.user.me.query()`
+```typescript
+ssl: isSupabase ? {
+  ca: readFileSync(resolve(__dirname, "../../prod-ca-2021.crt")).toString(),
+} : false
+```
 
-3. **TRPC Router** → `apps/api/src/trpc/routers/user.ts`
-   - Executes `getUserById(db, session.user.id)`
+### Using Direct Connection (Alternative)
 
-4. **Database Query** → `packages/db/src/queries/users.ts`
-   - Joins users + teams tables
-   - Returns: id, email, fullName, avatarUrl, teamId, team{id, name, slug, planCode}
+If pooler doesn't work, use the direct connection:
 
-5. **Schema** → `packages/db/src/schema.ts`
-   - users table: 13 columns with indexes
-   - teams table: 10 columns with foreign keys
+```bash
+export DATABASE_SESSION_POOLER_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
+bun run migrate
+```
 
-6. **TypeScript Types** → `packages/supabase/src/types/db.ts`
-   - Auto-generated from production schema
+## 🔄 Migration Workflow
+
+### Column Rename Prompts
+
+When running migrations, drizzle-kit will ask if columns are created or renamed:
+
+```
+Is inbox_id column in teams table created or renamed from another column?
+❯ + inbox_id              create column    ← SELECT THIS for new columns
+  ~ slug › inbox_id       rename column
+  ~ owner_id › inbox_id   rename column
+```
+
+**Always select "create column" unless you're intentionally renaming an existing column.**
+
+## 📊 Verification
+
+After deployment:
+
+```bash
+# Check table structure
+psql $DATABASE_SESSION_POOLER_URL -c "\d teams"
+
+# Verify data
+psql $DATABASE_SESSION_POOLER_URL -c "SELECT id, name, email, plan FROM teams LIMIT 5;"
+```
 
 ## 🐛 Troubleshooting
 
-### "No schema changes, nothing to migrate"
-This is normal if schema is up to date. Use `drizzle-kit push` to force sync.
+### SSL Connection Errors
 
-### "Database connection failed"
-Check:
-- Supabase is running (local)
-- Environment variables are set correctly
-- Network access to production database
+If you see "SSL connection is required":
+- Ensure `prod-ca-2021.crt` exists in project root
+- Use direct connection URL (not pooler)
+- Check `drizzle.config.ts` has SSL config
 
-### "Type errors after schema update"
-Regenerate types:
+### Migration Already Applied
+
+If migration files already exist:
 ```bash
-cd packages/supabase && bun run db:generate
+# Delete old migrations (if safe)
+rm -rf packages/db/migrations/*.sql
+
+# Regenerate
+bun run migrate:generate
 ```
 
-### Foreign key constraint errors
-Ensure:
-- Related tables exist
-- Column types match
-- Cascade options are correct
+### Connection Pooler Issues
 
-## 📁 File Structure
+Use direct connection instead:
+```bash
+# Instead of: aws-1-us-east-2.pooler.supabase.com
+# Use: db.PROJECT.supabase.co
+```
+
+## 📁 Important Files
 
 ```
-packages/
-├── db/
-│   ├── src/
-│   │   ├── schema.ts           # Drizzle schema definitions
-│   │   ├── queries/
-│   │   │   └── users.ts        # getUserById, updateUser
-│   │   └── client.ts           # Database client setup
-│   ├── migrations/              # Generated SQL migrations
-│   ├── scripts/
-│   │   ├── dev-migrate.sh      # Local migration script
-│   │   └── migrate.sh          # Production migration script
-│   └── drizzle.config.ts       # Drizzle Kit configuration
-│
-└── supabase/
-    ├── src/types/db.ts         # Generated TypeScript types
-    └── package.json            # Contains db:generate script
+packages/db/
+├── drizzle.config.ts       # SSL config, DB credentials
+├── .env                    # Production DB URLs
+├── scripts/
+│   ├── dev-migrate.sh     # Local: auto-detects Supabase
+│   └── migrate.sh         # Production: requires DB URL
+├── migrations/            # Generated SQL (git committed)
+└── src/schema.ts         # Drizzle schema definitions
+
+prod-ca-2021.crt          # SSL cert (project root)
 ```
 
 ## 🔐 Security Notes
 
-- Never commit `.env.local` with production credentials
-- Use connection pooler URLs for production
-- Enable Row Level Security (RLS) policies
-- Review migration SQL before production deploy
-- Always backup production database before major schema changes
+- `packages/db/.env` contains production credentials (gitignored)
+- SSL cert (`prod-ca-2021.crt`) is in project root
+- Always review generated migrations before production deploy
+- Backup production before major schema changes
 
-## 📚 Additional Resources
+## 💰 Team Payment Setup
 
-- [Drizzle Kit Documentation](https://orm.drizzle.team/kit-docs/overview)
-- [Supabase CLI Documentation](https://supabase.com/docs/guides/cli)
-- [PostgreSQL Schema Basics](https://www.postgresql.org/docs/current/ddl-schemas.html)
+Our teams table matches Midday's architecture for Stripe payments:
+
+```typescript
+teams {
+  id, name, logoUrl           // Basic info
+  email, inboxId              // Communication
+  inboxEmail, inboxForwarding // Email features
+  plan, stripeCustomerId      // Stripe payments (not Polar!)
+  countryCode                 // Localization
+  documentClassification      // AI features
+  canceledAt                  // Subscription status
+}
+```
+
+**Note:** We don't use `baseCurrency` - everything is handled by Stripe.

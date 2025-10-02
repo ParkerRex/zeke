@@ -3,7 +3,7 @@ import { Icons } from "@zeke/ui/icons";
 import { Sparkles } from "lucide-react";
 
 export function ChatEmpty() {
-  const { data: bootstrap } = api.workspace.bootstrap.useQuery();
+  const { data: bootstrap } = api.workspace.get.useQuery();
   const firstName = bootstrap?.user?.fullName?.split(" ")[0] || "there";
 
   return (

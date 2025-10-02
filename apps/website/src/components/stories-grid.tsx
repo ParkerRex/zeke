@@ -2,7 +2,7 @@
  * Reusable stories grid component
  */
 
-import { cn } from "@zeke/ui/lib/utils";
+import { cn } from "@zeke/ui/cn";
 import type { StoryClusterView } from "../lib/stories";
 import { StoryCard } from "./story-card";
 

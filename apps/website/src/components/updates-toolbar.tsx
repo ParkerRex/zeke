@@ -90,7 +90,7 @@ export function UpdatesToolbar({ posts }) {
 
   const handleOnShare = () => {
     const popup = popupCenter({
-      url: `https://twitter.com/intent/tweet?text=${currentPost.title} https://zekehq.com/updates/${currentPost.slug}`,
+      url: `https://twitter.com/intent/tweet?text=${currentPost.title} https://zekehq.com/blog/${currentPost.slug}`,
       title: currentPost.title,
       w: 800,
       h: 400,

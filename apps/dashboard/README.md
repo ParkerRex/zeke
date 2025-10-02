@@ -142,16 +142,16 @@ Here are examples of what tab-enabled URLs look like:
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Start development server
-pnpm dev
+bun dev
 
 # Run type checking
-pnpm typecheck
+bun typecheck
 
 # Run linting
-pnpm lint
+bun lint
 ```
 
 ### Project Structure

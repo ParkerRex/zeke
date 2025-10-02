@@ -19,7 +19,7 @@ The email package's architecture reveals the challenges of modern email developm
 ## Installation
 
 ```bash
-pnpm add @zeke/email
+bun add @zeke/email
 ```
 
 ## Usage
@@ -117,7 +117,7 @@ const title = t('email.welcome.title');
 Preview emails locally:
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 This starts the React Email development server where you can preview all templates with hot reloading.
@@ -136,11 +136,11 @@ This starts the React Email development server where you can preview all templat
 Test email rendering:
 
 ```bash
-pnpm test
+bun test
 ```
 
 Preview in browser:
 
 ```bash
-pnpm preview
+bun preview
 ```

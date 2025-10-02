@@ -206,29 +206,35 @@ export const teams = pgTable(
   "teams",
   {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
     name: text("name").notNull(),
-    slug: text("slug").notNull(),
-    ownerId: uuid("owner_id").references(() => users.id),
-    stripeCustomerId: text("stripe_customer_id"),
-    planCode: planCodeEnum("plan_code").default("trial"),
+    slug: text("slug").notNull(), // Team URL slug (generated from name)
+    ownerId: uuid("owner_id").references(() => users.id, {
+      onDelete: "set null",
+    }), // Primary team owner
     logoUrl: text("logo_url"),
-    metadata: jsonb("metadata"),
-    createdAt: timestamp("created_at", {
+    inboxId: text("inbox_id"),
+    email: text("email"),
+    inboxEmail: text("inbox_email"),
+    inboxForwarding: boolean("inbox_forwarding").default(true),
+    countryCode: text("country_code"),
+    documentClassification: boolean("document_classification").default(false),
+    canceledAt: timestamp("canceled_at", {
       withTimezone: true,
       mode: "string",
-    }).defaultNow(),
-    updatedAt: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
+    }),
+    plan: planCodeEnum("plan").default("trial").notNull(),
+    stripeCustomerId: text("stripe_customer_id"),
   },
   (table) => [
-    uniqueIndex("teams_slug_key").using("btree", table.slug),
+    uniqueIndex("teams_inbox_id_key").using("btree", table.inboxId),
     uniqueIndex("teams_stripe_customer_id_key").using(
       "btree",
       table.stripeCustomerId,
     ),
-    index("teams_owner_id_idx").using("btree", table.ownerId),
+    uniqueIndex("teams_slug_key").using("btree", table.slug), // Unique slug for URLs
   ],
 );
 
@@ -1385,6 +1391,38 @@ export const activities = pgTable(
 );
 
 // ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // story_published, highlight_shared, etc.
+    title: text("title").notNull(),
+    message: text("message"),
+    read: boolean("read").default(false).notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+  },
+  (table) => [
+    index("notifications_team_id_idx").using("btree", table.teamId),
+    index("notifications_user_id_idx").using("btree", table.userId),
+    index("notifications_read_idx").using("btree", table.read),
+    index("notifications_created_at_idx").using("btree", table.createdAt),
+  ],
+);
+
+// ============================================================================
 // BILLING TABLES (Stripe Integration)
 // ============================================================================
 
@@ -1605,3 +1643,33 @@ export const chatFeedback = pgTable(
 );
 
 // Relations
+export const usersRelations = relations(users, ({ one, many }) => ({
+  profile: one(userProfiles, {
+    fields: [users.id],
+    references: [userProfiles.user_id],
+  }),
+  usersOnTeams: many(teamMembers),
+  team: one(teams, {
+    fields: [users.teamId],
+    references: [teams.id],
+  }),
+}));
+
+export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
+}));
+
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [teams.ownerId],
+    references: [users.id],
+  }),
+  members: many(teamMembers),
+}));

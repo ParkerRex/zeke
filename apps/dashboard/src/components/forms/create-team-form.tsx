@@ -3,11 +3,9 @@
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { revalidateAfterTeamChange } from "@/actions/revalidate-action";
-import { SelectCurrency } from "@/components/select-currency";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { uniqueCurrencies } from "@zeke/location/currencies";
 import {
   Form,
   FormControl,
@@ -28,21 +26,17 @@ const formSchema = z.object({
     message: "Team name must be at least 2 characters.",
   }),
   countryCode: z.string(),
-  baseCurrency: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
-  defaultCurrencyPromise: Promise<string>;
   defaultCountryCodePromise: Promise<string>;
 };
 
 export function CreateTeamForm({
-  defaultCurrencyPromise,
   defaultCountryCodePromise,
 }: Props) {
-  const currency = use(defaultCurrencyPromise);
   const countryCode = use(defaultCountryCodePromise);
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -134,8 +128,7 @@ export function CreateTeamForm({
   const form = useZodForm(formSchema, {
     defaultValues: {
       name: "",
-      baseCurrency: currency,
-      countryCode: countryCode ?? "",
+      countryCode: countryCode ?? "US",
     },
   });
 
@@ -157,7 +150,6 @@ export function CreateTeamForm({
 
     console.log(`[${submissionId}] Team creation form submission started`, {
       teamName: values.name,
-      baseCurrency: values.baseCurrency,
       countryCode: values.countryCode,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
@@ -169,7 +161,6 @@ export function CreateTeamForm({
 
     createTeamMutation.mutate({
       name: values.name,
-      baseCurrency: values.baseCurrency,
       countryCode: values.countryCode,
       switchTeam: true, // Automatically switch to the new team
     });
@@ -189,7 +180,7 @@ export function CreateTeamForm({
               <FormControl>
                 <Input
                   autoFocus
-                  placeholder="Ex: Acme Marketing or Acme Co"
+                  placeholder="(if it's just you, that's cool too we love that)"
                   autoComplete="off"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -207,41 +198,19 @@ export function CreateTeamForm({
           control={form.control}
           name="countryCode"
           render={({ field }) => (
-            <FormItem className="mt-4 w-full">
+            <FormItem className="mt-4 w-full border-b border-border pb-4">
               <FormLabel className="text-xs text-[#666] font-normal">
                 Country
               </FormLabel>
               <FormControl className="w-full">
                 <CountrySelector
-                  defaultValue={field.value ?? ""}
+                  defaultValue={field.value ?? "US"}
                   onSelect={(code, name) => {
                     field.onChange(name);
                     form.setValue("countryCode", code);
                   }}
                 />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="baseCurrency"
-          render={({ field }) => (
-            <FormItem className="mt-4 border-b border-border pb-4">
-              <FormLabel className="text-xs text-[#666] font-normal">
-                Base currency
-              </FormLabel>
-              <FormControl>
-                <SelectCurrency currencies={uniqueCurrencies} {...field} />
-              </FormControl>
-
-              <FormDescription>
-                If you have multiple accounts in different currencies, this will
-                be the default currency for your company. You can change it
-                later.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

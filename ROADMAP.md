@@ -371,37 +371,37 @@ Playbooks (actionable next steps)
 **Status**: 🚧 In Progress (2025-09-30)
 **Priority**: CRITICAL - This is the foundation for the product vision
 
-### Authentication & Onboarding Setup - 🚧 TODO
+### Authentication & Onboarding Setup - ✅ COMPLETE
 
 **Priority**: HIGH - Required for production launch
 
 **Tasks:**
 
-- [ ] **Setup OAuth Providers**
-  - [ ] Configure Apple Sign In (Apple Developer Console)
-  - [ ] Configure GitHub OAuth (GitHub App settings)
-  - [ ] Configure Google OAuth (Google Cloud Console)
-  - [ ] Update environment variables with client IDs/secrets
-  - [ ] Test OAuth flows in dashboard
+- [x] **Setup OAuth Providers**
+  - [x] Configure Apple Sign In (Apple Developer Console)
+  - [x] Configure GitHub OAuth (GitHub App settings)
+  - [x] Configure Google OAuth (Google Cloud Console)
+  - [x] Update environment variables with client IDs/secrets
+  - [x] Test OAuth flows in dashboard
 
-- [ ] **Setup OTP (One-Time Password) Authentication**
-  - [ ] Configure email-based OTP system
-  - [ ] Setup SMS OTP provider (optional fallback)
-  - [ ] Implement OTP verification UI
-  - [ ] Add rate limiting for OTP requests
+- [x] **Setup OTP (One-Time Password) Authentication**
+  - [x] Configure email-based OTP system
+  - [x] Setup SMS OTP provider (optional fallback)
+  - [x] Implement OTP verification UI
+  - [x] Add rate limiting for OTP requests
 
-- [ ] **Transactional Email System**
-  - [ ] Setup email service provider (Resend/SendGrid/AWS SES)
-  - [ ] Design email templates:
-    - [ ] Welcome email (post-signup)
-    - [ ] OTP verification code
-    - [ ] Password reset
-    - [ ] Magic link authentication
-    - [ ] New brief notification
-    - [ ] Breaking change alert
-  - [ ] Configure email sending infrastructure
-  - [ ] Test email delivery and rendering
-  - [ ] Add unsubscribe management
+- [x] **Transactional Email System**
+  - [x] Setup email service provider (Resend/SendGrid/AWS SES)
+  - [x] Design email templates:
+    - [x] Welcome email (post-signup)
+    - [x] OTP verification code
+    - [x] Password reset
+    - [x] Magic link authentication
+    - [x] New brief notification
+    - [x] Breaking change alert
+  - [x] Configure email sending infrastructure
+  - [x] Test email delivery and rendering
+  - [x] Add unsubscribe management
 
 ### Backend: Fix OpenAI Responses API Integration - ✅ COMPLETE
 

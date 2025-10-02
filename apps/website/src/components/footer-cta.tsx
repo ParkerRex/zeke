@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@zeke/ui/button";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function FooterCTA() {
@@ -22,26 +21,11 @@ export function FooterCTA() {
       </p>
 
       <div className="mt-10 md:mb-8">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="https://cal.com/zeke-team/intro"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button
-              variant="outline"
-              className="border border-primary h-12 px-6 dark:border-white border-black text-primary hidden md:block"
-            >
-              Talk to founders
-            </Button>
-          </Link>
-
-          <a href="https://app.zekehq.com">
-            <Button className="h-12 px-5 bg-black text-white dark:bg-white dark:text-black hover:bg-black/80 dark:hover:bg-white/80">
-              Start free trial
-            </Button>
-          </a>
-        </div>
+        <a href="https://app.zekehq.com">
+          <Button className="h-12 px-5 bg-black text-white dark:bg-white dark:text-black hover:bg-black/80 dark:hover:bg-white/80">
+            Start free trial
+          </Button>
+        </a>
       </div>
     </div>
   );

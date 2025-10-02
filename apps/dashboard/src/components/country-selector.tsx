@@ -42,7 +42,7 @@ export function CountrySelector({ defaultValue, onSelect }: Props) {
           aria-expanded={open}
           className="w-full justify-between truncate font-normal"
         >
-          {selected?.name ?? "Select country"}
+          {selected?.name ?? "United States"}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

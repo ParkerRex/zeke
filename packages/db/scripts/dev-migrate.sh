@@ -15,7 +15,7 @@ echo "📍 Database: $DATABASE_SESSION_POOLER_URL"
 # Check if Supabase is running
 if ! curl -s http://127.0.0.1:54321/health >/dev/null 2>&1; then
     echo "❌ ERROR: Local Supabase is not running"
-    echo "💡 Start it with: cd packages/db && supabase start"
+    echo "💡 Start it with: cd apps/api && supabase start"
     exit 1
 fi
 

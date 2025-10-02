@@ -7,11 +7,12 @@ export const getTeamById = async (db: Database, id: string) => {
     .select({
       id: teams.id,
       name: teams.name,
+      slug: teams.slug,
+      ownerId: teams.ownerId,
       logoUrl: teams.logoUrl,
       email: teams.email,
       inboxId: teams.inboxId,
       plan: teams.plan,
-      baseCurrency: teams.baseCurrency,
       countryCode: teams.countryCode,
     })
     .from(teams)
@@ -47,8 +48,7 @@ export const updateTeamById = async (
 export type CreateTeamParams = {
   name: string;
   userId: string;
-  email: string;
-  baseCurrency?: string;
+  email?: string;
   countryCode?: string;
   logoUrl?: string;
   switchTeam?: boolean;
@@ -56,14 +56,21 @@ export type CreateTeamParams = {
 
 export const createTeam = async (db: Database, params: CreateTeamParams) => {
   try {
+    // Generate slug from team name (lowercase, replace spaces with hyphens)
+    const slug = params.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+
     const [newTeam] = await db
       .insert(teams)
       .values({
         name: params.name,
-        baseCurrency: params.baseCurrency,
-        countryCode: params.countryCode,
-        logoUrl: params.logoUrl,
+        slug: slug,
+        ownerId: params.userId, // Set owner
         email: params.email,
+        logoUrl: params.logoUrl,
+        countryCode: params.countryCode,
       })
       .returning({ id: teams.id });
 
@@ -102,8 +109,7 @@ export async function getTeamMembers(db: Database, teamId: string) {
       teamId: usersOnTeam.teamId,
       userId: usersOnTeam.userId,
       role: usersOnTeam.role,
-      createdAt: usersOnTeam.createdAt,
-      invitedBy: usersOnTeam.invitedBy,
+      joinedAt: usersOnTeam.joinedAt,
       user: {
         id: users.id,
         email: users.email,

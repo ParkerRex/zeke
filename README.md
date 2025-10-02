@@ -138,7 +138,7 @@ Since we forked from Midday, here's the translation table:
 ```bash
 # Required
 - Node 20+
-- pnpm 8+
+- Bun
 - PostgreSQL (or Supabase local)
 
 # Services (can run without for basic dev)
@@ -150,25 +150,134 @@ Since we forked from Midday, here's the translation table:
 ### Local Development
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Set up environment
 cp .env.example .env.local
 # Add your API keys to .env.local
 
 # Start Supabase locally
+cd apps/api
 supabase start
 
 # Run database migrations
-pnpm db:migrate
+cd ../../packages/db
+bun run migrate:dev
 
 # Start everything
-pnpm dev
+cd ../../
+bun dev
 
 # Access at
 # - Dashboard: http://localhost:3000
 # - API: http://localhost:3001
 ```
+
+## Database Setup (The WTF Explanation)
+
+### The Confusion: 3 Packages Doing "Database Stuff"
+
+If you're confused by `apps/api/supabase/`, `packages/db/`, and `packages/supabase/` all existing, you're not alone. Here's what the fuck each one actually does:
+
+#### `apps/api/supabase/` - The Database ENGINE
+- Contains `config.toml` - Supabase CLI configuration
+- This is WHERE THE DATABASE RUNS (Postgres container)
+- When you run `supabase start` here, it spins up:
+  - PostgreSQL database (localhost:54322)
+  - Supabase Studio (localhost:54323)
+  - Auth service
+  - Storage service
+- **This is NOT where your schema lives - it's just the container**
+
+#### `packages/db/` - Your SCHEMA & QUERIES (Source of Truth)
+- Schema definitions in `schema.ts`
+- Database queries in `queries/`
+- Drizzle ORM migrations
+- **This is where you define tables and write queries**
+- Think of this as "what the database should look like"
+
+#### `packages/supabase/` - Client Library
+- Authentication helpers
+- Supabase JavaScript SDK
+- Type generation utilities
+- **Just for talking to Supabase services from your app**
+
+### The Actual Workflow
+
+```bash
+# 1. Start the database container
+cd apps/api
+supabase start        # Spins up Postgres + auth + storage
+
+# 2. Enable vector extension (FIRST TIME ONLY)
+psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# 3. Change your schema
+cd ../../packages/db
+# Edit src/schema.ts
+
+# 4. Apply schema changes to local database
+bun run migrate:dev   # Pushes Drizzle schema to local Supabase
+
+# 5. Apply to production (when ready)
+export DATABASE_SESSION_POOLER_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
+bun run migrate       # Pushes to production Supabase
+
+# 6. Regenerate TypeScript types from production schema
+cd ../supabase
+bun run db:generate   # Pulls latest schema types from Supabase
+
+# 7. Use in your app
+# Import from @zeke/db/queries in your code
+```
+
+### Why It's This Way
+
+- **Supabase** = Database host + auth provider (runs Postgres)
+- **Drizzle** = ORM that talks to Supabase's Postgres (type-safe queries)
+- You have Supabase config in `apps/api` but schema in `packages/db` because:
+  - Supabase CLI needs to be in an app (it's the runtime)
+  - Drizzle schema is a package (it's shared code)
+
+### Common Mistakes
+
+❌ `supabase db start` - This command doesn't exist
+✅ `supabase start` - Starts everything including DB
+
+❌ Editing schema in `apps/api/supabase/`
+✅ Edit schema in `packages/db/src/schema.ts`
+
+❌ Running migrations from `apps/api`
+✅ Run migrations from `packages/db`
+
+### Troubleshooting
+
+**"type 'vector' does not exist"**
+```bash
+# Enable the vector extension for embeddings
+psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# For production
+psql "postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+**"only one postgres container starting"**
+- This is normal - imgproxy and pooler are optional services
+- The important container is `supabase_db_zeke` on port 54322
+- Check with: `docker ps --filter "name=supabase_db"`
+
+**"SSL connection is required" (production)**
+- Make sure `prod-ca-2021.crt` exists in project root
+- Use direct connection URL (not pooler) if issues persist
+- Check `packages/db/drizzle.config.ts` has SSL config
+
+### TL;DR
+
+1. **Database runs in**: `apps/api` (the container)
+2. **Schema lives in**: `packages/db` (the definitions)
+3. **Client used from**: `packages/supabase` (the SDK)
+
+This is actually a GOOD architecture (Supabase hosting + Drizzle ORM). It's just poorly named and confusing at first glance. See `packages/db/DEPLOYMENT.md` for detailed migration workflows.
 
 ## Key Directories to Understand
 

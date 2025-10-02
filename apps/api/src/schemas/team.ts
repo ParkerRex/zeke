@@ -103,11 +103,6 @@ export const createTeamSchema = z.object({
       "Research team name for collaborative discovery and insight publishing",
     example: "Acme Research Lab",
   }),
-  baseCurrency: z.string().openapi({
-    description:
-      "Primary currency for financial analysis in research outcomes (ISO 4217)",
-    example: "USD",
-  }),
   countryCode: z.string().optional().openapi({
     description: "Geographic context for research localization and compliance",
     example: "US",

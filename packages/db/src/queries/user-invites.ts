@@ -14,7 +14,6 @@ export async function getUserInvites(db: Database, email: string) {
       team: {
         id: teams.id,
         name: teams.name,
-        slug: teams.slug,
       },
     })
     .from(teamInvites)

@@ -8,7 +8,7 @@ export function Hero() {
   return (
     <section className="mt-[60px] lg:mt-[180px] min-h-[530px] relative lg:h-[calc(100vh-300px)]">
       <div className="flex flex-col">
-        <Link href="/updates/zeke-v1-1">
+        <Link href="/blog/zeke-v1-1">
           <Button
             variant="outline"
             className="rounded-full border-border flex space-x-2 items-center"
@@ -34,24 +34,9 @@ export function Hero() {
         </h2>
 
         <div className="mt-8 md:mt-10">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="https://cal.com/zeke-team/intro"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button
-                variant="outline"
-                className="border-transparent h-11 px-6 dark:bg-[#1D1D1D] bg-[#F2F1EF]"
-              >
-                Talk to founders
-              </Button>
-            </Link>
-
-            <a href="https://app.zekehq.com">
-              <Button className="h-11 px-5">Start free trial</Button>
-            </a>
-          </div>
+          <a href="https://app.zekehq.com">
+            <Button className="h-11 px-5">Start free trial</Button>
+          </a>
         </div>
 
         <p className="text-xs text-[#707070] mt-4 font-mono">

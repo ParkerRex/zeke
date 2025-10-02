@@ -222,16 +222,16 @@ ENGINE_API_KEY=xxx
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Run Trigger.dev dev server
-pnpm trigger:dev
+bun trigger:dev
 
 # In another terminal, run the worker
-pnpm dev:jobs
+bun dev:jobs
 
 # Trigger a test job
-pnpm trigger:test
+bun trigger:test
 ```
 
 ## Deployment
@@ -240,10 +240,10 @@ Jobs are automatically deployed when pushing to main:
 
 ```bash
 # Deploy to staging
-pnpm run deploy:staging
+bun run deploy:staging
 
 # Deploy to production
-pnpm run deploy:production
+bun run deploy:production
 ```
 
 ## Monitoring

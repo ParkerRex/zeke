@@ -7,7 +7,6 @@ import { Button } from "@zeke/ui/button";
 import { Card, CardContent } from "@zeke/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { env } from "@/env";
 
 export function PromoCard() {
   return (
@@ -27,7 +26,7 @@ export function PromoCard() {
           See how you scored in predicting model & platform moves.
         </p>
         <Button asChild className="mt-3">
-          <Link href={`${env.NEXT_PUBLIC_APP_URL}/sign-up`}>
+          <Link href={`${process.env.NEXT_PUBLIC_APP_URL || "/"}/sign-up`}>
             See predictions
           </Link>
         </Button>

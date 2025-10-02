@@ -29,16 +29,16 @@ export function Footer() {
                   <Link href="/overview">Overview</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
-                  <Link href="/inbox">Inbox</Link>
+                  <Link href="/sources">Content Sources</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
-                  <Link href="/vault">Vault</Link>
+                  <Link href="/library">Library</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
-                  <Link href="/tracker">Tracker</Link>
+                  <Link href="/insights">Insights</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
-                  <Link href="/invoice">Invoice</Link>
+                  <Link href="/playbooks">Playbooks</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
                   <Link href="/pricing">Pricing</Link>
@@ -77,10 +77,7 @@ export function Footer() {
               <span>Company</span>
               <ul>
                 <li className="transition-colors text-[#878787]">
-                  <Link href="/story">Story</Link>
-                </li>
-                <li className="transition-colors text-[#878787]">
-                  <Link href="/updates">Updates</Link>
+                  <Link href="/blog">Blog</Link>
                 </li>
                 <li className="transition-colors text-[#878787]">
                   <Link href="/oss-friends">OSS friends</Link>

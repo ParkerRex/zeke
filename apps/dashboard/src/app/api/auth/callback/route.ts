@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 
       // If user have no teams, redirect to team creation
       const { count } = await supabase
-        .from("users_on_team")
+        .from("team_members")
         .select("*", { count: "exact" })
         .eq("user_id", userId);
 

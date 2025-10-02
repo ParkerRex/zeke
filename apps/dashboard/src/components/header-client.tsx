@@ -110,12 +110,12 @@ export function IngestionHealth() {
 export function NotificationBadge() {
   const { openNotifications } = useModalParams();
 
-  // Get bootstrap data from context
-  const { data: bootstrap } = api.workspace.bootstrap.useQuery(undefined, {
+  // Get workspace data from context
+  const { data: workspace } = api.workspace.get.useQuery(undefined, {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const unreadCount = bootstrap?.navCounts?.notifications || 0;
+  const unreadCount = workspace?.navCounts?.notifications || 0;
 
   return (
     <Button
@@ -157,11 +157,11 @@ export function SearchTrigger() {
 }
 
 export function TrialStatus() {
-  const { data: bootstrap } = api.workspace.bootstrap.useQuery(undefined, {
+  const { data: workspace } = api.workspace.get.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
 
-  const team = bootstrap?.team;
+  const team = workspace?.team;
   if (!team || team.subscriptionStatus !== "trialing") return null;
 
   const daysLeft = team.trialDaysLeft || 0;

@@ -1,5 +1,5 @@
 import { CreateTeamForm } from "@/components/forms/create-team-form";
-import { getCountryCode, getCurrency } from "@zeke/location";
+import { getCountryCode } from "@zeke/location";
 import { Icons } from "@zeke/ui/icons";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function CreateTeam() {
-  const currency = getCurrency();
   const countryCode = getCountryCode();
 
   return (
@@ -27,15 +26,12 @@ export default function CreateTeam() {
           <div className="text-center">
             <h1 className="text-lg mb-2 font-serif">Setup your team</h1>
             <p className="text-[#878787] text-sm mb-8">
-              Add your company name, country and currency. We’ll use this to
-              personalize your experience in Zeke.
+              Add your company name and country. We'll use this to personalize
+              your experience in Zeke.
             </p>
           </div>
 
-          <CreateTeamForm
-            defaultCurrencyPromise={currency}
-            defaultCountryCodePromise={countryCode}
-          />
+          <CreateTeamForm defaultCountryCodePromise={countryCode} />
         </div>
       </div>
     </>

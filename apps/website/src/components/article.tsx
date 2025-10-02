@@ -23,11 +23,11 @@ export function Article({ data, firstPost }: Props) {
       <ArticleInView slug={data.slug} firstPost={firstPost} />
 
       <PostStatus status={data.metadata.tag} />
-      <Link className="mb-6 block" href={`/updates/${data.slug}`}>
+      <Link className="mb-6 block" href={`/blog/${data.slug}`}>
         <h2 className="font-medium text-2xl mb-6">{data.metadata.title}</h2>
       </Link>
 
-      <div className="updates">
+      <div className="blog">
         {data.metadata.image && (
           <Image
             src={data.metadata.image}

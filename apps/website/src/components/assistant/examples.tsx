@@ -1,47 +1,47 @@
 export const chatExamples = [
   {
-    title: `What's my burn rate`,
+    title: "Summarize today's research",
     content:
-      "Based on your historical data, your average burn rate is $8,933.33 per month. Your expected runway is 7 months, ending on January 5, 2025.",
+      "Based on 14 sources ingested today, the key themes are: AI agents in enterprise (8 mentions), multimodal reasoning improvements (5 mentions), and new regulatory frameworks in EU (3 mentions).",
   },
   {
-    title: `What's my runway`,
+    title: "Find mentions of pricing concerns",
     content:
-      "Based on your historical data, your expected runway is 7 months, ending in Jan 5, 2025.",
+      "Found 23 mentions of pricing concerns across 12 transcripts. Most common theme: willingness to pay for ROI-proven tools, but sticker shock on seat-based models.",
   },
   {
-    title: "What is my spending on Software",
+    title: "What pain points appear most",
     content:
-      "You have spent $8,933.33 on Software between Jun 1, 2023 and Jun 5, 2024",
+      "Top 3 pain points from last 30 days: 1) Integration complexity (47 mentions), 2) Lack of cited evidence (31 mentions), 3) Time spent context-switching (28 mentions).",
   },
   {
-    title: "Find a receipt or invoice",
+    title: "Draft a campaign brief for Q2",
     content:
-      "Please provide the name of the receipt or invoice you are looking for.",
+      "Based on your research library and GTM goals, here's a campaign brief focusing on enterprise integration pain points with 12 cited sources and 3 recommended experiments.",
   },
   {
-    title: "Find a transaction",
+    title: "Show insights by persona",
     content:
-      "Could you please provide more details about the transaction you are looking for?",
+      "Here's the breakdown: Product Managers (34 insights), Engineers (28 insights), Sales Leaders (19 insights). Click any group to see the top 5 themes with citations.",
   },
   {
-    title: `What's my profit for last year`,
+    title: "What are competitors saying",
     content:
-      "Based on the period from Jun 1, 2022 and Jun 1, 2023 your current profit is $18,933.33. In the previous period, your profit was $3,422.33",
+      "Based on 8 competitor podcasts and 4 earnings calls: increased focus on verticalization, emphasis on security compliance, and new pricing experiments around usage-based models.",
   },
   {
-    title: `What's my revenue`,
+    title: "Find quotes about AI skepticism",
     content:
-      "Based on the period from Jun 1, 2023 and Jun 5, 2024 your revenue is $18,933.33. In the previous period, your profit was $20,933.33.",
+      "Found 17 quotes across 9 sources expressing AI skepticism. Most cited concern: 'hallucinations erode trust' (6 mentions). Here are the timestamped clips.",
   },
   {
-    title: "Forecast profit",
+    title: "Generate enablement brief",
     content:
-      "Based on the last 12 months profit data, the forecasted profit for the next month is approximately $18,933.33. This is an indication of the forecast and should be verified.",
+      "Created a sales enablement brief with 5 top objections, recommended responses, and 14 customer quotes you can use. All citations included.",
   },
   {
-    title: "Forecast revenue",
+    title: "Compare last month to this month",
     content:
-      "Based on the last 12 months revenue data, the average monthly revenue is $3,422.33. Therefore, the forecasted revenue for the next month is approximately $18,933.33. This is an indication of the forecast and should be verified.",
+      "Last month: 42 sources, 8 key themes. This month: 51 sources, 12 key themes. New emerging topics: agentic workflows (15 mentions) and collaborative AI (9 mentions).",
   },
 ];

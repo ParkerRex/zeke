@@ -1,4 +1,4 @@
-project_id = "local"
+project_id = "zeke"
 
 [api]
 enabled = true
@@ -9,8 +9,6 @@ max_rows = 1000000
 
 [db]
 port = 54322
-schema = ""
-seed = ""
 
 [realtime]
 enabled = true
@@ -39,7 +37,6 @@ jwt_expiry = 36000
 
 [auth.email]
 enable_signup = true
-double_confirm_changes_enabled = false
 enable_confirmations = false
 
 [auth.sms]
@@ -56,12 +53,6 @@ redirect_uri = "http://localhost:54321/auth/v1/callback"
 enabled = true
 client_id = "env(GITHUB_CLIENT_ID)"
 secret = "env(GITHUB_SECRET)"
-redirect_uri = "http://localhost:54321/auth/v1/callback"
-
-[auth.external.apple]
-enabled = true
-client_id = "env(APPLE_CLIENT_ID)"
-secret = "env(APPLE_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 
 [analytics]

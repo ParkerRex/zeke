@@ -131,7 +131,7 @@ export const CardStack = ({
                     className="w-[35px] h-[20px] z-20 absolute top-[135px] left-[8px]"
                     onClick={() => onChangeCard(cards.find((c) => c.id === 3))}
                   >
-                    <span className="sr-only">Inbox</span>
+                    <span className="sr-only">Sources</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -139,7 +139,7 @@ export const CardStack = ({
                   className="py-1 px-3 rounded-sm"
                   sideOffset={8}
                 >
-                  <p className="text-xs">Inbox</p>
+                  <p className="text-xs">Sources</p>
                 </TooltipContent>
               </Tooltip>
 
@@ -150,7 +150,7 @@ export const CardStack = ({
                     className="w-[35px] h-[20px] z-20 absolute top-[170px] left-[8px]"
                     onClick={() => onChangeCard(cards.find((c) => c.id === 2))}
                   >
-                    <span className="sr-only">Tracker</span>
+                    <span className="sr-only">Insights</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -158,7 +158,7 @@ export const CardStack = ({
                   className="py-1 px-3 rounded-sm"
                   sideOffset={8}
                 >
-                  <p className="text-xs">Tracker</p>
+                  <p className="text-xs">Insights</p>
                 </TooltipContent>
               </Tooltip>
 
@@ -169,7 +169,7 @@ export const CardStack = ({
                     className="w-[35px] h-[20px] z-20 absolute top-[230px] left-[8px]"
                     onClick={() => onChangeCard(cards.find((c) => c.id === 4))}
                   >
-                    <span className="sr-only">Vault</span>
+                    <span className="sr-only">Library</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -177,7 +177,7 @@ export const CardStack = ({
                   className="py-1 px-3 rounded-sm"
                   sideOffset={8}
                 >
-                  <p className="text-xs">Vault</p>
+                  <p className="text-xs">Library</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
