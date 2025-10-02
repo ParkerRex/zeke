@@ -39,7 +39,7 @@ export const InfiniteMovingCards = ({
         if (scrollerRef.current) {
           scrollerRef.current.appendChild(duplicatedItem);
         }
-      });
+      }
 
       getDirection();
       getSpeed();

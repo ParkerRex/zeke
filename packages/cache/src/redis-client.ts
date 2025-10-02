@@ -19,6 +19,13 @@ export class RedisCache {
     const redisUrl = process.env.REDIS_URL;
 
     if (!redisUrl) {
+      const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+      if (isDev) {
+        console.warn("⚠️  REDIS_URL not configured - start Redis with 'bun run redis:start' or 'bun dev'");
+        console.warn("📖 See packages/cache/README.md for setup instructions");
+        // Gracefully degrade - cache operations will no-op
+        throw new Error("REDIS_UNAVAILABLE_DEV");
+      }
       throw new Error("REDIS_URL environment variable is required");
     }
 
@@ -72,6 +79,10 @@ export class RedisCache {
       const value = await redis.get(this.getKey(key));
       return this.parseValue<T>(value);
     } catch (error) {
+      // Silently return undefined if Redis is unavailable in dev
+      if (error instanceof Error && error.message === "REDIS_UNAVAILABLE_DEV") {
+        return undefined;
+      }
       console.error(
         `Redis get error for ${this.prefix} cache, key "${key}":`,
         error,
@@ -94,6 +105,10 @@ export class RedisCache {
         await redis.expire(redisKey, ttl);
       }
     } catch (error) {
+      // Silently no-op if Redis is unavailable in dev
+      if (error instanceof Error && error.message === "REDIS_UNAVAILABLE_DEV") {
+        return;
+      }
       console.error(
         `Redis set error for ${this.prefix} cache, key "${key}":`,
         error,
@@ -108,6 +123,10 @@ export class RedisCache {
       const redis = await this.getRedisClient();
       await redis.del(this.getKey(key));
     } catch (error) {
+      // Silently no-op if Redis is unavailable in dev
+      if (error instanceof Error && error.message === "REDIS_UNAVAILABLE_DEV") {
+        return;
+      }
       console.error(
         `Redis delete error for ${this.prefix} cache, key "${key}":`,
         error,

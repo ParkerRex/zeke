@@ -1,30 +1,29 @@
 "use client";
 
 import { InfiniteMovingCards } from "@/components/infinite-moving-cards";
-import React from "react";
 import { cn } from "@zeke/ui/cn";
+import React from "react";
 
 const testimonials = [
   {
     name: "Sarah Chen",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
     handle: "@sarahchen",
     verified: false,
-    quote: "Finally turned my 50+ saved podcast episodes into actionable insights. Saved me 20+ hours this week.",
+    quote:
+      "Finally turned my 50+ saved podcast episodes into actionable insights. Saved me 20+ hours this week.",
   },
   {
     name: "Marcus Johnson",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
     handle: "@marcusj_dev",
     verified: false,
-    quote: "The timestamp citations are a game-changer. I can verify every insight instantly.",
+    quote:
+      "The timestamp citations are a game-changer. I can verify every insight instantly.",
   },
   {
     name: "Emma Rodriguez",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
     handle: "@emmarod",
     verified: false,
     quote:
@@ -32,48 +31,47 @@ const testimonials = [
   },
   {
     name: "Alex Patel",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
     handle: "@alexpatel",
     verified: false,
-    quote: "Turned 3 hours of podcast listening into a 5-minute brief with all the key insights.",
+    quote:
+      "Turned 3 hours of podcast listening into a 5-minute brief with all the key insights.",
   },
   {
     name: "Jordan Lee",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
     handle: "@jordanlee_pm",
     verified: false,
-    quote: "The custom playbooks feature is incredible. I can now systematically process competitive research.",
+    quote:
+      "The custom playbooks feature is incredible. I can now systematically process competitive research.",
   },
   {
     name: "Taylor Kim",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Taylor",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Taylor",
     handle: "@taylorkim",
     verified: false,
-    quote: "Being able to export verified citations with timestamps makes my research reports 10x more credible.",
+    quote:
+      "Being able to export verified citations with timestamps makes my research reports 10x more credible.",
   },
   {
     name: "Jamie Santos",
     handle: "@jamiesantos",
     verified: false,
-    quote: "The source integration is seamless. I just paste a link and get comprehensive insights back.",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Jamie",
+    quote:
+      "The source integration is seamless. I just paste a link and get comprehensive insights back.",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jamie",
   },
   {
     name: "Casey Morgan",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Casey",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Casey",
     handle: "@caseymorgan",
     verified: false,
-    quote: "Zeke processes everything from ArXiv papers to YouTube tutorials. My research workflow is finally unified.",
+    quote:
+      "Zeke processes everything from ArXiv papers to YouTube tutorials. My research workflow is finally unified.",
   },
   {
     name: "River Thompson",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=River",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=River",
     handle: "@riverthompson",
     verified: false,
     quote:
@@ -81,16 +79,15 @@ const testimonials = [
   },
   {
     name: "Morgan Walsh",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Morgan",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Morgan",
     handle: "@morganwalsh_",
     verified: false,
-    quote: "The insight extraction is scary good. It finds connections between sources that I would have never noticed manually.",
+    quote:
+      "The insight extraction is scary good. It finds connections between sources that I would have never noticed manually.",
   },
   {
     name: "Dakota Price",
-    avatarUrl:
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Dakota",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dakota",
     handle: "@dakotaprice",
     verified: false,
     quote:
@@ -160,12 +157,12 @@ function InfiniteMovingLogos({
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
 
-      scrollerContent.forEach((item) => {
+      for (const item of scrollerContent) {
         const duplicatedItem = item.cloneNode(true);
         if (scrollerRef.current) {
           scrollerRef.current.appendChild(duplicatedItem);
         }
-      });
+      }
 
       getDirection();
       getSpeed();

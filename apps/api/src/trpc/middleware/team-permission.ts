@@ -48,9 +48,18 @@ export const withTeamPermission = async <TReturn>(opts: {
       }
     }
 
+    // Debug: Log the actual error details
+    console.error("ensureTeamAccess failed with unexpected error:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: error?.constructor?.name,
+      userId,
+    });
+
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Failed to resolve team access",
+      cause: error,
     });
   }
 

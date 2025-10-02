@@ -97,8 +97,9 @@ export const createTeam = async (db: Database, params: CreateTeamParams) => {
 
     return newTeam.id;
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to create team.");
+    console.error("Failed to create team:", error);
+    // Re-throw the original error to preserve details
+    throw error;
   }
 };
 

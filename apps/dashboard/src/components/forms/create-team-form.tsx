@@ -5,6 +5,7 @@
 import { revalidateAfterTeamChange } from "@/actions/revalidate-action";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
+import { logger } from "@zeke/logger";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
@@ -92,28 +93,35 @@ export function CreateTeamForm({
       onError: (error) => {
         const errorId = `team_creation_error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        const errorContext = {
+        // Extract TRPC error details
+        const trpcError = error && typeof error === 'object' && 'data' in error
+          ? (error as any).data
+          : null;
+
+        logger.error({
+          errorId,
+          msg: "Team creation mutation failed",
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
-          timestamp: new Date().toISOString(),
+          trpcCode: trpcError?.code,
+          trpcHttpStatus: trpcError?.httpStatus,
+          trpcData: trpcError,
           url: window.location.href,
-          userAgent: navigator.userAgent,
-        };
-
-        console.error(
-          `[${errorId}] Team creation mutation failed`,
-          errorContext,
-        );
+          timestamp: new Date().toISOString(),
+        });
 
         // Capture error in Sentry for debugging
         if (error instanceof Error && process.env.NODE_ENV === "production") {
           import("@sentry/nextjs").then((Sentry) => {
             Sentry.captureException(error, {
               extra: {
-                ...errorContext,
                 errorId,
                 component: "CreateTeamForm",
                 action: "team_creation_mutation",
+                trpcCode: trpcError?.code,
+                trpcHttpStatus: trpcError?.httpStatus,
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
               },
             });
           });

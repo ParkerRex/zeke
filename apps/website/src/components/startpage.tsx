@@ -8,6 +8,7 @@ import { SectionThree } from "@/components/section-three";
 import { SectionTwo } from "@/components/section-two";
 import SectionStories from "./section-stories";
 import { SectionVideo } from "./section-video";
+import { SourceLogos } from "./testimonials";
 
 export function StartPage() {
   return (
