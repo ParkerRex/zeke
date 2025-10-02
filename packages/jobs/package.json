@@ -22,8 +22,8 @@
     "fast-xml-parser": "^4.5.3",
     "jsdom": "^24.1.3",
     "openai": "^5.19.1",
-    "trigger.dev": "4.0.1",
-    "zod": "^3.25.64"
+    "trigger.dev": "4.0.4",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/heic-convert": "2.1.0",
