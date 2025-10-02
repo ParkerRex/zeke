@@ -18,7 +18,6 @@ const config = {
   transpilePackages: [
     "@zeke/ui",
     "@zeke/tailwind",
-    "@zeke/invoice",
     "@zeke/api",
   ],
   serverExternalPackages: ["@react-pdf/renderer", "pdfjs-dist"],

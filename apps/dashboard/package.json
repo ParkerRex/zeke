@@ -28,7 +28,6 @@
     "@zeke/engine": "workspace:*",
     "@zeke/events": "workspace:*",
     "@zeke/inbox": "workspace:*",
-    "@zeke/invoice": "workspace:*",
     "@zeke/location": "workspace:*",
     "@zeke/supabase": "workspace:*",
     "@zeke/ui": "workspace:*",
