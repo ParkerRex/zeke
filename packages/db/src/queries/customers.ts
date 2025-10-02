@@ -7,7 +7,6 @@ import {
   // trackerProjects, // REMOVED: trackerProjects table removed in migration to Zeke
 } from "@db/schema";
 import { buildSearchQuery } from "@zeke/db/utils/search-query";
-// import { generateToken } from "@zeke/invoice/token"; // REMOVED: invoice module dependency
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm/sql/sql";
 // import { createActivity } from "./activities"; // TODO: Re-enable when activities module is created

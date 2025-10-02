@@ -28,9 +28,6 @@
   },
   "dependencies": {
     "@date-fns/utc": "^2.1.1",
-    "@zeke/categories": "workspace:*",
-    "@zeke/encryption": "workspace:*",
-    "@zeke/invoice": "workspace:*",
     "@zeke/logger": "workspace:*",
     "@types/pg": "^8.15.5",
     "camelcase-keys": "^10.0.0",

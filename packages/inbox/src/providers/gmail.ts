@@ -1,6 +1,6 @@
 import type { Database } from "@zeke/db/client";
 import { updateInboxAccount } from "@zeke/db/queries";
-import { encrypt } from "@zeke/encryption";
+import { encrypt } from "../encryption";
 import { ensureFileExtension } from "@zeke/utils";
 import type { Credentials } from "google-auth-library";
 import { type Auth, type gmail_v1, google } from "googleapis";

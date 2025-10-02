@@ -1648,7 +1648,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.id],
     references: [userProfiles.user_id],
   }),
-  usersOnTeams: many(teamMembers),
+  usersOnTeams: many(teamMembers, {
+    relationName: "userTeamMemberships",
+  }),
   team: one(teams, {
     fields: [users.teamId],
     references: [teams.id],
@@ -1659,10 +1661,12 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   user: one(users, {
     fields: [teamMembers.userId],
     references: [users.id],
+    relationName: "userTeamMemberships",
   }),
   team: one(teams, {
     fields: [teamMembers.teamId],
     references: [teams.id],
+    relationName: "teamMemberships",
   }),
 }));
 
@@ -1671,5 +1675,7 @@ export const teamsRelations = relations(teams, ({ one, many }) => ({
     fields: [teams.ownerId],
     references: [users.id],
   }),
-  members: many(teamMembers),
+  members: many(teamMembers, {
+    relationName: "teamMemberships",
+  }),
 }));

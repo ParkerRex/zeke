@@ -16,7 +16,6 @@
     "test": "bun test src"
   },
   "dependencies": {
-    "@zeke/encryption": "workspace:*",
     "@zeke/supabase": "workspace:*",
     "googleapis": "^150.0.1",
     "zod": "^4.1.11",

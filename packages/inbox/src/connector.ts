@@ -1,6 +1,6 @@
 import type { Database } from "@zeke/db/client";
 import { getInboxAccountById, upsertInboxAccount } from "@zeke/db/queries";
-import { decrypt, encrypt } from "@zeke/encryption";
+import { decrypt, encrypt } from "./encryption";
 import { GmailProvider } from "./providers/gmail";
 import {
   type Account,
