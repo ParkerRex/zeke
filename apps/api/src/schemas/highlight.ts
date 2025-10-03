@@ -21,6 +21,73 @@ export const highlightCollaboratorRoleSchema = z
     example: "editor",
   });
 
+export const highlightKindSchema = z
+  .enum([
+    "insight",
+    "quote",
+    "action",
+    "question",
+    "code_example",
+    "code_change",
+    "api_change",
+    "metric",
+  ])
+  .openapi({
+    description: "Type of highlight content",
+    example: "code_example",
+  });
+
+export const createHighlightInputSchema = z
+  .object({
+    storyId: z.string().uuid().openapi({
+      description: "Story to attach the highlight to",
+      example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
+    }),
+    chapterId: z.string().uuid().optional().openapi({
+      description: "Optional chapter association",
+      example: "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+    }),
+    kind: highlightKindSchema.default("insight"),
+    title: z.string().optional().openapi({
+      description: "Optional headline for the highlight",
+      example: "Playbook adoption jumps 30%",
+    }),
+    summary: z.string().min(1).openapi({
+      description: "Short summary of the highlight",
+      example: "Adoption increased after introducing contextual workflows.",
+    }),
+    quote: z.string().optional().openapi({
+      description: "Supporting quote for the highlight",
+      example: "This rollout removed friction for every AE.",
+    }),
+    tags: z.array(z.string()).optional().openapi({
+      description: "Tags to associate",
+      example: ["sales", "enablement"],
+    }),
+    turnIds: z.array(z.string().uuid()).optional().openapi({
+      description: "Transcript turns that support the insight",
+      example: ["4b6c8d0e-1f23-4567-89ab-cdef01234567"],
+    }),
+    startSeconds: z.number().min(0).optional().openapi({
+      description: "Start timestamp for media clips",
+      example: 120,
+    }),
+    endSeconds: z.number().min(0).optional().openapi({
+      description: "End timestamp for media clips",
+      example: 140,
+    }),
+    metadata: z.record(z.unknown()).optional().openapi({
+      description: "Additional metadata for downstream tooling",
+    }),
+    origin: highlightOriginSchema.optional(),
+    originMetadata: z.record(z.unknown()).optional().openapi({
+      description: "Metadata about the source system",
+    }),
+  })
+  .openapi({
+    description: "Payload for creating a new highlight",
+  });
+
 export const highlightReferenceSchema = z
   .object({
     id: z.string().uuid().openapi({
@@ -158,11 +225,11 @@ export const highlightSchema = z
       description: "Associated chapter",
       example: "a1b2c3d4-5678-90ab-cdef-1234567890ab",
     }),
-    origin: highlightOriginSchema,
-    assistantThreadId: z.string().uuid().nullable().openapi({
-      description: "Linked assistant thread if applicable",
-      example: "4d3c2b1a-7890-1234-5678-abcdef012345",
+    kind: highlightKindSchema.openapi({
+      description: "Categorization for the highlight",
+      example: "insight",
     }),
+    origin: highlightOriginSchema,
     title: z.string().nullable().openapi({
       description: "Headline for the highlight",
       example: "Novel claim: GPT-5 trains at 10x scale",
@@ -225,6 +292,114 @@ export const highlightListResponseSchema = z.array(highlightSchema).openapi({
   description: "Highlights returned for a story or query",
 });
 
+export const highlightFeedSortSchema = z
+  .enum(["recent", "relevant", "confidence"])
+  .openapi({
+    description: "Sorting strategy for highlight feeds",
+    example: "recent",
+  });
+
+export const highlightFeedInputSchema = z
+  .object({
+    limit: z.number().int().min(1).max(50).default(20).openapi({
+      description: "Maximum highlights to return",
+      example: 20,
+    }),
+    offset: z.number().int().min(0).default(0).openapi({
+      description: "Number of highlights to skip",
+      example: 0,
+    }),
+    goalIds: z.array(z.string()).optional().openapi({
+      description: "Goals to prioritize in the feed",
+      example: ["improve-onboarding"],
+    }),
+    tags: z.array(z.string()).optional().openapi({
+      description: "Tag filters to apply",
+      example: ["key-insight", "novel-claim"],
+    }),
+    kind: z.union([highlightKindSchema, z.literal("all")]).default("all").openapi({
+      description: "Highlight kind filter, or 'all' for any",
+      example: "insight",
+    }),
+    sortBy: highlightFeedSortSchema.default("recent"),
+    scope: z
+      .enum(["all", "system", "team"])
+      .default("all")
+      .openapi({
+        description:
+          "Which highlights to return: system-generated, team-created, or both",
+        example: "system",
+      }),
+  })
+  .openapi({
+    description: "Parameters for fetching paginated highlight feeds",
+  });
+
+export const highlightFeedResponseSchema = z
+  .object({
+    items: z.array(z.lazy(() => highlightSchema)),
+    pagination: z
+      .object({
+        total: z.number().int(),
+        limit: z.number().int(),
+        offset: z.number().int(),
+        hasMore: z.boolean(),
+      })
+      .openapi({
+        description: "Pagination metadata for the feed",
+      }),
+    filters: z
+      .object({
+        kind: highlightKindSchema.nullable(),
+        tags: z.array(z.string()),
+        goalIds: z.array(z.string()),
+        sortBy: highlightFeedSortSchema,
+        scope: z.enum(["all", "system", "team"]),
+      })
+      .openapi({
+        description: "Filters applied to the feed results",
+      }),
+  })
+  .openapi({
+    description: "Highlight feed with pagination and applied filters",
+  });
+
+export const highlightTrendingInputSchema = z
+  .object({
+    limit: z.number().int().min(1).max(20).default(10).openapi({
+      description: "Maximum highlights to return",
+      example: 10,
+    }),
+    timeframe: z.enum(["day", "week", "month"]).default("week").openapi({
+      description: "Timeframe window to consider",
+      example: "week",
+    }),
+    scope: z
+      .enum(["system", "team", "all"])
+      .default("system")
+      .openapi({
+        description:
+          "Which highlights to consider when evaluating trending results",
+        example: "system",
+      }),
+  })
+  .openapi({
+    description: "Parameters for fetching trending highlights",
+  });
+
+export const highlightTrendingResponseSchema = z
+  .object({
+    items: z.array(z.lazy(() => highlightSchema)),
+    timeframe: z.enum(["day", "week", "month"]),
+    generatedAt: z.string().openapi({
+      description: "Timestamp when the payload was generated",
+      example: "2024-05-16T10:23:00Z",
+    }),
+  })
+  .openapi({
+    description: "Trending highlights snapshot",
+  });
+
 export const highlightEngagementSchema = z
   .object({
     highlightId: z.string().uuid().openapi({
@@ -270,10 +445,22 @@ export const highlightsByStoryInputSchema = z
       description: "Story to fetch highlights for",
       example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
     }),
-    includeGlobal: z.boolean().default(true).openapi({
-      description: "Include highlights shared globally",
-      example: true,
-    }),
+    includeGlobal: z
+      .boolean()
+      .default(true)
+      .openapi({
+        description:
+          "Deprecated: use scope to control whether team or system highlights are returned",
+        example: true,
+      }),
+    scope: z
+      .enum(["all", "system", "team"])
+      .default("all")
+      .openapi({
+        description:
+          "Highlight scope to return for a story: system-generated, team-created, or both",
+        example: "all",
+      }),
   })
   .openapi({
     description: "Parameters for fetching highlights tied to a story",
@@ -294,22 +481,6 @@ export const highlightIdsInputSchema = z
   })
   .openapi({
     description: "Input payload for highlight engagement queries",
-  });
-
-export const highlightKindSchema = z
-  .enum([
-    "insight",
-    "quote",
-    "action",
-    "question",
-    "code_example",
-    "code_change",
-    "api_change",
-    "metric",
-  ])
-  .openapi({
-    description: "Type of highlight content",
-    example: "code_example",
   });
 
 export const prioritizedHighlightSchema = z
@@ -368,3 +539,10 @@ export type PrioritizedHighlightsInput = z.infer<
   typeof prioritizedHighlightsInputSchema
 >;
 export type HighlightsByKindInput = z.infer<typeof highlightsByKindInputSchema>;
+export type HighlightFeedInput = z.infer<typeof highlightFeedInputSchema>;
+export type HighlightFeedResponse = z.infer<typeof highlightFeedResponseSchema>;
+export type HighlightTrendingInput = z.infer<typeof highlightTrendingInputSchema>;
+export type HighlightTrendingResponse = z.infer<
+  typeof highlightTrendingResponseSchema
+>;
+export type CreateHighlightInput = z.infer<typeof createHighlightInputSchema>;

@@ -1,4 +1,4 @@
-import type { MessageDataParts } from "@api/ai/tools/registry";
+import type { MessageDataParts } from "@api/ai/tools/types";
 import type { UIMessage } from "ai";
 
 // Define UITools as a generic type to avoid circular dependencies

@@ -73,12 +73,11 @@ app.post("/", withRequiredScope("chat.write"), async (c) => {
       // Map tool names to suggested action IDs
       // This is a simple mapping - you might want to make this more sophisticated
       const toolNameToActionId: Record<string, string> = {
-        getStoryHighlights: "trending-story-highlights",
-        summarizeSources: "summarize-new-sources",
-        draftBrief: "draft-executive-brief",
-        planPlaybook: "plan-research-playbook",
+        getHighlights: "trending-story-highlights",
+        getSummaries: "summarize-new-sources",
+        getBrief: "draft-executive-brief",
+        getPlaybook: "plan-research-playbook",
         linkInsights: "link-related-insights",
-        webSearch: "perform-web-search",
       };
 
       // Try to find matching action ID for this tool

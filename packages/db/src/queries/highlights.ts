@@ -18,6 +18,8 @@ import {
   asc,
   desc,
   eq,
+  gt,
+  gte,
   inArray,
   isNotNull,
   isNull,
@@ -31,10 +33,39 @@ import {
   numericToNumber,
 } from "../utils/highlights";
 
+type HighlightKind = (typeof highlightKind.enumValues)[number];
 type HighlightOrigin = (typeof highlightOrigin.enumValues)[number];
 type HighlightShareScope = (typeof highlightShareScope.enumValues)[number];
 type HighlightCollaboratorRole =
   (typeof highlightCollaboratorRole.enumValues)[number];
+
+export type HighlightFeedScope = "all" | "team" | "system";
+
+export type HighlightFeedSort = "recent" | "relevant" | "confidence";
+
+export type GetHighlightFeedParams = {
+  teamId?: string | null;
+  limit?: number;
+  offset?: number;
+  kind?: (typeof highlightKind.enumValues)[number] | null;
+  tags?: string[];
+  goalIds?: string[]; // Reserved for future personalization logic
+  sortBy?: HighlightFeedSort;
+  scope?: HighlightFeedScope;
+};
+
+export type HighlightFeedResult = {
+  items: HighlightRecord[];
+  total: number;
+};
+
+export type GetTrendingHighlightsParams = {
+  timeframe: "day" | "week" | "month";
+  limit?: number;
+  teamId?: string | null;
+  minConfidence?: number;
+  scope?: HighlightFeedScope;
+};
 
 type HighlightBaseRow = {
   id: string;
@@ -42,8 +73,8 @@ type HighlightBaseRow = {
   teamId: string | null;
   createdBy: string;
   chapterId: string | null;
+  kind: HighlightKind;
   origin: HighlightOrigin;
-  assistantThreadId: string | null;
   title: string | null;
   summary: string | null;
   quote: string | null;
@@ -84,8 +115,8 @@ export type HighlightRecord = {
   teamId: string | null;
   createdBy: string;
   chapterId: string | null;
+  kind: HighlightKind;
   origin: HighlightOrigin;
-  assistantThreadId: string | null;
   title: string | null;
   summary: string | null;
   quote: string | null;
@@ -107,6 +138,7 @@ export type GetStoryHighlightsParams = {
   storyId: string;
   teamId?: string | null;
   includeGlobal?: boolean;
+  scope?: HighlightFeedScope;
 };
 
 export type GetHighlightByIdParams = {
@@ -119,6 +151,7 @@ export type CreateHighlightParams = {
   teamId: string;
   createdBy: string;
   chapterId?: string | null;
+  kind?: HighlightKind;
   title?: string | null;
   summary?: string | null;
   quote?: string | null;
@@ -180,8 +213,8 @@ const highlightSelection = {
   teamId: highlights.team_id,
   createdBy: highlights.created_by,
   chapterId: highlights.chapter_id,
+  kind: highlights.kind,
   origin: highlights.origin,
-  assistantThreadId: highlights.assistant_thread_id,
   title: highlights.title,
   summary: highlights.summary,
   quote: highlights.quote,
@@ -202,8 +235,8 @@ function mapBaseHighlight(row: HighlightBaseRow): HighlightRecord {
     teamId: row.teamId,
     createdBy: row.createdBy,
     chapterId: row.chapterId,
+    kind: row.kind,
     origin: row.origin,
-    assistantThreadId: row.assistantThreadId,
     title: row.title,
     summary: row.summary,
     quote: row.quote,
@@ -351,6 +384,221 @@ async function hydrateHighlights(
   });
 }
 
+const combineConditions = (conditions: SQL[]): SQL | undefined => {
+  if (conditions.length === 0) {
+    return undefined;
+  }
+
+  if (conditions.length === 1) {
+    return conditions[0];
+  }
+
+  return and(...conditions);
+};
+
+export async function getHighlightFeed(
+  db: Database,
+  params: GetHighlightFeedParams = {},
+): Promise<HighlightFeedResult> {
+  const {
+    teamId = null,
+    limit = 20,
+    offset = 0,
+    kind = null,
+    tags,
+    sortBy = "recent",
+    scope = "all",
+  } = params;
+
+  const effectiveScope: HighlightFeedScope = (() => {
+    if (!teamId) {
+      return scope === "team" ? "team" : "system";
+    }
+    return scope;
+  })();
+
+  const baseConditions: SQL[] = [];
+
+  switch (effectiveScope) {
+    case "team": {
+      if (teamId) {
+        baseConditions.push(eq(highlights.team_id, teamId));
+      } else {
+        baseConditions.push(sql`false`);
+      }
+      break;
+    }
+    case "system": {
+      baseConditions.push(isNull(highlights.team_id));
+      break;
+    }
+    case "all":
+    default: {
+      if (teamId) {
+        baseConditions.push(
+          or(eq(highlights.team_id, teamId), isNull(highlights.team_id)),
+        );
+      } else {
+        baseConditions.push(isNull(highlights.team_id));
+      }
+      break;
+    }
+  }
+
+  if (kind) {
+    baseConditions.push(eq(highlights.kind, kind));
+  }
+
+  const orderExpressions = (() => {
+    switch (sortBy) {
+      case "confidence":
+      case "relevant":
+        return [desc(highlights.confidence), desc(highlights.created_at)];
+      default:
+        return [desc(highlights.created_at)];
+    }
+  })();
+
+  const idsConditions = [...baseConditions];
+
+  if (tags?.length) {
+    idsConditions.push(inArray(highlightTags.tag, tags));
+  }
+
+  const whereForIds = combineConditions(idsConditions);
+
+  let idsQuery = db
+    .select({ id: highlights.id })
+    .from(highlights);
+
+  if (tags?.length) {
+    idsQuery = idsQuery.innerJoin(
+      highlightTags,
+      eq(highlightTags.highlight_id, highlights.id),
+    );
+  }
+
+  if (whereForIds) {
+    idsQuery = idsQuery.where(whereForIds);
+  }
+
+  if (tags?.length) {
+    idsQuery = idsQuery.groupBy(highlights.id);
+  }
+
+  if (orderExpressions.length > 0) {
+    idsQuery = idsQuery.orderBy(...orderExpressions);
+  }
+
+  const allIds = await idsQuery;
+  const total = allIds.length;
+
+  if (total === 0) {
+    return { items: [], total: 0 };
+  }
+
+  const pagedIds = allIds
+    .slice(offset, offset + limit)
+    .map((row) => row.id);
+
+  if (pagedIds.length === 0) {
+    return { items: [], total };
+  }
+
+  let highlightsQuery = db
+    .select(highlightSelection)
+    .from(highlights)
+    .where(inArray(highlights.id, pagedIds));
+
+  if (orderExpressions.length > 0) {
+    highlightsQuery = highlightsQuery.orderBy(...orderExpressions);
+  }
+
+  const rows = (await highlightsQuery) as HighlightBaseRow[];
+  const hydrated = await hydrateHighlights(db, rows, teamId ?? null);
+
+  return { items: hydrated, total };
+}
+
+export async function getTrendingHighlights(
+  db: Database,
+  params: GetTrendingHighlightsParams,
+): Promise<HighlightRecord[]> {
+  const {
+    timeframe,
+    limit = 10,
+    teamId = null,
+    minConfidence = 0.7,
+    scope = teamId ? "all" : "system",
+  } = params;
+
+  const timeframeMs = (() => {
+    switch (timeframe) {
+      case "day":
+        return 24 * 60 * 60 * 1000;
+      case "month":
+        return 30 * 24 * 60 * 60 * 1000;
+      case "week":
+      default:
+        return 7 * 24 * 60 * 60 * 1000;
+    }
+  })();
+
+  const since = new Date(Date.now() - timeframeMs);
+
+  const conditions: SQL[] = [
+    gte(highlights.created_at, since),
+    gt(highlights.confidence, minConfidence),
+  ];
+
+  switch (scope) {
+    case "team": {
+      if (teamId) {
+        conditions.push(eq(highlights.team_id, teamId));
+      } else {
+        conditions.push(sql`false`);
+      }
+      break;
+    }
+    case "system": {
+      conditions.push(isNull(highlights.team_id));
+      break;
+    }
+    case "all":
+    default: {
+      if (teamId) {
+        conditions.push(
+          or(eq(highlights.team_id, teamId), isNull(highlights.team_id)),
+        );
+      } else {
+        conditions.push(isNull(highlights.team_id));
+      }
+      break;
+    }
+  }
+
+  const whereCondition = combineConditions(conditions);
+
+  let query = db.select(highlightSelection).from(highlights);
+
+  if (whereCondition) {
+    query = query.where(whereCondition);
+  }
+
+  query = query.orderBy(
+    desc(highlights.confidence),
+    desc(highlights.created_at),
+  );
+
+  const rows = (await query.limit(limit)) as HighlightBaseRow[];
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  return hydrateHighlights(db, rows, teamId ?? null);
+}
+
 async function fetchHighlights(
   db: Database,
   filter: SQL | undefined,
@@ -372,15 +620,31 @@ export async function getStoryHighlights(
   params: GetStoryHighlightsParams,
 ): Promise<HighlightRecord[]> {
   const includeGlobal = params.includeGlobal ?? true;
+  const scope: HighlightFeedScope = (() => {
+    if (params.scope) return params.scope;
+    return includeGlobal ? "all" : "team";
+  })();
   const conditions: SQL[] = [eq(highlights.story_id, params.storyId)];
 
   if (params.teamId) {
-    conditions.push(
-      includeGlobal
-        ? or(eq(highlights.team_id, params.teamId), isNull(highlights.team_id))
-        : eq(highlights.team_id, params.teamId),
-    );
+    switch (scope) {
+      case "team":
+        conditions.push(eq(highlights.team_id, params.teamId));
+        break;
+      case "system":
+        conditions.push(isNull(highlights.team_id));
+        break;
+      case "all":
+      default:
+        conditions.push(
+          or(eq(highlights.team_id, params.teamId), isNull(highlights.team_id)),
+        );
+        break;
+    }
   } else {
+    if (scope === "team") {
+      return [];
+    }
     conditions.push(isNull(highlights.team_id));
   }
 
@@ -410,6 +674,7 @@ export async function createHighlight(
         team_id: params.teamId,
         created_by: params.createdBy,
         chapter_id: params.chapterId ?? null,
+        kind: params.kind ?? undefined,
         title: params.title ?? null,
         summary: params.summary ?? null,
         quote: params.quote ?? null,

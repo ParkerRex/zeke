@@ -10,6 +10,7 @@ import { storiesRouter } from "./stories";
 import { tagsRouter } from "./tags";
 import { teamsRouter } from "./teams";
 import { transcriptionRouter } from "./transcription";
+import { triggerRouter } from "./trigger";
 import { usersRouter } from "./users";
 
 const routers = new OpenAPIHono<Context>();
@@ -30,5 +31,6 @@ routers.route("/tags", tagsRouter);
 routers.route("/search", searchRouter);
 routers.route("/chat", chatRouter);
 routers.route("/transcription", transcriptionRouter);
+routers.route("/trigger", triggerRouter);
 
 export { routers };

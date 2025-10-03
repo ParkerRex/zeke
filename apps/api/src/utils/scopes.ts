@@ -13,6 +13,7 @@ export const SCOPES = [
   "teams.manage",
   "users.read",
   "users.manage",
+  "jobs.trigger",
 ] as const;
 
 export type Scope = (typeof SCOPES)[number];

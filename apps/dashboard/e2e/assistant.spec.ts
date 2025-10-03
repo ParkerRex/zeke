@@ -162,9 +162,9 @@ test.describe("Assistant Chat Interface", () => {
           content: "I'll search for that information.",
           toolInvocations: [
             {
-              toolName: "webSearch",
-              args: { query: "AI news" },
-              result: { found: 5 },
+              toolName: "getSummaries",
+              args: { topic: "AI news" },
+              result: { totalSources: 3 },
             },
           ],
         })}\n\n`,
@@ -177,7 +177,7 @@ test.describe("Assistant Chat Interface", () => {
     // Tool indicator should appear
     const toolIndicator = page.locator("[data-testid='tool-invocation']");
     await expect(toolIndicator).toBeVisible();
-    await expect(toolIndicator).toContainText(/webSearch/i);
+    await expect(toolIndicator).toContainText(/getSummaries/i);
   });
 
   test("should persist chat history", async ({ page }) => {

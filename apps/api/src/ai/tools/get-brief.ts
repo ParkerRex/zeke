@@ -1,16 +1,14 @@
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
-import { getStoryHighlights } from "./get-story-highlights";
-import type { ToolResult } from "./research-registry";
-import { summarizeSources } from "./summarize-sources";
-
-const inputSchema = z.object({
-  topic: z.string(),
-  audience: z.enum(["technical", "executive", "general"]).default("general"),
-  format: z.enum(["brief", "report", "presentation", "blog"]).default("brief"),
-  includeRecommendations: z.boolean().default(true),
-});
+import { getHighlights } from "./get-highlights";
+import { getSummaries } from "./get-summaries";
+import type { GetBriefInput } from "./schema";
+import type {
+  HighlightDetail,
+  SummaryToolData,
+  ToolResult,
+} from "./types";
 
 const briefSchema = z.object({
   title: z.string(),
@@ -41,20 +39,54 @@ const briefSchema = z.object({
   }),
 });
 
-/**
- * Draft brief tool - Creates research briefs based on collected insights
- */
-export async function draftBrief(
-  input: z.infer<typeof inputSchema>,
+type BriefToolData = {
+  brief: z.infer<typeof briefSchema>;
+  metadata: {
+    topic: string;
+    audience: string;
+    format: string;
+    sourcesAnalyzed: number;
+    insightsIncluded: number;
+    generatedAt: string;
+  };
+};
+
+type BriefToolResult = ToolResult<BriefToolData, "getBrief">;
+
+function formatHighlightsForPrompt(highlights: HighlightDetail[]) {
+  return highlights.slice(0, 10).map((highlight) => ({
+    id: highlight.id,
+    title: highlight.title,
+    summary: highlight.summary,
+    kind: highlight.kind,
+    confidence: highlight.metrics.confidence,
+    tags: highlight.tags,
+    story: highlight.story,
+  }));
+}
+
+function formatSourcesForPrompt(summaryData: SummaryToolData | undefined) {
+  if (!summaryData) {
+    return [];
+  }
+
+  return summaryData.sources.map((source) => ({
+    id: source.id,
+    name: source.name,
+    storyCount: source.storyCount,
+  }));
+}
+
+export async function getBrief(
+  input: GetBriefInput,
   context: { teamId: string; userId: string },
-): Promise<ToolResult> {
+): Promise<BriefToolResult> {
   try {
     const { topic, audience, format, includeRecommendations } = input;
 
-    // Gather relevant data
     const [highlightsResult, summaryResult] = await Promise.all([
-      getStoryHighlights({ limit: 20, timeframe: "month" }, context),
-      summarizeSources({ topic, maxSources: 10, style: "detailed" }, context),
+      getHighlights({ limit: 20, timeframe: "month" }, context),
+      getSummaries({ topic, maxSources: 10, style: "detailed" }, context),
     ]);
 
     if (!highlightsResult.success || !summaryResult.success) {
@@ -62,13 +94,18 @@ export async function draftBrief(
         success: false,
         error: "Failed to gather research data",
         metadata: {
-          toolName: "draftBrief",
+          toolName: "getBrief",
           executionTime: Date.now(),
         },
       };
     }
 
-    // Generate the brief
+    const highlightData = highlightsResult.data?.highlights ?? [];
+    const summaryData = summaryResult.data;
+
+    const promptHighlights = formatHighlightsForPrompt(highlightData);
+    const promptSources = formatSourcesForPrompt(summaryData);
+
     const audienceInstructions = {
       technical:
         "Use technical language, include implementation details, and focus on technical implications.",
@@ -76,7 +113,7 @@ export async function draftBrief(
         "Focus on business impact, strategic implications, and high-level decisions.",
       general:
         "Use accessible language, explain technical concepts simply, and focus on practical outcomes.",
-    };
+    } as const;
 
     const formatInstructions = {
       brief: "Create a concise 1-2 page brief with key points.",
@@ -84,7 +121,7 @@ export async function draftBrief(
       presentation:
         "Structure as presentation talking points with clear sections.",
       blog: "Write in an engaging blog post style with narrative flow.",
-    };
+    } as const;
 
     const { object: brief } = await generateObject({
       model: openai("gpt-4o"),
@@ -99,38 +136,42 @@ ${formatInstructions[format]}
 
 Include Recommendations: ${includeRecommendations}
 
-Research Data:
-Highlights: ${JSON.stringify(highlightsResult.data, null, 2)}
-Summary: ${JSON.stringify(summaryResult.data, null, 2)}
+Highlights:
+${JSON.stringify(promptHighlights, null, 2)}
 
-Generate a comprehensive brief that synthesizes this research into actionable insights.`,
+Source Summary Metadata:
+${JSON.stringify(summaryData, null, 2)}
+
+Focus on synthesizing the research into an actionable brief that reflects the highlights and summary context provided.`,
     });
+
+    const data: BriefToolData = {
+      brief,
+      metadata: {
+        topic,
+        audience,
+        format,
+        sourcesAnalyzed: summaryData?.metadata.totalSources ?? 0,
+        insightsIncluded: highlightData.length,
+        generatedAt: new Date().toISOString(),
+      },
+    };
 
     return {
       success: true,
-      data: {
-        brief,
-        metadata: {
-          topic,
-          audience,
-          format,
-          sourcesAnalyzed: summaryResult.data?.metadata?.totalSources || 0,
-          insightsIncluded: highlightsResult.data?.highlights?.length || 0,
-          generatedAt: new Date().toISOString(),
-        },
-      },
+      data,
       metadata: {
-        toolName: "draftBrief",
+        toolName: "getBrief",
         executionTime: Date.now(),
       },
     };
   } catch (error) {
-    console.error("Error in draftBrief:", error);
+    console.error("Error in getBrief:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to draft brief",
       metadata: {
-        toolName: "draftBrief",
+        toolName: "getBrief",
         executionTime: Date.now(),
       },
     };

@@ -6,11 +6,10 @@ import { billingRouter } from "./billing";
 import { chatsRouter } from "./chats";
 import { chatFeedbackRouter } from "./feedback";
 import { highlightRouter } from "./highlight";
-import { insightsRouter } from "./insights";
 import { notificationSettingsRouter } from "./notification-settings";
 import { notificationsRouter } from "./notifications";
 import { oauthApplicationsRouter } from "./oauth-applications";
-import { pipelineRouter } from "./pipeline";
+import { triggerRouter } from "./trigger";
 import { searchRouter } from "./search";
 import { storiesRouter } from "./stories";
 import { suggestedActionsRouter } from "./suggested-actions";
@@ -29,13 +28,12 @@ export const appRouter = createTRPCRouter({
   team: teamRouter,
   chatFeedback: chatFeedbackRouter,
   highlight: highlightRouter,
-  insights: insightsRouter,
   stories: storiesRouter,
   user: userRouter,
   suggestedActions: suggestedActionsRouter,
   oauthApplications: oauthApplicationsRouter,
   search: searchRouter,
-  pipeline: pipelineRouter,
+  trigger: triggerRouter,
   apiKeys: apiKeysRouter,
   workspace: workspaceRouter,
 });

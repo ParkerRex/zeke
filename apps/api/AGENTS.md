@@ -13,139 +13,24 @@
 - Surface actionable errors: throw `HTTPException` for REST handlers, `TRPCError` for TRPC procedures, and prefer precise messages over generic failures.
 - Keep rate limiting, team permissions, and scope checks in middleware to maintain clear separation between transport and business logic.
 
-## Layout Reference
-```text
-apps/api/
-├── Dockerfile                           # Multi-stage Bun image for Fly.io deployment
-├── README.md                            # Environment setup and cache implementation docs
-├── fly-preview.yml                      # Fly Machines preview deployment configuration
-├── fly.toml                             # Production Fly deployment manifest
-├── package.json                         # Bun workspace manifest and scripts
-├── tsconfig.json                        # TypeScript compiler options
-└── src/                                 # Runtime source code
-    ├── index.ts                         # Hono entrypoint: REST routers, TRPC, health, CORS
-    ├── context.ts                       # Shared context utilities
-    ├── ai/                              # AI assistant implementation
-    │   ├── artifacts/                   # AI-generated artifacts during chat flows
-    │   │   ├── burn-rate.ts             # Burn rate calculation artifact
-    │   │   ├── chat-title.ts            # Chat title generation artifact
-    │   │   ├── followup-questions.ts    # Follow-up question generation artifact
-    │   │   └── get-goals.ts             # Goal extraction artifact
-    │   ├── tools/                       # AI tools for research and analysis
-    │   │   ├── draft-brief.ts           # Draft brief creation tool
-    │   │   ├── get-burn-rate.ts         # Burn rate analysis tool
-    │   │   ├── get-story-highlights.ts  # Story highlight extraction tool
-    │   │   ├── index.ts                 # Tool registry
-    │   │   ├── research-registry.ts     # Research source registry tool
-    │   │   ├── summarize-sources.ts     # Source summarization tool
-    │   │   ├── tools.test.ts            # Tool tests
-    │   │   └── web-search.ts            # Web search tool
-    │   ├── utils/                       # AI utility functions
-    │   │   ├── generate-followup-questions.ts # Followup question generation
-    │   │   ├── get-user-context.ts      # User context extraction
-    │   │   └── safe-value.ts            # Safe value extraction helper
-    │   ├── context.ts                   # AI context builder
-    │   ├── generate-system-prompt.ts    # System prompt generation
-    │   ├── generate-title.ts            # Title generation
-    │   ├── tool-types.ts                # Tool type definitions
-    │   └── types.ts                     # AI types
-    ├── auth/                            # Team authentication utilities
-    │   └── team.ts                      # Team permission helpers
-    ├── rest/                            # Hono REST surface
-    │   ├── middleware/                  # REST middleware
-    │   │   ├── auth.ts                  # Bearer token validation and session hydration
-    │   │   ├── context.ts               # Context setup middleware
-    │   │   ├── db.ts                    # Database connection middleware
-    │   │   ├── index.ts                 # Middleware exports and composition
-    │   │   ├── primary-read-after-write.ts # Primary DB routing after mutations
-    │   │   ├── scope.ts                 # Authorization scope checks
-    │   │   └── team.ts                  # Team context middleware
-    │   ├── routers/                     # REST resources and OpenAPI definitions
-    │   │   ├── assistant.ts             # AI assistant endpoints
-    │   │   ├── chat.ts                  # Chat endpoints with streaming
-    │   │   ├── chat-rate-limit.test.ts  # Chat rate limiting tests
-    │   │   ├── chat.test.ts             # Chat endpoint tests
-    │   │   ├── highlights.ts            # Highlight CRUD endpoints
-    │   │   ├── index.ts                 # REST router aggregator
-    │   │   ├── search.ts                # Search endpoints
-    │   │   ├── stories.ts               # Story management endpoints
-    │   │   ├── tags.ts                  # Tag CRUD endpoints
-    │   │   ├── teams.ts                 # Team management endpoints
-    │   │   └── users.ts                 # User profile endpoints
-    │   └── types.ts                     # Hono context typing
-    ├── schemas/                         # Zod schemas shared across REST and TRPC
-    │   ├── assistant.ts                 # AI assistant schemas
-    │   ├── billing.ts                   # Billing schemas
-    │   ├── chat.ts                      # Chat message schemas
-    │   ├── highlight.ts                 # Highlight schemas
-    │   ├── notification-settings.ts     # Notification preference schemas
-    │   ├── notifications.ts             # Notification schemas
-    │   ├── search.ts                    # Search schemas
-    │   ├── stories.ts                   # Story schemas
-    │   ├── stripe.ts                    # Stripe integration schemas
-    │   ├── tags.ts                      # Tag schemas
-    │   ├── team.ts                      # Team schemas
-    │   ├── transaction-attachments.ts   # Transaction attachment schemas
-    │   ├── transaction-categories.ts    # Transaction category schemas
-    │   ├── transaction-tags.ts          # Transaction tag schemas
-    │   └── users.ts                     # User schemas
-    ├── security/                        # Security utilities
-    │   ├── rbac-validation.test.ts      # RBAC validation tests
-    │   └── security-scan.test.ts        # Security scan tests
-    ├── services/                        # External service wrappers
-    │   ├── resend.ts                    # Resend email client
-    │   └── supabase.ts                  # Supabase client helpers
-    ├── trpc/                            # TRPC surface
-    │   ├── init.ts                      # TRPC context setup and procedure definitions
-    │   ├── middleware/                  # TRPC middleware
-    │   │   ├── primary-read-after-write.ts # Primary DB routing for TRPC
-    │   │   ├── rbac.ts                  # Role-based access control middleware
-    │   │   ├── rbac.test.ts             # RBAC tests
-    │   │   └── team-permission.ts       # Team access verification
-    │   └── routers/                     # TRPC routers by domain
-    │       ├── _app.ts                  # Root router composition
-    │       ├── assistant.ts             # AI assistant procedures
-    │       ├── chats.ts                 # Chat management procedures
-    │       ├── highlight.ts             # Highlight procedures
-    │       ├── insights.ts              # Insights procedures
-    │       ├── insights.test.ts         # Insights tests
-    │       ├── pipeline.ts              # Content pipeline procedures
-    │       ├── pipeline.test.ts         # Pipeline tests
-    │       ├── search.ts                # Search procedures
-    │       ├── stories.ts               # Story procedures
-    │       ├── stories.test.ts          # Story tests
-    │       ├── tags.ts                  # Tag procedures
-    │       ├── team.ts                  # Team procedures
-    │       ├── user.ts                  # User procedures
-    │       ├── workspace.ts             # Workspace procedures
-    │       └── workspace.test.ts        # Workspace tests
-    └── utils/                           # Cross-cutting helpers
-        ├── audit-logger.ts              # Audit logging utilities
-        ├── auth.ts                      # Supabase JWT verification
-        ├── geo.ts                       # Locale/geo header extraction
-        ├── health.ts                    # Database health checks
-        ├── oauth.ts                     # OAuth helper functions
-        ├── parse.ts                     # JSON parsing utilities
-        ├── scopes.ts                    # Authorization scope definitions
-        ├── search-filters.ts            # LLM-powered natural language search
-        ├── search.ts                    # ts_vector search query builder
-        ├── streaming-utils.ts           # Streaming response utilities
-        ├── stripe.ts                    # Stripe API client
-        └── validate-response.ts         # Zod response validation
-```
+## Naming Conventions
+- Postgres tables stay snake_case, and Drizzle maps them to camelCase fields via the `casing: "snake_case"` setting ([packages/db/src/client.ts:85](packages/db/src/client.ts#L85)). Schema definitions therefore read/write camelCase properties such as `userId` and `createdAt` even though the physical columns are `user_id` and `created_at` ([packages/db/src/schema.ts:436-440](packages/db/src/schema.ts#L436-L440)).
+  - All JSON that leaves the API is intentionally camelCase so that the web app and other TypeScript clients can consume it without extra transforms—see the OpenAPI schema for stories where response fields are `createdAt`, `clusterId`, `embedUrl`, etc. ([apps/api/src/schemas/stories.ts:57-86](apps/api/src/schemas/stories.ts#L57-L86)).
+- When we need to pass filters down to SQL that still expects snake_case, we translate at the edge of the call—for example the LLM filter generator returns camelCase `startDate` and `endDate` ([apps/api/src/utils/search-filters.ts:7-18](apps/api/src/utils/search-filters.ts#L7-L18)) which are then passed as-is to `globalSemanticSearchQuery` that maps them to snake_case parameters like `start_date` and `end_date` for the stored procedure ([packages/db/src/queries/search.ts:58-76](packages/db/src/queries/search.ts#L58-L76)). That keeps the external contract camelCase while preserving compatibility with existing SQL helpers.
 
 ## Key Architecture Patterns
 
-### REST + TRPC Dual Surface
-- REST endpoints expose OpenAPI-documented routes for external integrations
-- TRPC provides type-safe procedures for internal Next.js app consumption
-- Both share Zod schemas from `src/schemas/` for consistency
+### Two API Shapes
+
+- The `/trpc/*` surface is our first-party RPC layer, wired straight into the appRouter with shared context ([apps/api/src/index.ts:38-44](apps/api/src/index.ts#L38-L44), [apps/api/src/trpc/init.ts:1-82](apps/api/src/trpc/init.ts#L1-L82)). It gives the dashboard a fully typed client, superjson serialization, and access to session/team context via middleware like `withTeamPermission`, so we can iterate quickly without managing REST verbs or OpenAPI churn.
+- The REST layer hangs off the same Hono app (`app.route("/", routers)` at [apps/api/src/index.ts:204](apps/api/src/index.ts#L204)) and is wrapped with OpenAPI tooling (OpenAPIHono, Scalar) plus auth/rate-limit middleware that speaks API keys and OAuth tokens ([apps/api/src/rest/middleware/auth.ts:1-151](apps/api/src/rest/middleware/auth.ts#L1-L151), [apps/api/src/rest/middleware/index.ts:1-34](apps/api/src/rest/middleware/index.ts#L1-L34)). This is the contract we publish to third parties—stable URLs, documented schemas, scope-based permissions.
+- Both layers call into the shared query modules under `@zeke/db/queries`, so business logic and data shaping live in one place while we expose it through whichever transport best fits the consumer (see imports in [apps/api/src/rest/routers/stories.ts:17](apps/api/src/rest/routers/stories.ts#L17) and [apps/api/src/trpc/routers/search.ts:4](apps/api/src/trpc/routers/search.ts#L4)).
 
 ### AI Assistant Integration
 - Chat endpoints support streaming responses via Server-Sent Events
 - AI tools in `src/ai/tools/` are called during chat conversations
 - AI artifacts generate metadata (titles, follow-up questions) asynchronously
-- Tools: `web-search`, `draft-brief`, `summarize-sources`, `get-story-highlights`, `research-registry`
+- Tools: `web-search`, `get-brief`, `get-summaries`, `get-highlights`, `get-playbook`, `link-insights`
 - Artifacts: `chat-title`, `followup-questions`, `burn-rate`, `get-goals`
 
 ### Authentication & Authorization
@@ -159,13 +44,3 @@ apps/api/
 - Primary/replica setup with `withPrimaryReadAfterWrite` for read-after-write consistency
 - Redis caching for API keys, users, teams, permissions (30 min TTL)
 - Replication cache tracks recent mutations (10 sec TTL) to route reads to primary
-
-### Core Domains
-- **Stories**: Research projects with sources and insights
-- **Chat**: AI assistant conversations with streaming
-- **Search**: Natural language search with LLM-powered filters
-- **Highlights**: Story highlights and annotations
-- **Tags**: Tagging system for stories and content
-- **Workspace**: Workspace management and settings
-- **Pipeline**: Content ingestion pipeline from engine
-- **Insights**: Analytics and insights generation

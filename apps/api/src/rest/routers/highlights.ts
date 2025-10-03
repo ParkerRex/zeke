@@ -44,10 +44,19 @@ app.openapi(
     const db = c.get("db");
     const teamId = c.get("teamId");
     const query = c.req.valid("query");
+    const requestedScope = query.scope ?? (query.includeGlobal ? "all" : "team");
+    const effectiveScope = teamId
+      ? requestedScope
+      : requestedScope === "team"
+        ? "team"
+        : requestedScope === "all"
+          ? "system"
+          : requestedScope;
 
     const highlights = await getStoryHighlights(db, {
       storyId: query.storyId,
       includeGlobal: query.includeGlobal,
+      scope: effectiveScope,
       teamId,
     });
 

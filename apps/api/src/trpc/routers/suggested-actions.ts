@@ -9,7 +9,7 @@ import {
 const SUGGESTED_ACTIONS_CONFIG = [
   {
     id: "trending-story-highlights",
-    toolName: "getStoryHighlights",
+    toolName: "getHighlights",
     toolParams: {
       timeframe: "week",
       limit: 6,
@@ -17,7 +17,7 @@ const SUGGESTED_ACTIONS_CONFIG = [
   },
   {
     id: "summarize-new-sources",
-    toolName: "summarizeSources",
+    toolName: "getSummaries",
     toolParams: {
       maxSources: 5,
       style: "brief",
@@ -25,7 +25,7 @@ const SUGGESTED_ACTIONS_CONFIG = [
   },
   {
     id: "draft-executive-brief",
-    toolName: "draftBrief",
+    toolName: "getBrief",
     toolParams: {
       topic: "Latest research findings",
       audience: "executive",
@@ -35,7 +35,7 @@ const SUGGESTED_ACTIONS_CONFIG = [
   },
   {
     id: "plan-research-playbook",
-    toolName: "planPlaybook",
+    toolName: "getPlaybook",
     toolParams: {
       objective: "Launch a competitive intelligence playbook",
       scope: "moderate",
@@ -49,15 +49,6 @@ const SUGGESTED_ACTIONS_CONFIG = [
     toolParams: {
       lookForPatterns: true,
       minConfidence: 0.75,
-    },
-  },
-  {
-    id: "perform-web-search",
-    toolName: "webSearch",
-    toolParams: {
-      query: "Latest industry developments",
-      recency: "week",
-      maxResults: 5,
     },
   },
 ] as const;

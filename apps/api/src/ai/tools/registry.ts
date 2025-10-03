@@ -1,53 +1,59 @@
-// Tool metadata for title generation and UI display
+import { getBrief } from "./get-brief";
+import { getHighlights } from "./get-highlights";
+import { getPlaybook } from "./get-playbook";
+import { getSummaries } from "./get-summaries";
+import { linkInsights } from "./link-insights";
+import { toolSchemas } from "./schema";
+
 export const toolMetadata = {
-  getBurnRateAnalysis: {
-    name: "getBurnRateAnalysis",
-    title: "Burn Rate Analysis",
+  getHighlights: {
+    name: "getHighlights",
+    title: "Story Highlights",
     description:
-      "Generate comprehensive burn rate analysis with interactive visualizations, spending trends, runway projections, and actionable insights",
-    relatedTools: ["getBurnRate", "getTransactions", "getExpenses"],
+      "Retrieve and analyze story highlights, key insights, and trending topics from ingested content.",
+    parameters: toolSchemas.getHighlights,
+    relatedTools: ["getSummaries", "linkInsights"],
   },
-  getBurnRate: {
-    name: "getBurnRate",
-    title: "Burn Rate",
+  getSummaries: {
+    name: "getSummaries",
+    title: "Summarize Sources",
     description:
-      "Calculate and analyze monthly cash burn rate, showing how much money the business spends each month",
-    relatedTools: ["getBurnRateAnalysis", "getTransactions"],
+      "Generate comprehensive summaries from multiple sources with key takeaways and insights.",
+    parameters: toolSchemas.getSummaries,
+    relatedTools: ["getHighlights", "getBrief"],
   },
-  getTransactions: {
-    name: "getTransactions",
-    title: "Transactions",
+  getBrief: {
+    name: "getBrief",
+    title: "Draft Brief",
     description:
-      "Retrieve and analyze financial transactions with advanced filtering, search, and sorting capabilities",
-    relatedTools: ["getBurnRate", "getBurnRateAnalysis", "getExpenses"],
+      "Create a research brief or content outline based on collected insights and stories.",
+    parameters: toolSchemas.getBrief,
+    relatedTools: ["getSummaries", "getPlaybook"],
   },
-  getExpensesBreakdown: {
-    name: "getExpensesBreakdown",
-    title: "Expenses Breakdown",
+  getPlaybook: {
+    name: "getPlaybook",
+    title: "Plan Playbook",
     description:
-      "Retrieve and analyze financial expenses with advanced filtering, search, and sorting capabilities",
-    relatedTools: ["getBurnRate", "getBurnRateAnalysis", "getTransactions"],
+      "Design and plan a research playbook for systematic analysis of a topic or competitor.",
+    parameters: toolSchemas.getPlaybook,
+    relatedTools: ["getBrief", "linkInsights"],
   },
-  getBalanceSheet: {
-    name: "getBalanceSheet",
-    title: "Balance Sheet",
+  linkInsights: {
+    name: "linkInsights",
+    title: "Link Insights",
     description:
-      "Retrieve and analyze financial balance sheet with advanced filtering, search, and sorting capabilities",
-    relatedTools: ["getBurnRate", "getBurnRateAnalysis", "getTransactions"],
-  },
-  getForecast: {
-    name: "getForecast",
-    title: "Forecast",
-    description:
-      "Retrieve and analyze financial forecast with advanced filtering, search, and sorting capabilities",
-    relatedTools: ["getBurnRate", "getBurnRateAnalysis", "getTransactions"],
+      "Connect and correlate insights across stories, highlights, and goals to identify patterns.",
+    parameters: toolSchemas.linkInsights,
+    relatedTools: ["getHighlights", "getPlaybook"],
   },
 } as const;
 
 export type ToolName = keyof typeof toolMetadata;
 
-export type MessageDataParts = {
-  title: {
-    title: string;
-  };
-};
+export const researchTools = {
+  getHighlights,
+  getSummaries,
+  getBrief,
+  getPlaybook,
+  linkInsights,
+} as const;
