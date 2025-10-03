@@ -1,8 +1,8 @@
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
-import type { ToolResult } from "./research-registry";
 import { getStoryHighlights } from "./get-story-highlights";
+import type { ToolResult } from "./research-registry";
 import { summarizeSources } from "./summarize-sources";
 
 const inputSchema = z.object({

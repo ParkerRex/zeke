@@ -491,88 +491,88 @@ export const usersOnTeam = pgTable(
   ],
 );
 
-export const usersInAuth = pgTable(
-  "auth.users",
-  {
-    instanceId: uuid("instance_id"),
-    id: uuid("id").notNull(),
-    aud: varchar("aud", { length: 255 }),
-    role: varchar("role", { length: 255 }),
-    email: varchar("email", { length: 255 }),
-    encryptedPassword: varchar("encrypted_password", { length: 255 }),
-    emailConfirmedAt: timestamp("email_confirmed_at", { withTimezone: true }),
-    invitedAt: timestamp("invited_at", { withTimezone: true }),
-    confirmationToken: varchar("confirmation_token", { length: 255 }),
-    confirmationSentAt: timestamp("confirmation_sent_at", {
-      withTimezone: true,
-    }),
-    recoveryToken: varchar("recovery_token", { length: 255 }),
-    recoverySentAt: timestamp("recovery_sent_at", { withTimezone: true }),
-    emailChangeTokenNew: varchar("email_change_token_new", { length: 255 }),
-    emailChange: varchar("email_change", { length: 255 }),
-    emailChangeSentAt: timestamp("email_change_sent_at", {
-      withTimezone: true,
-    }),
-    lastSignInAt: timestamp("last_sign_in_at", { withTimezone: true }),
-    rawAppMetaData: jsonb("raw_app_meta_data"),
-    rawUserMetaData: jsonb("raw_user_meta_data"),
-    isSuperAdmin: boolean("is_super_admin"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
-    phone: text("phone").default(sql`null::character varying`),
-    phoneConfirmedAt: timestamp("phone_confirmed_at", { withTimezone: true }),
-    phoneChange: text("phone_change").default(sql`''::character varying`),
-    phoneChangeToken: varchar("phone_change_token", { length: 255 }).default(
-      sql`''::character varying`,
-    ),
-    phoneChangeSentAt: timestamp("phone_change_sent_at", {
-      withTimezone: true,
-    }),
-    // Drizzle ORM does not support .stored() for generated columns, so we omit it
-    confirmedAt: timestamp("confirmed_at", {
-      withTimezone: true,
-      mode: "string",
-    }).generatedAlwaysAs(sql`LEAST(email_confirmed_at, phone_confirmed_at)`),
-    emailChangeTokenCurrent: varchar("email_change_token_current", {
-      length: 255,
-    }).default(sql`''::character varying`),
-    emailChangeConfirmStatus: smallint("email_change_confirm_status").default(
-      0,
-    ),
-    bannedUntil: timestamp("banned_until", { withTimezone: true }),
-    reauthenticationToken: varchar("reauthentication_token", {
-      length: 255,
-    }).default(sql`''::character varying`),
-    reauthenticationSentAt: timestamp("reauthentication_sent_at", {
-      withTimezone: true,
-    }),
-    isSsoUser: boolean("is_sso_user").notNull().default(false),
-    deletedAt: timestamp("deleted_at", { withTimezone: true }),
-    isAnonymous: boolean("is_anonymous").notNull().default(false),
-  },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "users_pkey" }),
-    unique("users_phone_key").on(table.phone),
-    unique("confirmation_token_idx").on(table.confirmationToken),
-    unique("email_change_token_current_idx").on(table.emailChangeTokenCurrent),
-    unique("email_change_token_new_idx").on(table.emailChangeTokenNew),
-    unique("reauthentication_token_idx").on(table.reauthenticationToken),
-    unique("recovery_token_idx").on(table.recoveryToken),
-    unique("users_email_partial_key").on(table.email),
-    index("users_instance_id_email_idx").on(
-      table.instanceId,
-      sql`lower((email)::text)`,
-    ),
-    index("users_instance_id_idx").on(table.instanceId),
-    index("users_is_anonymous_idx").on(table.isAnonymous),
-    // Check constraint for email_change_confirm_status
-    {
-      kind: "check",
-      name: "users_email_change_confirm_status_check",
-      expression: sql`((email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2))`,
-    },
-  ],
-);
+// export const usersInAuth = pgTable(
+//   "auth.users",
+//   {
+//     instanceId: uuid("instance_id"),
+//     id: uuid("id").notNull(),
+//     aud: varchar("aud", { length: 255 }),
+//     role: varchar("role", { length: 255 }),
+//     email: varchar("email", { length: 255 }),
+//     encryptedPassword: varchar("encrypted_password", { length: 255 }),
+//     emailConfirmedAt: timestamp("email_confirmed_at", { withTimezone: true }),
+//     invitedAt: timestamp("invited_at", { withTimezone: true }),
+//     confirmationToken: varchar("confirmation_token", { length: 255 }),
+//     confirmationSentAt: timestamp("confirmation_sent_at", {
+//       withTimezone: true,
+//     }),
+//     recoveryToken: varchar("recovery_token", { length: 255 }),
+//     recoverySentAt: timestamp("recovery_sent_at", { withTimezone: true }),
+//     emailChangeTokenNew: varchar("email_change_token_new", { length: 255 }),
+//     emailChange: varchar("email_change", { length: 255 }),
+//     emailChangeSentAt: timestamp("email_change_sent_at", {
+//       withTimezone: true,
+//     }),
+//     lastSignInAt: timestamp("last_sign_in_at", { withTimezone: true }),
+//     rawAppMetaData: jsonb("raw_app_meta_data"),
+//     rawUserMetaData: jsonb("raw_user_meta_data"),
+//     isSuperAdmin: boolean("is_super_admin"),
+//     createdAt: timestamp("created_at", { withTimezone: true }),
+//     updatedAt: timestamp("updated_at", { withTimezone: true }),
+//     phone: text("phone").default(sql`null::character varying`),
+//     phoneConfirmedAt: timestamp("phone_confirmed_at", { withTimezone: true }),
+//     phoneChange: text("phone_change").default(sql`''::character varying`),
+//     phoneChangeToken: varchar("phone_change_token", { length: 255 }).default(
+//       sql`''::character varying`,
+//     ),
+//     phoneChangeSentAt: timestamp("phone_change_sent_at", {
+//       withTimezone: true,
+//     }),
+//     // Drizzle ORM does not support .stored() for generated columns, so we omit it
+//     confirmedAt: timestamp("confirmed_at", {
+//       withTimezone: true,
+//       mode: "string",
+//     }).generatedAlwaysAs(sql`LEAST(email_confirmed_at, phone_confirmed_at)`),
+//     emailChangeTokenCurrent: varchar("email_change_token_current", {
+//       length: 255,
+//     }).default(sql`''::character varying`),
+//     emailChangeConfirmStatus: smallint("email_change_confirm_status").default(
+//       0,
+//     ),
+//     bannedUntil: timestamp("banned_until", { withTimezone: true }),
+//     reauthenticationToken: varchar("reauthentication_token", {
+//       length: 255,
+//     }).default(sql`''::character varying`),
+//     reauthenticationSentAt: timestamp("reauthentication_sent_at", {
+//       withTimezone: true,
+//     }),
+//     isSsoUser: boolean("is_sso_user").notNull().default(false),
+//     deletedAt: timestamp("deleted_at", { withTimezone: true }),
+//     isAnonymous: boolean("is_anonymous").notNull().default(false),
+//   },
+//   (table) => [
+//     primaryKey({ columns: [table.id], name: "users_pkey" }),
+//     unique("users_phone_key").on(table.phone),
+//     unique("confirmation_token_idx").on(table.confirmationToken),
+//     unique("email_change_token_current_idx").on(table.emailChangeTokenCurrent),
+//     unique("email_change_token_new_idx").on(table.emailChangeTokenNew),
+//     unique("reauthentication_token_idx").on(table.reauthenticationToken),
+//     unique("recovery_token_idx").on(table.recoveryToken),
+//     unique("users_email_partial_key").on(table.email),
+//     index("users_instance_id_email_idx").on(
+//       table.instanceId,
+//       sql`lower((email)::text)`,
+//     ),
+//     index("users_instance_id_idx").on(table.instanceId),
+//     index("users_is_anonymous_idx").on(table.isAnonymous),
+//     // Check constraint for email_change_confirm_status
+//     {
+//       kind: "check",
+//       name: "users_email_change_confirm_status_check",
+//       expression: sql`((email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2))`,
+//     },
+//   ],
+// );
 
 export const apiKeys = pgTable(
   "api_keys",

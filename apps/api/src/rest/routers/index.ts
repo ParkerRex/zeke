@@ -1,7 +1,6 @@
 import type { Context } from "@api/rest/types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { protectedMiddleware } from "../middleware";
-import { assistantRouter } from "./assistant";
 import { chatRouter } from "./chat";
 import { highlightsRouter } from "./highlights";
 import { notificationsRouter } from "./notifications";
@@ -22,15 +21,14 @@ routers.route("/oauth", oauthRouter);
 routers.use(...protectedMiddleware);
 
 // Mount protected routes
-routers.route("/assistant", assistantRouter);
-routers.route("/chat", chatRouter);
 routers.route("/highlights", highlightsRouter);
 routers.route("/notifications", notificationsRouter);
-routers.route("/search", searchRouter);
-routers.route("/stories", storiesRouter);
-routers.route("/tags", tagsRouter);
 routers.route("/teams", teamsRouter);
-routers.route("/transcription", transcriptionRouter);
+routers.route("/stories", storiesRouter);
 routers.route("/users", usersRouter);
+routers.route("/tags", tagsRouter);
+routers.route("/search", searchRouter);
+routers.route("/chat", chatRouter);
+routers.route("/transcription", transcriptionRouter);
 
 export { routers };

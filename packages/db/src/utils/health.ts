@@ -1,11 +1,6 @@
-import { db } from "../client";
 import { sql } from "drizzle-orm";
+import { db } from "../client";
 
-export async function checkHealth(): Promise<void> {
-  try {
-    // Simple query to check database connectivity
-    await db.execute(sql`SELECT 1`);
-  } catch (error) {
-    throw new Error(`Database health check failed: ${error}`);
-  }
+export async function checkHealth() {
+  await db.executeOnReplica(sql`SELECT 1`);
 }

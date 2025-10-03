@@ -1,25 +1,16 @@
-import { replicationCache } from "@zeke/cache/replication-cache";
 import { teamPermissionsCache } from "@zeke/cache/team-permissions-cache";
-import type { DatabaseWithPrimary } from "@zeke/db/client";
 import { getUserTeamId } from "@zeke/db/queries";
 import { logger } from "@zeke/logger";
 import type { MiddlewareHandler } from "hono";
 
 /**
- * Database middleware that handles replication lag based on mutation operations
- * For mutations: always use primary DB
- * For queries: use primary DB if the team recently performed a mutation
+ * Middleware that keeps the request context in sync with the active team.
+ * For now all traffic goes to the primary database; once replicas are added we
+ * can reintroduce the read-after-write safeguards here.
  */
 export const withPrimaryReadAfterWrite: MiddlewareHandler = async (c, next) => {
-  // Get session and database from context
   const session = c.get("session");
   const db = c.get("db");
-
-  // Determine operation type based on HTTP method
-  const method = c.req.method;
-  const operationType = ["POST", "PUT", "PATCH", "DELETE"].includes(method)
-    ? "mutation"
-    : "query";
 
   let teamId: string | null = null;
 
@@ -34,7 +25,6 @@ export const withPrimaryReadAfterWrite: MiddlewareHandler = async (c, next) => {
 
     if (!teamId && session.user.id) {
       try {
-        // Get user's current team
         const userTeamId = await getUserTeamId(db, session.user.id);
 
         if (userTeamId) {
@@ -51,38 +41,7 @@ export const withPrimaryReadAfterWrite: MiddlewareHandler = async (c, next) => {
     }
   }
 
-  let finalDb = db;
-
-  if (teamId) {
-    // For mutations, always use primary DB and update the team's timestamp
-    if (operationType === "mutation") {
-      await replicationCache.set(teamId);
-
-      // Use primary-only mode to maintain interface consistency
-      const dbWithPrimary = db as DatabaseWithPrimary;
-      if (dbWithPrimary.usePrimaryOnly) {
-        finalDb = dbWithPrimary.usePrimaryOnly();
-      }
-      // If usePrimaryOnly doesn't exist, we're already using the primary DB
-    }
-    // For queries, check if the team recently performed a mutation
-    else {
-      const timestamp = await replicationCache.get(teamId);
-      const now = Date.now();
-
-      // If the timestamp exists and hasn't expired, use primary DB
-      if (timestamp && now < timestamp) {
-        // Use primary-only mode to maintain interface consistency
-        const dbWithPrimary = db as DatabaseWithPrimary;
-        if (dbWithPrimary.usePrimaryOnly) {
-          finalDb = dbWithPrimary.usePrimaryOnly();
-        }
-      }
-    }
-  }
-
-  // Set database and context in Hono context
-  c.set("db", finalDb);
+  c.set("db", db);
   c.set("session", session);
   c.set("teamId", teamId);
 

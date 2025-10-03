@@ -1,30 +1,42 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "../init";
-import { assistantRouter } from "./assistant";
-import { chatsRouter } from "./chats";
+import { apiKeysRouter } from "./api-keys";
+import { appsRouter } from "./apps";
 import { billingRouter } from "./billing";
+import { chatsRouter } from "./chats";
+import { chatFeedbackRouter } from "./feedback";
 import { highlightRouter } from "./highlight";
 import { insightsRouter } from "./insights";
+import { notificationSettingsRouter } from "./notification-settings";
+import { notificationsRouter } from "./notifications";
+import { oauthApplicationsRouter } from "./oauth-applications";
 import { pipelineRouter } from "./pipeline";
 import { searchRouter } from "./search";
 import { storiesRouter } from "./stories";
+import { suggestedActionsRouter } from "./suggested-actions";
 import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
 import { userRouter } from "./user";
 import { workspaceRouter } from "./workspace";
 
 export const appRouter = createTRPCRouter({
+  notifications: notificationsRouter,
+  notificationSettings: notificationSettingsRouter,
+  apps: appsRouter,
   billing: billingRouter,
-  assistant: assistantRouter,
   chats: chatsRouter,
   tags: tagsRouter,
   team: teamRouter,
+  chatFeedback: chatFeedbackRouter,
   highlight: highlightRouter,
   insights: insightsRouter,
   stories: storiesRouter,
   user: userRouter,
+  suggestedActions: suggestedActionsRouter,
+  oauthApplications: oauthApplicationsRouter,
   search: searchRouter,
   pipeline: pipelineRouter,
+  apiKeys: apiKeysRouter,
   workspace: workspaceRouter,
 });
 

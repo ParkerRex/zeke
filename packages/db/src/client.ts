@@ -1,41 +1,97 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./schema";
 
-const connectionString =
-  process.env.DATABASE_SESSION_POOLER_URL ??
-  process.env.SUPABASE_DB_URL ??
-  process.env.DATABASE_URL ??
-  process.env.DATABASE_PRIMARY_URL;
-
-if (!connectionString) {
-  throw new Error(
-    "Missing SUPABASE_DB_URL (or DATABASE_URL) environment variable for database connection.",
-  );
-}
+const isDevelopment = process.env.NODE_ENV === "development";
 
 const connectionConfig = {
-  prepare: false,
-  max: Number(process.env.DB_POOL_SIZE ?? 5),
-  idle_timeout: 30,
-  max_lifetime: 0,
-  connect_timeout: 10,
-  ssl: connectionString.includes("localhost") ? undefined : "require",
-} as const;
+  max: isDevelopment ? 8 : 12,
+  idleTimeoutMillis: isDevelopment ? 5000 : 60000,
+  connectionTimeoutMillis: 15000,
+  maxUses: isDevelopment ? 100 : 0,
+  allowExitOnIdle: true,
+};
 
-const client = postgres(connectionString, connectionConfig);
+const primaryPool = new Pool({
+  connectionString: process.env.DATABASE_PRIMARY_URL!,
+  ...connectionConfig,
+});
 
-export const db = drizzle(client, {
+// Connection pool monitoring function
+export const getConnectionPoolStats = () => {
+  const getPoolStats = (pool: Pool, name: string) => {
+    try {
+      return {
+        name,
+        total: pool.options?.max ?? 0,
+        idle: pool.idleCount || 0,
+        active: pool.totalCount - pool.idleCount,
+        waiting: pool.waitingCount || 0,
+        ended: pool.ended || false,
+      };
+    } catch (error) {
+      return {
+        name,
+        error: error instanceof Error ? error.message : String(error),
+        total: 0,
+        idle: 0,
+        active: 0,
+        waiting: 0,
+        ended: true,
+      };
+    }
+  };
+
+  const pools = {
+    primary: getPoolStats(primaryPool, "primary"),
+  };
+
+  const poolArray = Object.values(pools);
+  const totalActive = poolArray.reduce(
+    (sum: number, pool: any) => sum + (pool.active || 0),
+    0,
+  );
+  const totalWaiting = poolArray.reduce(
+    (sum: number, pool: any) => sum + (pool.waiting || 0),
+    0,
+  );
+  const hasExhaustedPools = poolArray.some(
+    (pool: any) =>
+      (pool.active || 0) >= (pool.total || 0) || (pool.waiting || 0) > 0,
+  );
+
+  const totalConnections = primaryPool.options?.max ?? connectionConfig.max;
+  const utilizationPercent = totalConnections
+    ? Math.round((totalActive / totalConnections) * 100)
+    : 0;
+
+  return {
+    timestamp: new Date().toISOString(),
+    region: process.env.FLY_REGION || "unknown",
+    instance: process.env.FLY_ALLOC_ID || "local",
+    pools,
+    summary: {
+      totalConnections,
+      totalActive,
+      totalWaiting,
+      hasExhaustedPools,
+      utilizationPercent,
+    },
+  };
+};
+
+export const primaryDb = drizzle(primaryPool, {
   schema,
   casing: "snake_case",
 });
 
-export const connectDb = async () => db;
+export const db = primaryDb;
 
-// Additional export for compatibility with API routes and tools
+// Keep connectDb for backward compatibility, but just return the singleton
+export const connectDb = async () => {
+  return db;
+};
+
 export const createClient = () => db;
 
-export type Database = typeof db;
-
-// Backwards compatibility for legacy helpers expecting this shape.
-export type DatabaseWithPrimary = Database;
+export type Database = Awaited<ReturnType<typeof connectDb>>;
