@@ -1,13 +1,13 @@
 import type { Context } from "@api/rest/types";
-import { protectedMiddleware, withRequiredScope } from "@api/rest/middleware";
 import {
-  createTagInputSchema,
-  tagSchema,
-  updateTagInputSchema,
+  createTagSchema,
+  deleteTagSchema,
+  tagResponseSchema,
+  tagsResponseSchema,
+  updateTagSchema,
 } from "@api/schemas/tags";
 import { validateResponse } from "@api/utils/validate-response";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import {
   createTag,
   deleteTag,
@@ -15,26 +15,25 @@ import {
   getTags,
   updateTag,
 } from "@zeke/db/queries";
+import { withRequiredScope } from "../middleware";
 
 const app = new OpenAPIHono<Context>();
-
-app.use("*", ...protectedMiddleware);
 
 app.openapi(
   createRoute({
     method: "get",
     path: "/",
-    summary: "List tags",
-    description: "Return all tags scoped to the active team.",
+    summary: "List all tags",
     operationId: "listTags",
+    "x-speakeasy-name-override": "list",
+    description: "Retrieve a list of tags for the authenticated team.",
     tags: ["Tags"],
-    security: [{ bearerAuth: [] }],
     responses: {
       200: {
-        description: "Tags available to the current team.",
+        description: "Retrieve a list of tags for the authenticated team.",
         content: {
           "application/json": {
-            schema: z.array(tagSchema),
+            schema: tagsResponseSchema,
           },
         },
       },
@@ -45,13 +44,51 @@ app.openapi(
     const db = c.get("db");
     const teamId = c.get("teamId");
 
-    if (!teamId) {
-      return c.json([]);
-    }
+    const result = await getTags(db, { teamId });
 
-    const rows = await getTags(db, { teamId });
+    return c.json(
+      validateResponse(
+        {
+          data: result,
+        },
+        tagsResponseSchema,
+      ),
+    );
+  },
+);
 
-    return c.json(validateResponse(rows, z.array(tagSchema)));
+app.openapi(
+  createRoute({
+    method: "get",
+    path: "/{id}",
+    summary: "Retrieve a tag",
+    operationId: "getTagById",
+    "x-speakeasy-name-override": "get",
+    description: "Retrieve a tag by ID for the authenticated team.",
+    tags: ["Tags"],
+    request: {
+      params: tagResponseSchema.pick({ id: true }),
+    },
+    responses: {
+      200: {
+        description: "Retrieve a tag by ID for the authenticated team.",
+        content: {
+          "application/json": {
+            schema: tagResponseSchema,
+          },
+        },
+      },
+    },
+    middleware: [withRequiredScope("tags.read")],
+  }),
+  async (c) => {
+    const db = c.get("db");
+    const teamId = c.get("teamId");
+    const { id } = c.req.valid("param");
+
+    const result = await getTagById(db, { id, teamId });
+
+    return c.json(validateResponse(result, tagResponseSchema));
   },
 );
 
@@ -59,26 +96,26 @@ app.openapi(
   createRoute({
     method: "post",
     path: "/",
-    summary: "Create tag",
-    description: "Create a new tag scoped to the active team.",
+    summary: "Create a new tag",
     operationId: "createTag",
+    "x-speakeasy-name-override": "create",
+    description: "Create a new tag for the authenticated team.",
     tags: ["Tags"],
-    security: [{ bearerAuth: [] }],
     request: {
       body: {
         content: {
           "application/json": {
-            schema: createTagInputSchema,
+            schema: createTagSchema,
           },
         },
       },
     },
     responses: {
       201: {
-        description: "Tag created successfully.",
+        description: "Tag created",
         content: {
           "application/json": {
-            schema: tagSchema,
+            schema: tagResponseSchema,
           },
         },
       },
@@ -88,29 +125,11 @@ app.openapi(
   async (c) => {
     const db = c.get("db");
     const teamId = c.get("teamId");
-
-    if (!teamId) {
-      throw new HTTPException(400, {
-        message: "Active team required to create tags",
-      });
-    }
-
     const body = c.req.valid("json");
 
-    const result = await createTag(db, {
-      teamId,
-      name: body.name,
-    });
+    const result = await createTag(db, { teamId, ...body });
 
-    const fullRecord = await getTagById(db, { id: result.id, teamId });
-
-    if (!fullRecord) {
-      throw new HTTPException(500, {
-        message: "Tag created but failed to load full record",
-      });
-    }
-
-    return c.json(validateResponse(fullRecord, tagSchema), 201);
+    return c.json(validateResponse(result, tagResponseSchema), 201);
   },
 );
 
@@ -118,27 +137,27 @@ app.openapi(
   createRoute({
     method: "patch",
     path: "/{id}",
-    summary: "Update tag",
-    description: "Rename an existing tag.",
+    summary: "Update a tag",
     operationId: "updateTag",
+    "x-speakeasy-name-override": "update",
+    description: "Update a tag by ID for the authenticated team.",
     tags: ["Tags"],
-    security: [{ bearerAuth: [] }],
     request: {
-      params: updateTagInputSchema.pick({ id: true }),
+      params: updateTagSchema.pick({ id: true }),
       body: {
         content: {
           "application/json": {
-            schema: createTagInputSchema,
+            schema: updateTagSchema.pick({ name: true }),
           },
         },
       },
     },
     responses: {
       200: {
-        description: "Updated tag.",
+        description: "Tag updated",
         content: {
           "application/json": {
-            schema: tagSchema,
+            schema: tagResponseSchema,
           },
         },
       },
@@ -148,31 +167,16 @@ app.openapi(
   async (c) => {
     const db = c.get("db");
     const teamId = c.get("teamId");
-
-    if (!teamId) {
-      throw new HTTPException(400, {
-        message: "Active team required to update tags",
-      });
-    }
-
     const { id } = c.req.valid("param");
-    const body = c.req.valid("json");
+    const { name } = c.req.valid("json");
 
-    await updateTag(db, {
+    const result = await updateTag(db, {
       id,
-      name: body.name,
+      name,
       teamId,
     });
 
-    const refreshed = await getTagById(db, { id, teamId });
-
-    if (!refreshed) {
-      throw new HTTPException(404, {
-        message: "Tag not found",
-      });
-    }
-
-    return c.json(validateResponse(refreshed, tagSchema));
+    return c.json(validateResponse(result, tagResponseSchema));
   },
 );
 
@@ -180,17 +184,17 @@ app.openapi(
   createRoute({
     method: "delete",
     path: "/{id}",
-    summary: "Delete tag",
-    description: "Remove a tag from the active team.",
+    summary: "Delete a tag",
     operationId: "deleteTag",
+    "x-speakeasy-name-override": "delete",
+    description: "Delete a tag by ID for the authenticated team.",
     tags: ["Tags"],
-    security: [{ bearerAuth: [] }],
     request: {
-      params: updateTagInputSchema.pick({ id: true }),
+      params: deleteTagSchema.pick({ id: true }),
     },
     responses: {
       204: {
-        description: "Tag deleted.",
+        description: "Tag deleted",
       },
     },
     middleware: [withRequiredScope("tags.write")],
@@ -198,27 +202,11 @@ app.openapi(
   async (c) => {
     const db = c.get("db");
     const teamId = c.get("teamId");
-
-    if (!teamId) {
-      throw new HTTPException(400, {
-        message: "Active team required to delete tags",
-      });
-    }
-
     const { id } = c.req.valid("param");
 
-    const removed = await deleteTag(db, {
-      id,
-      teamId,
-    });
+    const result = await deleteTag(db, { id, teamId });
 
-    if (!removed) {
-      throw new HTTPException(404, {
-        message: "Tag not found",
-      });
-    }
-
-    return c.body(null, 204);
+    return c.json(validateResponse(result, tagResponseSchema));
   },
 );
 

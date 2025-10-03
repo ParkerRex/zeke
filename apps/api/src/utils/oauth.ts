@@ -1,14 +1,11 @@
-import { createHash, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
+import { hash } from "@zeke/encryption";
 
 export type OAuthApplication = {
   id: string;
   active: boolean | null;
   clientSecret: string;
 };
-
-function hash(str: string): string {
-  return createHash("sha256").update(str).digest("hex");
-}
 
 export function validateClientCredentials(
   application: OAuthApplication | null | undefined,

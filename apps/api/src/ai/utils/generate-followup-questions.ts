@@ -48,7 +48,7 @@ Based on the tool output provided, generate 2-4 contextual follow-up questions t
 
 Examples of good follow-up questions:
 - "Compare vs last quarter"
-- "Drill into expense categories" 
+- "Drill into expense categories"
 - "Show cost reduction opportunities"
 - "Analyze seasonal patterns"
 - "Break down by department"

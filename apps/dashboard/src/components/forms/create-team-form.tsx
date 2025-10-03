@@ -5,7 +5,6 @@
 import { revalidateAfterTeamChange } from "@/actions/revalidate-action";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
-import { logger } from "@zeke/logger";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
@@ -98,7 +97,7 @@ export function CreateTeamForm({
           ? (error as any).data
           : null;
 
-        logger.error({
+        console.error({
           errorId,
           msg: "Team creation mutation failed",
           error: error instanceof Error ? error.message : String(error),

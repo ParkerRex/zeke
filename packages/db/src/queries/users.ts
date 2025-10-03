@@ -1,27 +1,29 @@
 import type { Database } from "@db/client";
-import { teamMembers, teams, users } from "@db/schema";
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
+import { teams, users, usersOnTeam } from "@db/schema";
+import { teamPermissionsCache } from "@zeke/cache/team-permissions-cache";
+import { eq, inArray, sql } from "drizzle-orm";
 
 export const getUserById = async (db: Database, id: string) => {
   const [result] = await db
     .select({
       id: users.id,
-      email: users.email,
       fullName: users.fullName,
+      email: users.email,
       avatarUrl: users.avatarUrl,
       locale: users.locale,
+      timeFormat: users.timeFormat,
+      dateFormat: users.dateFormat,
       weekStartsOnMonday: users.weekStartsOnMonday,
       timezone: users.timezone,
       timezoneAutoSync: users.timezoneAutoSync,
-      timeFormat: users.timeFormat,
-      dateFormat: users.dateFormat,
       teamId: users.teamId,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt,
       team: {
         id: teams.id,
         name: teams.name,
+        logoUrl: teams.logoUrl,
         plan: teams.plan,
+        createdAt: teams.createdAt,
+        canceledAt: teams.canceledAt,
       },
     })
     .from(users)
@@ -34,13 +36,15 @@ export const getUserById = async (db: Database, id: string) => {
 export type UpdateUserParams = {
   id: string;
   fullName?: string | null;
+  teamId?: string | null;
+  email?: string | null;
   avatarUrl?: string | null;
   locale?: string | null;
+  timeFormat?: number | null;
+  dateFormat?: string | null;
   weekStartsOnMonday?: boolean | null;
   timezone?: string | null;
   timezoneAutoSync?: boolean | null;
-  timeFormat?: number | null;
-  dateFormat?: string | null;
 };
 
 export const updateUser = async (db: Database, data: UpdateUserParams) => {
@@ -52,17 +56,23 @@ export const updateUser = async (db: Database, data: UpdateUserParams) => {
     .where(eq(users.id, id))
     .returning({
       id: users.id,
-      email: users.email,
       fullName: users.fullName,
+      email: users.email,
       avatarUrl: users.avatarUrl,
       locale: users.locale,
+      timeFormat: users.timeFormat,
+      dateFormat: users.dateFormat,
       weekStartsOnMonday: users.weekStartsOnMonday,
       timezone: users.timezone,
       timezoneAutoSync: users.timezoneAutoSync,
-      timeFormat: users.timeFormat,
-      dateFormat: users.dateFormat,
       teamId: users.teamId,
     });
+
+  // If teamId was updated, invalidate the team permissions cache
+  if (updateData.teamId !== undefined) {
+    const cacheKey = `user:${id}:team`;
+    await teamPermissionsCache.delete(cacheKey);
+  }
 
   return result;
 };
@@ -77,19 +87,23 @@ export const getUserTeamId = async (db: Database, userId: string) => {
 };
 
 export const deleteUser = async (db: Database, id: string) => {
+  // Find teams where this user is a member
   const teamsWithUser = await db
     .select({
-      teamId: teamMembers.teamId,
-      memberCount: sql<number>`count(${teamMembers.userId})`.as("member_count"),
+      teamId: usersOnTeam.teamId,
+      memberCount: sql<number>`count(${usersOnTeam.userId})`.as("member_count"),
     })
-    .from(teamMembers)
-    .where(eq(teamMembers.userId, id))
-    .groupBy(teamMembers.teamId);
+    .from(usersOnTeam)
+    .where(eq(usersOnTeam.userId, id))
+    .groupBy(usersOnTeam.teamId);
 
+  // Extract team IDs with only one member (this user)
   const teamIdsToDelete = teamsWithUser
     .filter((team) => team.memberCount === 1)
     .map((team) => team.teamId);
 
+  // Delete the user and teams with only this user as a member
+  // Foreign key constraints with cascade delete will handle related records
   await Promise.all([
     db.delete(users).where(eq(users.id, id)),
     teamIdsToDelete.length > 0
@@ -99,47 +113,3 @@ export const deleteUser = async (db: Database, id: string) => {
 
   return { id };
 };
-
-type SetActiveTeamParams = {
-  userId: string;
-  teamId: string;
-};
-
-export async function setActiveTeam(db: Database, params: SetActiveTeamParams) {
-  const { userId, teamId } = params;
-
-  return db.transaction(async (tx) => {
-    const membership = await tx
-      .select({ status: teamMembers.status })
-      .from(teamMembers)
-      .where(
-        and(eq(teamMembers.userId, userId), eq(teamMembers.teamId, teamId)),
-      )
-      .limit(1);
-
-    if (!membership.length) {
-      throw new Error("User does not have access to this team");
-    }
-
-    await tx
-      .update(teamMembers)
-      .set({ status: "inactive" })
-      .where(
-        and(eq(teamMembers.userId, userId), ne(teamMembers.teamId, teamId)),
-      );
-
-    await tx
-      .update(teamMembers)
-      .set({ status: "active", joinedAt: sql`now()` })
-      .where(
-        and(eq(teamMembers.userId, userId), eq(teamMembers.teamId, teamId)),
-      );
-
-    await tx
-      .update(users)
-      .set({ teamId, updatedAt: sql`now()` })
-      .where(eq(users.id, userId));
-
-    return { userId, teamId };
-  });
-}

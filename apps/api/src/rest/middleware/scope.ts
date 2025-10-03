@@ -12,7 +12,7 @@ export const withRequiredScope = (
         {
           error: "Unauthorized",
           description:
-            "No access permissions found. Please authenticate with a valid API key or access token.",
+            "No scopes found for the current user. Authentication is required.",
         },
         401,
       );
@@ -27,9 +27,9 @@ export const withRequiredScope = (
       return c.json(
         {
           error: "Forbidden",
-          description: `Insufficient permissions for this research operation. Required: ${requiredScopes.join(
+          description: `Insufficient permissions. Required scopes: ${requiredScopes.join(
             ", ",
-          )}. Available: ${scopes.join(", ")}`,
+          )}. Your scopes: ${scopes.join(", ")}`,
         },
         403,
       );

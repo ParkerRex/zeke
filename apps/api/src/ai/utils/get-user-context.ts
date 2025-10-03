@@ -1,9 +1,9 @@
-import { userCache } from "@zeke/cache/user-cache";
+import { chatCache } from "@zeke/cache/chat-cache";
+import type { ChatUserContext } from "@zeke/cache/chat-cache";
 import type { Database } from "@zeke/db/client";
 import { getTeamById, getUserById } from "@zeke/db/queries";
 import { logger } from "@zeke/logger";
 import { HTTPException } from "hono/http-exception";
-import type { ChatUserContext } from "../context";
 
 interface GetUserContextParams {
   db: Database;
@@ -27,10 +27,9 @@ export async function getUserContext({
   timezone,
 }: GetUserContextParams): Promise<ChatUserContext> {
   // Try to get cached context first
-  const cacheKey = `${userId}:${teamId}`;
-  const cached = await userCache.get(cacheKey);
+  const cached = await chatCache.getUserContext(userId, teamId);
   if (cached) {
-    return cached as ChatUserContext;
+    return cached;
   }
 
   // If not cached, fetch team and user data in parallel
@@ -46,16 +45,20 @@ export async function getUserContext({
   }
 
   const context: ChatUserContext = {
-    id: userId,
-    email: user.email,
-    fullName: user.fullName,
+    userId,
     teamId,
-    role: "member", // TODO: Get actual role from team membership
-    plan: team.plan,
+    teamName: team.name,
+    fullName: user.fullName,
+    baseCurrency: team.baseCurrency,
+    locale: user.locale ?? "en-US",
+    dateFormat: user.dateFormat,
+    country,
+    city,
+    timezone,
   };
 
   // Cache for future requests (non-blocking)
-  userCache.set(cacheKey, context).catch((err) => {
+  chatCache.setUserContext(userId, teamId, context).catch((err) => {
     logger.warn({
       msg: "Failed to cache user context",
       userId,

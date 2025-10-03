@@ -16,14 +16,14 @@ export const updateUserSchema = z.object({
   avatarUrl: z
     .string()
     .url()
-    .refine((url) => url.includes("zekehq.com"), {
-      message: "avatarUrl must be a zekehq.com domain URL",
+    .refine((url) => url.includes("midday.ai"), {
+      message: "avatarUrl must be a midday.ai domain URL",
     })
     .optional()
     .openapi({
       description:
-        "URL to the user's avatar image. Must be hosted on zekehq.com domain",
-      example: "https://cdn.zekehq.com/avatars/jane-doe.jpg",
+        "URL to the user's avatar image. Must be hosted on midday.ai domain",
+      example: "https://cdn.midday.ai/avatars/jane-doe.jpg",
     }),
   locale: z.string().optional().openapi({
     description:
@@ -69,7 +69,7 @@ export const userSchema = z.object({
     description: "Unique identifier of the user",
     example: "123e4567-e89b-12d3-a456-426614174000",
   }),
-  fullName: z.string().nullable().openapi({
+  fullName: z.string().openapi({
     description: "Full name of the user",
     example: "Jane Doe",
   }),
@@ -79,7 +79,7 @@ export const userSchema = z.object({
   }),
   avatarUrl: z.string().url().nullable().openapi({
     description: "URL to the user's avatar image",
-    example: "https://cdn.zekehq.com/avatars/jane-doe.jpg",
+    example: "https://cdn.midday.ai/avatars/jane-doe.jpg",
   }),
   locale: z.string().nullable().openapi({
     description:
@@ -118,18 +118,6 @@ export const userSchema = z.object({
         "ddDotMMDotyyyy",
       ],
     }),
-  teamId: z.string().uuid().nullable().openapi({
-    description: "Unique identifier of the team the user belongs to",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  }),
-  createdAt: z.string().nullable().openapi({
-    description: "Timestamp when the user was created",
-    example: "2024-01-15T10:30:00Z",
-  }),
-  updatedAt: z.string().nullable().openapi({
-    description: "Timestamp when the user was last updated",
-    example: "2024-01-20T14:45:00Z",
-  }),
   team: z
     .object({
       id: z.string().uuid().openapi({
@@ -140,12 +128,12 @@ export const userSchema = z.object({
         description: "Name of the team or organization",
         example: "Acme Corporation",
       }),
-      slug: z.string().openapi({
-        description: "URL-friendly slug for the team",
-        example: "acme-corporation",
+      logoUrl: z.string().url().openapi({
+        description: "URL to the team's logo image",
+        example: "https://cdn.midday.ai/logos/acme-corp.png",
       }),
-      planCode: z.string().openapi({
-        description: "Current subscription plan code of the team",
+      plan: z.string().openapi({
+        description: "Current subscription plan of the team",
         example: "pro",
       }),
     })

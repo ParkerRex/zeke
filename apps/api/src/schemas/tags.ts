@@ -1,55 +1,73 @@
 import { z } from "@hono/zod-openapi";
 
-export const tagSchema = z
+export const createTagSchema = z
   .object({
-    id: z.string().uuid().openapi({
-      description: "Unique identifier for the tag",
-      example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-    }),
     name: z.string().openapi({
-      description: "Display name of the tag",
+      description: "The name of the tag.",
       example: "Important",
     }),
-    teamId: z.string().uuid().openapi({
-      description: "Owning team identifier",
-      example: "1a2b3c4d-5e6f-7081-92a3-b4c5d6e7f809",
-    }),
-    createdAt: z.string().openapi({
-      description: "Creation timestamp",
-      example: "2024-05-16T08:25:00Z",
-    }),
   })
-  .openapi({ description: "Tag definition" });
+  .openapi("CreateTag");
 
-export const createTagInputSchema = z
+export const deleteTagSchema = z
   .object({
-    name: z.string().trim().min(1).max(48).openapi({
-      description: "Name for the new tag",
-      example: "Key Insight",
-    }),
+    id: z
+      .string()
+      .uuid()
+      .openapi({
+        description: "The UUID of the tag to delete.",
+        example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+        param: {
+          in: "path",
+          name: "id",
+        },
+      }),
   })
-  .openapi({ description: "Payload for creating a tag" });
+  .openapi("DeleteTag");
 
-export const updateTagInputSchema = z
+export const updateTagSchema = z
   .object({
-    id: z.string().uuid().openapi({
-      description: "Tag identifier",
-      example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-    }),
-    name: z.string().trim().min(1).max(48).openapi({
-      description: "Updated tag name",
+    id: z
+      .string()
+      .uuid()
+      .openapi({
+        description: "The ID of the tag to update.",
+        example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+        param: {
+          in: "path",
+          name: "id",
+        },
+      }),
+    name: z.string().openapi({
+      description: "The new name of the tag.",
       example: "Urgent",
     }),
   })
-  .openapi({ description: "Payload for updating a tag" });
+  .openapi("UpdateTag");
 
-export const deleteTagInputSchema = z
+export const tagResponseSchema = z
   .object({
-    id: z.string().uuid().openapi({
-      description: "Tag identifier",
-      example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+    id: z
+      .string()
+      .uuid()
+      .openapi({
+        description: "The UUID of the tag.",
+        example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+        param: {
+          in: "path",
+        },
+      }),
+    name: z.string().openapi({
+      description: "The name of the tag.",
+      example: "Important",
     }),
   })
-  .openapi({ description: "Payload for deleting a tag" });
+  .openapi("TagResponse");
 
-export type TagSchema = z.infer<typeof tagSchema>;
+export const tagsResponseSchema = z
+  .object({
+    data: z.array(tagResponseSchema).openapi({
+      description: "List of tags.",
+    }),
+  })
+  .openapi("TagsResponse");

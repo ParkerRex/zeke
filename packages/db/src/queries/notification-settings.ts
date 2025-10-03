@@ -1,10 +1,10 @@
 import {
-  getUserSettingsNotificationTypes,
   type NotificationType,
+  getUserSettingsNotificationTypes,
 } from "@zeke/notifications";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../client";
-// import { notificationSettings } from "../schema"; // TODO: Create notification_settings table when needed
+import { notificationSettings } from "../schema";
 
 export type NotificationChannel = "in_app" | "email" | "push";
 
@@ -38,26 +38,66 @@ export async function getNotificationSettings(
   db: Database,
   params: GetNotificationSettingsParams,
 ): Promise<NotificationSetting[]> {
-  // TODO: Implement when notification_settings table is created
-  // For now, return empty array (defaults to enabled notifications)
-  return [];
+  const conditions = [
+    eq(notificationSettings.userId, params.userId),
+    eq(notificationSettings.teamId, params.teamId),
+  ];
+
+  if (params.notificationType) {
+    conditions.push(
+      eq(notificationSettings.notificationType, params.notificationType),
+    );
+  }
+
+  if (params.channel) {
+    conditions.push(eq(notificationSettings.channel, params.channel));
+  }
+
+  const results = await db
+    .select()
+    .from(notificationSettings)
+    .where(and(...conditions));
+
+  return results.map((result) => ({
+    ...result,
+    channel: result.channel as NotificationChannel,
+  }));
 }
 
 export async function upsertNotificationSetting(
   db: Database,
   params: UpsertNotificationSettingParams,
 ): Promise<NotificationSetting> {
-  // TODO: Implement when notification_settings table is created
-  // For now, return a mock setting
+  const [result] = await db
+    .insert(notificationSettings)
+    .values({
+      userId: params.userId,
+      teamId: params.teamId,
+      notificationType: params.notificationType,
+      channel: params.channel,
+      enabled: params.enabled,
+    })
+    .onConflictDoUpdate({
+      target: [
+        notificationSettings.userId,
+        notificationSettings.teamId,
+        notificationSettings.notificationType,
+        notificationSettings.channel,
+      ],
+      set: {
+        enabled: params.enabled,
+        updatedAt: new Date().toISOString(),
+      },
+    })
+    .returning();
+
+  if (!result) {
+    throw new Error("Failed to upsert notification setting");
+  }
+
   return {
-    id: crypto.randomUUID(),
-    userId: params.userId,
-    teamId: params.teamId,
-    notificationType: params.notificationType,
-    channel: params.channel,
-    enabled: params.enabled,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    ...result,
+    channel: result.channel as NotificationChannel,
   };
 }
 

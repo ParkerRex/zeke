@@ -57,6 +57,7 @@ export const protectedProcedure = t.procedure
 
     return opts.next({
       ctx: {
+        ...opts.ctx,
         teamId,
         session,
       },

@@ -7,7 +7,6 @@ import {
   deleteTeamSchema,
   inviteTeamMembersSchema,
   leaveTeamSchema,
-  updateBaseCurrencySchema,
   updateTeamByIdSchema,
   updateTeamMemberSchema,
 } from "@api/schemas/team";
@@ -32,11 +31,7 @@ import {
   updateTeamById,
   updateTeamMember,
 } from "@zeke/db/queries";
-import type {
-  DeleteTeamPayload,
-  InviteTeamMembersPayload,
-  UpdateBaseCurrencyPayload,
-} from "@zeke/jobs/schema";
+import type { InviteTeamMembersPayload } from "@zeke/jobs/schema";
 
 export const teamRouter = createTRPCRouter({
   current: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
@@ -108,11 +103,11 @@ export const teamRouter = createTRPCRouter({
       const teamMembersData = await getTeamMembersByTeamId(db, input.teamId);
 
       const currentUser = teamMembersData?.find(
-        (member) => member.user?.id === session.user.id,
+        (member: any) => member.user?.id === session.user.id,
       );
 
       const totalOwners = teamMembersData?.filter(
-        (member) => member.role === "owner",
+        (member: any) => member.role === "owner",
       ).length;
 
       if (currentUser?.role === "owner" && totalOwners === 1) {
@@ -157,8 +152,6 @@ export const teamRouter = createTRPCRouter({
           message: "Team not found",
         });
       }
-
-      // Bank connections cleanup removed during migration to Zeke
     }),
 
   deleteMember: protectedProcedure
@@ -239,15 +232,4 @@ export const teamRouter = createTRPCRouter({
   availablePlans: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
     return getAvailablePlans(db, teamId!);
   }),
-
-  updateBaseCurrency: protectedProcedure
-    .input(updateBaseCurrencySchema)
-    .mutation(async ({ ctx: { teamId }, input }) => {
-      const event = await tasks.trigger("update-base-currency", {
-        teamId: teamId!,
-        baseCurrency: input.baseCurrency,
-      } satisfies UpdateBaseCurrencyPayload);
-
-      return event;
-    }),
 });

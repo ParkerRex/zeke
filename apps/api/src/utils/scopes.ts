@@ -1,11 +1,11 @@
 export const SCOPES = [
+  "chat.read",
+  "chat.write",
   "stories.read",
   "stories.write",
   "stories.metrics",
   "highlights.read",
   "highlights.write",
-  "assistant.read",
-  "assistant.write",
   "search.read",
   "tags.read",
   "tags.write",
@@ -47,66 +47,42 @@ export const scopePresets = [
   },
 ];
 
-export const scopesToName = (scopes: Scope[]) => {
-  if (scopes.length === SCOPES.length) {
+export const scopesToName = (scopes: string[]) => {
+  if (scopes.includes("apis.all")) {
     return {
-      name: "All Access",
-      description: "Full access to every REST and TRPC surface",
-      preset: "all_access" as const,
+      name: "All access",
+      description: "full access to all resources",
+      preset: "all_access",
     };
   }
 
-  const normalized = new Set(scopes);
-  if (observerScopes.every((scope) => normalized.has(scope))) {
+  if (scopes.includes("apis.read")) {
     return {
-      name: "Observer",
-      description: "Read access for stories, highlights, and search",
-      preset: "observer" as const,
-    };
-  }
-
-  if (scopes.every((scope) => scope.endsWith(".read"))) {
-    return {
-      name: "Read Only",
-      description: "Read access across the API",
-      preset: "read_only" as const,
+      name: "Read-only",
+      description: "read-only access to all resources",
+      preset: "read_only",
     };
   }
 
   return {
-    name: "Custom",
-    description: "Custom mix of scopes",
-    preset: undefined,
-  } as const;
+    name: "Restricted",
+    description: "restricted access to some resources",
+    preset: "restricted",
+  };
 };
-
-export const expandScopes = (scopes: string[]): Scope[] => {
-  if (!scopes.length) {
-    return [];
+export const expandScopes = (scopes: string[]): string[] => {
+  if (scopes.includes("apis.all")) {
+    // Return all scopes except any that start with "apis."
+    return SCOPES.filter((scope) => !scope.startsWith("apis."));
   }
 
-  const allowed = new Set<Scope>();
-
-  for (const scope of scopes) {
-    if (scope === "all_access") {
-      SCOPES.forEach((entry) => allowed.add(entry));
-      continue;
-    }
-
-    if (scope === "read_only") {
-      readOnlyScopes.forEach((entry) => allowed.add(entry));
-      continue;
-    }
-
-    if (scope === "observer") {
-      observerScopes.forEach((entry) => allowed.add(entry));
-      continue;
-    }
-
-    if ((SCOPES as readonly string[]).includes(scope)) {
-      allowed.add(scope as Scope);
-    }
+  if (scopes.includes("apis.read")) {
+    // Return all read scopes except any that start with "apis."
+    return SCOPES.filter(
+      (scope) => scope.endsWith(".read") && !scope.startsWith("apis."),
+    );
   }
 
-  return Array.from(allowed);
+  // For custom scopes, filter out any "apis." scopes
+  return scopes.filter((scope) => !scope.startsWith("apis."));
 };

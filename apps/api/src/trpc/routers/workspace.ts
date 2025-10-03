@@ -1,5 +1,7 @@
+import type { Database } from "@zeke/db/client";
+import { sourceConnections, sourceHealth } from "@zeke/db/schema";
+import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 /**
@@ -19,9 +21,6 @@ export const workspaceRouter = createTRPCRouter({
     if (!teamId) {
       const user = await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id, userId),
-        with: {
-          profile: true,
-        },
       });
 
       if (!user) {
@@ -31,6 +30,10 @@ export const workspaceRouter = createTRPCRouter({
         });
       }
 
+      const userPreferences =
+        (user as { preferences?: Record<string, unknown> | null }).preferences ??
+        {};
+
       return {
         user: {
           id: user.id,
@@ -39,7 +42,7 @@ export const workspaceRouter = createTRPCRouter({
           avatarUrl: user.avatarUrl,
           locale: user.locale || "en",
           timezone: user.timezone || "UTC",
-          preferences: user.profile?.preferences || {},
+          preferences: userPreferences,
         },
         team: null,
         navCounts: {
@@ -67,9 +70,6 @@ export const workspaceRouter = createTRPCRouter({
       // Fetch user data
       const user = await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id, userId),
-        with: {
-          profile: true,
-        },
       });
 
       if (!user) {
@@ -82,9 +82,18 @@ export const workspaceRouter = createTRPCRouter({
       // Fetch team data with member count
       const team = await db.query.teams.findFirst({
         where: (teams, { eq }) => eq(teams.id, teamId),
+        columns: {
+          id: true,
+          name: true,
+          logoUrl: true,
+          plan: true,
+        },
         with: {
-          members: {
-            limit: 100,
+          usersOnTeam: {
+            columns: {
+              userId: true,
+              role: true,
+            },
           },
         },
       });
@@ -163,22 +172,21 @@ export const workspaceRouter = createTRPCRouter({
       const assistantSummary = await getAssistantSummary(db, teamId, userId);
 
       // Get subscription details for trial status
-      const subscription = await db.query.subscriptions.findFirst({
-        where: (subs, { eq }) => eq(subs.teamId, teamId),
-      });
+      const memberships = team.usersOnTeam ?? [];
 
-      let trialDaysLeft = null;
-      let subscriptionStatus = subscription?.status || "inactive";
+      const isOwner = memberships.some(
+        (member) => member.userId === userId && member.role === "owner",
+      );
 
-      if (subscriptionStatus === "trialing" && subscription?.trialEndsAt) {
-        trialDaysLeft = Math.max(
-          0,
-          Math.ceil(
-            (new Date(subscription.trialEndsAt).getTime() - Date.now()) /
-              (1000 * 60 * 60 * 24),
-          ),
-        );
-      }
+      const memberCount = memberships.length;
+
+      const userPreferences =
+        (user as { preferences?: Record<string, unknown> | null }).preferences ??
+        {};
+
+      const subscriptionStatus = team.plan === "trial" ? "trialing" : "active";
+
+      const trialDaysLeft = null;
 
       // Return bootstrap payload
       return {
@@ -189,15 +197,15 @@ export const workspaceRouter = createTRPCRouter({
           avatarUrl: user.avatarUrl,
           locale: user.locale || "en",
           timezone: user.timezone || "UTC",
-          preferences: user.profile?.preferences || {},
+          preferences: userPreferences,
         },
         team: {
           id: team.id,
           name: team.name,
-          slug: team.slug, // Now exists in schema
-          plan: team.plan, // Use 'plan' field from schema
-          memberCount: team.members.length,
-          isOwner: team.ownerId === userId, // Now works with ownerId column
+          logoUrl: team.logoUrl,
+          plan: team.plan,
+          memberCount,
+          isOwner,
           subscriptionStatus,
           trialDaysLeft,
         },
@@ -226,41 +234,23 @@ export const workspaceRouter = createTRPCRouter({
 /**
  * Get active banners for the team
  */
-async function getBanners(db: any, teamId: string) {
+async function getBanners(db: Database, teamId: string) {
   const banners = [];
 
-  // Check for trial expiration
-  const subscription = await db.query.subscriptions.findFirst({
-    where: (subs, { and, eq }) =>
-      and(eq(subs.teamId, teamId), eq(subs.status, "trialing")),
-  });
+  // Check for ingestion issues scoped to the team's source connections
+  const failingSources = await db
+    .select({ sourceId: sourceConnections.sourceId })
+    .from(sourceConnections)
+    .innerJoin(
+      sourceHealth,
+      eq(sourceHealth.sourceId, sourceConnections.sourceId),
+    )
+    .where(
+      and(eq(sourceConnections.teamId, teamId), eq(sourceHealth.status, "error")),
+    )
+    .limit(1);
 
-  if (subscription?.trialEndsAt) {
-    const daysLeft = Math.ceil(
-      (new Date(subscription.trialEndsAt).getTime() - Date.now()) /
-        (1000 * 60 * 60 * 24),
-    );
-
-    if (daysLeft <= 7 && daysLeft > 0) {
-      banners.push({
-        id: "trial-expiring",
-        type: "warning",
-        message: `Your trial expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`,
-        action: {
-          label: "Upgrade Now",
-          href: "/settings/billing",
-        },
-      });
-    }
-  }
-
-  // Check for ingestion issues
-  const failedSources = await db.query.sourceHealth.findMany({
-    where: (health, { eq }) => eq(health.status, "error"),
-    limit: 1,
-  });
-
-  if (failedSources.length > 0) {
+  if (failingSources.length > 0) {
     banners.push({
       id: "ingestion-errors",
       type: "error",
@@ -278,7 +268,11 @@ async function getBanners(db: any, teamId: string) {
 /**
  * Get assistant usage summary for the user
  */
-async function getAssistantSummary(db: any, teamId: string, userId: string) {
+async function getAssistantSummary(
+  db: Database,
+  teamId: string,
+  userId: string,
+) {
   // Get recent chat activity
   const recentChats = await db.query.chats.findMany({
     where: (chats, { and, eq, gte }) =>

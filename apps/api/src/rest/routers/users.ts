@@ -1,27 +1,24 @@
 import type { Context } from "@api/rest/types";
-import { protectedMiddleware, withRequiredScope } from "@api/rest/middleware";
 import { updateUserSchema, userSchema } from "@api/schemas/users";
 import { validateResponse } from "@api/utils/validate-response";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { getUserById, updateUser } from "@zeke/db/queries";
+import { withRequiredScope } from "../middleware";
 
 const app = new OpenAPIHono<Context>();
-
-app.use("*", ...protectedMiddleware);
 
 app.openapi(
   createRoute({
     method: "get",
     path: "/me",
-    summary: "Current user",
-    description: "Return the profile for the authenticated user.",
+    summary: "Retrieve the current user",
     operationId: "getCurrentUser",
+    "x-speakeasy-name-override": "get",
+    description: "Retrieve the current user for the authenticated team.",
     tags: ["Users"],
-    security: [{ bearerAuth: [] }],
     responses: {
       200: {
-        description: "User profile",
+        description: "Retrieve the current user for the authenticated team.",
         content: {
           "application/json": {
             schema: userSchema,
@@ -35,21 +32,9 @@ app.openapi(
     const db = c.get("db");
     const session = c.get("session");
 
-    if (!session?.user?.id) {
-      throw new HTTPException(401, {
-        message: "Authentication required",
-      });
-    }
+    const result = await getUserById(db, session.user.id);
 
-    const user = await getUserById(db, session.user.id);
-
-    if (!user) {
-      throw new HTTPException(404, {
-        message: "User not found",
-      });
-    }
-
-    return c.json(validateResponse(user, userSchema));
+    return c.json(validateResponse(result, userSchema));
   },
 );
 
@@ -57,11 +42,11 @@ app.openapi(
   createRoute({
     method: "patch",
     path: "/me",
-    summary: "Update current user",
-    description: "Update profile fields for the authenticated user.",
+    summary: "Update the current user",
     operationId: "updateCurrentUser",
+    "x-speakeasy-name-override": "update",
+    description: "Update the current user for the authenticated team.",
     tags: ["Users"],
-    security: [{ bearerAuth: [] }],
     request: {
       body: {
         content: {
@@ -73,7 +58,7 @@ app.openapi(
     },
     responses: {
       200: {
-        description: "Updated user",
+        description: "The updated user",
         content: {
           "application/json": {
             schema: userSchema,
@@ -81,34 +66,19 @@ app.openapi(
         },
       },
     },
-    middleware: [withRequiredScope("users.manage")],
+    middleware: [withRequiredScope("users.write")],
   }),
   async (c) => {
     const db = c.get("db");
     const session = c.get("session");
-
-    if (!session?.user?.id) {
-      throw new HTTPException(401, {
-        message: "Authentication required",
-      });
-    }
-
     const body = c.req.valid("json");
 
-    await updateUser(db, {
+    const result = await updateUser(db, {
       id: session.user.id,
       ...body,
     });
 
-    const refreshed = await getUserById(db, session.user.id);
-
-    if (!refreshed) {
-      throw new HTTPException(404, {
-        message: "User not found",
-      });
-    }
-
-    return c.json(validateResponse(refreshed, userSchema));
+    return c.json(validateResponse(result, userSchema));
   },
 );
 

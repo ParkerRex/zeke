@@ -1,6 +1,6 @@
-import { TeamAccessError, ensureTeamAccess } from "@api/auth/team";
 import type { Session } from "@api/utils/auth";
 import { TRPCError } from "@trpc/server";
+import { teamCache } from "@zeke/cache/team-cache";
 import type { Database } from "@zeke/db/client";
 
 export const withTeamPermission = async <TReturn>(opts: {
@@ -27,47 +27,52 @@ export const withTeamPermission = async <TReturn>(opts: {
     });
   }
 
-  let teamId: string | null;
+  const result = await ctx.db.query.users.findFirst({
+    with: {
+      usersOnTeams: {
+        columns: {
+          id: true,
+          teamId: true,
+        },
+      },
+    },
+    where: (users, { eq }) => eq(users.id, userId),
+  });
 
-  try {
-    teamId = await ensureTeamAccess(ctx.db, userId);
-  } catch (error) {
-    if (error instanceof TeamAccessError) {
-      if (error.code === "USER_NOT_FOUND") {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: error.message,
-        });
-      }
+  if (!result) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "User not found",
+    });
+  }
 
-      if (error.code === "TEAM_FORBIDDEN") {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: error.message,
-        });
-      }
+  const teamId = result.teamId;
+
+  // If teamId is null, user has no team assigned but this is now allowed
+  if (teamId !== null) {
+    const cacheKey = `user:${userId}:team:${teamId}`;
+    let hasAccess = await teamCache.get(cacheKey);
+
+    if (hasAccess === undefined) {
+      hasAccess = result.usersOnTeams.some(
+        (membership) => membership.teamId === teamId,
+      );
+
+      await teamCache.set(cacheKey, hasAccess);
     }
 
-    // Debug: Log the actual error details
-    console.error("ensureTeamAccess failed with unexpected error:", {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      errorType: error?.constructor?.name,
-      userId,
-    });
-
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Failed to resolve team access",
-      cause: error,
-    });
+    if (!hasAccess) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "No permission to access this team",
+      });
+    }
   }
 
   return next({
     ctx: {
-      session: ctx.session,
+      ...ctx,
       teamId,
-      db: ctx.db,
     },
   });
 };

@@ -1,51 +1,77 @@
 import type { UIChatMessage } from "@api/ai/types";
-import { sql } from "drizzle-orm";
+import { type SQL, relations, sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  customType,
+  date,
   foreignKey,
   index,
   integer,
+  json,
   jsonb,
   numeric,
   pgEnum,
+  pgPolicy,
   pgTable,
-  pgView,
   primaryKey,
+  smallint,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
+  varchar,
   vector,
 } from "drizzle-orm/pg-core";
-import type { PgNumericConfig } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm/relations";
 
-const numericCasted = (name: string, config?: PgNumericConfig) =>
-  numeric(name, config);
+export const tsvector = customType<{
+  data: string;
+}>({
+  dataType() {
+    return "tsvector";
+  },
+});
+
+type NumericConfig = {
+  precision?: number;
+  scale?: number;
+};
+
+export const numericCasted = customType<{
+  data: number;
+  driverData: string;
+  config: NumericConfig;
+}>({
+  dataType: (config) => {
+    if (config?.precision && config?.scale) {
+      return `numeric(${config.precision}, ${config.scale})`;
+    }
+    return "numeric";
+  },
+  fromDriver: (value: string) => Number.parseFloat(value),
+  toDriver: (value: number) => value.toString(),
+});
 
 // ============================================================================
 // ENUMS
 // ============================================================================
 
 export const healthStatus = pgEnum("health_status", ["ok", "warn", "error"]);
-export const pricingPlanInterval = pgEnum("pricing_plan_interval", [
-  "day",
-  "week",
-  "month",
-  "year",
-]);
-export const pricingType = pgEnum("pricing_type", ["one_time", "recurring"]);
-export const subscriptionStatus = pgEnum("subscription_status", [
-  "trialing",
+
+export const plansEnum = pgEnum("plans", ["trial", "starter", "pro"]);
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "active",
   "canceled",
-  "incomplete",
-  "incomplete_expired",
   "past_due",
   "unpaid",
-  "paused",
+  "trialing",
+  "incomplete",
+  "incomplete_expired",
 ]);
+
+export const teamRolesEnum = pgEnum("teamRoles", ["owner", "member"]);
+
 export const planCodeEnum = pgEnum("plan_code", [
   "trial",
   "starter",
@@ -64,6 +90,7 @@ export const inviteStatus = pgEnum("invite_status", [
   "expired",
   "revoked",
 ]);
+
 export const storyKind = pgEnum("story_kind", [
   "article",
   "video",
@@ -81,11 +108,7 @@ export const highlightKind = pgEnum("highlight_kind", [
   "api_change", // API updates, new endpoints
   "metric", // Performance numbers, benchmarks
 ]);
-export const highlightOrigin = pgEnum("highlight_origin", [
-  "user",
-  "assistant",
-  "system",
-]);
+export const highlightOrigin = pgEnum("highlight_origin", ["user", "system"]);
 export const highlightCollaboratorRole = pgEnum("highlight_collaborator_role", [
   "viewer",
   "editor",
@@ -114,16 +137,6 @@ export const stepStatus = pgEnum("step_status", [
   "completed",
   "skipped",
 ]);
-export const threadStatus = pgEnum("thread_status", [
-  "active",
-  "resolved",
-  "archived",
-]);
-export const messageRole = pgEnum("message_role", [
-  "user",
-  "assistant",
-  "system",
-]);
 
 export const activityTypeEnum = pgEnum("activity_type", [
   "story_published",
@@ -132,273 +145,157 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "highlight_pinned",
   "playbook_created",
   "playbook_published",
-  "assistant_thread_started",
-  "assistant_message_posted",
   "goal_created",
   "goal_completed",
   "subscription_upgraded",
   "subscription_downgraded",
 ]);
 
-export const activityVisibilityEnum = pgEnum("activity_visibility", [
-  "team",
-  "personal",
-  "system",
+export const activitySourceEnum = pgEnum("activity_source", [
+  "system", // Automated system processes
+  "user", // Direct user actions
 ]);
 
-// ============================================================================
-// USER & PROFILE TABLES
-// ============================================================================
+export const activityStatusEnum = pgEnum("activity_status", [
+  "unread",
+  "read",
+  "archived",
+]);
 
-export const users = pgTable(
-  "users",
+export const tags = pgTable(
+  "tags",
   {
-    id: uuid("id").primaryKey().notNull(),
-    email: text("email").notNull(),
-    fullName: text("full_name"),
-    avatarUrl: text("avatar_url"),
-    teamId: uuid("team_id"),
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-    locale: text("locale").default("en"),
-    weekStartsOnMonday: boolean("week_starts_on_monday").default(false),
-    timezone: text("timezone"),
-    timezoneAutoSync: boolean("timezone_auto_sync").default(true),
-    timeFormat: integer("time_format").default(24),
-    dateFormat: text("date_format"),
-    updatedAt: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    teamId: uuid("team_id").notNull(),
+    name: text().notNull(),
   },
   (table) => [
-    uniqueIndex("users_email_key").using("btree", table.email),
-    index("users_created_at_idx").using("btree", table.createdAt),
-    index("users_team_id_idx").using("btree", table.teamId),
+    index("tags_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "tags_team_id_fkey",
+    }).onDelete("cascade"),
+    unique("unique_tag_name").on(table.teamId, table.name),
+    pgPolicy("Tags can be handled by a member of the team", {
+      as: "permissive",
+      for: "all",
+      to: ["public"],
+      using: sql`(team_id IN ( SELECT private.get_teams_for_authenticated_user() AS get_teams_for_authenticated_user))`,
+    }),
   ],
 );
-
-export const userProfiles = pgTable("user_profiles", {
-  user_id: uuid("user_id")
-    .primaryKey()
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  job_title: text("job_title"),
-  preferences: jsonb("preferences"),
-  timezone: text("timezone").default("UTC"),
-  created_at: timestamp("created_at", {
-    withTimezone: true,
-    mode: "string",
-  }).defaultNow(),
-  updated_at: timestamp("updated_at", {
-    withTimezone: true,
-    mode: "string",
-  }).defaultNow(),
-});
-
-// ============================================================================
-// TEAM & MEMBERSHIP TABLES
-// ============================================================================
 
 export const teams = pgTable(
   "teams",
   {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    id: uuid().defaultRandom().primaryKey().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    name: text("name").notNull(),
-    slug: text("slug").notNull(), // Team URL slug (generated from name)
-    ownerId: uuid("owner_id").references(() => users.id, {
-      onDelete: "set null",
-    }), // Primary team owner
+    name: text(),
     logoUrl: text("logo_url"),
-    inboxId: text("inbox_id"),
-    email: text("email"),
-    inboxEmail: text("inbox_email"),
-    inboxForwarding: boolean("inbox_forwarding").default(true),
-    countryCode: text("country_code"),
-    documentClassification: boolean("document_classification").default(false),
+    email: text(),
     canceledAt: timestamp("canceled_at", {
       withTimezone: true,
       mode: "string",
     }),
-    plan: planCodeEnum("plan").default("trial").notNull(),
-    stripeCustomerId: text("stripe_customer_id"),
+    plan: plansEnum().default("trial").notNull(),
+    // subscriptionStatus: subscriptionStatusEnum("subscription_status"),
   },
   (table) => [
-    uniqueIndex("teams_inbox_id_key").using("btree", table.inboxId),
-    uniqueIndex("teams_stripe_customer_id_key").using(
-      "btree",
-      table.stripeCustomerId,
-    ),
-    uniqueIndex("teams_slug_key").using("btree", table.slug), // Unique slug for URLs
-  ],
-);
-
-export const teamMembers = pgTable(
-  "team_members",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    teamId: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    role: teamRole("role").notNull().default("member"),
-    status: text("status").notNull().default("active"),
-    joinedAt: timestamp("joined_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    uniqueIndex("team_members_team_user_key").using(
-      "btree",
-      table.teamId,
-      table.userId,
-    ),
-    index("team_members_user_id_idx").using("btree", table.userId),
-  ],
-);
-
-export const usersOnTeam = teamMembers;
-
-export const teamInvites = pgTable(
-  "team_invites",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    teamId: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    invitedBy: uuid("invited_by").references(() => users.id, {
-      onDelete: "set null",
+    pgPolicy("Invited users can select team if they are invited.", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
     }),
-    email: text("email").notNull(),
-    role: teamRole("role").notNull().default("member"),
-    status: inviteStatus("status").notNull().default("pending"),
-    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "string" }),
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("team_invites_team_email_idx").using(
-      "btree",
-      table.teamId,
-      table.email,
-    ),
-    index("team_invites_status_idx").using("btree", table.status),
-  ],
-);
-
-export const userInvites = teamInvites;
-
-// ============================================================================
-// CUSTOMER & GOAL TABLES
-// ============================================================================
-
-export const customers = pgTable(
-  "customers",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    persona: text("persona"),
-    status: text("status").default("active"),
-    owner_id: uuid("owner_id").references(() => users.id, {
-      onDelete: "set null",
+    pgPolicy("Teams can be deleted by a member of the team", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
     }),
-    context: jsonb("context"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("customers_team_id_idx").using("btree", table.team_id),
-    index("customers_owner_id_idx").using("btree", table.owner_id),
-  ],
-);
-
-export const customerTags = pgTable(
-  "customer_tags",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    color: text("color"),
-  },
-  (table) => [
-    uniqueIndex("customer_tags_team_name_key").using(
-      "btree",
-      table.team_id,
-      table.name,
-    ),
-  ],
-);
-
-export const customerTagAssignments = pgTable(
-  "customer_tag_assignments",
-  {
-    customer_id: uuid("customer_id")
-      .notNull()
-      .references(() => customers.id, { onDelete: "cascade" }),
-    tag_id: uuid("tag_id")
-      .notNull()
-      .references(() => customerTags.id, { onDelete: "cascade" }),
-  },
-  (table) => [primaryKey({ columns: [table.customer_id, table.tag_id] })],
-);
-
-export const teamGoals = pgTable(
-  "team_goals",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    customer_id: uuid("customer_id").references(() => customers.id, {
-      onDelete: "set null",
+    pgPolicy("Teams can be selected by a member of the team", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
     }),
-    created_by: uuid("created_by")
-      .notNull()
-      .references(() => users.id),
-    title: text("title").notNull(),
-    goal_type: text("goal_type").notNull(),
-    status: text("status").default("active"),
-    success_metrics: jsonb("success_metrics"),
-    doc_refs: jsonb("doc_refs"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("team_goals_team_id_idx").using("btree", table.team_id),
-    index("team_goals_customer_id_idx").using("btree", table.customer_id),
+    pgPolicy("Teams can be updated by a member of the team", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+    }),
   ],
 );
 
-// ============================================================================
-// SOURCE & INGESTION TABLES
-// ============================================================================
+export const userInvites = pgTable(
+  "user_invites",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    teamId: uuid("team_id"),
+    email: text(),
+    role: teamRolesEnum(),
+    code: text().default("nanoid(24)"),
+    invitedBy: uuid("invited_by"),
+  },
+  (table) => [
+    index("user_invites_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "public_user_invites_team_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.invitedBy],
+      foreignColumns: [users.id],
+      name: "user_invites_invited_by_fkey",
+    }).onDelete("cascade"),
+    unique("unique_team_invite").on(table.teamId, table.email),
+    unique("user_invites_code_key").on(table.code),
+    pgPolicy("Enable select for users based on email", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`((auth.jwt() ->> 'email'::text) = email)`,
+    }),
+    pgPolicy("User Invites can be created by a member of the team", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("User Invites can be deleted by a member of the team", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+    pgPolicy("User Invites can be deleted by invited email", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+    pgPolicy("User Invites can be selected by a member of the team", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("User Invites can be updated by a member of the team", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+    }),
+  ],
+);
 
 export const sources = pgTable(
   "sources",
@@ -424,6 +321,584 @@ export const sources = pgTable(
     index("sources_active_idx").using("btree", table.is_active),
   ],
 );
+
+export const apps = pgTable(
+  "apps",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    teamId: uuid("team_id").defaultRandom(),
+    config: jsonb(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    appId: text("app_id").notNull(),
+    createdBy: uuid("created_by").defaultRandom(),
+    settings: jsonb(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: "apps_created_by_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "integrations_team_id_fkey",
+    }).onDelete("cascade"),
+    unique("unique_app_id_team_id").on(table.teamId, table.appId),
+    pgPolicy("Apps can be deleted by a member of the team", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+      using: sql`(team_id IN ( SELECT private.get_teams_for_authenticated_user() AS get_teams_for_authenticated_user))`,
+    }),
+    pgPolicy("Apps can be inserted by a member of the team", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("Apps can be selected by a member of the team", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Apps can be updated by a member of the team", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+    }),
+  ],
+);
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid().primaryKey().notNull(),
+    fullName: text("full_name"),
+    avatarUrl: text("avatar_url"),
+    email: text(),
+    teamId: uuid("team_id"),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    locale: text().default("en"),
+    weekStartsOnMonday: boolean("week_starts_on_monday").default(false),
+    timezone: text(),
+    timezoneAutoSync: boolean("timezone_auto_sync").default(true),
+    timeFormat: numericCasted("time_format").default(24),
+    dateFormat: text("date_format"),
+  },
+  (table) => [
+    index("users_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.id],
+      foreignColumns: [table.id],
+      name: "users_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "users_team_id_fkey",
+    }).onDelete("set null"),
+    pgPolicy("Users can insert their own profile.", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+      withCheck: sql`(auth.uid() = id)`,
+    }),
+    pgPolicy("Users can select their own profile.", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Users can select users if they are in the same team", {
+      as: "permissive",
+      for: "select",
+      to: ["authenticated"],
+    }),
+    pgPolicy("Users can update own profile.", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+    }),
+  ],
+);
+
+export const usersOnTeam = pgTable(
+  "users_on_team",
+  {
+    userId: uuid("user_id").notNull(),
+    teamId: uuid("team_id").notNull(),
+    id: uuid().defaultRandom().notNull(),
+    role: teamRolesEnum(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+  },
+  (table) => [
+    index("users_on_team_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("users_on_team_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "users_on_team_team_id_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "users_on_team_user_id_fkey",
+    }).onDelete("cascade"),
+    primaryKey({
+      columns: [table.userId, table.teamId, table.id],
+      name: "members_pkey",
+    }),
+    pgPolicy("Enable insert for authenticated users only", {
+      as: "permissive",
+      for: "insert",
+      to: ["authenticated"],
+      withCheck: sql`true`,
+    }),
+    pgPolicy("Enable updates for users on team", {
+      as: "permissive",
+      for: "update",
+      to: ["authenticated"],
+    }),
+    pgPolicy("Select for current user teams", {
+      as: "permissive",
+      for: "select",
+      to: ["authenticated"],
+    }),
+    pgPolicy("Users on team can be deleted by a member of the team", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+  ],
+);
+
+export const usersInAuth = pgTable(
+  "auth.users",
+  {
+    instanceId: uuid("instance_id"),
+    id: uuid("id").notNull(),
+    aud: varchar("aud", { length: 255 }),
+    role: varchar("role", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    encryptedPassword: varchar("encrypted_password", { length: 255 }),
+    emailConfirmedAt: timestamp("email_confirmed_at", { withTimezone: true }),
+    invitedAt: timestamp("invited_at", { withTimezone: true }),
+    confirmationToken: varchar("confirmation_token", { length: 255 }),
+    confirmationSentAt: timestamp("confirmation_sent_at", {
+      withTimezone: true,
+    }),
+    recoveryToken: varchar("recovery_token", { length: 255 }),
+    recoverySentAt: timestamp("recovery_sent_at", { withTimezone: true }),
+    emailChangeTokenNew: varchar("email_change_token_new", { length: 255 }),
+    emailChange: varchar("email_change", { length: 255 }),
+    emailChangeSentAt: timestamp("email_change_sent_at", {
+      withTimezone: true,
+    }),
+    lastSignInAt: timestamp("last_sign_in_at", { withTimezone: true }),
+    rawAppMetaData: jsonb("raw_app_meta_data"),
+    rawUserMetaData: jsonb("raw_user_meta_data"),
+    isSuperAdmin: boolean("is_super_admin"),
+    createdAt: timestamp("created_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    phone: text("phone").default(sql`null::character varying`),
+    phoneConfirmedAt: timestamp("phone_confirmed_at", { withTimezone: true }),
+    phoneChange: text("phone_change").default(sql`''::character varying`),
+    phoneChangeToken: varchar("phone_change_token", { length: 255 }).default(
+      sql`''::character varying`,
+    ),
+    phoneChangeSentAt: timestamp("phone_change_sent_at", {
+      withTimezone: true,
+    }),
+    // Drizzle ORM does not support .stored() for generated columns, so we omit it
+    confirmedAt: timestamp("confirmed_at", {
+      withTimezone: true,
+      mode: "string",
+    }).generatedAlwaysAs(sql`LEAST(email_confirmed_at, phone_confirmed_at)`),
+    emailChangeTokenCurrent: varchar("email_change_token_current", {
+      length: 255,
+    }).default(sql`''::character varying`),
+    emailChangeConfirmStatus: smallint("email_change_confirm_status").default(
+      0,
+    ),
+    bannedUntil: timestamp("banned_until", { withTimezone: true }),
+    reauthenticationToken: varchar("reauthentication_token", {
+      length: 255,
+    }).default(sql`''::character varying`),
+    reauthenticationSentAt: timestamp("reauthentication_sent_at", {
+      withTimezone: true,
+    }),
+    isSsoUser: boolean("is_sso_user").notNull().default(false),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    isAnonymous: boolean("is_anonymous").notNull().default(false),
+  },
+  (table) => [
+    primaryKey({ columns: [table.id], name: "users_pkey" }),
+    unique("users_phone_key").on(table.phone),
+    unique("confirmation_token_idx").on(table.confirmationToken),
+    unique("email_change_token_current_idx").on(table.emailChangeTokenCurrent),
+    unique("email_change_token_new_idx").on(table.emailChangeTokenNew),
+    unique("reauthentication_token_idx").on(table.reauthenticationToken),
+    unique("recovery_token_idx").on(table.recoveryToken),
+    unique("users_email_partial_key").on(table.email),
+    index("users_instance_id_email_idx").on(
+      table.instanceId,
+      sql`lower((email)::text)`,
+    ),
+    index("users_instance_id_idx").on(table.instanceId),
+    index("users_is_anonymous_idx").on(table.isAnonymous),
+    // Check constraint for email_change_confirm_status
+    {
+      kind: "check",
+      name: "users_email_change_confirm_status_check",
+      expression: sql`((email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2))`,
+    },
+  ],
+);
+
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: uuid("id").notNull().defaultRandom().primaryKey(),
+    keyEncrypted: text("key_encrypted").notNull(),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    userId: uuid("user_id").notNull(),
+    teamId: uuid("team_id").notNull(),
+    keyHash: text("key_hash"),
+    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
+    lastUsedAt: timestamp("last_used_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+  },
+  (table) => [
+    index("api_keys_key_idx").using(
+      "btree",
+      table.keyHash.asc().nullsLast().op("text_ops"),
+    ),
+    index("api_keys_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("api_keys_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "api_keys_user_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "api_keys_team_id_fkey",
+    }).onDelete("cascade"),
+    unique("api_keys_key_unique").on(table.keyHash),
+  ],
+);
+
+export const chats = pgTable(
+  "chats",
+  {
+    id: text("id").primaryKey(), // nanoid
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    title: text("title"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    teamIdIdx: index("chats_team_id_idx").on(table.teamId),
+    userIdIdx: index("chats_user_id_idx").on(table.userId),
+    updatedAtIdx: index("chats_updated_at_idx").on(table.updatedAt),
+  }),
+);
+
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chats.id, {
+        onDelete: "cascade",
+      }),
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    content: jsonb("content").$type<UIChatMessage>().notNull(), // Store individual message as JSONB
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    chatIdIdx: index("chat_messages_chat_id_idx").on(table.chatId),
+    teamIdIdx: index("chat_messages_team_id_idx").on(table.teamId),
+    userIdIdx: index("chat_messages_user_id_idx").on(table.userId),
+    createdAtIdx: index("chat_messages_created_at_idx").on(table.createdAt),
+  }),
+);
+
+export const chatFeedback = pgTable(
+  "chat_feedback",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chats.id, {
+        onDelete: "cascade",
+      }),
+    messageId: text("message_id").notNull(), // Client-side message ID from AI SDK
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+    type: text("type").notNull(), // "positive", "negative", "other"
+    comment: text("comment"), // Optional comment
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    chatIdIdx: index("chat_feedback_chat_id_idx").on(table.chatId),
+    messageIdIdx: index("chat_feedback_message_id_idx").on(table.messageId),
+    teamIdIdx: index("chat_feedback_team_id_idx").on(table.teamId),
+    userIdIdx: index("chat_feedback_user_id_idx").on(table.userId),
+    typeIdx: index("chat_feedback_type_idx").on(table.type),
+    createdAtIdx: index("chat_feedback_created_at_idx").on(table.createdAt),
+  }),
+);
+
+// Relations
+// OAuth Applications
+export const oauthApplications = pgTable(
+  "oauth_applications",
+  {
+    id: uuid("id").notNull().defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    description: text("description"),
+    overview: text("overview"),
+    developerName: text("developer_name"),
+    logoUrl: text("logo_url"),
+    website: text("website"),
+    installUrl: text("install_url"),
+    screenshots: text("screenshots").array().default(sql`'{}'::text[]`),
+    redirectUris: text("redirect_uris").array().notNull(),
+    clientId: text("client_id").notNull().unique(),
+    clientSecret: text("client_secret").notNull(),
+    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
+    teamId: uuid("team_id").notNull(),
+    createdBy: uuid("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    isPublic: boolean("is_public").default(false),
+    active: boolean("active").default(true),
+    status: text("status", {
+      enum: ["draft", "pending", "approved", "rejected"],
+    }).default("draft"),
+  },
+  (table) => [
+    index("oauth_applications_team_id_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("oauth_applications_client_id_idx").using(
+      "btree",
+      table.clientId.asc().nullsLast().op("text_ops"),
+    ),
+    index("oauth_applications_slug_idx").using(
+      "btree",
+      table.slug.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "oauth_applications_team_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: "oauth_applications_created_by_fkey",
+    }).onDelete("cascade"),
+    pgPolicy("OAuth applications can be managed by team members", {
+      as: "permissive",
+      for: "all",
+      to: ["public"],
+      using: sql`(team_id IN ( SELECT private.get_teams_for_authenticated_user() AS get_teams_for_authenticated_user))`,
+    }),
+  ],
+);
+
+// OAuth Authorization Codes
+export const oauthAuthorizationCodes = pgTable(
+  "oauth_authorization_codes",
+  {
+    id: uuid("id").notNull().defaultRandom().primaryKey(),
+    code: text("code").notNull().unique(),
+    applicationId: uuid("application_id").notNull(),
+    userId: uuid("user_id").notNull(),
+    teamId: uuid("team_id").notNull(),
+    scopes: text("scopes").array().notNull(),
+    redirectUri: text("redirect_uri").notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    used: boolean("used").default(false),
+    codeChallenge: text("code_challenge"),
+    codeChallengeMethod: text("code_challenge_method"),
+  },
+  (table) => [
+    index("oauth_authorization_codes_code_idx").using(
+      "btree",
+      table.code.asc().nullsLast().op("text_ops"),
+    ),
+    index("oauth_authorization_codes_application_id_idx").using(
+      "btree",
+      table.applicationId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("oauth_authorization_codes_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.applicationId],
+      foreignColumns: [oauthApplications.id],
+      name: "oauth_authorization_codes_application_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "oauth_authorization_codes_user_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "oauth_authorization_codes_team_id_fkey",
+    }).onDelete("cascade"),
+  ],
+);
+
+// OAuth Access Tokens
+export const oauthAccessTokens = pgTable(
+  "oauth_access_tokens",
+  {
+    id: uuid("id").notNull().defaultRandom().primaryKey(),
+    token: text("token").notNull().unique(),
+    refreshToken: text("refresh_token").unique(),
+    applicationId: uuid("application_id").notNull(),
+    userId: uuid("user_id").notNull(),
+    teamId: uuid("team_id").notNull(),
+    scopes: text("scopes").array().notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    lastUsedAt: timestamp("last_used_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    revoked: boolean("revoked").default(false),
+    revokedAt: timestamp("revoked_at", { withTimezone: true, mode: "string" }),
+  },
+  (table) => [
+    index("oauth_access_tokens_token_idx").using(
+      "btree",
+      table.token.asc().nullsLast().op("text_ops"),
+    ),
+    index("oauth_access_tokens_refresh_token_idx").using(
+      "btree",
+      table.refreshToken.asc().nullsLast().op("text_ops"),
+    ),
+    index("oauth_access_tokens_application_id_idx").using(
+      "btree",
+      table.applicationId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("oauth_access_tokens_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.applicationId],
+      foreignColumns: [oauthApplications.id],
+      name: "oauth_access_tokens_application_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "oauth_access_tokens_user_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "oauth_access_tokens_team_id_fkey",
+    }).onDelete("cascade"),
+  ],
+);
+
+// where it falls off maybe
 
 export const sourceConnections = pgTable(
   "source_connections",
@@ -525,10 +1000,6 @@ export const contents = pgTable(
   ],
 );
 
-// ============================================================================
-// STORY & CLUSTER TABLES
-// ============================================================================
-
 export const storyClusters = pgTable(
   "story_clusters",
   {
@@ -616,10 +1087,6 @@ export const storyAssets = pgTable(
     index("story_assets_type_idx").using("btree", table.asset_type),
   ],
 );
-
-// ============================================================================
-// AUTHOR & CATEGORY TABLES
-// ============================================================================
 
 export const authors = pgTable(
   "authors",
@@ -714,10 +1181,6 @@ export const storyTagEmbeddings = pgTable(
   ],
 );
 
-// ============================================================================
-// STORY STRUCTURE TABLES (Chapters & Turns)
-// ============================================================================
-
 export const storyChapters = pgTable(
   "story_chapters",
   {
@@ -759,10 +1222,6 @@ export const storyTurns = pgTable(
     index("story_turns_position_idx").using("btree", table.position),
   ],
 );
-
-// ============================================================================
-// STORY ANALYSIS TABLES
-// ============================================================================
 
 export const storyEmbeddings = pgTable("story_embeddings", {
   story_id: uuid("story_id")
@@ -820,7 +1279,6 @@ export const highlights = pgTable(
     }),
     kind: highlightKind("kind").notNull().default("insight"),
     origin: highlightOrigin("origin").notNull().default("user"),
-    assistant_thread_id: uuid("assistant_thread_id"),
     title: text("title"),
     summary: text("summary"),
     quote: text("quote"),
@@ -1082,12 +1540,6 @@ export const playbooks = pgTable(
     template_id: uuid("template_id").references(() => playbookTemplates.id, {
       onDelete: "set null",
     }),
-    customer_id: uuid("customer_id").references(() => customers.id, {
-      onDelete: "set null",
-    }),
-    goal_id: uuid("goal_id").references(() => teamGoals.id, {
-      onDelete: "set null",
-    }),
     created_by: uuid("created_by")
       .notNull()
       .references(() => users.id),
@@ -1104,7 +1556,6 @@ export const playbooks = pgTable(
   (table) => [
     index("playbooks_team_idx").using("btree", table.team_id),
     index("playbooks_story_idx").using("btree", table.story_id),
-    index("playbooks_customer_idx").using("btree", table.customer_id),
     index("playbooks_status_idx").using("btree", table.status),
   ],
 );
@@ -1233,167 +1684,6 @@ export const playbookRunEvents = pgTable(
   ],
 );
 
-// ============================================================================
-// ASSISTANT TABLES
-// ============================================================================
-
-export const assistantThreads = pgTable(
-  "assistant_threads",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    story_id: uuid("story_id").references(() => stories.id, {
-      onDelete: "set null",
-    }),
-    playbook_id: uuid("playbook_id").references(() => playbooks.id, {
-      onDelete: "set null",
-    }),
-    goal_id: uuid("goal_id").references(() => teamGoals.id, {
-      onDelete: "set null",
-    }),
-    created_by: uuid("created_by")
-      .notNull()
-      .references(() => users.id),
-    topic: text("topic"),
-    status: threadStatus("status").notNull().default("active"),
-    started_at: timestamp("started_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("assistant_threads_team_idx").using("btree", table.team_id),
-    index("assistant_threads_story_idx").using("btree", table.story_id),
-    index("assistant_threads_status_idx").using("btree", table.status),
-  ],
-);
-
-export const highlightAssistantThreadFk = foreignKey({
-  columns: [highlights.assistant_thread_id],
-  foreignColumns: [assistantThreads.id],
-  name: "highlights_assistant_thread_id_fkey",
-}).onDelete("set null");
-
-export const assistantThreadSources = pgTable(
-  "assistant_thread_sources",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    thread_id: uuid("thread_id")
-      .notNull()
-      .references(() => assistantThreads.id, { onDelete: "cascade" }),
-    highlight_id: uuid("highlight_id").references(() => highlights.id, {
-      onDelete: "cascade",
-    }),
-    turn_id: uuid("turn_id").references(() => storyTurns.id, {
-      onDelete: "cascade",
-    }),
-    added_by: uuid("added_by")
-      .notNull()
-      .references(() => users.id),
-    position: integer("position").notNull().default(0),
-    added_at: timestamp("added_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("assistant_thread_sources_thread_idx").using(
-      "btree",
-      table.thread_id,
-    ),
-  ],
-);
-
-export const assistantMessages = pgTable(
-  "assistant_messages",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    thread_id: uuid("thread_id")
-      .notNull()
-      .references(() => assistantThreads.id, { onDelete: "cascade" }),
-    sender_id: uuid("sender_id").references(() => users.id, {
-      onDelete: "set null",
-    }),
-    role: messageRole("role").notNull(),
-    body: text("body").notNull(),
-    metadata: jsonb("metadata"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("assistant_messages_thread_idx").using("btree", table.thread_id),
-    index("assistant_messages_created_idx").using("btree", table.created_at),
-  ],
-);
-
-export const messageSourceLinks = pgTable(
-  "message_source_links",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    message_id: uuid("message_id")
-      .notNull()
-      .references(() => assistantMessages.id, { onDelete: "cascade" }),
-    highlight_id: uuid("highlight_id").references(() => highlights.id, {
-      onDelete: "cascade",
-    }),
-    turn_id: uuid("turn_id").references(() => storyTurns.id, {
-      onDelete: "cascade",
-    }),
-    confidence: numeric("confidence", { precision: 3, scale: 2 }),
-  },
-  (table) => [
-    index("message_source_links_message_idx").using("btree", table.message_id),
-  ],
-);
-
-export const activities = pgTable(
-  "activities",
-  {
-    id: uuid("id").primaryKey().notNull().defaultRandom(),
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, { onDelete: "cascade" }),
-    actor_id: uuid("actor_id").references(() => users.id, {
-      onDelete: "set null",
-    }),
-    type: activityTypeEnum("type").notNull(),
-    visibility: activityVisibilityEnum("visibility").notNull().default("team"),
-    story_id: uuid("story_id").references(() => stories.id, {
-      onDelete: "set null",
-    }),
-    highlight_id: uuid("highlight_id").references(() => highlights.id, {
-      onDelete: "set null",
-    }),
-    playbook_id: uuid("playbook_id").references(() => playbooks.id, {
-      onDelete: "set null",
-    }),
-    thread_id: uuid("thread_id").references(() => assistantThreads.id, {
-      onDelete: "set null",
-    }),
-    goal_id: uuid("goal_id").references(() => teamGoals.id, {
-      onDelete: "set null",
-    }),
-    metadata: jsonb("metadata"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-  },
-  (table) => [
-    index("activities_team_idx").using("btree", table.team_id),
-    index("activities_type_idx").using("btree", table.type),
-    index("activities_created_at_idx").using("btree", table.created_at),
-  ],
-);
-
-// ============================================================================
-// NOTIFICATIONS
-// ============================================================================
-
 export const notifications = pgTable(
   "notifications",
   {
@@ -1422,91 +1712,77 @@ export const notifications = pgTable(
   ],
 );
 
-// ============================================================================
-// BILLING TABLES (Stripe Integration)
-// ============================================================================
-
-export const products = pgTable(
-  "products",
+export const activities = pgTable(
+  "activities",
   {
-    id: text("id").primaryKey().notNull(), // Stripe product ID
-    name: text("name").notNull(),
-    description: text("description"),
-    active: boolean("active").default(true),
-    metadata: jsonb("metadata"),
-  },
-  (table) => [index("products_active_idx").using("btree", table.active)],
-);
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
 
-export const prices = pgTable(
-  "prices",
-  {
-    id: text("id").primaryKey().notNull(), // Stripe price ID
-    product_id: text("product_id")
-      .notNull()
-      .references(() => products.id),
-    active: boolean("active").default(true),
-    currency: text("currency").notNull(),
-    type: pricingType("type").notNull(),
-    unit_amount: bigint("unit_amount", { mode: "number" }),
-    interval: pricingPlanInterval("interval"),
-    interval_count: integer("interval_count"),
-    metadata: jsonb("metadata"),
-  },
-  (table) => [
-    index("prices_product_idx").using("btree", table.product_id),
-    index("prices_active_idx").using("btree", table.active),
-  ],
-);
+    // Core fields
+    teamId: uuid("team_id").notNull(),
+    userId: uuid("user_id"),
+    type: activityTypeEnum().notNull(),
+    priority: smallint().default(5), // 1-3 = notifications, 4-10 = insights only
 
-export const subscriptions = pgTable(
-  "subscriptions",
-  {
-    id: text("id").primaryKey().notNull(), // Stripe subscription ID
-    team_id: uuid("team_id")
-      .notNull()
-      .references(() => teams.id),
-    price_id: text("price_id")
-      .notNull()
-      .references(() => prices.id),
-    status: subscriptionStatus("status").notNull(),
-    plan_code: planCodeEnum("plan_code").notNull(),
-    current_period_start: timestamp("current_period_start", {
+    // Group related activities together (e.g., same business event across multiple users)
+    groupId: uuid("group_id"),
+
+    // Source of the activity
+    source: activitySourceEnum().notNull(),
+
+    // All the data
+    metadata: jsonb().notNull(),
+
+    // Simple lifecycle (only for notifications)
+    status: activityStatusEnum().default("unread").notNull(),
+
+    // Timestamp of last system use (e.g. insight generation, digest inclusion)
+    lastUsedAt: timestamp("last_used_at", {
       withTimezone: true,
       mode: "string",
     }),
-    current_period_end: timestamp("current_period_end", {
-      withTimezone: true,
-      mode: "string",
-    }),
-    trial_ends_at: timestamp("trial_ends_at", {
-      withTimezone: true,
-      mode: "string",
-    }),
-    canceled_at: timestamp("canceled_at", {
-      withTimezone: true,
-      mode: "string",
-    }),
-    metadata: jsonb("metadata"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).defaultNow(),
   },
   (table) => [
-    index("subscriptions_team_idx").using("btree", table.team_id),
-    index("subscriptions_status_idx").using("btree", table.status),
-    index("subscriptions_plan_code_idx").using("btree", table.plan_code),
+    // Optimized indexes
+    index("activities_notifications_idx").using(
+      "btree",
+      table.teamId,
+      table.priority,
+      table.status,
+      table.createdAt.desc(),
+    ),
+    index("activities_insights_idx").using(
+      "btree",
+      table.teamId,
+      table.type,
+      table.source,
+      table.createdAt.desc(),
+    ),
+    index("activities_metadata_gin_idx").using("gin", table.metadata),
+    index("activities_group_id_idx").on(table.groupId),
+    index("activities_insights_group_idx").using(
+      "btree",
+      table.teamId,
+      table.groupId,
+      table.type,
+      table.createdAt.desc(),
+    ),
+
+    // Foreign keys
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "activities_team_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "activities_user_id_fkey",
+    }).onDelete("set null"),
   ],
 );
-
-// ============================================================================
-// OPERATIONAL TABLES (Keep for instrumentation)
-// ============================================================================
 
 export const platformQuota = pgTable("platform_quota", {
   provider: text("provider").primaryKey().notNull(),
@@ -1541,141 +1817,225 @@ export const sourceHealth = pgTable("source_health", {
   }).defaultNow(),
 });
 
-// ============================================================================
-// CHAT TABLES
-// ============================================================================
-
-export const chats = pgTable(
-  "chats",
-  {
-    id: text("id").primaryKey(), // nanoid
-    teamId: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, {
-        onDelete: "cascade",
-      }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      }),
-    title: text("title"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => ({
-    teamIdIdx: index("chats_team_id_idx").on(table.teamId),
-    userIdIdx: index("chats_user_id_idx").on(table.userId),
-    updatedAtIdx: index("chats_updated_at_idx").on(table.updatedAt),
-  }),
-);
-
-export const chatMessages = pgTable(
-  "chat_messages",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    chatId: text("chat_id")
-      .notNull()
-      .references(() => chats.id, {
-        onDelete: "cascade",
-      }),
-    teamId: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, {
-        onDelete: "cascade",
-      }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      }),
-    content: jsonb("content").$type<UIChatMessage>().notNull(), // Store individual message as JSONB
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => ({
-    chatIdIdx: index("chat_messages_chat_id_idx").on(table.chatId),
-    teamIdIdx: index("chat_messages_team_id_idx").on(table.teamId),
-    userIdIdx: index("chat_messages_user_id_idx").on(table.userId),
-    createdAtIdx: index("chat_messages_created_at_idx").on(table.createdAt),
-  }),
-);
-
-export const chatFeedback = pgTable(
-  "chat_feedback",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    chatId: text("chat_id")
-      .notNull()
-      .references(() => chats.id, {
-        onDelete: "cascade",
-      }),
-    messageId: text("message_id").notNull(), // Client-side message ID from AI SDK
-    teamId: uuid("team_id")
-      .notNull()
-      .references(() => teams.id, {
-        onDelete: "cascade",
-      }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      }),
-    type: text("type").notNull(), // "positive", "negative", "other"
-    comment: text("comment"), // Optional comment
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => ({
-    chatIdIdx: index("chat_feedback_chat_id_idx").on(table.chatId),
-    messageIdIdx: index("chat_feedback_message_id_idx").on(table.messageId),
-    teamIdIdx: index("chat_feedback_team_id_idx").on(table.teamId),
-    userIdIdx: index("chat_feedback_user_id_idx").on(table.userId),
-    typeIdx: index("chat_feedback_type_idx").on(table.type),
-    createdAtIdx: index("chat_feedback_created_at_idx").on(table.createdAt),
-  }),
-);
-
 // Relations
+
 export const usersRelations = relations(users, ({ one, many }) => ({
-  profile: one(userProfiles, {
+  stories: many(stories),
+  highlights: many(highlights),
+  playbooks: many(playbooks),
+  userInvites: many(userInvites),
+  apps: many(apps),
+  apiKeys: many(apiKeys),
+  oauthApplications: many(oauthApplications),
+  oauthAuthorizationCodes: many(oauthAuthorizationCodes),
+  oauthAccessTokens: many(oauthAccessTokens),
+  usersInAuth: one(usersInAuth, {
     fields: [users.id],
-    references: [userProfiles.user_id],
-  }),
-  usersOnTeams: many(teamMembers, {
-    relationName: "userTeamMemberships",
+    references: [usersInAuth.id],
   }),
   team: one(teams, {
     fields: [users.teamId],
     references: [teams.id],
   }),
+  usersOnTeams: many(usersOnTeam),
 }));
 
-export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
+export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
   user: one(users, {
-    fields: [teamMembers.userId],
+    fields: [apiKeys.userId],
     references: [users.id],
-    relationName: "userTeamMemberships",
   }),
   team: one(teams, {
-    fields: [teamMembers.teamId],
+    fields: [apiKeys.teamId],
     references: [teams.id],
-    relationName: "teamMemberships",
   }),
 }));
 
-export const teamsRelations = relations(teams, ({ one, many }) => ({
-  owner: one(users, {
-    fields: [teams.ownerId],
+export const teamsRelations = relations(teams, ({ many }) => ({
+  stories: many(stories),
+  highlights: many(highlights),
+  playbooks: many(playbooks),
+  tags: many(tags),
+  userInvites: many(userInvites),
+  apps: many(apps),
+  apiKeys: many(apiKeys),
+  users: many(users),
+  usersOnTeams: many(usersOnTeam),
+}));
+
+export const appsRelations = relations(apps, ({ one }) => ({
+  user: one(users, {
+    fields: [apps.createdBy],
     references: [users.id],
   }),
-  members: many(teamMembers, {
-    relationName: "teamMemberships",
+  team: one(teams, {
+    fields: [apps.teamId],
+    references: [teams.id],
+  }),
+}));
+
+export const usersInAuthRelations = relations(usersInAuth, ({ many }) => ({
+  users: many(users),
+}));
+
+export const usersOnTeamRelations = relations(usersOnTeam, ({ one }) => ({
+  team: one(teams, {
+    fields: [usersOnTeam.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [usersOnTeam.userId],
+    references: [users.id],
+  }),
+}));
+
+// OAuth Relations
+export const oauthApplicationsRelations = relations(
+  oauthApplications,
+  ({ one, many }) => ({
+    team: one(teams, {
+      fields: [oauthApplications.teamId],
+      references: [teams.id],
+    }),
+    createdBy: one(users, {
+      fields: [oauthApplications.createdBy],
+      references: [users.id],
+    }),
+    authorizationCodes: many(oauthAuthorizationCodes),
+    accessTokens: many(oauthAccessTokens),
+  }),
+);
+
+export const oauthAuthorizationCodesRelations = relations(
+  oauthAuthorizationCodes,
+  ({ one }) => ({
+    application: one(oauthApplications, {
+      fields: [oauthAuthorizationCodes.applicationId],
+      references: [oauthApplications.id],
+    }),
+    user: one(users, {
+      fields: [oauthAuthorizationCodes.userId],
+      references: [users.id],
+    }),
+    team: one(teams, {
+      fields: [oauthAuthorizationCodes.teamId],
+      references: [teams.id],
+    }),
+  }),
+);
+
+export const oauthAccessTokensRelations = relations(
+  oauthAccessTokens,
+  ({ one }) => ({
+    application: one(oauthApplications, {
+      fields: [oauthAccessTokens.applicationId],
+      references: [oauthApplications.id],
+    }),
+    user: one(users, {
+      fields: [oauthAccessTokens.userId],
+      references: [users.id],
+    }),
+    team: one(teams, {
+      fields: [oauthAccessTokens.teamId],
+      references: [teams.id],
+    }),
+  }),
+);
+
+export const notificationSettings = pgTable(
+  "notification_settings",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    userId: uuid("user_id").notNull(),
+    teamId: uuid("team_id").notNull(),
+    notificationType: text("notification_type").notNull(),
+    channel: text("channel").notNull(), // 'in_app', 'email', 'push'
+    enabled: boolean().default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("notification_settings_user_team_type_channel_key").on(
+      table.userId,
+      table.teamId,
+      table.notificationType,
+      table.channel,
+    ),
+    index("notification_settings_user_team_idx").on(table.userId, table.teamId),
+    index("notification_settings_type_channel_idx").on(
+      table.notificationType,
+      table.channel,
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "notification_settings_user_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "notification_settings_team_id_fkey",
+    }).onDelete("cascade"),
+    pgPolicy("Users can manage their own notification settings", {
+      as: "permissive",
+      for: "all",
+      to: ["public"],
+      using: sql`(user_id = auth.uid())`,
+    }),
+  ],
+);
+
+export const chatsRelations = relations(chats, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [chats.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [chats.userId],
+    references: [users.id],
+  }),
+  chatMessages: many(chatMessages),
+  feedback: many(chatFeedback),
+}));
+
+export const chatMessagesRelations = relations(
+  chatMessages,
+  ({ one, many }) => ({
+    chat: one(chats, {
+      fields: [chatMessages.chatId],
+      references: [chats.id],
+    }),
+    team: one(teams, {
+      fields: [chatMessages.teamId],
+      references: [teams.id],
+    }),
+    user: one(users, {
+      fields: [chatMessages.userId],
+      references: [users.id],
+    }),
+    feedback: many(chatFeedback),
+  }),
+);
+
+export const chatFeedbackRelations = relations(chatFeedback, ({ one }) => ({
+  chat: one(chats, {
+    fields: [chatFeedback.chatId],
+    references: [chats.id],
+  }),
+  message: one(chatMessages, {
+    fields: [chatFeedback.messageId],
+    references: [chatMessages.id],
+  }),
+  team: one(teams, {
+    fields: [chatFeedback.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [chatFeedback.userId],
+    references: [users.id],
   }),
 }));

@@ -1,7 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import type { InferUITools } from "ai";
 import { getContext } from "./context";
-import { researchTools } from "./tools";
+import { researchTools } from "./tools/registry";
 
 // Tool registry function - this creates the actual tool implementations
 export const createToolRegistry = () => {

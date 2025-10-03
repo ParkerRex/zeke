@@ -5,16 +5,14 @@ import { withDatabase } from "./db";
 import { withPrimaryReadAfterWrite } from "./primary-read-after-write";
 
 /**
- * Public endpoint middleware for research content endpoints
- * Only attaches database with smart routing - no authentication required
- * Used for: content discovery, public research feeds, health checks
+ * Public endpoint middleware - only attaches database with smart routing
+ * No authentication required
  */
 export const publicMiddleware: MiddlewareHandler[] = [withDatabase];
 
 /**
- * Protected endpoint middleware for authenticated research operations
- * Supports both API keys and OAuth tokens for research team access
- * Used for: content analysis, story management, team collaboration
+ * Protected endpoint middleware - requires authentication
+ * Supports both API keys and OAuth tokens in a single unified middleware
  * Note: withAuth must be first to set session in context
  */
 export const protectedMiddleware: MiddlewareHandler[] = [
@@ -27,7 +25,7 @@ export const protectedMiddleware: MiddlewareHandler[] = [
       return c.get("session")?.user?.id ?? "unknown";
     },
     statusCode: 429,
-    message: "Research API rate limit exceeded. Please try again later.",
+    message: "Rate limit exceeded",
   }),
   withPrimaryReadAfterWrite,
 ];

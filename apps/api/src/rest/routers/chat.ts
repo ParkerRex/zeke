@@ -9,7 +9,7 @@ import {
 } from "@api/ai/generate-title";
 import { createToolRegistry } from "@api/ai/tool-types";
 import type { ChatMessageMetadata } from "@api/ai/types";
-// formatToolCallTitle removed during migration to Zeke
+import { formatToolCallTitle } from "@api/ai/utils/format-tool-call-title";
 import { getUserContext } from "@api/ai/utils/get-user-context";
 import type { Context } from "@api/rest/types";
 import { chatRequestSchema } from "@api/schemas/chat";
@@ -73,9 +73,12 @@ app.post("/", withRequiredScope("chat.write"), async (c) => {
       // Map tool names to suggested action IDs
       // This is a simple mapping - you might want to make this more sophisticated
       const toolNameToActionId: Record<string, string> = {
-        getBurnRate: "burn-rate", // Could be multiple actions that use this tool
-        getBurnRateAnalysis: "health-report",
-        getTransactions: "latest-transactions",
+        getStoryHighlights: "trending-story-highlights",
+        summarizeSources: "summarize-new-sources",
+        draftBrief: "draft-executive-brief",
+        planPlaybook: "plan-research-playbook",
+        linkInsights: "link-related-insights",
+        webSearch: "perform-web-search",
       };
 
       // Try to find matching action ID for this tool
@@ -144,8 +147,8 @@ app.post("/", withRequiredScope("chat.write"), async (c) => {
 
         if (isToolCallMessage) {
           const { toolName } = messageMetadata.toolCall!;
-          // Generate a descriptive title for tool calls
-          messageContent = `Tool: ${toolName}`;
+          // Generate a descriptive title for tool calls using registry metadata
+          messageContent = formatToolCallTitle(toolName);
         } else {
           // Use combined text from all messages for better context
           messageContent = extractTextContent(allMessages);

@@ -1,6 +1,6 @@
 import type { Database } from "@db/client";
 import { teams, users, usersOnTeam } from "@db/schema";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export async function getTeamMembersByTeamId(db: Database, teamId: string) {
   return db

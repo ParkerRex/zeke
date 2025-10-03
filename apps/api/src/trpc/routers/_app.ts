@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "../init";
 import { assistantRouter } from "./assistant";
 import { chatsRouter } from "./chats";
+import { billingRouter } from "./billing";
 import { highlightRouter } from "./highlight";
 import { insightsRouter } from "./insights";
 import { pipelineRouter } from "./pipeline";
@@ -13,6 +14,7 @@ import { userRouter } from "./user";
 import { workspaceRouter } from "./workspace";
 
 export const appRouter = createTRPCRouter({
+  billing: billingRouter,
   assistant: assistantRouter,
   chats: chatsRouter,
   tags: tagsRouter,
