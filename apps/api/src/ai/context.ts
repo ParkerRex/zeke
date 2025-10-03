@@ -1,14 +1,6 @@
 import { type BaseContext, createTypedContext } from "@ai-sdk-tools/artifacts";
-import type { Database } from "@zeke/db/client";
-
-export interface ChatUserContext {
-  id: string;
-  email: string;
-  fullName?: string | null;
-  teamId: string;
-  role: "owner" | "admin" | "member" | "viewer";
-  plan?: string;
-}
+import type { Database } from "@db/client";
+import type { ChatUserContext } from "@zeke/cache/chat-cache";
 
 interface ChatContext extends BaseContext {
   db: Database;
