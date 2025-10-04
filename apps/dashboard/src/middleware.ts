@@ -37,7 +37,6 @@ export async function middleware(request: NextRequest) {
   if (
     !session &&
     newUrl.pathname !== "/login" &&
-    !newUrl.pathname.startsWith("/api/auth/") && // Exclude auth API routes (defense-in-depth)
     !newUrl.pathname.includes("/i/") &&
     !newUrl.pathname.includes("/s/") &&
     !newUrl.pathname.includes("/verify") &&
@@ -93,9 +92,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Exclude: Next.js internals, static files, and ALL API routes (including locale-prefixed)
-    // This prevents middleware from running on /api/* and /en/api/* etc.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
