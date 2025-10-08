@@ -31,7 +31,6 @@ import {
   updateTeamById,
   updateTeamMember,
 } from "@zeke/db/queries";
-import type { InviteTeamMembersPayload } from "@zeke/jobs/schema";
 
 export const teamRouter = createTRPCRouter({
   current: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
@@ -209,7 +208,7 @@ export const teamRouter = createTRPCRouter({
           invites,
           ip,
           locale: "en",
-        } satisfies InviteTeamMembersPayload);
+        });
       }
 
       // Return information about the invitation process

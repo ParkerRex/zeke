@@ -65,7 +65,44 @@ export const triggerRunStatusResponseSchema = z
     description: "Detailed Trigger.dev run payload",
   });
 
+export const triggerIngestUrlInputSchema = z
+  .object({
+    url: z.string().url().openapi({
+      description: "URL to queue for ingestion",
+      example: "https://example.com/article",
+    }),
+    priority: z
+      .enum(["normal", "high"])
+      .default("normal")
+      .openapi({
+        description: "Relative ingestion priority",
+        example: "high",
+      }),
+  })
+  .openapi({
+    description: "Parameters for triggering a manual ingestion run",
+  });
+
+export const triggerRunPlaybookInputSchema = z
+  .object({
+    playbookId: z.string().uuid().openapi({
+      description: "Playbook to execute",
+      example: "2a4b6c8d-0e1f-2345-6789-abcdef012345",
+    }),
+    context: z
+      .record(z.unknown())
+      .optional()
+      .openapi({
+        description: "Optional context metadata forwarded to the run",
+      }),
+  })
+  .openapi({
+    description: "Parameters for triggering a playbook run",
+  });
+
 export type TriggerTaskInput = z.infer<typeof triggerTaskInputSchema>;
 export type TriggerTaskResponse = z.infer<typeof triggerTaskResponseSchema>;
 export type TriggerRunStatusInput = z.infer<typeof triggerRunStatusInputSchema>;
 export type TriggerRunStatusResponse = z.infer<typeof triggerRunStatusResponseSchema>;
+export type TriggerIngestUrlInput = z.infer<typeof triggerIngestUrlInputSchema>;
+export type TriggerRunPlaybookInput = z.infer<typeof triggerRunPlaybookInputSchema>;

@@ -13,7 +13,6 @@ import { triggerRouter } from "./trigger";
 import { searchRouter } from "./search";
 import { storiesRouter } from "./stories";
 import { suggestedActionsRouter } from "./suggested-actions";
-import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
 import { userRouter } from "./user";
 import { workspaceRouter } from "./workspace";
@@ -24,7 +23,6 @@ export const appRouter = createTRPCRouter({
   apps: appsRouter,
   billing: billingRouter,
   chats: chatsRouter,
-  tags: tagsRouter,
   team: teamRouter,
   chatFeedback: chatFeedbackRouter,
   highlight: highlightRouter,

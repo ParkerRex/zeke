@@ -5,6 +5,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@db/*": [
+        "../../packages/db/src/*"
+      ],
+      "@jobs/*": [
+        "../../packages/jobs/src/*"
       ]
     },
     "strict": true

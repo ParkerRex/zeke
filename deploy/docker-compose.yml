@@ -1,0 +1,113 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: zeke-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - zeke
+    environment:
+      - ACME_AGREE=true
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+  dashboard:
+    image: zeke-dashboard:staging
+    env_file:
+      - ./env/${ENVIRONMENT:-staging}/dashboard.env
+    networks:
+      - zeke
+    expose:
+      - "3001"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+  website:
+    image: zeke-website:staging
+    env_file:
+      - ./env/${ENVIRONMENT:-staging}/website.env
+    networks:
+      - zeke
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+  engine:
+    image: zeke-engine:staging
+    env_file:
+      - ./env/${ENVIRONMENT:-staging}/engine.env
+    networks:
+      - zeke
+    expose:
+      - "3010"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+  api:
+    image: zeke-api:staging
+    env_file:
+      - ./env/${ENVIRONMENT:-staging}/api.env
+    networks:
+      - zeke
+    expose:
+      - "3003"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+  redis:
+    image: redis:7-alpine
+    container_name: zeke-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - zeke
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["staging", "production"]
+
+networks:
+  zeke:
+    driver: bridge
+
+volumes:
+  caddy-data:
+  caddy-config:
+  redis-data:

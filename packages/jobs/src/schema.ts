@@ -33,6 +33,7 @@ export type AnalyzeStoryPayload = z.infer<typeof analyzeStorySchema>;
 export const oneOffIngestSchema = z.object({
   url: z.string().url(),
   requestedBy: z.string().uuid().optional(),
+  priority: z.enum(["normal", "high"]).default("normal"),
 });
 
 export type OneOffIngestPayload = z.infer<typeof oneOffIngestSchema>;

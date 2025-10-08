@@ -1,133 +1,85 @@
+import type { Scope } from "@api/utils/scopes";
+
+type Resource = {
+  key: string;
+  name: string;
+  description: string;
+  scopes: ReadonlyArray<{
+    scope: Scope;
+    type: "read" | "write";
+    label: string;
+  }>;
+};
+
 export const RESOURCES = [
   {
-    key: "bank-accounts",
-    name: "Bank Accounts",
-    description: "Access to bank account data",
+    key: "chat",
+    name: "Chat",
+    description: "Access to assistant conversations.",
     scopes: [
-      { scope: "bank-accounts.read", type: "read", label: "Read" },
-      { scope: "bank-accounts.write", type: "write", label: "Write" },
+      { scope: "chat.read", type: "read", label: "Read" },
+      { scope: "chat.write", type: "write", label: "Write" },
     ],
   },
   {
-    key: "customers",
-    name: "Customers",
-    description: "Access to customer data",
+    key: "stories",
+    name: "Stories",
+    description: "Access to stories across the workspace.",
     scopes: [
-      { scope: "customers.read", type: "read", label: "Read" },
-      { scope: "customers.write", type: "write", label: "Write" },
+      { scope: "stories.read", type: "read", label: "Read" },
+      { scope: "stories.write", type: "write", label: "Write" },
+      { scope: "stories.metrics", type: "read", label: "Metrics" },
     ],
   },
   {
-    key: "documents",
-    name: "Documents",
-    description: "Access to document data",
+    key: "highlights",
+    name: "Highlights",
+    description: "Access to highlights surfaced by Zeke.",
     scopes: [
-      { scope: "documents.read", type: "read", label: "Read" },
-      { scope: "documents.write", type: "write", label: "Write" },
+      { scope: "highlights.read", type: "read", label: "Read" },
+      { scope: "highlights.write", type: "write", label: "Write" },
     ],
   },
   {
-    key: "inbox",
-    name: "Inbox",
-    description: "Access to inbox data",
-    scopes: [
-      { scope: "inbox.read", type: "read", label: "Read" },
-      { scope: "inbox.write", type: "write", label: "Write" },
-    ],
-  },
-  {
-    key: "invoices",
-    name: "Invoices",
-    description: "Access to invoice data",
-    scopes: [
-      { scope: "invoices.read", type: "read", label: "Read" },
-      { scope: "invoices.write", type: "write", label: "Write" },
-    ],
-  },
-  {
-    key: "transactions",
-    name: "Transactions",
-    description: "Access to transaction data",
-    scopes: [
-      { scope: "transactions.read", type: "read", label: "Read" },
-      { scope: "transactions.write", type: "write", label: "Write" },
-    ],
-  },
-  {
-    key: "teams",
-    name: "Teams",
-    description: "Access to team data",
-    scopes: [
-      { scope: "teams.read", type: "read", label: "Read" },
-      { scope: "teams.write", type: "write", label: "Write" },
-    ],
-  },
-  {
-    key: "users",
-    name: "Users",
-    description: "Access to user data",
-    scopes: [
-      { scope: "users.read", type: "read", label: "Read" },
-      { scope: "users.write", type: "write", label: "Write" },
-    ],
-  },
-  {
-    key: "tracker-entries",
-    name: "Tracker Entries",
-    description: "Access to tracker entry data",
-    scopes: [
-      { scope: "tracker-entries.read", type: "read", label: "Read" },
-      {
-        scope: "tracker-entries.write",
-        type: "write",
-        label: "Write",
-      },
-    ],
-  },
-  {
-    key: "tracker-projects",
-    name: "Tracker Projects",
-    description: "Access to tracker project data",
-    scopes: [
-      { scope: "tracker-projects.read", type: "read", label: "Read" },
-      {
-        scope: "tracker-projects.write",
-        type: "write",
-        label: "Write",
-      },
-    ],
+    key: "search",
+    name: "Search",
+    description: "Access to semantic search.",
+    scopes: [{ scope: "search.read", type: "read", label: "Query" }],
   },
   {
     key: "tags",
     name: "Tags",
-    description: "Access to tag data",
+    description: "Access to the shared tag taxonomy.",
     scopes: [
       { scope: "tags.read", type: "read", label: "Read" },
       { scope: "tags.write", type: "write", label: "Write" },
     ],
   },
   {
-    key: "reports",
-    name: "Reports",
-    description: "Access to reports data",
-    scopes: [{ scope: "reports.read", type: "read", label: "Read" }],
-  },
-  {
-    key: "search",
-    name: "Search",
-    description: "Access to search functionality",
-    scopes: [{ scope: "search.read", type: "read", label: "Read" }],
-  },
-  {
-    key: "notifications",
-    name: "Notifications",
-    description: "Access to notifications data",
+    key: "teams",
+    name: "Teams",
+    description: "Access to team directory and settings.",
     scopes: [
-      { scope: "notifications.read", type: "read", label: "Read" },
-      { scope: "notifications.write", type: "write", label: "Write" },
+      { scope: "teams.read", type: "read", label: "Read" },
+      { scope: "teams.manage", type: "write", label: "Manage" },
     ],
   },
-] as const;
+  {
+    key: "users",
+    name: "Users",
+    description: "Access to user profiles and roles.",
+    scopes: [
+      { scope: "users.read", type: "read", label: "Read" },
+      { scope: "users.manage", type: "write", label: "Manage" },
+    ],
+  },
+  {
+    key: "jobs",
+    name: "Jobs",
+    description: "Permission to trigger background jobs.",
+    scopes: [{ scope: "jobs.trigger", type: "write", label: "Trigger" }],
+  },
+] as const satisfies ReadonlyArray<Resource>;
 
 export const getScopeDescription = (scope: string) => {
   // Handle special API-level scopes

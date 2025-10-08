@@ -1,6 +1,6 @@
 import type { Bindings } from "@engine/common/bindings";
 import { ApplePodcastsProvider } from "./apple-podcasts/apple-podcasts-provider";
-import { ArxivProvider } from "./arxiv/arxiv-provider";
+import { ArxivProvider } from "./arXiv/arxiv-provider";
 import type { ProviderInterface } from "./interface";
 import { RSSProvider } from "./rss/rss-provider";
 import { SemanticScholarProvider } from "./semantic-scholar/semantic-scholar-provider";

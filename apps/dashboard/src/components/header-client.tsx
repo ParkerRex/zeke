@@ -6,16 +6,7 @@ import { api } from "@/trpc/client";
 import { Badge } from "@zeke/ui/badge";
 import { Button } from "@zeke/ui/button";
 import { cn } from "@zeke/ui/cn";
-import {
-  AlertCircle,
-  Bell,
-  CheckCircle2,
-  Link2,
-  PlayCircle,
-  Search,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { Bell, Link2, PlayCircle, Search, Sparkles } from "lucide-react";
 
 /**
  * HeaderClient - Client components for the header
@@ -78,33 +69,8 @@ export function QuickActions() {
 }
 
 export function IngestionHealth() {
-  // Get pipeline status from API
-  const { data: status } = api.pipeline.dashboardStatus.useQuery(undefined, {
-    refetchInterval: 60000, // Refresh every minute
-  });
-
-  if (!status) return null;
-
-  const healthIcon =
-    status.health.overall === "error" ? (
-      <AlertCircle className="h-4 w-4 text-destructive" />
-    ) : status.health.overall === "warning" ? (
-      <Zap className="h-4 w-4 text-yellow-600" />
-    ) : (
-      <CheckCircle2 className="h-4 w-4 text-green-600" />
-    );
-
-  return (
-    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-muted/30">
-      {healthIcon}
-      <div className="flex flex-col">
-        <span className="text-xs font-medium">Pipeline</span>
-        <span className="text-xs text-muted-foreground">
-          {status.health.sources.healthy}/{status.health.sources.total} sources
-        </span>
-      </div>
-    </div>
-  );
+  // Pipeline health surface was retired with the Trigger.dev integration.
+  return null;
 }
 
 export function NotificationBadge() {

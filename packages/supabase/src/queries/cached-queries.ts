@@ -9,3 +9,9 @@ export const getSession = cache(async () => {
 
   return supabase.auth.getSession();
 });
+
+export const getUser = cache(async () => {
+  const supabase = await createClient();
+
+  return supabase.auth.getUser();
+});

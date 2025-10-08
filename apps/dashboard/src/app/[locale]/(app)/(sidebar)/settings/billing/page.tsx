@@ -1,6 +1,5 @@
 import { ManageSubscription } from "@/components/manage-subscription";
 import { Plans } from "@/components/plans";
-import { Orders } from "@/components/tables/orders";
 import { getQueryClient, prefetch, trpc } from "@/trpc/server";
 import type { Metadata } from "next";
 
@@ -61,7 +60,11 @@ export default async function Billing() {
         </div>
       )}
 
-      {(team?.plan !== "trial" || team?.canceledAt !== null) && <Orders />}
+      {(team?.plan !== "trial" || team?.canceledAt !== null) && (
+        <div className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+          Billing history coming soon.
+        </div>
+      )}
     </div>
   );
 }

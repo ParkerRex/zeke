@@ -2,6 +2,7 @@ import type { Session } from "@api/utils/auth";
 import { TRPCError } from "@trpc/server";
 import { teamCache } from "@zeke/cache/team-cache";
 import type { Database } from "@zeke/db/client";
+import { users } from "@zeke/db/schema";
 
 export const withTeamPermission = async <TReturn>(opts: {
   ctx: {
@@ -27,17 +28,42 @@ export const withTeamPermission = async <TReturn>(opts: {
     });
   }
 
-  const result = await ctx.db.query.users.findFirst({
-    with: {
-      usersOnTeams: {
-        columns: {
-          id: true,
-          teamId: true,
+  const ensureUserRecord = async () =>
+    ctx.db.query.users.findFirst({
+      with: {
+        usersOnTeams: {
+          columns: {
+            id: true,
+            teamId: true,
+          },
         },
       },
-    },
-    where: (users, { eq }) => eq(users.id, userId),
-  });
+      where: (users, { eq }) => eq(users.id, userId),
+    });
+
+  let result = await ensureUserRecord();
+
+  if (!result) {
+    const sessionUser = ctx.session?.user;
+
+    if (!sessionUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "No permission to access this team",
+      });
+    }
+
+    await ctx.db
+      .insert(users)
+      .values({
+        id: sessionUser.id,
+        email: sessionUser.email ?? null,
+        fullName: sessionUser.full_name ?? null,
+      })
+      .onConflictDoNothing({ target: users.id });
+
+    result = await ensureUserRecord();
+  }
 
   if (!result) {
     throw new TRPCError({

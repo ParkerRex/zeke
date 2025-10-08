@@ -31,7 +31,6 @@
   ],
   "remote": {
     "urls": [
-      "http://localhost:3001/**",
       "https://beta.zekehq.com/**",
       "https://app.zekehq.com/**"
     ]

@@ -1,0 +1,74 @@
+{
+  email admin@zekehq.com
+  acme_ca https://acme-v02.api.letsencrypt.org/directory
+  storage file_system /data
+  auto_https disable_redirects
+}
+
+(common_headers) {
+  header {
+    Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+  }
+}
+
+http:// {
+  redir https://{host}{uri} 308
+}
+
+(app_common) {
+  tls {
+    issuer acme
+  }
+  import common_headers
+}
+
+# Staging sites
+app-staging.zekehq.com {
+  import app_common
+  reverse_proxy dashboard:3001
+}
+
+staging.zekehq.com {
+  import app_common
+  reverse_proxy website:3000
+}
+
+api-staging.zekehq.com {
+  import app_common
+  reverse_proxy api:3003
+}
+
+engine-staging.zekehq.com {
+  import app_common
+  reverse_proxy engine:3010
+}
+
+# Production sites
+app.zekehq.com {
+  import app_common
+  reverse_proxy dashboard:3001
+}
+
+www.zekehq.com {
+  import app_common
+  reverse_proxy website:3000
+}
+
+zekehq.com {
+  import app_common
+  redir https://www.zekehq.com{uri}
+}
+
+api.zekehq.com {
+  import app_common
+  reverse_proxy api:3003
+}
+
+engine.zekehq.com {
+  import app_common
+  reverse_proxy engine:3010
+}

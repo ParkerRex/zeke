@@ -11,15 +11,15 @@ const triggerAccessToken =
 const triggerApiUrl =
   process.env.TRIGGER_API_URL ?? process.env.TRIGGER_ENDPOINT;
 
-if (triggerAccessToken) {
-  const configuration: { accessToken: string; baseURL?: string } = {
-    accessToken: triggerAccessToken,
-  };
-  if (triggerApiUrl) {
-    configuration.baseURL = triggerApiUrl;
-  }
-  configure(configuration);
+const configuration: { accessToken: string; baseURL?: string } = {
+  accessToken: triggerAccessToken ?? "api_local_dev_placeholder",
+};
+
+if (triggerApiUrl) {
+  configuration.baseURL = triggerApiUrl;
 }
+
+configure(configuration);
 
 // Store the database instance
 const DbLocal = locals.create<{

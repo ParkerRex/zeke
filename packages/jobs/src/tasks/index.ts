@@ -22,5 +22,5 @@ export { scoreRelevance } from "./insights/score-relevance";
 // Brief generation
 export { generateBrief } from "./briefs/generate";
 
-// Playbooks
-export { runPlaybook } from "./playbooks/run";
+// Playbooks (disabled until playbook pipeline ready)
+// export { runPlaybook } from "./playbooks/run";

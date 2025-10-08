@@ -19,14 +19,16 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
+# Install Node for esbuild postinstall scripts
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs ca-certificates curl && rm -rf /var/lib/apt/lists/*
 # Don't copy the lockfile, allow Bun to generate a fresh one
 RUN bun install
 
 # Copy the full source code
 COPY --from=builder /app/out/full/ .
 
-# Copy the prebuilt engine dist from the build context (assumes CI built it)
-COPY apps/engine/dist /app/apps/engine/dist
+# Ensure engine dist directory exists (engine runs separately in VPS stack)
+RUN mkdir -p /app/apps/engine/dist
 
 # Runner stage (same as installer to avoid another copy)
 FROM installer AS runner

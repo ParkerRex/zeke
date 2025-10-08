@@ -1,0 +1,28 @@
+# Ignore VCS and editor files
+.git
+.gitignore
+
+# Node/Bun artifacts
+node_modules
+**/node_modules
+**/.next
+**/out
+**/.turbo
+**/dist
+**/build
+**/.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment & deployment artifacts
+.env
+**/.env
+*.log
+
+# Docker build outputs
+**/Dockerfile.local
+
+# Exclude deploy tooling from context (pruned repo will reintroduce as needed)
+deploy

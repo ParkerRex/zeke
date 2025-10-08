@@ -191,11 +191,11 @@ export const storyDetailSchema = z
 
 export const listStoriesInputSchema = z
   .object({
-    limit: z.number().int().min(1).max(50).default(20).openapi({
+    limit: z.coerce.number().int().min(1).max(50).default(20).openapi({
       description: "Max number of stories to fetch",
       example: 20,
     }),
-    offset: z.number().int().min(0).default(0).openapi({
+    offset: z.coerce.number().int().min(0).default(0).openapi({
       description: "Offset for pagination",
       example: 40,
     }),

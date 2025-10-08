@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **auth-bug**: OAuth authentication now works correctly with locale-prefixed routes
+  - Root cause: Middleware matcher pattern did not account for i18n URL rewriting (`/api/auth/callback` → `/en/api/auth/callback`)
+  - Impact: Authentication middleware, OAuth callback handler
+  - PR: [#22](https://github.com/joinvai/zeke/pull/22)
+
 ### Fixed - 2025-09-30
 
 **OpenAI Responses API Compatibility**

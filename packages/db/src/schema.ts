@@ -1829,10 +1829,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   oauthApplications: many(oauthApplications),
   oauthAuthorizationCodes: many(oauthAuthorizationCodes),
   oauthAccessTokens: many(oauthAccessTokens),
-  usersInAuth: one(usersInAuth, {
-    fields: [users.id],
-    references: [usersInAuth.id],
-  }),
+  // usersInAuth: one(usersInAuth, {
+  //   fields: [users.id],
+  //   references: [usersInAuth.id],
+  // }),
   team: one(teams, {
     fields: [users.teamId],
     references: [teams.id],
@@ -1874,9 +1874,9 @@ export const appsRelations = relations(apps, ({ one }) => ({
   }),
 }));
 
-export const usersInAuthRelations = relations(usersInAuth, ({ many }) => ({
-  users: many(users),
-}));
+// export const usersInAuthRelations = relations(usersInAuth, ({ many }) => ({
+//   users: many(users),
+// }));
 
 export const usersOnTeamRelations = relations(usersOnTeam, ({ one }) => ({
   team: one(teams, {

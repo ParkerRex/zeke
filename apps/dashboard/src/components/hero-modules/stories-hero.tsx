@@ -140,7 +140,8 @@ function StoryItem({
   category: "trending" | "signals" | "repo-watch";
   onTrack: (event: string, props: any) => void;
 }) {
-  const chiliLevel = Math.round(story.chiliScore * 5);
+  const rawChili = typeof story.chiliScore === "number" ? story.chiliScore : 0;
+  const chiliLevel = Number.isFinite(rawChili) ? Math.max(0, Math.round(rawChili * 5)) : 0;
 
   const handleClick = () => {
     onTrack("StoryClicked", {

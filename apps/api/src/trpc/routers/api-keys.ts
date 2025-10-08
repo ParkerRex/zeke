@@ -1,4 +1,4 @@
-import { deleteApiKeySchema, upsertApiKeySchema } from "@api/schemas/api-keys";
+import { deleteApiKeySchema, upsertApiKeySchema } from "@api/schemas/api-key";
 import { resend } from "@api/services/resend";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { apiKeyCache } from "@zeke/cache/api-key-cache";

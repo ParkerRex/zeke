@@ -2,16 +2,8 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-import {
-  activeTabParser,
-  globalPanelParser,
-  panelStatesParser,
-  tabMetadataParser,
-  tabsParser,
-} from "@/utils/nuqs";
 import type { StoryEmbedKind, StoryOverlaySummary } from "@/utils/stories";
-import { useQueryStates } from "nuqs";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export type Tab = {
   id: string; // clusterId or "share:abc123"
@@ -27,6 +19,38 @@ export type Tab = {
   preview?: boolean;
   // Pinned tabs stay at the front of the list
   pinned?: boolean;
+};
+
+type TabMetadata = {
+  title?: string;
+  clusterId?: string;
+  embedKind?: StoryEmbedKind;
+  embedUrl?: string;
+  preview?: boolean;
+  pinned?: boolean;
+};
+
+type TabsState = {
+  tabs: string[];
+  activeId: string;
+  metadata: Record<string, TabMetadata>;
+  panelStates: Record<string, boolean>;
+  globalPanel: boolean;
+};
+
+const DEFAULT_OVERLAYS: StoryOverlaySummary = {
+  whyItMatters: "",
+  chili: 0,
+  confidence: 0,
+  sources: [],
+};
+
+const INITIAL_STATE: TabsState = {
+  tabs: [],
+  activeId: "",
+  metadata: {},
+  panelStates: {},
+  globalPanel: false,
 };
 
 // Helper function to sort tabs (pinned first)
@@ -73,48 +97,33 @@ function createOptimisticTab(
     embedUrl: "about:blank",
     clusterId: isShare ? undefined : id,
     shareId: isShare ? id : undefined,
-    overlays: {
-      whyItMatters: "",
-      chili: 0,
-      confidence: 0,
-      sources: [],
-    },
+    overlays: DEFAULT_OVERLAYS,
     preview: true,
   };
 }
 
 export function useTabs() {
-  const [state, setState] = useQueryStates({
-    tabs: tabsParser,
-    activeId: activeTabParser,
-    panelStates: panelStatesParser,
-    globalPanel: globalPanelParser,
-    metadata: tabMetadataParser,
-  });
+  const [state, setState] = useState<TabsState>(INITIAL_STATE);
 
-  // Derive tab objects from URL state
-  const tabs: Tab[] = sortTabs(
-    state.tabs.map((id) => {
-      const meta = state.metadata[id];
-      return {
-        id,
-        title: meta?.title || `Tab ${id}`,
-        embedKind: (meta?.embedKind as StoryEmbedKind) || "article",
-        embedUrl: meta?.embedUrl || "about:blank",
-        clusterId: meta?.clusterId,
-        shareId: id.startsWith("share:") ? id.replace("share:", "") : undefined,
-        preview: meta?.preview || false,
-        pinned: meta?.pinned || false,
-        overlays: {
-          whyItMatters: "",
-          chili: 0,
-          confidence: 0,
-          sources: [],
-        },
-        context: {},
-      };
-    }),
-  );
+  const tabs: Tab[] = useMemo(() => {
+    return sortTabs(
+      state.tabs.map((id) => {
+        const meta = state.metadata[id];
+        return {
+          id,
+          title: meta?.title || `Tab ${id}`,
+          embedKind: meta?.embedKind || "article",
+          embedUrl: meta?.embedUrl || "about:blank",
+          clusterId: meta?.clusterId,
+          shareId: id.startsWith("share:") ? id.replace("share:", "") : undefined,
+          preview: meta?.preview || false,
+          pinned: meta?.pinned || false,
+          overlays: DEFAULT_OVERLAYS,
+          context: {},
+        } satisfies Tab;
+      }),
+    );
+  }, [state.metadata, state.tabs]);
 
   const activeId = state.activeId;
   const active = tabs.find((t) => t.id === activeId);
@@ -123,12 +132,12 @@ export function useTabs() {
   const openTab = useCallback(
     (tab: Tab) => {
       setState((prev) => {
-        const newTabs = prev.tabs.includes(tab.id)
-          ? prev.tabs
-          : [...prev.tabs, tab.id];
+        const exists = prev.tabs.includes(tab.id);
+        const updatedTabs = exists ? prev.tabs : [...prev.tabs, tab.id];
 
         return {
-          tabs: newTabs,
+          ...prev,
+          tabs: updatedTabs,
           activeId: tab.id,
           metadata: {
             ...prev.metadata,
@@ -144,143 +153,137 @@ export function useTabs() {
         };
       });
     },
-    [setState],
+    [],
   );
 
-  const closeTab = useCallback(
-    (id: string) => {
-      setState((prev) => {
-        const idx = prev.tabs.findIndex((tabId) => tabId === id);
-        const newTabs = prev.tabs.filter((tabId) => tabId !== id);
-        const newMetadata = { ...prev.metadata };
-        delete newMetadata[id];
+  const closeTab = useCallback((id: string) => {
+    setState((prev) => {
+      const idx = prev.tabs.findIndex((tabId) => tabId === id);
+      const newTabs = prev.tabs.filter((tabId) => tabId !== id);
+      const { [id]: _, ...metadata } = prev.metadata;
+      const { [id]: __, ...panelStates } = prev.panelStates;
 
-        const newPanelStates = { ...prev.panelStates };
-        delete newPanelStates[id];
+      let newActiveId = prev.activeId;
+      if (prev.activeId === id) {
+        newActiveId = newTabs[idx - 1] || newTabs[0] || "";
+      }
 
-        // If closing active tab, activate another
-        let newActiveId = prev.activeId;
-        if (prev.activeId === id) {
-          newActiveId = newTabs[idx - 1] || newTabs[0] || "";
-        }
-
-        return {
-          tabs: newTabs,
-          activeId: newActiveId,
-          metadata: newMetadata,
-          panelStates: newPanelStates,
-        };
-      });
-    },
-    [setState],
-  );
-
-  const setActive = useCallback(
-    (id: string) => {
-      setState((prev) => ({
+      return {
         ...prev,
-        activeId: id,
-        // Update global panel state when switching tabs
-        globalPanel: prev.panelStates[id] ?? prev.globalPanel,
-      }));
-    },
-    [setState],
-  );
+        tabs: newTabs,
+        activeId: newActiveId,
+        metadata,
+        panelStates,
+      };
+    });
+  }, []);
 
-  const pinTab = useCallback(
-    (id: string, pinned = true) => {
-      setState((prev) => ({
-        ...prev,
-        metadata: {
-          ...prev.metadata,
-          [id]: { ...prev.metadata[id], pinned },
-        },
-      }));
-    },
-    [setState],
-  );
+  const setActive = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      activeId: id,
+      globalPanel: prev.panelStates[id] ?? prev.globalPanel,
+    }));
+  }, []);
 
-  const promoteTab = useCallback(
-    (id: string) => {
-      setState((prev) => ({
-        ...prev,
-        metadata: {
-          ...prev.metadata,
-          [id]: { ...prev.metadata[id], preview: false },
-        },
-      }));
-    },
-    [setState],
-  );
+  const pinTab = useCallback((id: string, pinned = true) => {
+    setState((prev) => ({
+      ...prev,
+      metadata: {
+        ...prev.metadata,
+        [id]: { ...prev.metadata[id], pinned },
+      },
+    }));
+  }, []);
+
+  const promoteTab = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      metadata: {
+        ...prev.metadata,
+        [id]: { ...prev.metadata[id], preview: false },
+      },
+    }));
+  }, []);
 
   // Panel management
   const sidePanelOpen = activeId
-    ? (state.panelStates[activeId] ?? state.globalPanel)
+    ? state.panelStates[activeId] ?? state.globalPanel
     : state.globalPanel;
 
   const setSidePanelOpen = useCallback(
     (open: boolean) => {
-      if (activeId) {
-        setState((prev) => ({
-          ...prev,
-          panelStates: { ...prev.panelStates, [activeId]: open },
-        }));
-      } else {
-        setState((prev) => ({ ...prev, globalPanel: open }));
-      }
+      setState((prev) => {
+        if (prev.activeId) {
+          return {
+            ...prev,
+            panelStates: { ...prev.panelStates, [prev.activeId]: open },
+          };
+        }
+
+        return { ...prev, globalPanel: open };
+      });
     },
-    [activeId, setState],
+    [],
   );
 
   // Batch operations
   const batch = useCallback(
     (fn: (tabs: Tab[]) => Tab[]) => {
-      const newTabs = fn(tabs);
-      const newTabIds = newTabs.map((t) => t.id);
-      const newMetadata = Object.fromEntries(
-        newTabs.map((tab) => [
-          tab.id,
-          {
+      setState((prev) => {
+        const tabObjects = prev.tabs.map((id) => {
+          const meta = prev.metadata[id];
+          return {
+            id,
+            title: meta?.title || `Tab ${id}`,
+            embedKind: meta?.embedKind || "article",
+            embedUrl: meta?.embedUrl || "about:blank",
+            clusterId: meta?.clusterId,
+            shareId: id.startsWith("share:") ? id.replace("share:", "") : undefined,
+            preview: meta?.preview || false,
+            pinned: meta?.pinned || false,
+            overlays: DEFAULT_OVERLAYS,
+            context: {},
+          } satisfies Tab;
+        });
+
+        const nextTabs = fn(tabObjects);
+        const nextIds = nextTabs.map((tab) => tab.id);
+        const nextMetadata: Record<string, TabMetadata> = {};
+
+        for (const tab of nextTabs) {
+          nextMetadata[tab.id] = {
             title: tab.title,
             clusterId: tab.clusterId,
             embedKind: tab.embedKind,
             embedUrl: tab.embedUrl,
             preview: tab.preview,
             pinned: tab.pinned,
-          },
-        ]),
-      );
+          };
+        }
 
-      setState((prev) => ({
-        ...prev,
-        tabs: newTabIds,
-        metadata: newMetadata,
-      }));
+        return {
+          ...prev,
+          tabs: nextIds,
+          metadata: nextMetadata,
+        };
+      });
     },
-    [tabs, setState],
+    [],
   );
 
-  // Update overlay
+  // Update overlay/context currently no-op placeholders
   const updateOverlay = useCallback(
-    (id: string, partial: Partial<Overlays>) => {
-      // Note: Overlays are not stored in URL state as they're too large
-      // This would need to be handled by updating the tab object directly
-      // or fetching fresh data from the API
-      console.log("updateOverlay called:", id, partial);
+    (id: string, partial: Partial<StoryOverlaySummary>) => {
+      console.debug("updateOverlay", id, partial);
     },
     [],
   );
 
-  // Update context
-  const updateContext = useCallback(
-    (id: string, partial: Record<string, unknown>) => {
-      // Context is also not stored in URL state
-      console.log("updateContext called:", id, partial);
-    },
-    [],
-  );
+  const updateContext = useCallback((id: string, partial: Record<string, unknown>) => {
+    console.debug("updateContext", id, partial);
+  }, []);
 
-  // Restore from URL (for initial hydration)
   const restoreFromUrl = useCallback(
     async (id: string, isShare = false) => {
       const isShareTab = isShare ?? false;
@@ -302,15 +305,8 @@ export function useTabs() {
 
         const tab = createTabFromResponse(res, optimisticId, isShareTab, id);
         openTab(tab);
-      } catch (e) {
-        try {
-          const { toast } = await import("sonner");
-          toast.error("Unable to open story", {
-            description: String((e as Error)?.message || "Unknown error"),
-          });
-        } catch {
-          // Toast import failed, ignore
-        }
+      } catch (error) {
+        console.error("Unable to open story", error);
       }
     },
     [openTab],
@@ -332,14 +328,13 @@ export function useTabs() {
     setSidePanelOpen,
     panelOpenById: state.panelStates,
     batch,
-    // Utility methods
     closeOthers: (id: string) => {
       const tab = tabs.find((t) => t.id === id);
       if (tab) batch(() => [tab]);
     },
     closeToRight: (id: string) => {
       const index = tabs.findIndex((t) => t.id === id);
-      if (index >= 0) batch((tabs) => tabs.slice(0, index + 1));
+      if (index >= 0) batch((current) => current.slice(0, index + 1));
     },
     resetPanelState: () => {
       setState((prev) => ({

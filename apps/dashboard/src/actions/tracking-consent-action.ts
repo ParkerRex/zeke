@@ -4,7 +4,7 @@ import { Cookies } from "@/utils/constants";
 import { addYears } from "date-fns";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { actionClient } from "../../../website/src/actions/safe-action";
+import { actionClient } from "./safe-action";
 
 export const trackingConsentAction = actionClient
   .schema(z.boolean())

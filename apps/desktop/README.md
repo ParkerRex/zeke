@@ -10,17 +10,15 @@ A Tauri-based desktop application for Zeke that supports multiple environments w
 
 ## Environment Configuration
 
-The desktop app supports three environments, each loading a different URL:
-
-- **Development**: `http://localhost:3001`
-- **Staging**: `https://beta.zekehq.com`
-- **Production**: `https://app.zekehq.com`
+Use `ZEKE_APP_URL` to point the desktop shell at the live dashboard. If the
+variable is not provided, the app falls back to `https://app.zekehq.com`. Set
+`ZEKE_ENV=staging` to automatically use `https://beta.zekehq.com`.
 
 ## Running the App
 
 ### Development Mode
 ```bash
-# Run in development environment (loads localhost:3001)
+# Run in development environment (loads ZEKE_APP_URL or the default remote app)
 bun run tauri:dev
 ```
 
@@ -57,11 +55,11 @@ bun run tauri:build:prod
 
 The environment is controlled by the `ZEKE_ENV` environment variable:
 
-- `development` or `dev` → `http://localhost:3001`
 - `staging` → `https://beta.zekehq.com`
 - `production` or `prod` → `https://app.zekehq.com`
+- any other value falls back to `ZEKE_APP_URL` or `https://app.zekehq.com`
 
-If no environment is specified, it defaults to development mode.
+Set `ZEKE_APP_URL` if you need to override the dashboard URL explicitly.
 
 ## Manual Environment Setting
 

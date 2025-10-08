@@ -31,11 +31,13 @@ export function SourceIntakeSheet() {
   const [notes, setNotes] = useState("");
   const isOpen = Boolean(sourceIntake);
 
-  const ingestUrl = api.pipeline.quickActions.ingestUrl.useMutation({
-    onSuccess: () => {
+  const ingestUrl = api.trigger.ingestUrl.useMutation({
+    onSuccess: (run) => {
       toast({
         title: "Source queued",
-        description: "The URL has been added to the ingestion pipeline.",
+        description: run?.id
+          ? `Run ${run.id} acknowledged by Trigger.dev.`
+          : "The URL has been added to the ingestion queue.",
       });
       closeSourceIntake();
       setUrl("");

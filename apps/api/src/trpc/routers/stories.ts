@@ -5,22 +5,27 @@ import {
 } from "@api/schemas/stories";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import {
   getStoryForDisplay,
   getStoryMetrics,
   listStoriesForDisplay,
 } from "@zeke/db/queries";
-import { requirePermission } from "../middleware/rbac";
-import { createAuditLogger } from "@api/utils/audit-logger";
+import { gte } from "drizzle-orm";
+import { z } from "zod";
 
 export const storiesRouter = createTRPCRouter({
   get: protectedProcedure
-    .use(requirePermission("read:stories"))
     .input(getStoriesSchema)
     .query(async ({ input, ctx: { db, teamId } }) => {
+      if (!teamId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Team context required",
+        });
+      }
+
       return listStoriesForDisplay(db, {
-        teamId: teamId!,
+        teamId,
         limit: input.limit,
         offset: input.offset,
         kind: input.kind,
@@ -30,7 +35,6 @@ export const storiesRouter = createTRPCRouter({
     }),
 
   getById: protectedProcedure
-    .use(requirePermission("read:stories"))
     .input(getStoryByIdSchema)
     .query(async ({ input, ctx: { db, teamId } }) => {
       const detail = await getStoryForDisplay(db, input.storyId);
@@ -59,7 +63,6 @@ export const storiesRouter = createTRPCRouter({
     }),
 
   getMetrics: protectedProcedure
-    .use(requirePermission("read:stories"))
     .input(getStoryMetricsSchema)
     .query(async ({ input, ctx: { db, teamId } }) => {
       if (!teamId) {
@@ -77,7 +80,6 @@ export const storiesRouter = createTRPCRouter({
    * Returns trending, signals, and repo watch stories with pagination and caching
    */
   dashboardSummaries: protectedProcedure
-    .use(requirePermission("read:stories"))
     .input(
       z
         .object({
@@ -98,17 +100,22 @@ export const storiesRouter = createTRPCRouter({
       }
 
       try {
+        const now = Date.now();
+        const sevenDaysAgoIso = new Date(
+          now - 7 * 24 * 60 * 60 * 1000,
+        ).toISOString();
+        const fourteenDaysAgoIso = new Date(
+          now - 14 * 24 * 60 * 60 * 1000,
+        ).toISOString();
+
         // Fetch different categories of stories in parallel
         const [trendingStories, signalsStories, repoWatchStories] =
           await Promise.all([
             // Trending: Recent stories with high engagement
             db.query.stories.findMany({
               where: (stories, { gte }) =>
-                gte(
-                  stories.publishedAt,
-                  new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                ), // Last 7 days
-              orderBy: (stories, { desc }) => [desc(stories.publishedAt)],
+                gte(stories.published_at, sevenDaysAgoIso), // Last 7 days
+              orderBy: (stories, { desc }) => [desc(stories.published_at)],
               limit,
               with: {
                 cluster: true,
@@ -121,7 +128,7 @@ export const storiesRouter = createTRPCRouter({
             db.query.teamStoryStates
               .findMany({
                 where: (states, { and, eq }) =>
-                  and(eq(states.teamId, teamId), eq(states.pinned, true)),
+                  and(eq(states.team_id, teamId), eq(states.pinned, true)),
                 limit,
                 with: {
                   story: {
@@ -137,14 +144,9 @@ export const storiesRouter = createTRPCRouter({
 
             // Repo Watch: Stories from specific watched sources
             db.query.stories.findMany({
-              where: (stories, { and, inArray }) => {
-                // In production, this would filter by watched source IDs
-                return gte(
-                  stories.createdAt,
-                  new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-                );
-              },
-              orderBy: (stories, { desc }) => [desc(stories.createdAt)],
+              where: (stories, { gte }) =>
+                gte(stories.created_at, fourteenDaysAgoIso),
+              orderBy: (stories, { desc }) => [desc(stories.created_at)],
               limit: Math.floor(limit / 2), // Fewer repo watch items
               with: {
                 cluster: true,
@@ -155,12 +157,12 @@ export const storiesRouter = createTRPCRouter({
           ]);
 
         // Get metrics for all story IDs if requested
-        let metricsMap = new Map();
+        const metricsMap = new Map();
         if (includeMetrics) {
           const allStoryIds = [
             ...trendingStories.map((s) => s.id),
-            ...signalsStories.map((s) => s.id),
-            ...repoWatchStories.map((s) => s.id),
+            ...signalsStories.map((s) => s.id!),
+            ...repoWatchStories.map((s) => s.id!),
           ];
 
           const metrics = await getStoryMetrics(db, {
@@ -168,9 +170,9 @@ export const storiesRouter = createTRPCRouter({
             storyIds: allStoryIds,
           });
 
-          metrics.forEach((m) => {
+          for (const m of metrics) {
             metricsMap.set(m.storyId, m);
-          });
+          }
         }
 
         // Format response with categories

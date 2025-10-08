@@ -334,7 +334,9 @@ export function Header() {
 
         <a
           className="text-sm font-medium pr-2 border-l-[1px] border-border pl-4 hidden md:block"
-          href={process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3001"}
+          href={
+            process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3001"
+          }
         >
           Sign in
         </a>
@@ -435,7 +437,7 @@ export function Header() {
               >
                 <Link
                   className="text-xl text-primary"
-                  href={process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3001"}
+                  href="https://app.zekehq.com"
                 >
                   Sign in
                 </Link>

@@ -29,11 +29,13 @@ export function PlaybookRunSheet() {
   const [context, setContext] = useState("");
   const isOpen = Boolean(playbookRun);
 
-  const runPlaybook = api.pipeline.quickActions.runPlaybook.useMutation({
-    onSuccess: (result) => {
+  const runPlaybook = api.trigger.runPlaybook.useMutation({
+    onSuccess: (run) => {
       toast({
         title: "Playbook started",
-        description: `Execution ID: ${result.runId}`,
+        description: run?.id
+          ? `Trigger.dev acknowledged run ${run.id}.`
+          : "Playbook execution has started.",
       });
       closePlaybookRun();
       setContext("");

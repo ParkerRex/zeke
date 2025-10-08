@@ -10,7 +10,6 @@ export * from "./oauth-applications";
 export * from "./oauth-flow";
 export * from "./pipeline";
 export * from "./platform";
-export * from "./playbooks";
 export * from "./raw-items";
 export * from "./search";
 export * from "./short-links";

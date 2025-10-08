@@ -1,7 +1,5 @@
 import type { Database } from "@db/client";
 import {
-  assistantThreadSources,
-  assistantThreads,
   playbookStepHighlights,
   playbookSteps,
   playbooks,
@@ -102,21 +100,6 @@ export async function getHighlightEngagement(
     .groupBy(playbookStepHighlights.highlight_id, playbooks.team_id)
     .as("playbook_links");
 
-  const threadLinks = db
-    .select({
-      highlightId: assistantThreadSources.highlight_id,
-      teamId: assistantThreads.team_id,
-      linkedThreads: sql<number>`count(distinct ${assistantThreadSources.thread_id})::int`,
-    })
-    .from(assistantThreadSources)
-    .innerJoin(
-      assistantThreads,
-      eq(assistantThreads.id, assistantThreadSources.thread_id),
-    )
-    .where(sql`${assistantThreadSources.highlight_id} is not null`)
-    .groupBy(assistantThreadSources.highlight_id, assistantThreads.team_id)
-    .as("thread_links");
-
   const query = db
     .select({
       highlightId: base.highlightId,
@@ -125,7 +108,7 @@ export async function getHighlightEngagement(
       archivedCount: base.archivedCount,
       pinnedCount: base.pinnedCount,
       linkedPlaybookSteps: sql<number>`coalesce(${playbookLinks.linkedPlaybookSteps}, 0)::int`,
-      linkedThreads: sql<number>`coalesce(${threadLinks.linkedThreads}, 0)::int`,
+      linkedThreads: sql<number>`0::int`,
       lastUpdatedAt: base.lastUpdatedAt,
     })
     .from(base)
@@ -134,13 +117,6 @@ export async function getHighlightEngagement(
       and(
         eq(playbookLinks.highlightId, base.highlightId),
         eq(playbookLinks.teamId, base.teamId),
-      ),
-    )
-    .leftJoin(
-      threadLinks,
-      and(
-        eq(threadLinks.highlightId, base.highlightId),
-        eq(threadLinks.teamId, base.teamId),
       ),
     );
 

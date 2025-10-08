@@ -32,7 +32,7 @@ app.openapi(
     tags: ["Stories"],
     security: [{ bearerAuth: [] }],
     request: {
-      query: listStoriesInputSchema.partial(),
+      query: listStoriesInputSchema,
     },
     responses: {
       200: {
@@ -56,24 +56,14 @@ app.openapi(
       });
     }
 
-    const queries = c.req.queries();
-    const params = listStoriesInputSchema.parse({
-      limit: queries.limit?.[0] ? Number(queries.limit[0]) : undefined,
-      offset: queries.offset?.[0] ? Number(queries.offset[0]) : undefined,
-      kind: queries.kind?.[0],
-      search: queries.search?.[0],
-      storyIds:
-        queries.storyIds && queries.storyIds.length > 0
-          ? queries.storyIds
-          : undefined,
-    });
+    const params = c.req.valid("query");
 
     const result = await listStoriesForDisplay(db, {
       teamId,
       limit: params.limit,
       offset: params.offset,
       kind: params.kind,
-      search: params.search ?? undefined,
+      search: params.search ?? null,
       storyIds: params.storyIds,
     });
 
@@ -170,18 +160,7 @@ app.openapi(
       });
     }
 
-    const queries = c.req.queries();
-    const storyIds = queries.storyIds ?? [];
-
-    if (storyIds.length === 0) {
-      throw new HTTPException(400, {
-        message: "Provide at least one storyId query parameter",
-      });
-    }
-
-    const params = storyMetricsInputSchema.parse({
-      storyIds,
-    });
+    const params = c.req.valid("query");
 
     const metrics = await getStoryMetrics(db, {
       teamId,

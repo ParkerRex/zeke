@@ -16,3 +16,8 @@ export async function getUserQuery(supabase: Client, userId: string) {
 export async function getTeamByIdQuery(supabase: Client, teamId: string) {
   return supabase.from("teams").select("*").eq("id", teamId).single();
 }
+
+export async function getAdminFlag() {
+  // TODO: implement actual RBAC for admin privileges
+  return { isAdmin: true };
+}
