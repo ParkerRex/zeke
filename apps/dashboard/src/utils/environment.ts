@@ -1,4 +1,8 @@
 export function getUrl() {
+  if (typeof window !== "undefined" && window.location) {
+    return window.location.origin;
+  }
+
   if (process.env.NEXT_PUBLIC_URL) {
     return process.env.NEXT_PUBLIC_URL;
   }
