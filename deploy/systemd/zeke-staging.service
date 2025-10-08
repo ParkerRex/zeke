@@ -1,0 +1,16 @@
+[Unit]
+Description=Zeke Staging Stack
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/zeke/deploy
+EnvironmentFile=/srv/zeke/deploy/.env.staging
+ExecStart=/usr/bin/docker compose --env-file /srv/zeke/deploy/.env.staging --profile staging up -d
+ExecStop=/usr/bin/docker compose --env-file /srv/zeke/deploy/.env.staging --profile staging down
+RemainAfterExit=yes
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

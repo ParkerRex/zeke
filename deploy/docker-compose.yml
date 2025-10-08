@@ -24,7 +24,7 @@ services:
     profiles: ["staging", "production"]
 
   dashboard:
-    image: zeke-dashboard:staging
+    image: ${DASHBOARD_IMAGE:-zeke-dashboard:staging}
     env_file:
       - ./env/${ENVIRONMENT:-staging}/dashboard.env
     networks:
@@ -41,7 +41,7 @@ services:
     profiles: ["staging", "production"]
 
   website:
-    image: zeke-website:staging
+    image: ${WEBSITE_IMAGE:-zeke-website:staging}
     env_file:
       - ./env/${ENVIRONMENT:-staging}/website.env
     networks:
@@ -56,7 +56,7 @@ services:
     profiles: ["staging", "production"]
 
   engine:
-    image: zeke-engine:staging
+    image: ${ENGINE_IMAGE:-zeke-engine:staging}
     env_file:
       - ./env/${ENVIRONMENT:-staging}/engine.env
     networks:
@@ -71,7 +71,7 @@ services:
     profiles: ["staging", "production"]
 
   api:
-    image: zeke-api:staging
+    image: ${API_IMAGE:-zeke-api:staging}
     env_file:
       - ./env/${ENVIRONMENT:-staging}/api.env
     networks:

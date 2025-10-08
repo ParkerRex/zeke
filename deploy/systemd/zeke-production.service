@@ -1,0 +1,16 @@
+[Unit]
+Description=Zeke Production Stack
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/zeke/deploy
+EnvironmentFile=/srv/zeke/deploy/.env.production
+ExecStart=/usr/bin/docker compose --env-file /srv/zeke/deploy/.env.production --profile production up -d
+ExecStop=/usr/bin/docker compose --env-file /srv/zeke/deploy/.env.production --profile production down
+RemainAfterExit=yes
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

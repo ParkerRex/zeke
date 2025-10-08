@@ -71,6 +71,43 @@ Example outputs from 2025-10-05 (macOS M3 Pro):
 - `zeke-api`: `sha256:3d56d106115ac852995e60781860dbcf0e8ed5dba8e1bbf586b94f07baebfacf` (≈1.63 GB)
 - `zeke-engine`: `sha256:eaf381409666be9338046f206c90dfa29f40ce8163b526d9af91be24022bbf62` (≈0.68 GB)
 
+## Compose Environment Files
+The deployment stack reads image tags and environment selection from `deploy/.env` (or an override passed with `--env-file`). Copy the sample file before starting or enabling the systemd units:
+
+```bash
+cp deploy/.env.example deploy/.env.staging
+cp deploy/.env.example deploy/.env.production
+```
+
+Edit the copies to match the target environment:
+
+```ini
+# /srv/zeke/deploy/.env.staging
+ENVIRONMENT=staging
+DASHBOARD_IMAGE=zeke-dashboard:staging
+WEBSITE_IMAGE=zeke-website:staging
+API_IMAGE=zeke-api:staging
+ENGINE_IMAGE=zeke-engine:staging
+```
+
+```ini
+# /srv/zeke/deploy/.env.production
+ENVIRONMENT=production
+DASHBOARD_IMAGE=zeke-dashboard:prod
+WEBSITE_IMAGE=zeke-website:prod
+API_IMAGE=zeke-api:prod
+ENGINE_IMAGE=zeke-engine:prod
+```
+
+Bring the stack up manually with:
+
+```bash
+cd /srv/zeke/deploy
+docker compose --env-file .env.staging --profile staging up -d
+```
+
+The systemd unit files in `deploy/systemd/` expect the same `.env.<environment>` layout.
+
 ## Next Steps
 - Push the tags to the registry of choice (`docker push ghcr.io/<org>/<image>:staging`) **or** save and stream them to the VPS (`docker save zeke-dashboard:staging | ssh user@vps docker load`).
-- Update `deploy/docker-compose.yml` to reference the published tags before bringing the stack up.
+- Update the `.env.*` files (or exported variables) so `deploy/docker-compose.yml` reads the correct image tags before bringing the stack up.
