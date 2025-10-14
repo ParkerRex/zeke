@@ -11,11 +11,21 @@ docker build -t zeke-engine:local -f apps/engine/Dockerfile .
 
 echo "🚀 Starting containers..."
 cd deploy
-ENVIRONMENT=local \
-DASHBOARD_IMAGE=zeke-dashboard:local \
-WEBSITE_IMAGE=zeke-website:local \
-API_IMAGE=zeke-api:local \
-ENGINE_IMAGE=zeke-engine:local \
-docker compose --profile staging up -d
+export ENVIRONMENT=local
+export DASHBOARD_IMAGE=zeke-dashboard:local
+export WEBSITE_IMAGE=zeke-website:local
+export API_IMAGE=zeke-api:local
+export ENGINE_IMAGE=zeke-engine:local
+docker compose -f docker-compose.yml -f docker-compose.local.yml --profile local up -d
 
-echo "✅ Stack running. Check logs: docker compose --profile staging logs -f"
+echo "✅ Stack running!"
+echo ""
+echo "Services available at:"
+echo "  - Website:   http://localhost:3000"
+echo "  - Dashboard: http://localhost:3001"
+echo "  - API:       http://localhost:3003"
+echo "  - Engine:    http://localhost:3010"
+echo "  - Redis:     localhost:6379"
+echo ""
+echo "View logs: cd deploy && docker compose --profile local logs -f"
+echo "Stop stack: cd deploy && docker compose --profile local down"
