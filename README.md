@@ -148,6 +148,8 @@ Since we forked from Midday, here's the translation table:
 ```
 
 ### Local Development
+
+#### Option 1: Native Development (Recommended for Active Development)
 ```bash
 # Install dependencies
 bun install
@@ -172,6 +174,38 @@ bun dev
 # - Dashboard: http://localhost:3000
 # - API: http://localhost:3001
 ```
+
+#### Option 2: Docker (Full Production-Like Stack)
+```bash
+# Set up local environment files
+# (automatically copies from staging examples)
+mkdir -p deploy/env/local
+cp deploy/env/staging/*.env.example deploy/env/local/
+cd deploy/env/local && for f in *.env.example; do cp "$f" "${f%.example}"; done
+
+# Edit environment files with your local values
+# deploy/env/local/api.env
+# deploy/env/local/dashboard.env
+# deploy/env/local/engine.env
+# deploy/env/local/website.env
+
+# Build and run the full stack
+./deploy/run-local.sh
+
+# Check logs
+cd deploy && docker compose --profile staging logs -f
+
+# Stop all services
+docker compose --profile staging down
+```
+
+The Docker setup runs:
+- **Caddy** (reverse proxy) on ports 80/443
+- **API** on port 3003
+- **Dashboard** on port 3001
+- **Website** on port 3000
+- **Engine** on port 3010
+- **Redis** on port 6379
 
 ## Database Setup (The WTF Explanation)
 
