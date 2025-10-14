@@ -1,1 +1,0 @@
-find functions in NotificationsService.swift that are not covered by tests
