@@ -5,7 +5,8 @@ export type SourceType =
   | "twitter"
   | "blog"
   | "podcast"
-  | "paper";
+  | "paper"
+  | "semantic-scholar";
 export type ContentType =
   | "video"
   | "audio"

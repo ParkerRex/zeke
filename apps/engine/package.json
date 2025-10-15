@@ -10,9 +10,12 @@
     "build": "bun build src/server/index.ts --outdir dist --target bun",
     "start": "bun run src/server/index.ts"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "exports": {
     ".": "./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "bun-types": "^1.3.0"
   }
 }

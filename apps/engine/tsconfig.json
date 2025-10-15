@@ -8,12 +8,7 @@
       ]
     },
     "strict": true,
-    "types": [
-      "@cloudflare/workers-types",
-      "bun-types"
-    ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "types": ["bun-types"],
     "lib": [
       "ESNext"
     ],
@@ -31,7 +26,6 @@
   "exclude": [
     "dist",
     "node_modules",
-    ".wrangler",
     ".turbo",
     "**/*.test.ts",
     "**/*.spec.ts",

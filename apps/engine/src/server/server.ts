@@ -13,9 +13,6 @@ function buildEnv(): ProviderFacade {
     YOUTUBE_QUOTA_LIMIT: process.env.YOUTUBE_QUOTA_LIMIT ?? "0",
     YOUTUBE_QUOTA_RESET_HOUR: process.env.YOUTUBE_QUOTA_RESET_HOUR ?? "0",
     YOUTUBE_RATE_LIMIT_BUFFER: process.env.YOUTUBE_RATE_LIMIT_BUFFER ?? "0",
-    KV: undefined as never,
-    STORAGE: undefined as never,
-    AI: undefined as never,
   });
 
   return provider;
