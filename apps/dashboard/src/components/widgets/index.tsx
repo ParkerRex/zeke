@@ -14,9 +14,7 @@ import * as React from "react";
 import { Assistant } from "./assistant";
 import { Inbox } from "./inbox";
 import { WidgetsNavigation } from "./navigation";
-import { Spending } from "./spending";
 import { Tracker } from "./tracker";
-import { Transactions } from "./transactions/transactions";
 import { Vault } from "./vault";
 
 export function Widgets() {
@@ -35,11 +33,9 @@ export function Widgets() {
 
   const items = [
     <Assistant key="assistant" />,
-    <Spending disabled={disabled} key="spending" />, // Repurposed for research budget/usage
-    <Transactions disabled={disabled} key="transactions" />, // Repurposed for research activities
-    <Tracker key="tracker" />, // Research time tracking
-    <Inbox key="inbox" disabled={disabled} />, // Research inbox for triage
-    <Vault key="vault" />, // Document vault for sources
+    <Tracker key="tracker" />,
+    <Inbox key="inbox" disabled={disabled} />,
+    <Vault key="vault" />,
   ];
 
   return (

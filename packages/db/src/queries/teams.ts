@@ -96,6 +96,8 @@ export const createTeam = async (db: Database, params: CreateTeamParams) => {
         },
       );
 
+      const shouldSwitchTeam = params.switchTeam ?? existingTeams.length === 0;
+
       // Create the team
       console.log(`[${teamCreationId}] Creating team record`);
       const [newTeam] = await tx
@@ -129,7 +131,7 @@ export const createTeam = async (db: Database, params: CreateTeamParams) => {
       await createSystemCategoriesForTeam(tx, newTeam.id, params.countryCode);
 
       // Optionally switch user to the new team (atomic)
-      if (params.switchTeam) {
+      if (shouldSwitchTeam) {
         console.log(`[${teamCreationId}] Switching user to new team`);
         await tx
           .update(users)
@@ -173,7 +175,7 @@ export const createTeam = async (db: Database, params: CreateTeamParams) => {
   });
 
   // If team switching was enabled, invalidate the team permissions cache
-  if (params.switchTeam) {
+  if (params.switchTeam ?? true) {
     const cacheKey = `user:${params.userId}:team`;
     await teamPermissionsCache.delete(cacheKey);
   }

@@ -25,12 +25,10 @@ services:
 
   dashboard:
     image: ${DASHBOARD_IMAGE:-zeke-dashboard:staging}
-    env_file:
-      - ./env/${ENVIRONMENT:-staging}/dashboard.env
     networks:
       - zeke
-    expose:
-      - "3001"
+    ports:
+      - "3001:3001"
     depends_on:
       - redis
     healthcheck:
@@ -72,12 +70,10 @@ services:
 
   api:
     image: ${API_IMAGE:-zeke-api:staging}
-    env_file:
-      - ./env/${ENVIRONMENT:-staging}/api.env
     networks:
       - zeke
-    expose:
-      - "3003"
+    ports:
+      - "3003:3003"
     depends_on:
       - redis
     healthcheck:

@@ -9,7 +9,7 @@ import {
   IoShieldCheckmark,
 } from "react-icons/io5";
 
-import { cn } from "@zeke/ui/lib/utils";
+import { cn } from "@zeke/ui/cn";
 
 export function WorkspacePreview({ className }: { className?: string }) {
   return (

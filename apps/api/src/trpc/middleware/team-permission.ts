@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { teamCache } from "@zeke/cache/team-cache";
 import type { Database } from "@zeke/db/client";
 import { users } from "@zeke/db/schema";
+import { eq } from "drizzle-orm";
 
 export const withTeamPermission = async <TReturn>(opts: {
   ctx: {
@@ -72,7 +73,13 @@ export const withTeamPermission = async <TReturn>(opts: {
     });
   }
 
-  const teamId = result.teamId;
+  let teamId = result.teamId;
+
+  // Safety net: if teamId is null but user has memberships, auto-assign first team
+  if (teamId === null && result.usersOnTeams.length > 0) {
+    teamId = result.usersOnTeams[0]!.teamId;
+    await ctx.db.update(users).set({ teamId }).where(eq(users.id, userId));
+  }
 
   // If teamId is null, user has no team assigned but this is now allowed
   if (teamId !== null) {

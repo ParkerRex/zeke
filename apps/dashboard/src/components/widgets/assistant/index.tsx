@@ -44,25 +44,16 @@ export function Assistant() {
   const { track } = useAnalytics();
   const [question, setQuestion] = useState("");
 
-  const { data: workspace, isLoading: workspaceLoading } =
-    api.workspace.get.useQuery(undefined, {
-      staleTime: 5 * 60 * 1000,
-    });
-
   const { data: chats, isLoading: chatsLoading } = api.chats.list.useQuery(
     { limit: 4, orderBy: "recent" },
     { staleTime: 60 * 1000 },
   );
 
-  const assistantSummary: AssistantSummary | undefined =
-    workspace?.assistantSummary;
+  const workspaceLoading = false;
 
   const prompts = useMemo(() => {
-    if (assistantSummary?.suggestedPrompts?.length) {
-      return assistantSummary.suggestedPrompts.slice(0, 3);
-    }
     return DEFAULT_PROMPTS;
-  }, [assistantSummary?.suggestedPrompts]);
+  }, []);
 
   const recentChats: ChatListItem[] = useMemo(() => {
     if (!chats?.items?.length) return [];

@@ -73,8 +73,10 @@ export const teamRouter = createTRPCRouter({
       });
 
       try {
+        const switchTeam = input.switchTeam ?? true;
         const teamId = await createTeam(db, {
           ...input,
+          switchTeam,
           userId: session.user.id,
           email: session.user.email!,
         });

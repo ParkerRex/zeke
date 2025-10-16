@@ -11,7 +11,7 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 type RouterInputs = inferRouterInputs<AppRouter>;
 
 export type TeamSummary = RouterOutputs["team"]["list"][number];
-export type TeamDetail = RouterOutputs["team"]["get"];
+export type TeamDetail = NonNullable<RouterOutputs["team"]["current"]>;
 export type TeamInvite = RouterOutputs["team"]["invites"][number];
 
 export function useTeamsQuery() {
@@ -26,15 +26,9 @@ export function useCurrentTeam() {
   });
 }
 
-export function useTeamById(teamId: string) {
-  const trpc = useTRPC();
-  return useSuspenseQuery(trpc.team.get.queryOptions({ teamId }));
-}
-
-export function useSetActiveTeam() {
-  const trpc = useTRPC();
-  return useMutation(trpc.team.setActive.mutationOptions());
-}
+// Removed useTeamById - not used, and team.get doesn't exist
+// Use useCurrentTeam for the active team
+// Removed useSetActiveTeam - use trpc.user.update({ teamId }) instead
 
 export function useTeamInvites() {
   const trpc = useTRPC();

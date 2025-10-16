@@ -1,5 +1,4 @@
-import { updateSession } from "@zeke/supabase/middleware";
-import { createClient } from "@zeke/supabase/server";
+import { createMiddlewareClient, updateSession } from "@zeke/supabase/middleware";
 import { createI18nMiddleware } from "next-international/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -10,8 +9,9 @@ const I18nMiddleware = createI18nMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
-  const response = await updateSession(request, I18nMiddleware(request));
-  const supabase = await createClient();
+  const i18nResponse = I18nMiddleware(request);
+  const response = await updateSession(request, i18nResponse);
+  const supabase = createMiddlewareClient(request, response);
   const url = new URL("/", request.url);
   const nextUrl = request.nextUrl;
 
@@ -33,6 +33,15 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  console.log('[MIDDLEWARE DEBUG]', {
+    pathname: newUrl.pathname,
+    pathnameWithoutLocale,
+    hasSession: !!session,
+    sessionUserId: session?.user?.id,
+    sessionEmail: session?.user?.email,
+    timestamp: new Date().toISOString(),
+  });
+
   // 1. Not authenticated
   if (
     !session &&
@@ -41,7 +50,8 @@ export async function middleware(request: NextRequest) {
     !newUrl.pathname.includes("/s/") &&
     !newUrl.pathname.includes("/verify") &&
     !newUrl.pathname.includes("/all-done") &&
-    !newUrl.pathname.includes("/desktop/search")
+    !newUrl.pathname.includes("/desktop/search") &&
+    !newUrl.pathname.includes("/mfa/setup")
   ) {
     const url = new URL("/login", request.url);
 

@@ -17,31 +17,30 @@ export default async function Layout({
 }) {
   const queryClient = getQueryClient();
 
-  // Fetch current workspace - single query for all initial data
-  const workspace = await queryClient
-    .fetchQuery(trpc.workspace.get.queryOptions())
-    .catch(() => null);
 
-  if (!workspace) {
+  // NOTE: These are used in the global sheets
+batchPrefetch([
+    trpc.team.current.queryOptions(),
+    trpc.user.me.queryOptions(),
+    trpc.search.global.queryOptions({ searchTerm: "" }),
+  ]);
+
+
+  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions())
+
+  if (!user) {
     redirect("/login");
   }
 
-  const { user, team } = workspace;
-
+  // Profile gate
   if (!user.fullName) {
     redirect("/setup");
   }
 
-  if (!team) {
+  // Team selection gate
+  if (!user.teamId) {
     redirect("/teams");
   }
-
-  // Prefetch additional data for global sheets (research-focused)
-  batchPrefetch([
-    trpc.team.current.queryOptions(),
-    trpc.search.global.queryOptions({ searchTerm: "" }),
-  ]);
-
   return (
     <HydrateClient>
       <div className="relative">
@@ -49,7 +48,7 @@ export default async function Layout({
 
         <div className="md:ml-[70px] pb-8">
           <Header />
-          <div className="px-6">{children}</div>
+          <div className="px-8">{children}</div>
         </div>
 
         <Suspense>

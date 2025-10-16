@@ -84,7 +84,7 @@ export function OAuthConsentScreen() {
     if (!selectedTeamId) {
       toast({
         title: "Error",
-        description: "Please select a workspace",
+        description: "Please select a team",
         variant: "error",
       });
       return;
@@ -250,12 +250,12 @@ export function OAuthConsentScreen() {
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="workspace" className="text-sm font-normal">
+            <Label htmlFor="team" className="text-sm font-normal">
               Select a team to grant API access to
             </Label>
             <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Search workspaces" />
+                <SelectValue placeholder="Search teams" />
               </SelectTrigger>
               <SelectContent>
                 {teams?.map((team) => (

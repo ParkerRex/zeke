@@ -10,7 +10,7 @@ import { Bell, Link2, PlayCircle, Search, Sparkles } from "lucide-react";
 
 /**
  * HeaderClient - Client components for the header
- * Uses bootstrap data from the workspace router
+ * Uses team and notification data from TRPC
  */
 
 export function QuickActions() {
@@ -76,12 +76,13 @@ export function IngestionHealth() {
 export function NotificationBadge() {
   const { openNotifications } = useModalParams();
 
-  // Get workspace data from context
-  const { data: workspace } = api.workspace.get.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  // Fetch unread notifications directly
+  const { data: notifPage } = api.notifications.list.useQuery(
+    { status: "unread", pageSize: 20 },
+    { staleTime: 60 * 1000 }, // 1 minute
+  );
 
-  const unreadCount = workspace?.navCounts?.notifications || 0;
+  const unreadCount = notifPage?.data?.length ?? 0;
 
   return (
     <Button
@@ -123,21 +124,19 @@ export function SearchTrigger() {
 }
 
 export function TrialStatus() {
-  const { data: workspace } = api.workspace.get.useQuery(undefined, {
+  const { data: team } = api.team.current.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
 
-  const team = workspace?.team;
-  if (!team || team.subscriptionStatus !== "trialing") return null;
-
-  const daysLeft = team.trialDaysLeft || 0;
+  if (!team || team.plan !== "trial") return null;
 
   return (
     <Badge
-      variant={daysLeft <= 3 ? "destructive" : "secondary"}
-      className={cn("hidden md:inline-flex", daysLeft <= 3 && "animate-pulse")}
+      data-testid="trial-status"
+      variant="secondary"
+      className="hidden md:inline-flex"
     >
-      {daysLeft} day{daysLeft !== 1 ? "s" : ""} left in trial
+      Trial
     </Badge>
   );
 }

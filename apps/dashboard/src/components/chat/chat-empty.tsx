@@ -3,8 +3,8 @@ import { Icons } from "@zeke/ui/icons";
 import { Sparkles } from "lucide-react";
 
 export function ChatEmpty() {
-  const { data: bootstrap } = api.workspace.get.useQuery();
-  const firstName = bootstrap?.user?.fullName?.split(" ")[0] || "there";
+  const { data: user } = api.user.me.useQuery();
+  const firstName = user?.fullName?.split(" ")?.[0] ?? "there";
 
   return (
     <div className="w-full flex flex-col items-center justify-center text-center">

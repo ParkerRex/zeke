@@ -10,23 +10,19 @@ import { useCallback, useEffect } from "react";
  * Provides type-safe event tracking with automatic context enrichment
  */
 export function useAnalytics() {
-  const { data: workspace } = api.workspace.get.useQuery();
+  const { data: user } = api.user.me.useQuery();
+  const { data: team } = api.team.current.useQuery();
 
-  // Build context from workspace data
+  // Build context from user and team data
   const context: EventContext = {
-    teamId: workspace?.team?.id || "unknown",
-    userId: workspace?.user?.id || "unknown",
+    teamId: team?.id ?? "unknown",
+    userId: user?.id ?? "unknown",
     sessionId:
       typeof window !== "undefined"
         ? window.sessionStorage.getItem("sessionId") || generateSessionId()
         : "server",
     timestamp: new Date().toISOString(),
-    subscriptionTier:
-      workspace?.team?.subscriptionStatus === "active"
-        ? "paid"
-        : workspace?.team?.subscriptionStatus === "trialing"
-          ? "trial"
-          : "free",
+    subscriptionTier: team?.plan === "trial" ? "trial" : team?.plan ? "paid" : "free",
     deviceType: getDeviceType(),
     browserInfo: getBrowserInfo(),
   };
@@ -35,7 +31,7 @@ export function useAnalytics() {
   useEffect(() => {
     track("DashboardView", {
       source: "navigation",
-      hasNotifications: (workspace?.navCounts?.notifications || 0) > 0,
+      hasNotifications: false,
     });
   }, []);
 

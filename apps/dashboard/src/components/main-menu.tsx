@@ -41,7 +41,7 @@ const items = [
     path: "/settings",
     name: "Settings",
     children: [
-      { path: "/settings", name: "Workspace" },
+      { path: "/settings", name: "Settings" },
       { path: "/settings/members", name: "Team" },
       { path: "/settings/notifications", name: "Notifications" },
       { path: "/settings/developer", name: "Developer" },

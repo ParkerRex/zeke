@@ -13,9 +13,9 @@ import { triggerRouter } from "./trigger";
 import { searchRouter } from "./search";
 import { storiesRouter } from "./stories";
 import { suggestedActionsRouter } from "./suggested-actions";
+import { tagsRouter } from "./tags";
 import { teamRouter } from "./team";
 import { userRouter } from "./user";
-import { workspaceRouter } from "./workspace";
 
 export const appRouter = createTRPCRouter({
   notifications: notificationsRouter,
@@ -31,9 +31,9 @@ export const appRouter = createTRPCRouter({
   suggestedActions: suggestedActionsRouter,
   oauthApplications: oauthApplicationsRouter,
   search: searchRouter,
+  tags: tagsRouter,
   trigger: triggerRouter,
   apiKeys: apiKeysRouter,
-  workspace: workspaceRouter,
 });
 
 // export type definition of API

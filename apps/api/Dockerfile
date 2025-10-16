@@ -19,8 +19,10 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-# Install Node for esbuild postinstall scripts
-RUN apt-get update && apt-get install -y --no-install-recommends nodejs ca-certificates curl && rm -rf /var/lib/apt/lists/*
+# Install Node 20 for esbuild postinstall scripts
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs && rm -rf /var/lib/apt/lists/*
 # Don't copy the lockfile, allow Bun to generate a fresh one
 RUN bun install
 

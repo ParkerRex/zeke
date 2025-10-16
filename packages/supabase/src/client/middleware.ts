@@ -1,11 +1,11 @@
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
 
-export async function updateSession(
+export function createMiddlewareClient(
   request: NextRequest,
   response: NextResponse,
 ) {
-  createServerClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -24,6 +24,12 @@ export async function updateSession(
       },
     },
   );
+}
 
+export async function updateSession(
+  request: NextRequest,
+  response: NextResponse,
+) {
+  createMiddlewareClient(request, response);
   return response;
 }

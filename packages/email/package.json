@@ -18,12 +18,14 @@
     "start": "email start"
   },
   "dependencies": {
-    "@zeke/ui": "workspace:*",
-    "@zeke/utils": "workspace:*",
     "@react-email/components": "0.0.42",
     "@react-email/render": "1.1.2",
     "@react-email/tailwind": "1.0.5",
+    "@zeke/ui": "workspace:*",
+    "@zeke/utils": "workspace:*",
     "date-fns": "^4.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-email": "4.0.16",
     "responsive-react-email": "^0.0.5"
   },
