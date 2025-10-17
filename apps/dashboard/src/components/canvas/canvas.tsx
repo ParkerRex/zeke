@@ -17,7 +17,7 @@ import { ProfitAnalysisCanvas } from "./profit-analysis-canvas";
 import { ProfitCanvas } from "./profit-canvas";
 import { RevenueCanvas } from "./revenue-canvas";
 import { RunwayCanvas } from "./runway-canvas";
-import { SpendingCanvas } from "./spending-canvas";
+
 
 export function Canvas() {
   const { current } = useArtifacts({
@@ -88,8 +88,6 @@ export function Canvas() {
       return <HealthReportCanvas />;
     case "profit-analysis-canvas":
       return <ProfitAnalysisCanvas />;
-    case "spending-canvas":
-      return <SpendingCanvas />;
 
     default:
       return null;

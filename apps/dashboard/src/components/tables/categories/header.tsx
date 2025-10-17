@@ -5,10 +5,10 @@
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@zeke/ui/button";
 import { Input } from "@zeke/ui/input";
-import type { Category } from "./columns";
+import type { Tag } from "./columns";
 
 type Props = {
-  table?: Table<Category>;
+  table?: Table<Tag>;
   onOpenChange?: (isOpen: boolean) => void;
 };
 

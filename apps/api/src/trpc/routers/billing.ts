@@ -56,7 +56,7 @@ const getInvoiceProductName = (invoice: Stripe.Invoice) => {
   }
 
   const product = line.price?.product;
-  if (product && typeof product !== "string" && product.name) {
+  if (product && typeof product !== "string" && "name" in product && product.name) {
     return product.name;
   }
 

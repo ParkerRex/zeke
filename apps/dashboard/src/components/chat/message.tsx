@@ -14,7 +14,7 @@ import { Documents } from "./tools/documents/documents";
 import { Inbox } from "./tools/inbox/inbox";
 import { Profit } from "./tools/profit/profit";
 import { Revenue } from "./tools/revenue/revenue";
-import { Transactions } from "./tools/transactions/transactions";
+
 
 type ToolResultProps = {
   part: UIMessage["parts"][number];
@@ -33,8 +33,7 @@ function ToolResult({ part }: ToolResultProps) {
         return <Documents result={toolInvocation.result} />;
       case "getBurnRate":
         return <BurnRate result={toolInvocation.result} />;
-      case "getTransactions":
-        return <Transactions result={toolInvocation.result} />;
+
       case "getRevenue":
         return <Revenue result={toolInvocation.result} />;
       case "getProfit":

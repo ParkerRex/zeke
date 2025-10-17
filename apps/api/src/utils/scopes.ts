@@ -11,8 +11,12 @@ export const SCOPES = [
   "tags.write",
   "teams.read",
   "teams.manage",
+  "teams.write",
   "users.read",
   "users.manage",
+  "users.write",
+  "notifications.read",
+  "notifications.write",
   "jobs.trigger",
 ] as const;
 

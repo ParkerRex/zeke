@@ -174,7 +174,7 @@ export const oauthApplicationsRouter = createTRPCRouter({
           // Get team information
           const userTeam = userTeams.find((team) => team.id === teamId);
 
-          if (userTeam && session.user.email) {
+          if (userTeam && session.user.email && resend) {
             const html = await render(
               AppInstalledEmail({
                 email: session.user.email,
@@ -340,7 +340,7 @@ export const oauthApplicationsRouter = createTRPCRouter({
           const userTeams = await getTeamsByUserId(db, session.user.id);
           const currentTeam = userTeams?.find((team) => team.id === teamId);
 
-          if (currentTeam && session.user.email) {
+          if (currentTeam && session.user.email && resend) {
             const html = await render(
               AppReviewRequestEmail({
                 applicationName: application.name,

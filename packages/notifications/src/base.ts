@@ -5,7 +5,6 @@ import type { CreateActivityInput } from "./schemas";
 export interface TeamContext {
   id: string;
   name: string;
-  inboxId: string;
 }
 
 export interface NotificationHandler<T = any> {

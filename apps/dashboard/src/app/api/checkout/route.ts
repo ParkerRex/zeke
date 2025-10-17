@@ -51,10 +51,7 @@ export const GET = async (req: NextRequest) => {
     client_reference_id: team.id,
     success_url: successUrl.toString(),
     cancel_url: new URL(redirectPath ?? "/", req.nextUrl.origin).toString(),
-    customer: team.stripe_customer_id ?? undefined,
-    customer_email: team.stripe_customer_id
-      ? undefined
-      : (session.user.email ?? undefined),
+    customer_email: session.user.email ?? undefined,
     metadata: {
       teamId: team.id,
       teamName: team.name ?? "",

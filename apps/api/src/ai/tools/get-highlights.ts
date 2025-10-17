@@ -19,13 +19,13 @@ type RawHighlightRow = {
   quote: string | null;
   kind: string | null;
   confidence: string | null;
-  created_at: string | null;
-  story_id: string;
-  story_title: string | null;
-  story_published_at: string | null;
-  source_name: string | null;
-  overlay_confidence: string | null;
-  time_saved_seconds: number | null;
+  createdAt: string | null;
+  storyId: string;
+  storyTitle: string | null;
+  storyPublishedAt: string | null;
+  sourceName: string | null;
+  overlayConfidence: string | null;
+  timeSavedSeconds: number | null;
 };
 
 type HighlightToolResult = ToolResult<HighlightToolData, "getHighlights">;
@@ -136,13 +136,13 @@ export async function getHighlights(
         quote: highlights.quote,
         kind: highlights.kind,
         confidence: highlights.confidence,
-        created_at: highlights.created_at,
-        story_id: highlights.story_id,
-        story_title: stories.title,
-        story_published_at: stories.published_at,
-        source_name: sources.name,
-        overlay_confidence: storyOverlays.confidence,
-        time_saved_seconds: storyOverlays.time_saved_seconds,
+        createdAt: highlights.created_at,
+        storyId: highlights.story_id,
+        storyTitle: stories.title,
+        storyPublishedAt: stories.published_at,
+        sourceName: sources.name,
+        overlayConfidence: storyOverlays.confidence,
+        timeSavedSeconds: storyOverlays.time_saved_seconds,
       })
       .from(highlights)
       .innerJoin(stories, eq(highlights.story_id, stories.id))
@@ -158,7 +158,7 @@ export async function getHighlights(
     const tagRows = highlightIds.length
       ? await db
           .select({
-            highlight_id: highlightTags.highlight_id,
+            highlightId: highlightTags.highlight_id,
             tag: highlightTags.tag,
           })
           .from(highlightTags)
@@ -166,9 +166,9 @@ export async function getHighlights(
       : [];
 
     const tagMap = tagRows.reduce<Map<string, string[]>>((acc, row) => {
-      const existing = acc.get(row.highlight_id) ?? [];
+      const existing = acc.get(row.highlightId) ?? [];
       existing.push(row.tag);
-      acc.set(row.highlight_id, existing);
+      acc.set(row.highlightId, existing);
       return acc;
     }, new Map());
 
@@ -187,8 +187,8 @@ export async function getHighlights(
       const highlightConfidence = row.confidence
         ? Number(row.confidence)
         : null;
-      const overlayConfidence = row.overlay_confidence
-        ? Number(row.overlay_confidence)
+      const overlayConfidence = row.overlayConfidence
+        ? Number(row.overlayConfidence)
         : null;
 
       return {
@@ -202,16 +202,16 @@ export async function getHighlights(
         kind: row.kind,
         confidence: highlightConfidence,
         story: {
-          id: row.story_id,
-          title: row.story_title,
-          sourceName: row.source_name,
-          publishedAt: row.story_published_at,
+          id: row.storyId,
+          title: row.storyTitle,
+          sourceName: row.sourceName,
+          publishedAt: row.storyPublishedAt,
         },
         tags: tagMap.get(row.id) ?? [],
-        createdAt: row.created_at,
+        createdAt: row.createdAt,
         metrics: {
           confidence: highlightConfidence ?? overlayConfidence ?? null,
-          timeSavedSeconds: row.time_saved_seconds ?? null,
+          timeSavedSeconds: row.timeSavedSeconds ?? null,
         },
       };
     });

@@ -155,12 +155,12 @@ app.post("/", withRequiredScope("chat.write"), async (c) => {
 
         generatedTitle = await generateTitle({
           message: messageContent,
-          teamName: userContext.teamName,
-          fullName: userContext.fullName,
-          country: userContext.country,
-          baseCurrency: userContext.baseCurrency,
-          city: userContext.city,
-          timezone: userContext.timezone,
+          teamName: userContext.teamName ?? undefined,
+          fullName: userContext.fullName ?? undefined,
+          country: userContext.country ?? undefined,
+          baseCurrency: userContext.baseCurrency ?? undefined,
+          city: userContext.city ?? undefined,
+          timezone: userContext.timezone ?? undefined,
         });
 
         logger.info({

@@ -11,3 +11,11 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+
+export const respondTeamInviteSchema = z.object({
+  inviteId: z.string().uuid("Invalid invite ID"),
+});
+
+export const setActiveTeamSchema = z.object({
+  teamId: z.string().uuid("Invalid team ID"),
+});

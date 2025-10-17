@@ -6,7 +6,7 @@ export const triggerTaskInputSchema = z
       description: "Trigger.dev task identifier",
       example: "generate-brief",
     }),
-    payload: z.record(z.unknown()).default({}).openapi({
+    payload: z.record(z.string(), z.unknown()).default({}).openapi({
       description: "JSON payload forwarded to the task",
       example: {
         storyId: "123e4567-e89b-12d3-a456-426614174000",
@@ -90,7 +90,7 @@ export const triggerRunPlaybookInputSchema = z
       example: "2a4b6c8d-0e1f-2345-6789-abcdef012345",
     }),
     context: z
-      .record(z.unknown())
+      .record(z.string(), z.unknown())
       .optional()
       .openapi({
         description: "Optional context metadata forwarded to the run",

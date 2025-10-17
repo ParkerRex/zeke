@@ -19,7 +19,6 @@
   "exclude": [
     "node_modules",
     ".next",
-    "dist",
-    ".turbo"
+    "dist"
   ]
 }

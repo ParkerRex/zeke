@@ -7,6 +7,7 @@ import {
 } from "@zeke/db/queries";
 import type {
   EmailInput,
+  NotificationHandler,
   NotificationOptions,
   NotificationResult,
   UserData,
@@ -16,9 +17,11 @@ import { EmailService } from "./services/email-service";
 // All notification type imports removed during migration to Zeke
 // This will be reimplemented with Zeke research notifications
 
-const handlers = {
+const handlers: {
+  [K in keyof NotificationTypes]?: NotificationHandler<NotificationTypes[K]>;
+} = {
   // Handlers temporarily disabled during migration
-} as const;
+};
 
 export class Notifications {
   #emailService: EmailService;
@@ -37,7 +40,7 @@ export class Notifications {
       locale?: string | null;
     }>,
     teamId: string,
-    teamInfo: { name: string | null; inboxId: string | null },
+    teamInfo: { name: string | null },
   ): UserData[] {
     return teamMembers.map((member) => ({
       id: member.id,
@@ -103,7 +106,7 @@ export class Notifications {
     handler: any,
     validatedData: NotificationTypes[T],
     user: UserData,
-    teamContext: { id: string; name: string; inboxId: string },
+    teamContext: { id: string; name: string },
     options?: NotificationOptions,
   ): EmailInput {
     // Create email input using handler's createEmail function
@@ -163,7 +166,7 @@ export class Notifications {
     type: T,
     data: NotificationTypes[T],
     options?: NotificationOptions,
-    teamInfo?: { id: string; name: string | null; inboxId: string | null },
+    teamInfo?: { id: string; name: string | null },
   ): Promise<NotificationResult> {
     const handler = handlers[type];
 
@@ -207,7 +210,6 @@ export class Notifications {
         const teamContext = {
           id: teamInfo?.id || "",
           name: teamInfo?.name || "Team",
-          inboxId: teamInfo?.inboxId || "",
         };
         const sampleEmail = handler.createEmail(
           validatedData,

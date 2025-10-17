@@ -2,13 +2,13 @@
 
 import "server-only";
 
-import { connectDb } from "@zeke/db/src/client";
+import { connectDb } from "@zeke/db/client";
 import {
   getTeamInvitesByEmail,
   getTeamsForUser,
   getUserById,
-} from "@zeke/db/src/queries";
-import { getSession, getUser } from "@zeke/supabase/queries/cached-queries";
+} from "@zeke/db/queries";
+import { getSession, getUser } from "@zeke/supabase/cached-queries";
 
 export const getTeamsViewData = async () => {
   const user = await getUser();

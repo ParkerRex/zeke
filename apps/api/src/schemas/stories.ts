@@ -200,11 +200,10 @@ export const listStoriesInputSchema = z
       example: 40,
     }),
     kind: z
-      .enum(["all", "article", "video", "podcast", "pdf", "tweet"], {
-        description: "Filter stories by underlying content kind",
-      })
+      .enum(["all", "article", "video", "podcast", "pdf", "tweet"])
       .default("all")
       .openapi({
+        description: "Filter stories by underlying content kind",
         example: "article",
       }),
     search: z.string().trim().min(1).max(120).optional().openapi({

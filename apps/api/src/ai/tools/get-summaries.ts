@@ -14,19 +14,19 @@ import type { GetSummariesInput } from "./schema";
 import type { SummaryToolData, ToolResult } from "./types";
 
 type RawStoryRow = {
-  story_id: string;
-  story_title: string | null;
-  story_summary: string | null;
-  story_published_at: string | null;
-  primary_source_id: string | null;
-  primary_url: string | null;
-  overlay_summary: string | null;
-  overlay_confidence: string | null;
-  source_name: string | null;
+  storyId: string;
+  storyTitle: string | null;
+  storySummary: string | null;
+  storyPublishedAt: string | null;
+  primarySourceId: string | null;
+  primaryUrl: string | null;
+  overlaySummary: string | null;
+  overlayConfidence: string | null;
+  sourceName: string | null;
 };
 
 type RawHighlightRow = {
-  story_id: string;
+  storyId: string;
   summary: string | null;
   title: string | null;
   confidence: string | null;
@@ -71,13 +71,13 @@ const summarySchema = z.object({
 
 function mapHighlightRows(rows: RawHighlightRow[]) {
   return rows.reduce<Map<string, SourceStory["highlights"]>>((acc, row) => {
-    const list = acc.get(row.story_id) ?? [];
+    const list = acc.get(row.storyId) ?? [];
     list.push({
       title: row.title,
       summary: row.summary,
       confidence: row.confidence != null ? Number(row.confidence) : null,
     });
-    acc.set(row.story_id, list);
+    acc.set(row.storyId, list);
     return acc;
   }, new Map());
 }
@@ -89,23 +89,23 @@ function groupStoriesBySource(
   const grouped = new Map<string, SourceAggregation>();
 
   for (const row of rows) {
-    const key = row.primary_source_id ?? row.source_name ?? "__unattributed";
+    const key = row.primarySourceId ?? row.sourceName ?? "__unattributed";
     const existing = grouped.get(key) ?? {
-      id: row.primary_source_id,
-      name: row.source_name,
+      id: row.primarySourceId,
+      name: row.sourceName,
       stories: [],
     };
 
     existing.stories.push({
-      id: row.story_id,
-      title: row.story_title,
-      summary: row.story_summary,
-      publishedAt: row.story_published_at,
-      primaryUrl: row.primary_url,
-      whyItMatters: row.overlay_summary,
+      id: row.storyId,
+      title: row.storyTitle,
+      summary: row.storySummary,
+      publishedAt: row.storyPublishedAt,
+      primaryUrl: row.primaryUrl,
+      whyItMatters: row.overlaySummary,
       overlayConfidence:
-        row.overlay_confidence != null ? Number(row.overlay_confidence) : null,
-      highlights: highlightMap.get(row.story_id) ?? [],
+        row.overlayConfidence != null ? Number(row.overlayConfidence) : null,
+      highlights: highlightMap.get(row.storyId) ?? [],
     });
 
     grouped.set(key, existing);
@@ -158,15 +158,15 @@ export async function getSummaries(
 
     const storyRows: RawStoryRow[] = await db
       .select({
-        story_id: stories.id,
-        story_title: stories.title,
-        story_summary: stories.summary,
-        story_published_at: stories.published_at,
-        primary_source_id: stories.primary_source_id,
-        primary_url: stories.primary_url,
-        overlay_summary: storyOverlays.why_it_matters,
-        overlay_confidence: storyOverlays.confidence,
-        source_name: sources.name,
+        storyId: stories.id,
+        storyTitle: stories.title,
+        storySummary: stories.summary,
+        storyPublishedAt: stories.published_at,
+        primarySourceId: stories.primary_source_id,
+        primaryUrl: stories.primary_url,
+        overlaySummary: storyOverlays.why_it_matters,
+        overlayConfidence: storyOverlays.confidence,
+        sourceName: sources.name,
       })
       .from(stories)
       .innerJoin(teamStoryStates, eq(teamStoryStates.story_id, stories.id))
@@ -187,12 +187,12 @@ export async function getSummaries(
       };
     }
 
-    const storyIds = storyRows.map((row) => row.story_id);
+    const storyIds = storyRows.map((row) => row.storyId);
 
     const highlightRows: RawHighlightRow[] = storyIds.length
       ? await db
           .select({
-            story_id: highlights.story_id,
+            storyId: highlights.story_id,
             summary: highlights.summary,
             title: highlights.title,
             confidence: highlights.confidence,

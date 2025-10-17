@@ -1,26 +1,19 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-import { useInboxParams } from "@/hooks/use-inbox-params";
-import { useInvoiceParams } from "@/hooks/use-invoice-params";
-import { useTransactionParams } from "@/hooks/use-transaction-params";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 const SUPPORTED_NOTIFICATION_TYPES = [
-  "invoice_paid",
-  "invoice_overdue",
-  "invoice_created",
-  "invoice_sent",
-  "invoice_scheduled",
-  "invoice_reminder_sent",
-  "invoice_cancelled",
-  "transactions_created",
-  "inbox_new",
-  "inbox_needs_review",
-  "inbox_auto_matched",
-  "inbox_cross_currency_matched",
+  "story_published",
+  "story_pinned",
+  "highlight_created",
+  "highlight_pinned",
+  "playbook_created",
+  "playbook_published",
+  "goal_created",
+  "goal_completed",
+  "subscription_upgraded",
+  "subscription_downgraded",
 ];
 
 export function isNotificationClickable(activityType: string): boolean {
@@ -46,9 +39,6 @@ export function NotificationLink({
   className,
   actionButton,
 }: NotificationLinkProps) {
-  const { setParams: setInvoiceParams } = useInvoiceParams();
-  const { setParams: setTransactionParams } = useTransactionParams();
-  const { setParams: setInboxParams } = useInboxParams();
   const router = useRouter();
 
   const isClickable = isNotificationClickable(activityType);
@@ -58,40 +48,43 @@ export function NotificationLink({
 
     try {
       switch (activityType) {
-        case "invoice_paid":
-        case "invoice_overdue":
-        case "invoice_created":
-        case "invoice_sent":
-        case "invoice_scheduled":
-        case "invoice_reminder_sent":
-        case "invoice_cancelled":
-          setInvoiceParams({ invoiceId: recordId!, type: "details" });
-          break;
-
-        case "transactions_created":
-          if (metadata?.recordId) {
-            setTransactionParams({ transactionId: recordId! });
-          } else if (metadata?.dateRange) {
-            router.push(
-              `/transactions?start=${metadata.dateRange.from}&end=${metadata.dateRange.to}`,
-            );
-          }
-          break;
-
-        case "inbox_new":
-          router.push("/inbox");
-          break;
-
-        case "inbox_needs_review":
-        case "inbox_auto_matched":
-        case "inbox_cross_currency_matched":
-          // Use the inboxId from metadata to open the inbox details sheet
-          if (metadata?.inboxId) {
-            setInboxParams({ inboxId: metadata.inboxId, type: "details" });
+        case "story_published":
+        case "story_pinned":
+          if (recordId) {
+            router.push(`/story/${recordId}`);
           } else {
-            // Fallback to inbox page if no inboxId
-            router.push("/inbox");
+            router.push("/stories");
           }
+          break;
+
+        case "highlight_created":
+        case "highlight_pinned":
+          if (metadata?.storyId) {
+            router.push(`/story/${metadata.storyId}#highlight-${recordId}`);
+          } else if (recordId) {
+            router.push(`/stories?highlight=${recordId}`);
+          } else {
+            router.push("/stories");
+          }
+          break;
+
+        case "playbook_created":
+        case "playbook_published":
+          if (recordId) {
+            router.push(`/playbooks/${recordId}`);
+          } else {
+            router.push("/playbooks");
+          }
+          break;
+
+        case "goal_created":
+        case "goal_completed":
+          router.push("/today");
+          break;
+
+        case "subscription_upgraded":
+        case "subscription_downgraded":
+          router.push("/settings/billing");
           break;
 
         default:
@@ -113,7 +106,6 @@ export function NotificationLink({
     );
   }
 
-  // Non-clickable notification
   return (
     <div className="flex items-between space-x-4 px-3 py-3">
       <div className="flex items-between justify-between space-x-4 flex-1">

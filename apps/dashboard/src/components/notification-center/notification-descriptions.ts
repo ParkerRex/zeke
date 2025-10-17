@@ -1,8 +1,4 @@
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
-
 import type { useI18n } from "@/locales/client";
-import { formatAmount } from "@zeke/utils/format";
 import { format } from "date-fns";
 
 type UseI18nReturn = ReturnType<typeof useI18n>;
@@ -22,529 +18,204 @@ type NotificationDescriptionHandler = (
   t: UseI18nReturn,
 ) => string;
 
-const handleTransactionsCreated: NotificationDescriptionHandler = (
+const handleStoryPublished: NotificationDescriptionHandler = (
   metadata,
   user,
   t,
 ) => {
-  const count = metadata?.count || metadata?.transactionCount || 1;
-  const transaction = metadata?.transaction;
+  const storyTitle = metadata?.storyTitle || metadata?.title;
+  const author = metadata?.author || metadata?.userName;
 
-  // For single transactions, show rich details
-  if (count === 1 && transaction) {
-    const formattedAmount =
-      formatAmount({
-        currency: transaction.currency,
-        amount: transaction.amount,
-        locale: user?.locale || "en-US",
-      }) || `${transaction.amount} ${transaction.currency}`;
+  if (storyTitle && author) {
+    return `${author} published "${storyTitle}"`;
+  }
+  if (storyTitle) {
+    return `New story published: "${storyTitle}"`;
+  }
+  return "A new story was published";
+};
 
+const handleStoryPinned: NotificationDescriptionHandler = (
+  metadata,
+  user,
+  t,
+) => {
+  const storyTitle = metadata?.storyTitle || metadata?.title;
+
+  if (storyTitle) {
+    return `Story pinned: "${storyTitle}"`;
+  }
+  return "A story was pinned";
+};
+
+const handleHighlightCreated: NotificationDescriptionHandler = (
+  metadata,
+  user,
+  t,
+) => {
+  const storyTitle = metadata?.storyTitle;
+  const author = metadata?.author || metadata?.userName;
+  const highlightText = metadata?.highlightText;
+
+  if (storyTitle && author) {
+    return `${author} created a highlight in "${storyTitle}"`;
+  }
+  if (highlightText) {
+    const truncated =
+      highlightText.length > 50
+        ? `${highlightText.substring(0, 50)}...`
+        : highlightText;
+    return `New highlight: "${truncated}"`;
+  }
+  return "A new highlight was created";
+};
+
+const handleHighlightPinned: NotificationDescriptionHandler = (
+  metadata,
+  user,
+  t,
+) => {
+  const highlightText = metadata?.highlightText;
+
+  if (highlightText) {
+    const truncated =
+      highlightText.length > 50
+        ? `${highlightText.substring(0, 50)}...`
+        : highlightText;
+    return `Highlight pinned: "${truncated}"`;
+  }
+  return "A highlight was pinned";
+};
+
+const handlePlaybookCreated: NotificationDescriptionHandler = (
+  metadata,
+  user,
+  t,
+) => {
+  const playbookTitle = metadata?.playbookTitle || metadata?.title;
+  const author = metadata?.author || metadata?.userName;
+
+  if (playbookTitle && author) {
+    return `${author} created playbook "${playbookTitle}"`;
+  }
+  if (playbookTitle) {
+    return `New playbook created: "${playbookTitle}"`;
+  }
+  return "A new playbook was created";
+};
+
+const handlePlaybookPublished: NotificationDescriptionHandler = (
+  metadata,
+  user,
+  t,
+) => {
+  const playbookTitle = metadata?.playbookTitle || metadata?.title;
+  const publishedAt = metadata?.publishedAt;
+
+  if (playbookTitle && publishedAt) {
     const userDateFormat = user?.dateFormat || "dd/MM/yyyy";
-    const formattedDate = format(new Date(transaction.date), userDateFormat);
+    const publishedDate = new Date(publishedAt);
+    const formattedDate = format(publishedDate, userDateFormat);
 
-    return t("notifications.transactions_created.single_transaction", {
-      name: transaction.name,
-      amount: formattedAmount,
-      date: formattedDate,
-    });
+    return `Playbook "${playbookTitle}" published on ${formattedDate}`;
   }
-
-  // For multiple transactions, use count-based messages
-  if (count <= 5) {
-    return t("notifications.transactions_created.title", { count });
+  if (playbookTitle) {
+    return `Playbook published: "${playbookTitle}"`;
   }
-  return t("notifications.transactions_created.title_many", { count });
+  return "A playbook was published";
 };
 
-const handleInboxNew: NotificationDescriptionHandler = (metadata, user, t) => {
-  const count = metadata?.totalCount || 1;
-  const type = metadata?.type;
-  const provider = metadata?.provider ?? "";
-
-  switch (type) {
-    case "email":
-      return t("notifications.inbox_new.type.email", { count });
-    case "sync":
-      // @ts-expect-error
-      return t("notifications.inbox_new.type.sync", { count, provider });
-    case "slack":
-      return t("notifications.inbox_new.type.slack", { count });
-    case "upload":
-      return t("notifications.inbox_new.type.upload", { count });
-    default:
-      return t("notifications.inbox_new.title", { count });
-  }
-};
-
-const handleInvoicePaid: NotificationDescriptionHandler = (
+const handleGoalCreated: NotificationDescriptionHandler = (
   metadata,
   user,
   t,
 ) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const customerName = metadata?.customerName;
-  const source = metadata?.source;
-  const paidAt = metadata?.paidAt;
+  const goalTitle = metadata?.goalTitle || metadata?.title;
+  const targetDate = metadata?.targetDate;
 
-  if (invoiceNumber && source === "manual" && paidAt) {
+  if (goalTitle && targetDate) {
     const userDateFormat = user?.dateFormat || "dd/MM/yyyy";
-    const paidDate = new Date(paidAt);
-    const formattedDate = format(paidDate, userDateFormat);
+    const target = new Date(targetDate);
+    const formattedDate = format(target, userDateFormat);
 
-    if (customerName) {
-      return t("notifications.invoice_paid.manual_with_date", {
-        invoiceNumber,
-        customerName,
-        date: formattedDate,
-      });
-    }
-    return t("notifications.invoice_paid.manual_with_date_no_customer", {
-      invoiceNumber,
-      date: formattedDate,
-    });
+    return `New goal created: "${goalTitle}" (target: ${formattedDate})`;
   }
-
-  if (invoiceNumber && source === "manual") {
-    return customerName
-      ? t("notifications.invoice_paid.manual", {
-          invoiceNumber,
-          customerName,
-        })
-      : t("notifications.invoice_paid.manual_no_customer", {
-          invoiceNumber,
-        });
+  if (goalTitle) {
+    return `New goal created: "${goalTitle}"`;
   }
-
-  return invoiceNumber
-    ? t("notifications.invoice_paid.automatic", { invoiceNumber })
-    : t("notifications.invoice_paid.title");
+  return "A new goal was created";
 };
 
-const handleInvoiceOverdue: NotificationDescriptionHandler = (
+const handleGoalCompleted: NotificationDescriptionHandler = (
   metadata,
   user,
   t,
 ) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  return invoiceNumber
-    ? t("notifications.invoice_overdue.with_number", { invoiceNumber })
-    : t("notifications.invoice_overdue.title");
-};
+  const goalTitle = metadata?.goalTitle || metadata?.title;
+  const completedAt = metadata?.completedAt;
 
-const handleInvoiceScheduled: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const scheduledAt = metadata?.scheduledAt;
-  const customerName = metadata?.customerName;
-
-  if (invoiceNumber && scheduledAt) {
-    const scheduledDate = new Date(scheduledAt);
+  if (goalTitle && completedAt) {
     const userDateFormat = user?.dateFormat || "dd/MM/yyyy";
-    const formattedDate = format(scheduledDate, userDateFormat);
-    const formattedTime = format(scheduledDate, "HH:mm");
+    const completed = new Date(completedAt);
+    const formattedDate = format(completed, userDateFormat);
 
-    if (customerName) {
-      return t("notifications.invoice_scheduled.with_customer", {
-        invoiceNumber,
-        customerName,
-        date: formattedDate,
-        time: formattedTime,
-      });
-    }
-    return t("notifications.invoice_scheduled.without_customer", {
-      invoiceNumber,
-      date: formattedDate,
-      time: formattedTime,
-    });
+    return `Goal completed: "${goalTitle}" on ${formattedDate}`;
   }
-  if (invoiceNumber) {
-    return t("notifications.invoice_scheduled.simple", { invoiceNumber });
+  if (goalTitle) {
+    return `Goal completed: "${goalTitle}"`;
   }
-  return t("notifications.invoice_scheduled.title");
+  return "A goal was completed";
 };
 
-const handleInvoiceSent: NotificationDescriptionHandler = (
+const handleSubscriptionUpgraded: NotificationDescriptionHandler = (
   metadata,
   user,
   t,
 ) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const customerName = metadata?.customerName;
-  if (invoiceNumber && customerName) {
-    return t("notifications.invoice_sent.with_customer", {
-      invoiceNumber,
-      customerName,
-    });
+  const plan = metadata?.plan;
+  const features = metadata?.features;
+
+  if (plan && features) {
+    return `Subscription upgraded to ${plan} with: ${features.join(", ")}`;
   }
-  if (invoiceNumber) {
-    return t("notifications.invoice_sent.without_customer", {
-      invoiceNumber,
-    });
+  if (plan) {
+    return `Subscription upgraded to ${plan}`;
   }
-  return t("notifications.invoice_sent.title");
+  return "Your subscription was upgraded";
 };
 
-const handleInvoiceReminderSent: NotificationDescriptionHandler = (
+const handleSubscriptionDowngraded: NotificationDescriptionHandler = (
   metadata,
   user,
   t,
 ) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const customerName = metadata?.customerName;
-  if (invoiceNumber && customerName) {
-    return t("notifications.invoice_reminder_sent.with_customer", {
-      customerName,
-      invoiceNumber,
-    });
+  const plan = metadata?.plan;
+  const effectiveDate = metadata?.effectiveDate;
+
+  if (plan && effectiveDate) {
+    const userDateFormat = user?.dateFormat || "dd/MM/yyyy";
+    const effective = new Date(effectiveDate);
+    const formattedDate = format(effective, userDateFormat);
+
+    return `Subscription downgraded to ${plan} (effective: ${formattedDate})`;
   }
-  if (invoiceNumber) {
-    return t("notifications.invoice_reminder_sent.without_customer", {
-      invoiceNumber,
-    });
+  if (plan) {
+    return `Subscription downgraded to ${plan}`;
   }
-  return t("notifications.invoice_reminder_sent.title");
-};
-
-const handleInvoiceCancelled: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const customerName = metadata?.customerName;
-
-  if (invoiceNumber && customerName) {
-    return t("notifications.invoice_cancelled.with_customer", {
-      invoiceNumber,
-      customerName,
-    });
-  }
-  if (invoiceNumber) {
-    return t("notifications.invoice_cancelled.without_customer", {
-      invoiceNumber,
-    });
-  }
-  return t("notifications.invoice_cancelled.title");
-};
-
-const handleInvoiceCreated: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const invoiceNumber = metadata?.invoiceNumber;
-  const customerName = metadata?.customerName;
-  const amount = metadata?.amount;
-  const currency = metadata?.currency;
-
-  if (invoiceNumber && customerName && amount && currency) {
-    const formattedAmount =
-      formatAmount({
-        currency: currency,
-        amount: amount,
-        locale: user?.locale || "en-US",
-      }) ||
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currency,
-      }).format(amount);
-    return t("notifications.invoice_created.with_customer_and_amount", {
-      invoiceNumber,
-      customerName,
-      amount: formattedAmount,
-    });
-  }
-  if (invoiceNumber && customerName) {
-    return t("notifications.invoice_created.with_customer", {
-      invoiceNumber,
-      customerName,
-    });
-  }
-  if (invoiceNumber) {
-    return t("notifications.invoice_created.without_customer", {
-      invoiceNumber,
-    });
-  }
-  return t("notifications.invoice_created.title");
-};
-
-const handleInboxAutoMatched: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const documentName = metadata?.documentName;
-  const transactionName = metadata?.transactionName;
-  const documentAmount = metadata?.documentAmount;
-  const documentCurrency = metadata?.documentCurrency;
-  const transactionAmount = metadata?.transactionAmount;
-  const transactionCurrency = metadata?.transactionCurrency;
-  const amount = metadata?.amount; // Fallback
-  const currency = metadata?.currency; // Fallback
-
-  // Handle cross-currency auto-matches with both amounts
-  if (
-    documentName &&
-    transactionName &&
-    documentAmount &&
-    documentCurrency &&
-    transactionAmount &&
-    transactionCurrency &&
-    documentCurrency !== transactionCurrency
-  ) {
-    const formattedDocAmount =
-      formatAmount({
-        currency: documentCurrency,
-        amount: documentAmount,
-        locale: user?.locale || "en-US",
-      }) || `${documentAmount} ${documentCurrency}`;
-
-    const formattedTransAmount =
-      formatAmount({
-        currency: transactionCurrency,
-        amount: transactionAmount,
-        locale: user?.locale || "en-US",
-      }) || `${transactionAmount} ${transactionCurrency}`;
-
-    return t("notifications.inbox_auto_matched.cross_currency_details", {
-      documentName,
-      transactionName,
-      documentAmount: formattedDocAmount,
-      transactionAmount: formattedTransAmount,
-    });
-  }
-
-  // Handle same-currency or fallback to original logic
-  if (
-    documentName &&
-    transactionName &&
-    (documentAmount || amount) &&
-    (documentCurrency || currency)
-  ) {
-    const finalAmount = documentAmount || amount;
-    const finalCurrency = documentCurrency || currency;
-
-    const formattedAmount =
-      formatAmount({
-        currency: finalCurrency,
-        amount: finalAmount,
-        locale: user?.locale || "en-US",
-      }) ||
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: finalCurrency,
-      }).format(finalAmount);
-
-    return t("notifications.inbox_auto_matched.with_details", {
-      documentName,
-      transactionName,
-      amount: formattedAmount,
-    });
-  }
-
-  if (documentName && transactionName) {
-    return t("notifications.inbox_auto_matched.with_names", {
-      documentName,
-      transactionName,
-    });
-  }
-
-  return t("notifications.inbox_auto_matched.title");
-};
-
-const handleInboxNeedsReview: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const documentName = metadata?.documentName;
-  const transactionName = metadata?.transactionName;
-  const matchType = metadata?.matchType;
-  const documentAmount = metadata?.documentAmount;
-  const documentCurrency = metadata?.documentCurrency;
-  const transactionAmount = metadata?.transactionAmount;
-  const transactionCurrency = metadata?.transactionCurrency;
-
-  // Handle cross-currency matches (both high confidence and suggested)
-  if (
-    documentName &&
-    transactionName &&
-    documentAmount &&
-    documentCurrency &&
-    transactionAmount &&
-    transactionCurrency &&
-    documentCurrency !== transactionCurrency
-  ) {
-    const formattedDocAmount =
-      formatAmount({
-        currency: documentCurrency,
-        amount: documentAmount,
-        locale: user?.locale || "en-US",
-      }) || `${documentAmount} ${documentCurrency}`;
-
-    const formattedTransAmount =
-      formatAmount({
-        currency: transactionCurrency,
-        amount: transactionAmount,
-        locale: user?.locale || "en-US",
-      }) || `${transactionAmount} ${transactionCurrency}`;
-
-    if (matchType === "high_confidence") {
-      return t(
-        "notifications.inbox_needs_review.cross_currency_high_confidence",
-        {
-          documentName,
-          transactionName,
-          documentAmount: formattedDocAmount,
-          transactionAmount: formattedTransAmount,
-        },
-      );
-    }
-    return t("notifications.inbox_needs_review.cross_currency_suggested", {
-      documentName,
-      transactionName,
-      documentAmount: formattedDocAmount,
-      transactionAmount: formattedTransAmount,
-    });
-  }
-
-  // Handle same-currency matches
-  if (documentName && transactionName && documentAmount && documentCurrency) {
-    const formattedAmount =
-      formatAmount({
-        currency: documentCurrency,
-        amount: documentAmount,
-        locale: user?.locale || "en-US",
-      }) || `${documentAmount} ${documentCurrency}`;
-
-    if (matchType === "high_confidence") {
-      return t("notifications.inbox_needs_review.high_confidence_details", {
-        documentName,
-        transactionName,
-        amount: formattedAmount,
-      });
-    }
-    return t("notifications.inbox_needs_review.with_details", {
-      documentName,
-      transactionName,
-      amount: formattedAmount,
-    });
-  }
-
-  if (documentName && transactionName) {
-    if (matchType === "high_confidence") {
-      return t("notifications.inbox_needs_review.high_confidence_names", {
-        documentName,
-        transactionName,
-      });
-    }
-    return t("notifications.inbox_needs_review.with_names", {
-      documentName,
-      transactionName,
-    });
-  }
-
-  return t("notifications.inbox_needs_review.title");
-};
-
-const handleInboxCrossCurrencyMatched: NotificationDescriptionHandler = (
-  metadata,
-  user,
-  t,
-) => {
-  const documentName = metadata?.documentName;
-  const transactionName = metadata?.transactionName;
-  const documentAmount = metadata?.documentAmount;
-  const documentCurrency = metadata?.documentCurrency;
-  const transactionAmount = metadata?.transactionAmount;
-  const transactionCurrency = metadata?.transactionCurrency;
-  const matchType = metadata?.matchType;
-
-  if (
-    documentName &&
-    transactionName &&
-    documentAmount &&
-    documentCurrency &&
-    transactionAmount &&
-    transactionCurrency
-  ) {
-    const formattedDocAmount =
-      formatAmount({
-        currency: documentCurrency,
-        amount: documentAmount,
-        locale: user?.locale || "en-US",
-      }) ||
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: documentCurrency,
-      }).format(documentAmount);
-
-    const formattedTxAmount =
-      formatAmount({
-        currency: transactionCurrency,
-        amount: transactionAmount,
-        locale: user?.locale || "en-US",
-      }) ||
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: transactionCurrency,
-      }).format(transactionAmount);
-
-    // Use different messaging based on match confidence
-    if (matchType === "high_confidence") {
-      return t(
-        "notifications.inbox_cross_currency_matched.high_confidence_details",
-        {
-          documentName,
-          transactionName,
-          documentAmount: formattedDocAmount,
-          transactionAmount: formattedTxAmount,
-        },
-      );
-    }
-    return t("notifications.inbox_cross_currency_matched.with_details", {
-      documentName,
-      transactionName,
-      documentAmount: formattedDocAmount,
-      transactionAmount: formattedTxAmount,
-    });
-  }
-
-  if (documentName && transactionName) {
-    if (matchType === "high_confidence") {
-      return t(
-        "notifications.inbox_cross_currency_matched.high_confidence_names",
-        {
-          documentName,
-          transactionName,
-        },
-      );
-    }
-    return t("notifications.inbox_cross_currency_matched.with_names", {
-      documentName,
-      transactionName,
-    });
-  }
-
-  return t("notifications.inbox_cross_currency_matched.title");
+  return "Your subscription was downgraded";
 };
 
 const notificationHandlers: Record<string, NotificationDescriptionHandler> = {
-  transactions_created: handleTransactionsCreated,
-  inbox_new: handleInboxNew,
-  inbox_auto_matched: handleInboxAutoMatched,
-  inbox_needs_review: handleInboxNeedsReview,
-  inbox_cross_currency_matched: handleInboxCrossCurrencyMatched,
-  invoice_paid: handleInvoicePaid,
-  invoice_overdue: handleInvoiceOverdue,
-  invoice_scheduled: handleInvoiceScheduled,
-  invoice_sent: handleInvoiceSent,
-  invoice_reminder_sent: handleInvoiceReminderSent,
-  invoice_cancelled: handleInvoiceCancelled,
-  invoice_created: handleInvoiceCreated,
+  story_published: handleStoryPublished,
+  story_pinned: handleStoryPinned,
+  highlight_created: handleHighlightCreated,
+  highlight_pinned: handleHighlightPinned,
+  playbook_created: handlePlaybookCreated,
+  playbook_published: handlePlaybookPublished,
+  goal_created: handleGoalCreated,
+  goal_completed: handleGoalCompleted,
+  subscription_upgraded: handleSubscriptionUpgraded,
+  subscription_downgraded: handleSubscriptionDowngraded,
 };
 
 export function getNotificationDescription(
@@ -557,5 +228,5 @@ export function getNotificationDescription(
   if (handler) {
     return handler(metadata, user, t);
   }
-  return t("notifications.default.title");
+  return "New notification";
 }

@@ -49,7 +49,6 @@ export async function getUserContext({
     teamId,
     teamName: team.name,
     fullName: user.fullName,
-    baseCurrency: team.baseCurrency,
     locale: user.locale ?? "en-US",
     dateFormat: user.dateFormat,
     country,

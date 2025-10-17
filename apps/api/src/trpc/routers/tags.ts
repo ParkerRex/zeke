@@ -1,8 +1,8 @@
 import {
-  createTagInputSchema,
-  deleteTagInputSchema,
-  tagSchema,
-  updateTagInputSchema,
+  createTagSchema,
+  deleteTagSchema,
+  tagResponseSchema,
+  updateTagSchema,
 } from "@api/schemas/tags";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { createTag, deleteTag, getTags, updateTag } from "@zeke/db/queries";
@@ -10,7 +10,7 @@ import { z } from "@hono/zod-openapi";
 
 export const tagsRouter = createTRPCRouter({
   list: protectedProcedure
-    .output(z.array(tagSchema))
+    .output(z.array(tagResponseSchema))
     .query(async ({ ctx: { db, teamId } }) => {
       if (!teamId) {
         return [];
@@ -21,8 +21,8 @@ export const tagsRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(createTagInputSchema)
-    .output(tagSchema)
+    .input(createTagSchema)
+    .output(tagResponseSchema)
     .mutation(async ({ ctx: { db, teamId }, input }) => {
       if (!teamId) {
         throw new Error("Active team required");
@@ -37,8 +37,8 @@ export const tagsRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure
-    .input(deleteTagInputSchema)
-    .output(tagSchema.nullable())
+    .input(deleteTagSchema)
+    .output(tagResponseSchema.nullable())
     .mutation(async ({ ctx: { db, teamId }, input }) => {
       if (!teamId) {
         return null;
@@ -53,8 +53,8 @@ export const tagsRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(updateTagInputSchema)
-    .output(tagSchema)
+    .input(updateTagSchema)
+    .output(tagResponseSchema)
     .mutation(async ({ ctx: { db, teamId }, input }) => {
       if (!teamId) {
         throw new Error("Active team required");

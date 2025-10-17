@@ -5,7 +5,7 @@ export type HighlightReferenceRow = {
   highlightId: string;
   turnId: string;
   sourceUrl: string | null;
-  storyId: string;
+  storyId: string | null;
   chapterId: string | null;
   speaker: string | null;
   content: string | null;
@@ -18,7 +18,7 @@ export type HighlightReference = {
   highlightId: string;
   turnId: string;
   sourceUrl: string | null;
-  storyId: string;
+  storyId: string | null;
   chapterId: string | null;
   speaker: string | null;
   content: string | null;

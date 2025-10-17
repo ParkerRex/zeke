@@ -1,6 +1,4 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import type { RouterOutputs } from "@api/trpc/routers/_app";
 import { Icons } from "@zeke/ui/icons";
@@ -17,7 +15,6 @@ type Props = {
 };
 
 export function InboxStatus({ item }: Props) {
-  // Don't show status for processing items - let skeleton handle the visual feedback
   if (item.status === "processing" || item.status === "new") {
     return null;
   }
@@ -33,31 +30,7 @@ export function InboxStatus({ item }: Props) {
             </div>
           </TooltipTrigger>
           <TooltipContent sideOffset={10} className="text-xs">
-            <p>
-              We're reviewing the file and checking <br />
-              for a matching transaction
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-
-  if (item.status === "suggested_match") {
-    return (
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex space-x-1.5 items-center px-1.5 py-0.5 text-[10px] cursor-default font-mono border">
-              <div className="w-1.5 h-1.5 bg-[#FFD02B] rounded-full" />
-              <span>Suggested match</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent sideOffset={10} className="text-xs">
-            <p>
-              We found a possible match — confirm <br />
-              or dismiss it
-            </p>
+            <p>Analyzing content</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -74,31 +47,25 @@ export function InboxStatus({ item }: Props) {
             </div>
           </TooltipTrigger>
           <TooltipContent sideOffset={10} className="text-xs">
-            <p>
-              We didn't find a match yet — we'll check <br />
-              again when new transactions arrive
-            </p>
+            <p>Awaiting processing</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );
   }
 
-  if (item.status === "done" || item?.transactionId) {
+  if (item.status === "done") {
     return (
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="flex space-x-1 items-center px-1.5 py-0.5 text-[10px] cursor-default font-mono border">
               <Icons.Check className="size-3.5 mt-[1px]" />
-              <span>Matched</span>
+              <span>Processed</span>
             </div>
           </TooltipTrigger>
           <TooltipContent sideOffset={10} className="text-xs">
-            <p>
-              This file has been successfully <br />
-              matched to a transaction
-            </p>
+            <p>Content has been processed</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -110,14 +77,11 @@ export function InboxStatus({ item }: Props) {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex space-x-1 items-center px-1.5 py-0.5 text-[10px] cursor-default font-mono border">
-            <span>No match</span>
+            <span>Unprocessed</span>
           </div>
         </TooltipTrigger>
         <TooltipContent sideOffset={10} className="text-xs">
-          <p>
-            We couldn't find a match — please <br />
-            select the transaction manually
-          </p>
+          <p>Content needs review</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

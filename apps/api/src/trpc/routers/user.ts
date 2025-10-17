@@ -24,16 +24,18 @@ export const userRouter = createTRPCRouter({
 
   delete: protectedProcedure.mutation(
     async ({ ctx: { supabase, db, session } }) => {
-      const [data] = await Promise.all([
+      const results = await Promise.all([
         deleteUser(db, session.user.id),
         supabase.auth.admin.deleteUser(session.user.id),
-        resend.contacts.remove({
-          email: session.user.email!,
-          audienceId: process.env.RESEND_AUDIENCE_ID!,
-        }),
+        resend
+          ? resend.contacts.remove({
+              email: session.user.email!,
+              audienceId: process.env.RESEND_AUDIENCE_ID!,
+            })
+          : Promise.resolve(null),
       ]);
 
-      return data;
+      return results[0];
     },
   ),
 

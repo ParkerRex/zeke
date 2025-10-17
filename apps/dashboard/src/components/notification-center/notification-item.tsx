@@ -1,6 +1,4 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import {
   type Activity,
@@ -13,6 +11,13 @@ import { Button } from "@zeke/ui/button";
 import { cn } from "@zeke/ui/cn";
 import { Icons } from "@zeke/ui/icons";
 import { formatDistanceToNow } from "date-fns";
+import {
+  MdDescription,
+  MdOutlineStyle,
+  MdOutlineMenuBook,
+  MdOutlineTask,
+  MdOutlineAccountBalance,
+} from "react-icons/md";
 import { getNotificationDescription } from "./notification-descriptions";
 import { NotificationLink } from "./notification-link";
 
@@ -36,17 +41,16 @@ export function NotificationItem({
   const metadata = getMetadata(activity);
 
   const getNotificationIcon = (activityType: string) => {
-    if (activityType.startsWith("invoice_"))
-      return <Icons.Invoice className="size-4" />;
-    if (activityType.startsWith("transaction"))
-      return <Icons.Transactions className="size-4" />;
-    if (activityType === "inbox_new")
-      return <Icons.Inbox2 className="size-4" />;
-    if (activityType.startsWith("inbox_") && activityType.includes("matched"))
-      return <Icons.Match className="size-4" />;
-    if (activityType === "inbox_needs_review")
-      return <Icons.AlertCircle className="size-4" />;
-    if (activityType === "match") return <Icons.Match className="size-4" />;
+    if (activityType.startsWith("story_"))
+      return <MdDescription className="size-4" />;
+    if (activityType.startsWith("highlight_"))
+      return <MdOutlineStyle className="size-4" />;
+    if (activityType.startsWith("playbook_"))
+      return <MdOutlineMenuBook className="size-4" />;
+    if (activityType.startsWith("goal_"))
+      return <MdOutlineTask className="size-4" />;
+    if (activityType.startsWith("subscription_"))
+      return <MdOutlineAccountBalance className="size-4" />;
     return <Icons.Notifications className="size-4" />;
   };
 
@@ -74,9 +78,7 @@ export function NotificationItem({
           {description}
         </p>
         <span className="text-xs text-[#606060]">
-          {t("notifications.time_ago", {
-            time: formatDistanceToNow(new Date(activity.createdAt)),
-          })}
+          {formatDistanceToNow(new Date(activity.createdAt))} ago
         </span>
       </div>
     </>
@@ -89,7 +91,7 @@ export function NotificationItem({
         variant="secondary"
         className="rounded-full bg-transparent dark:hover:bg-[#1A1A1A] hover:bg-[#F6F6F3]"
         onClick={() => markMessageAsRead(id)}
-        title={t("notifications.archive_button")}
+        title="Archive notification"
       >
         <Icons.Inventory2 />
       </Button>

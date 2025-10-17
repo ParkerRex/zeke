@@ -88,12 +88,6 @@ export function InboxView() {
     queryClient.invalidateQueries({
       queryKey: trpc.inbox.getById.queryKey(),
     });
-
-    if (shouldInvalidateTransactions) {
-      queryClient.invalidateQueries({
-        queryKey: trpc.transactions.get.infiniteQueryKey(),
-      });
-    }
   };
 
   // Debounced handler for regular updates

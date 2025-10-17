@@ -89,7 +89,7 @@ docker build -t zeke-website:local -f apps/website/Dockerfile .
 docker build -t zeke-engine:local -f apps/engine/Dockerfile .
 ```
 
-**Note**: Build context is the monorepo root (`.`) because Turbo needs to prune workspaces.
+**Note**: Build context is the monorepo root (`.`) so Bun can resolve workspace dependencies during `bun install`.
 
 ### CI/CD
 
@@ -120,10 +120,6 @@ Services without a profile (like Redis in dev) run by default.
 **"Missing environment variables"**
 - Ensure all required env files exist in `deploy/env/{environment}/`
 - Copy from `.env.example` files and fill in values
-
-**"turbo prune failed"**
-- Make sure you're building from the monorepo root with `-f` flag
-- The Dockerfile copies the entire monorepo to allow Turbo pruning
 
 **"Container fails to start"**
 - Check logs: `docker compose --profile staging logs <service-name>`

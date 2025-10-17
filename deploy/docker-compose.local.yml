@@ -1,25 +1,10 @@
 version: "3.9"
 
 services:
-  caddy:
-    profiles: ["production"]  # Disable Caddy for local development
-
   website:
     ports:
       - "3000:3000"
-
-  dashboard:
-    ports:
-      - "3001:3001"
-
-  api:
-    ports:
-      - "3003:3003"
-
+  
   engine:
     ports:
       - "3010:3010"
-
-  redis:
-    ports:
-      - "6379:6379"

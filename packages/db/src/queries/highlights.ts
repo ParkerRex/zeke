@@ -435,9 +435,13 @@ export async function getHighlightFeed(
     case "all":
     default: {
       if (teamId) {
-        baseConditions.push(
-          or(eq(highlights.team_id, teamId), isNull(highlights.team_id)),
+        const condition = or(
+          eq(highlights.team_id, teamId),
+          isNull(highlights.team_id),
         );
+        if (condition) {
+          baseConditions.push(condition);
+        }
       } else {
         baseConditions.push(isNull(highlights.team_id));
       }
@@ -467,28 +471,32 @@ export async function getHighlightFeed(
 
   const whereForIds = combineConditions(idsConditions);
 
-  let idsQuery = db
-    .select({ id: highlights.id })
-    .from(highlights);
+  const idsQuery = (() => {
+    let query = db
+      .select({ id: highlights.id })
+      .from(highlights);
 
-  if (tags?.length) {
-    idsQuery = idsQuery.innerJoin(
-      highlightTags,
-      eq(highlightTags.highlight_id, highlights.id),
-    );
-  }
+    if (tags?.length) {
+      query = query.innerJoin(
+        highlightTags,
+        eq(highlightTags.highlight_id, highlights.id),
+      ) as unknown as typeof query;
+    }
 
-  if (whereForIds) {
-    idsQuery = idsQuery.where(whereForIds);
-  }
+    if (whereForIds) {
+      query = query.where(whereForIds) as typeof query;
+    }
 
-  if (tags?.length) {
-    idsQuery = idsQuery.groupBy(highlights.id);
-  }
+    if (tags?.length) {
+      query = query.groupBy(highlights.id) as typeof query;
+    }
 
-  if (orderExpressions.length > 0) {
-    idsQuery = idsQuery.orderBy(...orderExpressions);
-  }
+    if (orderExpressions.length > 0) {
+      query = query.orderBy(...orderExpressions) as typeof query;
+    }
+
+    return query;
+  })();
 
   const allIds = await idsQuery;
   const total = allIds.length;
@@ -505,14 +513,18 @@ export async function getHighlightFeed(
     return { items: [], total };
   }
 
-  let highlightsQuery = db
-    .select(highlightSelection)
-    .from(highlights)
-    .where(inArray(highlights.id, pagedIds));
+  const highlightsQuery = (() => {
+    let query = db
+      .select(highlightSelection)
+      .from(highlights)
+      .where(inArray(highlights.id, pagedIds));
 
-  if (orderExpressions.length > 0) {
-    highlightsQuery = highlightsQuery.orderBy(...orderExpressions);
-  }
+    if (orderExpressions.length > 0) {
+      query = query.orderBy(...orderExpressions) as typeof query;
+    }
+
+    return query;
+  })();
 
   const rows = (await highlightsQuery) as HighlightBaseRow[];
   const hydrated = await hydrateHighlights(db, rows, teamId ?? null);
@@ -547,8 +559,8 @@ export async function getTrendingHighlights(
   const since = new Date(Date.now() - timeframeMs);
 
   const conditions: SQL[] = [
-    gte(highlights.created_at, since),
-    gt(highlights.confidence, minConfidence),
+    gte(highlights.created_at, since.toISOString()),
+    gt(highlights.confidence, minConfidence.toString()),
   ];
 
   switch (scope) {
@@ -567,9 +579,13 @@ export async function getTrendingHighlights(
     case "all":
     default: {
       if (teamId) {
-        conditions.push(
-          or(eq(highlights.team_id, teamId), isNull(highlights.team_id)),
+        const condition = or(
+          eq(highlights.team_id, teamId),
+          isNull(highlights.team_id),
         );
+        if (condition) {
+          conditions.push(condition);
+        }
       } else {
         conditions.push(isNull(highlights.team_id));
       }
@@ -579,18 +595,22 @@ export async function getTrendingHighlights(
 
   const whereCondition = combineConditions(conditions);
 
-  let query = db.select(highlightSelection).from(highlights);
+  const query = (() => {
+    let q = db.select(highlightSelection).from(highlights);
 
-  if (whereCondition) {
-    query = query.where(whereCondition);
-  }
+    if (whereCondition) {
+      q = q.where(whereCondition) as typeof q;
+    }
 
-  query = query.orderBy(
-    desc(highlights.confidence),
-    desc(highlights.created_at),
-  );
+    q = q.orderBy(
+      desc(highlights.confidence),
+      desc(highlights.created_at),
+    ) as typeof q;
 
-  const rows = (await query.limit(limit)) as HighlightBaseRow[];
+    return q.limit(limit);
+  })();
+
+  const rows = (await query) as HighlightBaseRow[];
 
   if (rows.length === 0) {
     return [];
@@ -603,16 +623,20 @@ async function fetchHighlights(
   db: Database,
   filter: SQL | undefined,
 ): Promise<HighlightBaseRow[]> {
-  let query = db.select(highlightSelection).from(highlights);
+  const query = (() => {
+    let q = db.select(highlightSelection).from(highlights);
 
-  if (filter) {
-    query = query.where(filter);
-  }
+    if (filter) {
+      q = q.where(filter) as typeof q;
+    }
 
-  return query.orderBy(
-    desc(highlights.created_at),
-    highlights.id,
-  ) as unknown as Promise<HighlightBaseRow[]>;
+    return q.orderBy(
+      desc(highlights.created_at),
+      highlights.id,
+    );
+  })();
+
+  return query as unknown as Promise<HighlightBaseRow[]>;
 }
 
 export async function getStoryHighlights(
@@ -635,11 +659,16 @@ export async function getStoryHighlights(
         conditions.push(isNull(highlights.team_id));
         break;
       case "all":
-      default:
-        conditions.push(
-          or(eq(highlights.team_id, params.teamId), isNull(highlights.team_id)),
+      default: {
+        const condition = or(
+          eq(highlights.team_id, params.teamId),
+          isNull(highlights.team_id),
         );
+        if (condition) {
+          conditions.push(condition);
+        }
         break;
+      }
     }
   } else {
     if (scope === "team") {
@@ -667,23 +696,25 @@ export async function createHighlight(
   params: CreateHighlightParams,
 ): Promise<HighlightRecord | null> {
   const highlightId = await db.transaction(async (tx) => {
+    const valuesToInsert = {
+      story_id: params.storyId,
+      team_id: params.teamId,
+      created_by: params.createdBy,
+      chapter_id: params.chapterId ?? null,
+      kind: params.kind ?? undefined,
+      title: params.title ?? null,
+      summary: params.summary ?? null,
+      quote: params.quote ?? null,
+      start_seconds: params.startSeconds != null ? params.startSeconds.toString() : null,
+      end_seconds: params.endSeconds != null ? params.endSeconds.toString() : null,
+      metadata: params.metadata ?? null,
+      origin: params.origin ?? undefined,
+      origin_metadata: params.originMetadata ?? null,
+    } satisfies typeof highlights.$inferInsert;
+
     const [inserted] = await tx
       .insert(highlights)
-      .values({
-        story_id: params.storyId,
-        team_id: params.teamId,
-        created_by: params.createdBy,
-        chapter_id: params.chapterId ?? null,
-        kind: params.kind ?? undefined,
-        title: params.title ?? null,
-        summary: params.summary ?? null,
-        quote: params.quote ?? null,
-        start_seconds: params.startSeconds ?? null,
-        end_seconds: params.endSeconds ?? null,
-        metadata: params.metadata ?? null,
-        origin: params.origin ?? undefined,
-        origin_metadata: params.originMetadata ?? null,
-      })
+      .values(valuesToInsert)
       .returning({ id: highlights.id });
 
     if (!inserted) {
@@ -1042,7 +1073,7 @@ export async function getPrioritizedHighlights(
     summary: string | null;
     quote: string | null;
     confidence: string | null;
-    metadata: Record<string, unknown> | null;
+    metadata: unknown;
     createdAt: string | null;
     storyTitle: string | null;
     storyPublishedAt: string | null;
@@ -1091,7 +1122,7 @@ export async function getHighlightsByKind(
     summary: string | null;
     quote: string | null;
     confidence: string | null;
-    metadata: Record<string, unknown> | null;
+    metadata: unknown;
     createdAt: string | null;
     storyTitle: string | null;
     storyPublishedAt: string | null;

@@ -10,7 +10,7 @@ export const upsertApiKeySchema = z.object({
   }),
   scopes: z.array(z.enum(SCOPES)).openapi({
     description: "The scopes of the API key",
-    example: ["bank-accounts.read", "bank-accounts.write"],
+    example: ["stories.read", "stories.write"],
   }),
 });
 

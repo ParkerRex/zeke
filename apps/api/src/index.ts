@@ -121,7 +121,7 @@ app.get("/health/db", async (c) => {
   try {
     // Test with a simple query
     const testStart = Date.now();
-    await db.execute(sql`SELECT 1 as test`);
+    await db.execute(sql.raw(`SELECT 1 as test`));
     const queryTime = Date.now() - testStart;
 
     const totalTime = Date.now() - startTime;

@@ -1,10 +1,10 @@
 import { z } from "@hono/zod-openapi";
 
 export const highlightOriginSchema = z
-  .enum(["user", "assistant", "system"])
+  .enum(["user", "system"])
   .openapi({
     description: "Source of the highlight content",
-    example: "assistant",
+    example: "user",
   });
 
 export const highlightShareScopeSchema = z
@@ -76,11 +76,11 @@ export const createHighlightInputSchema = z
       description: "End timestamp for media clips",
       example: 140,
     }),
-    metadata: z.record(z.unknown()).optional().openapi({
+    metadata: z.record(z.string(), z.unknown()).optional().openapi({
       description: "Additional metadata for downstream tooling",
     }),
     origin: highlightOriginSchema.optional(),
-    originMetadata: z.record(z.unknown()).optional().openapi({
+    originMetadata: z.record(z.string(), z.unknown()).optional().openapi({
       description: "Metadata about the source system",
     }),
   })
@@ -106,7 +106,7 @@ export const highlightReferenceSchema = z
       description: "Optional supporting URL",
       example: "https://youtube.com/watch?v=abc123&t=123",
     }),
-    storyId: z.string().uuid().openapi({
+    storyId: z.string().uuid().nullable().openapi({
       description: "Story that contains the reference",
       example: "9f3a4c3f-6f5a-4d2e-97cf-0b3e20a1f4f2",
     }),
@@ -258,10 +258,10 @@ export const highlightSchema = z
       description: "Whether the highlight was AI generated",
       example: true,
     }),
-    metadata: z.record(z.unknown()).nullable().openapi({
+    metadata: z.record(z.string(), z.unknown()).nullable().openapi({
       description: "Additional AI metadata",
     }),
-    originMetadata: z.record(z.unknown()).nullable().openapi({
+    originMetadata: z.record(z.string(), z.unknown()).nullable().openapi({
       description: "Metadata from the originating system",
     }),
     createdAt: z.string().nullable().openapi({
@@ -492,7 +492,7 @@ export const prioritizedHighlightSchema = z
     summary: z.string().nullable(),
     quote: z.string().nullable(),
     confidence: z.string().nullable(),
-    metadata: z.record(z.unknown()).nullable(),
+    metadata: z.unknown(),
     createdAt: z.string().nullable(),
     storyTitle: z.string().nullable(),
     storyPublishedAt: z.string().nullable(),

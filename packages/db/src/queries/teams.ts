@@ -188,7 +188,7 @@ export async function getTeamMembers(db: Database, teamId: string) {
     .select({
       id: usersOnTeam.id,
       role: usersOnTeam.role,
-      team_id: usersOnTeam.teamId,
+      teamId: usersOnTeam.teamId,
       user: {
         id: users.id,
         fullName: users.fullName,

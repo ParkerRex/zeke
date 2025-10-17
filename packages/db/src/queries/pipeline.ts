@@ -15,7 +15,7 @@ export type PipelineRawItem = {
   title: string | null;
   kind: string;
   status: string;
-  createdAt: string;
+  createdAt: string | null;
 };
 
 export type PipelineContent = {
@@ -24,7 +24,7 @@ export type PipelineContent = {
   htmlUrl: string | null;
   contentType: string;
   languageCode: string | null;
-  extractedAt: string;
+  extractedAt: string | null;
 };
 
 export type PipelineStory = {
@@ -34,7 +34,7 @@ export type PipelineStory = {
   primaryUrl: string | null;
   kind: string;
   publishedAt: string | null;
-  createdAt: string;
+  createdAt: string | null;
 };
 
 export type PipelineActivity = {

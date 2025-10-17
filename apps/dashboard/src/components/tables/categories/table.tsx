@@ -26,59 +26,39 @@ import {
   TableRow,
 } from "@zeke/ui/table";
 import React from "react";
-import { columns, flattenCategories } from "./columns";
+import { columns } from "./columns";
 import { Header } from "./header";
 
 export function DataTable() {
   const [isOpen, onOpenChange] = React.useState(false);
-  const [expandedCategories, setExpandedCategories] = React.useState<
-    Set<string>
-  >(new Set());
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
   const { data } = useSuspenseQuery(
-    trpc.transactionCategories.get.queryOptions(),
+    trpc.tags.list.queryOptions(),
   );
 
-  const deleteCategoryMutation = useMutation(
-    trpc.transactionCategories.delete.mutationOptions({
+  const deleteTagMutation = useMutation(
+    trpc.tags.delete.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.transactionCategories.get.queryKey(),
+          queryKey: trpc.tags.list.queryKey(),
         });
       },
     }),
   );
 
-  // Flatten categories and filter based on expanded state
-  const flattenedData = React.useMemo(() => {
-    const flattened = flattenCategories(data ?? []);
-
-    // Filter to only show parent categories and children of expanded parents
-    return flattened.filter((category) => {
-      // Always show parent categories
-      if (!category.isChild) {
-        return true;
-      }
-      // Only show children if their parent is expanded
-      return category.parentId && expandedCategories.has(category.parentId);
-    });
-  }, [data, expandedCategories]);
-
   const table = useReactTable({
-    data: flattenedData,
+    data: data ?? [],
     getRowId: ({ id }) => id,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
-      deleteCategory: (id: string) => {
-        deleteCategoryMutation.mutate({ id });
+      deleteTag: (id: string) => {
+        deleteTagMutation.mutate({ id });
       },
-      expandedCategories,
-      setExpandedCategories,
     },
   });
 

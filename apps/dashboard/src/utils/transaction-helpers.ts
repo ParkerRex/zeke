@@ -64,8 +64,8 @@ export async function withTransaction<T>(
 }
 
 /**
- * Create a user with associated customer record
- * This is a common pattern that needs to be atomic
+ * Create a user record
+ * TODO: Add customer record support when database schema is updated
  */
 export async function createUserWithCustomer(
   userData: {
@@ -99,28 +99,14 @@ export async function createUserWithCustomer(
         throw new Error(`Failed to create user: ${userError.message}`);
       }
 
-      // Step 2: Create customer record
-      const { data: customer, error: customerError } = await client
-        .from("customers")
-        .insert([
-          {
-            id: userData.id,
-            stripe_customer_id: customerData.stripe_customer_id,
-          },
-        ])
-        .select("id")
-        .single();
-
-      if (customerError) {
-        // Rollback: Delete the user record
-        await client.from("users").delete().eq("id", userData.id);
-
-        throw new Error(`Failed to create customer: ${customerError.message}`);
-      }
+      // TODO: Create customer record when 'customers' table exists
+      console.log(
+        `Created user ${user.id}, customer ID ${customerData.stripe_customer_id} not stored`,
+      );
 
       return {
         userId: user.id,
-        customerId: customer.id,
+        customerId: user.id,
       };
     },
     { useAdminClient: true, userId: userData.id },

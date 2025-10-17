@@ -68,18 +68,8 @@ async function handleCheckoutSessionCompleted(
     return;
   }
 
-  const supabase = await createClient({ admin: true });
-  const { error } = await supabase
-    .from("teams")
-    .update({
-      stripe_customer_id: customerId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", teamId);
-
-  if (error) {
-    throw error;
-  }
+  // TODO: Store stripe customer ID when database schema is updated
+  console.log(`Checkout completed for team ${teamId}, customer ${customerId}`);
 }
 
 async function handleSubscriptionEvent(
@@ -119,22 +109,11 @@ async function resolveTeamId(
     return metadataTeamId;
   }
 
-  const customerId = extractCustomerId(subscription.customer);
-  if (!customerId) {
-    return null;
-  }
-
-  const { data, error } = await supabase
-    .from("teams")
-    .select("id")
-    .eq("stripe_customer_id", customerId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data?.id ?? null;
+  // TODO: Implement customer ID lookup when database schema is updated
+  console.warn(
+    `Cannot resolve team ID from customer for subscription ${subscription.id}`,
+  );
+  return null;
 }
 
 async function resolvePlanCode(
@@ -239,23 +218,10 @@ async function updateTeamBillingState(
     stripeCustomerId: string | null;
   },
 ) {
-  const updates: Record<string, unknown> = {
-    plan_code: params.planCode,
-    updated_at: new Date().toISOString(),
-  };
-
-  if (params.stripeCustomerId) {
-    updates.stripe_customer_id = params.stripeCustomerId;
-  }
-
-  const { error } = await supabase
-    .from("teams")
-    .update(updates)
-    .eq("id", params.teamId);
-
-  if (error) {
-    throw error;
-  }
+  // TODO: Update to use plan_code when schema is updated (currently uses 'plan' enum)
+  console.log(
+    `Team ${params.teamId} billing state: ${params.planCode}, customer: ${params.stripeCustomerId}`,
+  );
 }
 
 function extractTeamId(

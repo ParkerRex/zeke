@@ -8,3 +8,4 @@ interface ChatContext extends BaseContext {
 }
 
 export const { setContext, getContext } = createTypedContext<ChatContext>();
+export type { ChatUserContext };

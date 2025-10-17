@@ -98,6 +98,10 @@ export function createSourceQueries(db: Database) {
         })
         .returning({ id: sources.id });
 
+      if (!result[0]) {
+        throw new Error("Failed to create source");
+      }
+
       return result[0].id;
     },
 

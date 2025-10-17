@@ -138,12 +138,12 @@ function mapStory(row: StoryRow): StoryClusterStory {
 
 async function fetchStoryRows(
   db: Database,
-  filter: SQL | null,
+  filter: SQL | null | undefined,
   options: { limit?: number; offset?: number } = {},
 ): Promise<StoryRow[]> {
   const { limit, offset } = options;
 
-  let query = db
+  let queryBuilder = db
     .select({
       id: stories.id,
       clusterId: stories.cluster_id,
@@ -166,27 +166,28 @@ async function fetchStoryRows(
     })
     .from(stories)
     .innerJoin(contents, eq(contents.id, stories.content_id))
-    .leftJoin(storyOverlays, eq(storyOverlays.story_id, stories.id));
+    .leftJoin(storyOverlays, eq(storyOverlays.story_id, stories.id))
+    .$dynamic();
 
   if (filter) {
-    query = query.where(filter);
+    queryBuilder = queryBuilder.where(filter);
   }
 
-  query = query.orderBy(
+  queryBuilder = queryBuilder.orderBy(
     desc(stories.published_at),
     desc(stories.created_at),
     stories.id,
   );
 
   if (typeof limit === "number") {
-    query = query.limit(limit);
+    queryBuilder = queryBuilder.limit(limit);
   }
 
   if (typeof offset === "number" && offset > 0) {
-    query = query.offset(offset);
+    queryBuilder = queryBuilder.offset(offset);
   }
 
-  return query as unknown as Promise<StoryRow[]>;
+  return queryBuilder as unknown as Promise<StoryRow[]>;
 }
 
 function buildFilters(
@@ -196,7 +197,7 @@ function buildFilters(
     clusterId: string;
     search: string | null;
   }> = {},
-): SQL | null {
+): SQL | null | undefined {
   const conditions: SQL[] = [];
 
   if (params.clusterId) {
@@ -338,7 +339,8 @@ export async function listStoriesWithOverlays(
     (async () => {
       let countQuery = db
         .select({ count: sql<number>`cast(count(*) as int)` })
-        .from(stories);
+        .from(stories)
+        .$dynamic();
 
       if (filter) {
         countQuery = countQuery.where(filter);

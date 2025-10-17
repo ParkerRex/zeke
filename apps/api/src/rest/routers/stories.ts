@@ -118,7 +118,7 @@ app.openapi(
       });
 
       if (metrics.length > 0) {
-        detail.metrics = metrics[0];
+        detail.metrics = metrics[0] ?? null;
       }
     }
 

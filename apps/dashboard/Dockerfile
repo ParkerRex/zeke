@@ -1,28 +1,14 @@
-# syntax=docker/dockerfile:1.7
-
-FROM oven/bun:1.2.22 AS base
+FROM oven/bun:1.2.22 AS builder
 WORKDIR /app
 
-FROM base AS turbo
-RUN bun add -g turbo
-
-FROM turbo AS prune
-WORKDIR /app
-COPY . .
-RUN turbo prune @zeke/dashboard --docker
-
-FROM base AS deps
-WORKDIR /app
-COPY --from=prune /app/out/json/ ./
-RUN bun install --frozen-lockfile
-
-FROM deps AS builder
-WORKDIR /app
-COPY --from=prune /app/out/full/ ./
-RUN bun install --frozen-lockfile
+# Install Node 20 for Next.js optimizations that expect a Node runtime
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs && rm -rf /var/lib/apt/lists/*
+
+COPY . .
+RUN bun install --frozen-lockfile
+
 WORKDIR /app/apps/dashboard
 ARG NEXT_PUBLIC_URL
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID

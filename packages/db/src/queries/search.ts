@@ -6,7 +6,7 @@ export type GlobalSearchReturnType = {
   type: string;
   title: string;
   relevance: number;
-  created_at: string;
+  createdAt: string;
   data: any;
 };
 
@@ -33,8 +33,7 @@ export type GlobalSemanticSearchParams = {
  *
  * - Dynamically builds a query for each table type requested in `params.types`
  * - Applies full-text search (with prefix matching) if a search term is provided
- * - Applies date, amount, status, and currency filters as appropriate for each table
- * - Handles due date filters for invoices
+ * - Applies date, status, and other filters as appropriate for each table
  * - Returns a unified result set with type, id, relevance, created_at, and data
  * - Orders by relevance (if searching) or created_at, and limits results per table
  */
@@ -55,7 +54,7 @@ export async function globalSemanticSearchQuery(
   // team_id (uuid), search_term (text), start_date (text), end_date (text), types (text[]),
   // amount (numeric), amount_min (numeric), amount_max (numeric), status (text), currency (text),
   // language (text), due_date_start (text), due_date_end (text), max_results (integer), items_per_table_limit (integer)
-  const result: GlobalSearchReturnType[] = await db.execute(
+  const result = await db.execute<GlobalSearchReturnType>(
     sql`SELECT * FROM global_semantic_search(
         ${params.teamId ?? null},                    -- team_id (uuid)
         ${params.searchTerm ?? null},                -- search_term (text)
@@ -75,7 +74,7 @@ export async function globalSemanticSearchQuery(
       )`,
   );
 
-  return result;
+  return result.rows as GlobalSearchReturnType[];
 }
 
 type GlobalSearchParams = {
@@ -91,7 +90,7 @@ export async function globalSearchQuery(
   db: Database,
   params: GlobalSearchParams,
 ) {
-  const result: GlobalSearchReturnType[] = await db.executeOnReplica(
+  const result = await db.execute<GlobalSearchReturnType>(
     sql`SELECT * FROM global_search(
         ${params.searchTerm ?? null},
         ${params.teamId ?? null},
@@ -102,5 +101,5 @@ export async function globalSearchQuery(
       )`,
   );
 
-  return result;
+  return result.rows as GlobalSearchReturnType[];
 }

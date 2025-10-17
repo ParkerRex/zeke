@@ -419,10 +419,9 @@ Drizzle Flow
   into src/types/db.ts.
   - Commit the regenerated types together with the migration so downstream apps
   (@zeke/supabase) stay in sync.
-  - If you need to verify everything end-to-end, rerun the relevant service (bunx
-  turbo dev --filter=@zeke/api, etc.) and/or whatever tests exercise the new tables
+  - If you need to verify everything end-to-end, rerun the relevant service (`bun run
+  dev:api`, etc.) and/or whatever tests exercise the new tables
   before opening a PR.
-
 
 
 

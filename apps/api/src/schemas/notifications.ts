@@ -128,7 +128,7 @@ export const notificationSchema = z
     }),
     type: z.string().openapi({
       description: "Type of notification",
-      example: "transactions_created",
+      example: "story_published",
     }),
     priority: z.number().int().min(1).max(10).openapi({
       description:

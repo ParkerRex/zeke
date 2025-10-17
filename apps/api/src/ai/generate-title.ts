@@ -54,16 +54,16 @@ export const generateTitle = async ({
       - Return only the title, nothing else
 
       Examples of good natural titles:
-      - "Latest transactions"
+      - "Latest research insights"
       - "Monthly expenses" 
       - "Burn rate analysis"
-      - "Q1 spending review"
+      - "Q1 research progress"
       - "Recent payments"
       - "Cash flow overview"
       - "Expense breakdown"
       - "Financial summary"
       - "Transaction search"
-      - "Pending transactions"
+      - "Pending highlights"
 
       Avoid these patterns:
       - "Advanced transaction analysis"

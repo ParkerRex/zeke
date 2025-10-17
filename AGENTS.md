@@ -1,12 +1,12 @@
 # Zeke - Project Architecture & Agent Documentation
 
 ## Commands
-- **Build**: `bun run build` (runs turbo build across all workspaces)
-- **Lint**: `bun run lint` (runs turbo lint + manypkg check); `bun run format` (biome format)
-- **Typecheck**: `bun run typecheck` (runs turbo typecheck)
-- **Test All**: `bun run test` (runs turbo test --parallel)
+- **Build**: `bun run build` (runs the sequential build script across packages and apps)
+- **Lint**: `bun run lint` (Biome lint + manypkg check); `bun run format` (Biome formatter)
+- **Typecheck**: `bun run typecheck` (runs each app typecheck sequentially)
+- **Test All**: Run workspace tests individually (`cd apps/api && bun run test`, etc.)
 - **Test Single File**: `cd apps/api && bun test path/to/file.test.ts` (use Bun test runner)
-- **Dev All**: `bun dev` (starts redis + all apps via turbo)
+- **Dev All**: `bun dev` (starts Redis and all apps via the orchestration scripts)
 - **Dev Single**: `bun run dev:api` / `dev:dashboard` / `dev:website` / `dev:desktop`
 - **Docker Local**: `./deploy/run-local.sh` (builds and runs full stack in Docker)
 - **Docker Logs**: `cd deploy && docker compose --profile staging logs -f`
@@ -15,7 +15,7 @@
 - **DB Studio**: `cd packages/db && bun run migrate:studio`
 
 ## Architecture
-Monorepo using Bun + pnpm workspaces + Turbo. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (Trigger.dev), **ui** (React components), **supabase** (auth client), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
+Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (Trigger.dev), **ui** (React components), **supabase** (auth client), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
 
 ## Database
 - **Schema**: `packages/db/src/schema.ts` (Drizzle ORM, snake_case DB → camelCase app via `casing: "snake_case"`)

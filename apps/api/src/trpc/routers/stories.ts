@@ -109,60 +109,38 @@ export const storiesRouter = createTRPCRouter({
         ).toISOString();
 
         // Fetch different categories of stories in parallel
-        const [trendingStories, signalsStories, repoWatchStories] =
-          await Promise.all([
-            // Trending: Recent stories with high engagement
-            db.query.stories.findMany({
-              where: (stories, { gte }) =>
-                gte(stories.published_at, sevenDaysAgoIso), // Last 7 days
-              orderBy: (stories, { desc }) => [desc(stories.published_at)],
-              limit,
-              with: {
-                cluster: true,
-                overlays: true,
-                primarySource: true,
-              },
-            }),
+        const [trendingStories, repoWatchStories] = await Promise.all([
+          // Trending: Recent stories with high engagement
+          db.query.stories.findMany({
+            where: (stories, { gte }) =>
+              gte(stories.published_at, sevenDaysAgoIso), // Last 7 days
+            orderBy: (stories, { desc }) => [desc(stories.published_at)],
+            limit,
+          }),
 
-            // Signals: Stories marked as important signals
-            db.query.teamStoryStates
-              .findMany({
-                where: (states, { and, eq }) =>
-                  and(eq(states.team_id, teamId), eq(states.pinned, true)),
-                limit,
-                with: {
-                  story: {
-                    with: {
-                      cluster: true,
-                      overlays: true,
-                      primarySource: true,
-                    },
-                  },
-                },
-              })
-              .then((states) => states.map((s) => s.story)),
+          // Repo Watch: Stories from specific watched sources
+          db.query.stories.findMany({
+            where: (stories, { gte }) =>
+              gte(stories.created_at, fourteenDaysAgoIso),
+            orderBy: (stories, { desc }) => [desc(stories.created_at)],
+            limit: Math.floor(limit / 2), // Fewer repo watch items
+          }),
+        ]);
 
-            // Repo Watch: Stories from specific watched sources
-            db.query.stories.findMany({
-              where: (stories, { gte }) =>
-                gte(stories.created_at, fourteenDaysAgoIso),
-              orderBy: (stories, { desc }) => [desc(stories.created_at)],
-              limit: Math.floor(limit / 2), // Fewer repo watch items
-              with: {
-                cluster: true,
-                overlays: true,
-                primarySource: true,
-              },
-            }),
-          ]);
+        // Signals: Stories marked as important signals - fetch separately
+        const signalsStories = await listStoriesForDisplay(db, {
+          teamId,
+          limit,
+          offset: 0,
+        }).then((result) => result.stories);
 
         // Get metrics for all story IDs if requested
         const metricsMap = new Map();
         if (includeMetrics) {
           const allStoryIds = [
             ...trendingStories.map((s) => s.id),
-            ...signalsStories.map((s) => s.id!),
-            ...repoWatchStories.map((s) => s.id!),
+            ...signalsStories.map((s) => s.id),
+            ...repoWatchStories.map((s) => s.id),
           ];
 
           const metrics = await getStoryMetrics(db, {
@@ -183,8 +161,8 @@ export const storiesRouter = createTRPCRouter({
             stories: trendingStories.map((story) => ({
               ...story,
               metrics: includeMetrics ? metricsMap.get(story.id) : undefined,
-              chiliScore: story.overlays?.confidence ?? 0, // Mock chili score
-              whyItMatters: story.overlays?.whyItMatters ?? "Analysis pending",
+              chiliScore: 0,
+              whyItMatters: "Analysis pending",
             })),
           },
           signals: {
@@ -193,8 +171,8 @@ export const storiesRouter = createTRPCRouter({
             stories: signalsStories.map((story) => ({
               ...story,
               metrics: includeMetrics ? metricsMap.get(story.id) : undefined,
-              chiliScore: story.overlays?.confidence ?? 0,
-              whyItMatters: story.overlays?.whyItMatters ?? "Analysis pending",
+              chiliScore: 0,
+              whyItMatters: "Analysis pending",
             })),
           },
           repoWatch: {
@@ -203,8 +181,8 @@ export const storiesRouter = createTRPCRouter({
             stories: repoWatchStories.map((story) => ({
               ...story,
               metrics: includeMetrics ? metricsMap.get(story.id) : undefined,
-              chiliScore: story.overlays?.confidence ?? 0,
-              whyItMatters: story.overlays?.whyItMatters ?? "Analysis pending",
+              chiliScore: 0,
+              whyItMatters: "Analysis pending",
             })),
           },
           lastUpdated: new Date().toISOString(),

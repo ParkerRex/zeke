@@ -1,8 +1,8 @@
 "use server";
 
 import { acceptTeamInvite } from "@zeke/db/queries";
-import { connectDb } from "@zeke/db/src/client";
-import { getSession } from "@zeke/supabase/queries/cached-queries";
+import { connectDb } from "@zeke/db/client";
+import { getSession } from "@zeke/supabase/cached-queries";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { authActionClient } from "../safe-action";
 import { respondTeamInviteSchema } from "../schema";

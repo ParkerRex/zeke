@@ -1,7 +1,7 @@
 import type {
   StoryClusterRecord,
   StoryClusterStory,
-} from "@db/src/queries/story-clusters";
+} from "../queries/story-clusters";
 
 export type StorySource = {
   title: string;
@@ -155,9 +155,9 @@ export function mapStoryClusterStoryToView(
     embedUrl,
     overlays: {
       whyItMatters: overlay?.whyItMatters ?? null,
-      briefOneLiner: overlay?.briefOneLiner ?? null,
-      briefTwoLiner: overlay?.briefTwoLiner ?? null,
-      briefElevator: overlay?.briefElevator ?? null,
+      briefOneLiner: null,
+      briefTwoLiner: null,
+      briefElevator: null,
       chili,
       confidence,
       sources,

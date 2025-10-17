@@ -8,7 +8,7 @@ This note captures the repeatable process for producing release images that will
 - Adequate disk space (≈10 GB) for cached layers—clean up with `docker system prune` afterwards.
 
 ## Build Commands
-Run these from the repository root so the `turbo prune` steps can see the whole workspace. Each invocation produces staging and production tags that share the same image ID.
+Run these from the repository root so the Dockerfiles can access the entire workspace for `bun install`. Each invocation produces staging and production tags that share the same image ID.
 
 ```bash
 # Dashboard (needs Debian nodejs inside the builder stage for Next.js optimizations)

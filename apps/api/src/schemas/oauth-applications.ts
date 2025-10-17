@@ -8,12 +8,12 @@ export const createOAuthApplicationSchema = z.object({
   }),
   description: z.string().optional().openapi({
     description: "The description of the OAuth application",
-    example: "A Raycast extension for managing transactions",
+    example: "A Raycast extension for managing research insights",
   }),
   overview: z.string().optional().openapi({
     description: "Detailed overview of the OAuth application",
     example:
-      "This application provides advanced transaction management features including:\n- Real-time sync\n- Advanced filtering",
+      "This application provides advanced research management features including:\n- Real-time sync\n- Advanced filtering",
   }),
   developerName: z.string().optional().openapi({
     description: "The person or company developing this application",
@@ -55,7 +55,7 @@ export const createOAuthApplicationSchema = z.object({
     .default([])
     .openapi({
       description: "Array of scopes requested by the application",
-      example: ["transactions.read", "invoices.read"],
+      example: ["stories.read", "highlights.read", "playbooks.read"],
     }),
   isPublic: z.boolean().default(false).openapi({
     description: "Whether this is a public OAuth application",
@@ -75,7 +75,7 @@ export const updateOAuthApplicationSchema = z.object({
   }),
   description: z.string().optional().openapi({
     description: "The description of the OAuth application",
-    example: "An updated Raycast extension for managing transactions",
+    example: "An updated Raycast extension for managing research insights",
   }),
   overview: z.string().optional().openapi({
     description: "Detailed overview of the OAuth application",
@@ -123,7 +123,7 @@ export const updateOAuthApplicationSchema = z.object({
     .optional()
     .openapi({
       description: "Array of scopes requested by the application",
-      example: ["transactions.read", "invoices.read"],
+      example: ["stories.read", "highlights.read", "playbooks.read"],
     }),
   isPublic: z.boolean().optional().openapi({
     description: "Whether this is a public OAuth application",
@@ -179,12 +179,12 @@ export const oauthApplicationResponseSchema = z.object({
   }),
   description: z.string().nullable().openapi({
     description: "Description of the OAuth application",
-    example: "A Raycast extension for managing transactions",
+    example: "A Raycast extension for managing research insights",
   }),
   overview: z.string().nullable().openapi({
     description: "Detailed overview of the OAuth application",
     example:
-      "This application provides advanced transaction management features including:\n- Real-time sync\n- Advanced filtering",
+      "This application provides advanced research management features including:\n- Real-time sync\n- Advanced filtering",
   }),
   developerName: z.string().nullable().openapi({
     description: "The person or company developing this application",
@@ -219,7 +219,7 @@ export const oauthApplicationResponseSchema = z.object({
   }),
   scopes: z.array(z.string()).openapi({
     description: "Array of scopes for the application",
-    example: ["transactions.read", "invoices.read"],
+    example: ["stories.read", "highlights.read", "playbooks.read"],
   }),
   isPublic: z.boolean().openapi({
     description: "Whether this is a public OAuth application",

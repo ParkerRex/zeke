@@ -17,7 +17,7 @@ export const createCheckoutSessionSchema = z.object({
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
   metadata: z
-    .record(z.string())
+    .record(z.string(), z.string())
     .optional()
     .describe("Additional metadata for the subscription"),
 });
@@ -27,7 +27,7 @@ export const stripeWebhookEventSchema = z.object({
   id: z.string(),
   type: z.string(),
   data: z.object({
-    object: z.record(z.any()),
+    object: z.record(z.string(), z.any()),
   }),
   created: z.number(),
 });

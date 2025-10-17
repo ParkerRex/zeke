@@ -8,53 +8,57 @@ export function createContentQueries(db: Database) {
      * Insert content for a raw item
      */
     async insertContent(params: {
-      raw_item_id: string;
-      text_body: string;
-      html_url?: string | null;
-      pdf_url?: string | null;
-      audio_url?: string | null;
-      content_type?: string;
-      language_code?: string | null;
-      content_hash?: string | null;
-      transcript_url?: string | null;
-      transcript_vtt?: string | null;
-      duration_seconds?: number | null;
-      view_count?: number | null;
+      rawItemId: string;
+      textBody: string;
+      htmlUrl?: string | null;
+      pdfUrl?: string | null;
+      audioUrl?: string | null;
+      contentType?: string;
+      languageCode?: string | null;
+      contentHash?: string | null;
+      transcriptUrl?: string | null;
+      transcriptVtt?: string | null;
+      durationSeconds?: number | null;
+      viewCount?: number | null;
     }): Promise<string> {
       const {
-        raw_item_id,
-        text_body,
-        html_url,
-        pdf_url,
-        audio_url,
-        content_type,
-        language_code,
-        content_hash,
-        transcript_url,
-        transcript_vtt,
-        duration_seconds,
-        view_count,
+        rawItemId,
+        textBody,
+        htmlUrl,
+        pdfUrl,
+        audioUrl,
+        contentType,
+        languageCode,
+        contentHash,
+        transcriptUrl,
+        transcriptVtt,
+        durationSeconds,
+        viewCount,
       } = params;
 
       const result = await db
         .insert(contents)
         .values({
-          raw_item_id,
-          text_body,
-          content_type: content_type ?? "text",
-          html_url: html_url ?? undefined,
-          pdf_url: pdf_url ?? undefined,
-          audio_url: audio_url ?? undefined,
-          language_code: language_code ?? undefined,
-          content_hash: content_hash ?? undefined,
-          transcript_url: transcript_url ?? undefined,
-          transcript_vtt: transcript_vtt ?? undefined,
-          duration_seconds: duration_seconds ?? undefined,
-          view_count: view_count ?? undefined,
+          raw_item_id: rawItemId,
+          text_body: textBody,
+          content_type: contentType ?? "text",
+          html_url: htmlUrl ?? null,
+          pdf_url: pdfUrl ?? null,
+          audio_url: audioUrl ?? null,
+          language_code: languageCode ?? null,
+          content_hash: contentHash ?? "",
+          transcript_url: transcriptUrl ?? null,
+          transcript_vtt: transcriptVtt ?? null,
+          duration_seconds: durationSeconds ?? null,
+          view_count: viewCount ?? null,
         })
         .returning({ id: contents.id });
 
-      return result[0].id;
+      if (!result || result.length === 0) {
+        throw new Error("Failed to create content record");
+      }
+      
+      return result[0]!.id;
     },
 
     /**
@@ -92,7 +96,7 @@ export function createContentQueries(db: Database) {
         .from(contents)
         .where(eq(contents.raw_item_id, rawItemId));
 
-      return result[0].count > 0;
+      return (result[0]?.count ?? 0) > 0;
     },
   };
 }

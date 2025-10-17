@@ -3,37 +3,41 @@
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "build": "turbo build",
+    "build": "./scripts/build.sh",
     "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo clean",
-    "redis:start": "docker compose up -d",
-    "redis:stop": "docker compose down",
-    "redis:logs": "docker compose logs -f redis",
-    "dev": "bun run redis:start && turbo dev --parallel",
-    "test": "turbo test --parallel",
-    "start:dashboard": "turbo start --filter=@zeke/dashboard",
-    "start:website": "turbo start --filter=@zeke/website",
-    "dev:api": "turbo dev --filter=@zeke/api",
-    "dev:dashboard": "turbo dev --filter=@zeke/dashboard",
-    "build:dashboard": "turbo build --filter=@zeke/dashboard",
-    "dev:website": "turbo dev --filter=@zeke/website ",
-    "dev:desktop": "turbo dev --filter=@zeke/desktop",
-    "jobs:dashboard": "turbo jobs --filter=@zeke/jobs",
+    "dev": "./scripts/start-all.sh",
+    "stop": "./scripts/stop-all.sh",
+    "dev:api": "./scripts/start-api.sh",
+    "dev:dashboard": "./scripts/start-dashboard.sh",
+    "dev:website": "./scripts/start-website.sh",
+    "dev:desktop": "./scripts/start-desktop.sh",
+    "redis:start": "./scripts/start-redis.sh",
+    "redis:stop": "docker stop zeke-redis",
+    "docker:build:local": "./scripts/containers.sh build local",
+    "docker:up:local": "./scripts/containers.sh up local",
+    "docker:down:local": "./scripts/containers.sh down local",
+    "docker:logs:local": "./scripts/containers.sh logs local",
+    "docker:build:staging": "./scripts/containers.sh build staging",
+    "docker:deploy:staging": "./scripts/containers.sh deploy staging",
+    "docker:build:prod": "./scripts/containers.sh build prod",
+    "docker:deploy:prod": "./scripts/containers.sh deploy prod",
     "db:migrate": "cd packages/db && bun run migrate:dev",
     "db:migrate:prod": "cd packages/db && bun run migrate",
     "db:studio": "cd packages/db && bun run migrate:studio",
     "format": "biome format --write .",
-    "lint": "turbo lint && manypkg check",
-    "typecheck": "turbo typecheck"
+    "lint": "biome lint . && manypkg check",
+    "typecheck": "cd apps/api && bun run typecheck && cd ../dashboard && bun run typecheck && cd ../website && bun run typecheck"
   },
   "dependencies": {
     "@biomejs/biome": "1.9.4",
     "@manypkg/cli": "^0.24.0",
-    "turbo": "2.5.6",
     "typescript": "^5.9.2"
   },
   "packageManager": "bun@1.2.22",
   "devDependencies": {
     "bun-types": "^1.3.0"
+  },
+  "overrides": {
+    "drizzle-orm": "0.44.6"
   }
 }

@@ -26,7 +26,6 @@
   "exclude": [
     "dist",
     "node_modules",
-    ".turbo",
     "**/*.test.ts",
     "**/*.spec.ts",
     "tasks"
