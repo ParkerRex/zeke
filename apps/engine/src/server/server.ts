@@ -1,18 +1,22 @@
 import http from "node:http";
 import { URL } from "node:url";
+import { getEngineEnv } from "@zeke/utils/env";
 import { createProvider } from "../providers";
 import type { ProviderFacade } from "../providers";
 
 function buildEnv(): ProviderFacade {
+  // Validate environment variables at startup - will fail fast if invalid
+  const env = getEngineEnv();
+
   const provider = createProvider({
-    API_SECRET_KEY: process.env.API_SECRET_KEY ?? "",
-    TRIGGER_PROJECT_ID: process.env.TRIGGER_PROJECT_ID ?? "",
-    TRIGGER_SECRET_KEY: process.env.TRIGGER_SECRET_KEY ?? "",
-    TRIGGER_WEBHOOK_SECRET: process.env.TRIGGER_WEBHOOK_SECRET,
-    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY ?? "",
-    YOUTUBE_QUOTA_LIMIT: process.env.YOUTUBE_QUOTA_LIMIT ?? "0",
-    YOUTUBE_QUOTA_RESET_HOUR: process.env.YOUTUBE_QUOTA_RESET_HOUR ?? "0",
-    YOUTUBE_RATE_LIMIT_BUFFER: process.env.YOUTUBE_RATE_LIMIT_BUFFER ?? "0",
+    API_SECRET_KEY: env.API_SECRET_KEY,
+    TRIGGER_PROJECT_ID: env.TRIGGER_PROJECT_ID,
+    TRIGGER_SECRET_KEY: env.TRIGGER_SECRET_KEY,
+    TRIGGER_WEBHOOK_SECRET: env.TRIGGER_WEBHOOK_SECRET,
+    YOUTUBE_API_KEY: env.YOUTUBE_API_KEY ?? "",
+    YOUTUBE_QUOTA_LIMIT: env.YOUTUBE_QUOTA_LIMIT ?? "0",
+    YOUTUBE_QUOTA_RESET_HOUR: env.YOUTUBE_QUOTA_RESET_HOUR ?? "0",
+    YOUTUBE_RATE_LIMIT_BUFFER: env.YOUTUBE_RATE_LIMIT_BUFFER ?? "0",
   });
 
   return provider;
@@ -23,7 +27,8 @@ export async function createServer() {
 
   const server = http.createServer(async (req, res) => {
     try {
-      const requestUrl = new URL(req.url ?? "", `http://localhost:${process.env.PORT ?? 3010}`);
+      const env = getEngineEnv();
+      const requestUrl = new URL(req.url ?? "", `http://localhost:${env.PORT ?? 3010}`);
 
       if (req.method === "GET" && requestUrl.pathname === "/health") {
         const health = await provider.getHealthCheck();

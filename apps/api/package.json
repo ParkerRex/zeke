@@ -42,6 +42,7 @@
     "@zeke/logger": "workspace:*",
     "@zeke/notifications": "workspace:*",
     "@zeke/supabase": "workspace:*",
+    "@zeke/utils": "workspace:*",
     "ai": "^5.0.54",
     "camelcase-keys": "^10.0.0",
     "date-fns": "^4.1.0",

@@ -10,7 +10,9 @@
     "build": "bun build src/server/index.ts --outdir dist --target bun",
     "start": "bun run src/server/index.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@zeke/utils": "workspace:*"
+  },
   "exports": {
     ".": "./dist/index.js"
   },

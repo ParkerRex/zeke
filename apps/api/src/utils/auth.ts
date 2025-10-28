@@ -1,4 +1,5 @@
 import { type JWTPayload, jwtVerify } from "jose";
+import { getApiEnv } from "@zeke/utils/env";
 
 export type Session = {
   user: {
@@ -23,9 +24,12 @@ export async function verifyAccessToken(
   if (!accessToken) return null;
 
   try {
+    // Get validated environment - will fail fast if SUPABASE_JWT_SECRET is missing
+    const env = getApiEnv();
+
     const { payload } = await jwtVerify(
       accessToken,
-      new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET),
+      new TextEncoder().encode(env.SUPABASE_JWT_SECRET),
     );
 
     const supabasePayload = payload as SupabaseJWTPayload;

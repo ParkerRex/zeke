@@ -1,10 +1,14 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { getBaseEnv } from "@zeke/utils/env";
 import * as schema from "./schema";
 
-const isDevelopment = process.env.NODE_ENV === "development";
+// Validate environment at startup - fail fast if DATABASE_PRIMARY_URL is missing
+const env = getBaseEnv();
 
-const sslMode = process.env.PGSSLMODE?.toLowerCase();
+const isDevelopment = env.NODE_ENV === "development";
+
+const sslMode = env.PGSSLMODE?.toLowerCase();
 const sslOptions = sslMode === "disable"
   ? undefined
   : { rejectUnauthorized: sslMode !== "no-verify" };
@@ -18,7 +22,7 @@ const connectionConfig = {
 };
 
 const primaryPool = new Pool({
-  connectionString: process.env.DATABASE_PRIMARY_URL!,
+  connectionString: env.DATABASE_PRIMARY_URL,
   ssl: sslOptions,
   ...connectionConfig,
 });
@@ -71,10 +75,12 @@ export const getConnectionPoolStats = () => {
     ? Math.round((totalActive / totalConnections) * 100)
     : 0;
 
+  const currentEnv = getBaseEnv();
+
   return {
     timestamp: new Date().toISOString(),
-    region: process.env.FLY_REGION || "unknown",
-    instance: process.env.FLY_ALLOC_ID || "local",
+    region: currentEnv.FLY_REGION || "unknown",
+    instance: currentEnv.FLY_ALLOC_ID || "local",
     pools,
     summary: {
       totalConnections,

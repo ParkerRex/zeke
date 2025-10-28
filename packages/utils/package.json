@@ -10,11 +10,15 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "zod": "^4.1.11"
+  },
   "devDependencies": {
     "typescript": "^5.9.2"
   },
   "exports": {
     ".": "./src/index.ts",
+    "./env": "./src/env.ts",
     "./envs": "./src/envs.ts",
     "./format": "./src/format.ts",
     "./tax": "./src/tax.ts"

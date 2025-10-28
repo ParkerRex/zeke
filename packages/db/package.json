@@ -23,6 +23,7 @@
     "@zeke/encryption": "workspace:*",
     "@zeke/logger": "workspace:*",
     "@zeke/notifications": "workspace:*",
+    "@zeke/utils": "workspace:*",
     "camelcase-keys": "^10.0.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "0.44.6",

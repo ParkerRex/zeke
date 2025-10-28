@@ -1,6 +1,9 @@
+import { getEngineEnv } from "@zeke/utils/env";
 import { createServer } from "./server";
 
-const port = Number(process.env.PORT ?? 3010);
+// Validate environment at startup - fail fast if invalid
+const env = getEngineEnv();
+const port = env.PORT ?? 3010;
 
 createServer()
   .then((server) => {
