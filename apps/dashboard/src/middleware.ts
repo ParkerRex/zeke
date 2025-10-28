@@ -33,14 +33,16 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  console.log('[MIDDLEWARE DEBUG]', {
-    pathname: newUrl.pathname,
-    pathnameWithoutLocale,
-    hasSession: !!session,
-    sessionUserId: session?.user?.id,
-    sessionEmail: session?.user?.email,
-    timestamp: new Date().toISOString(),
-  });
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[MIDDLEWARE DEBUG]', {
+      pathname: newUrl.pathname,
+      pathnameWithoutLocale,
+      hasSession: !!session,
+      sessionUserId: session?.user?.id,
+      sessionEmail: session?.user?.email,
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   // 1. Not authenticated
   if (

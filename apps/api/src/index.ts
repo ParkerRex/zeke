@@ -5,6 +5,7 @@ import { getConnectionPoolStats } from "@zeke/db/client";
 import { db } from "@zeke/db/client";
 import { sql } from "drizzle-orm";
 import { cors } from "hono/cors";
+import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
 import { routers } from "./rest/routers";
 import type { Context } from "./rest/types";
@@ -43,7 +44,17 @@ app.use(
   }),
 );
 
-app.get("/health", async (c) => {
+// Rate limiter for health endpoints - generous limits for monitoring tools
+const healthRateLimiter = rateLimiter({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  limit: 60, // 60 requests per minute per IP
+  keyGenerator: (c) =>
+    c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "unknown",
+  statusCode: 429,
+  message: "Rate limit exceeded for health endpoint",
+});
+
+app.get("/health", healthRateLimiter, async (c) => {
   try {
     await checkHealth();
 
@@ -60,7 +71,7 @@ app.get("/health", async (c) => {
 });
 
 // Connection pool health check
-app.get("/health/pools", async (c) => {
+app.get("/health/pools", healthRateLimiter, async (c) => {
   try {
     const stats = getConnectionPoolStats();
 
@@ -115,7 +126,7 @@ app.get("/health/pools", async (c) => {
 });
 
 // Database connection test with timing
-app.get("/health/db", async (c) => {
+app.get("/health/db", healthRateLimiter, async (c) => {
   const startTime = Date.now();
 
   try {

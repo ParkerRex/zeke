@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { highlight } from "sugar-high";
+import DOMPurify from "isomorphic-dompurify";
 
 interface TableProps {
   data: {
@@ -69,7 +70,11 @@ interface CodeProps {
 
 function Code({ children, ...props }: CodeProps) {
   const codeHTML = highlight(children);
-  return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
+  const sanitizedHTML = DOMPurify.sanitize(codeHTML, {
+    ALLOWED_TAGS: ['span'],
+    ALLOWED_ATTR: ['class', 'style'],
+  });
+  return <code dangerouslySetInnerHTML={{ __html: sanitizedHTML }} {...props} />;
 }
 
 function slugify(str: string): string {
