@@ -1,5 +1,5 @@
 ---
-status: ready
+status: resolved
 priority: p1
 issue_id: "003"
 tags: [security, authentication, validation]

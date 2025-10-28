@@ -1,5 +1,5 @@
 ---
-status: ready
+status: resolved
 priority: p2
 issue_id: "004"
 tags: [security, privacy, logging, gdpr]
