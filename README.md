@@ -1,6 +1,21 @@
 # Zeke
 
-AI-powered research assistant that transforms content into actionable insights.
+AI-powered research intelligence platform that transforms content into actionable insights.
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Getting Started](./docs/getting-started.md) | Quick setup guide |
+| [Architecture](./docs/architecture.md) | System design |
+| [Development](./docs/development.md) | Dev workflows |
+| [Deployment](./docs/deployment.md) | Docker & production |
+| [CLAUDE.md](./CLAUDE.md) | AI assistant context |
+
+### Apps & Packages
+
+- **Apps**: [API](./docs/apps/api.md) · [Dashboard](./docs/apps/dashboard.md) · [Engine](./docs/apps/engine.md) · [Website](./docs/apps/website.md) · [Desktop](./docs/apps/desktop.md)
+- **Packages**: [Database](./docs/packages/database.md) · [Jobs](./docs/packages/jobs.md) · [Auth](./docs/packages/auth.md) · [Storage](./docs/packages/storage.md) · [Cache](./docs/packages/cache.md) · [UI](./docs/packages/ui.md)
 
 ## Tech Stack
 
@@ -22,7 +37,7 @@ apps/
   dashboard/     Next.js frontend (port 3001)
   engine/        Content fetching service
   website/       Marketing site
-  desktop/       Electron app
+  desktop/       Tauri native app
 
 packages/
   db/            Drizzle schema and queries
