@@ -2,52 +2,45 @@
 // TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
-import { mfaVerifyAction } from "@/actions/mfa-verify-action";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { Button } from "@zeke/ui/button";
 import { Dialog, DialogContent } from "@zeke/ui/dialog";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@zeke/ui/input-otp";
 import { Spinner } from "@zeke/ui/spinner";
-import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function AddNewDeviceModal() {
-  const supabase = createClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const [isValidating, setValidating] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [factorId, setFactorId] = useState("");
   const [error, setError] = useState(false);
   const [qr, setQR] = useState("");
   const isOpen = searchParams.get("add") === "device";
-
-  const verify = useAction(mfaVerifyAction, {
-    onSuccess: () => {
-      setIsRedirecting(true);
-      router.push(pathname);
-    },
-  });
 
   const onComplete = async (code: string) => {
     if (!isValidating) {
       setValidating(true);
 
-      const challenge = await supabase.auth.mfa.challenge({ factorId });
+      try {
+        const result = await authClient.twoFactor.verifyTotp({
+          code,
+        });
 
-      if (!challenge.data) {
+        if (result.data) {
+          setIsRedirecting(true);
+          router.push(pathname);
+        } else {
+          setError(true);
+          setValidating(false);
+        }
+      } catch {
         setError(true);
-        return;
+        setValidating(false);
       }
-
-      verify.execute({
-        factorId,
-        challengeId: challenge.data.id,
-        code,
-      });
     }
   };
 
@@ -56,17 +49,17 @@ export function AddNewDeviceModal() {
     setError(false);
 
     async function enroll() {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: "totp",
-      });
+      try {
+        const result = await authClient.twoFactor.enable({
+          issuer: "app.zekehq.com",
+        });
 
-      if (error) {
-        throw error;
+        if (result.data) {
+          setQR(result.data.totpURI);
+        }
+      } catch (err) {
+        console.error("Failed to enroll MFA:", err);
       }
-
-      setFactorId(data.id);
-
-      setQR(data.totp.qr_code);
     }
 
     if (isOpen) {
@@ -76,9 +69,8 @@ export function AddNewDeviceModal() {
 
   const handleOnClose = () => {
     router.push(pathname);
-
-    supabase.auth.mfa.unenroll({
-      factorId,
+    authClient.twoFactor.disable().catch(() => {
+      // Ignore errors when canceling
     });
   };
 

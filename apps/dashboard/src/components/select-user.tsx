@@ -1,10 +1,7 @@
 "use client";
 
-import { createClient } from "@zeke/supabase/client";
-import {
-  getCurrentUserTeamQuery,
-  getTeamMembersQuery,
-} from "@zeke/supabase/queries";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@zeke/ui/spinner";
 import { useEffect, useState } from "react";
 import { AssignedUser } from "./assigned-user";
@@ -22,32 +19,26 @@ type Props = {
 
 export function SelectUser({ selectedId, onSelect }: Props) {
   const [value, setValue] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const supabase = createClient();
-  const [users, setUsers] = useState<User[]>([]);
+  const trpc = useTRPC();
+
+  // Get current user to get their team ID
+  const { data: currentUser } = useQuery(trpc.user.me.queryOptions());
+
+  // Get team members
+  const { data: teamMembers, isLoading } = useQuery({
+    ...trpc.teams.getMembers.queryOptions({ teamId: currentUser?.teamId ?? "" }),
+    enabled: !!currentUser?.teamId,
+  });
+
+  const users: User[] = teamMembers?.map((member) => ({
+    id: member.id,
+    avatar_url: member.avatarUrl,
+    full_name: member.fullName,
+  })) ?? [];
 
   useEffect(() => {
     setValue(selectedId);
   }, [selectedId]);
-
-  useEffect(() => {
-    async function getUsers() {
-      const { data: userData } = await getCurrentUserTeamQuery(supabase);
-
-      if (userData?.team_id) {
-        const { data: membersData } = await getTeamMembersQuery(
-          supabase,
-          userData.team_id,
-        );
-
-        setUsers(membersData?.map(({ user }) => user));
-        setIsLoading(false);
-      }
-    }
-
-    setIsLoading(true);
-    getUsers();
-  }, [supabase]);
 
   if (!selectedId && isLoading) {
     return (

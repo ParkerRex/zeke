@@ -29,7 +29,7 @@ Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **da
 - **Linter**: Biome with `recommended: true`. Allows `noNonNullAssertion`, `noExplicitAny`, disables `useExhaustiveDependencies`.
 - **TypeScript**: Strict mode, NodeNext modules, target ES2022. Base config: `@zeke/tsconfig/base.json`.
 - **Naming**: camelCase for variables/functions, PascalCase for components/types. DB columns are snake_case but mapped to camelCase in app code.
-- **Imports**: Workspace packages via `@zeke/*`. Prefer importing from `@zeke/db/queries`, `@zeke/supabase`, etc.
+- **Imports**: Workspace packages via `@zeke/*`. Prefer importing from `@zeke/db/queries`, `@zeke/auth`, `@zeke/storage`, etc.
 - **Errors**: Throw `HTTPException` (REST), `TRPCError` (TRPC procedures). Use specific error messages.
 - **Tailwind**: Use `size-*` (e.g., `size-4`) instead of `w-* h-*` when width/height are equal (per `.cursor/rules/tailwind.mdc`).
 

@@ -1,5 +1,5 @@
 import { CaretSortIcon } from "@radix-ui/react-icons";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { Button } from "@zeke/ui/button";
 import {
   Collapsible,
@@ -14,11 +14,9 @@ import { useEffect, useState } from "react";
 import { CopyInput } from "./copy-input";
 
 export function EnrollMFA() {
-  const supabase = createClient();
   const router = useRouter();
   const [isValidating, setValidating] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [factorId, setFactorId] = useState<string | undefined>(undefined);
   const [qr, setQR] = useState<string | undefined>(undefined);
   const [secret, setSecret] = useState<string | undefined>(undefined);
   const [error, setError] = useState(false);
@@ -27,27 +25,22 @@ export function EnrollMFA() {
   const onComplete = async (code: string) => {
     setError(false);
 
-    if (!isValidating && factorId) {
+    if (!isValidating) {
       setValidating(true);
 
-      const challenge = await supabase.auth.mfa.challenge({ factorId });
+      try {
+        const result = await authClient.twoFactor.verifyTotp({
+          code,
+        });
 
-      if (!challenge.data) {
-        setError(true);
-        setValidating(false);
-        return;
-      }
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId,
-        challengeId: challenge.data.id,
-        code,
-      });
-
-      if (verify.data) {
-        setIsRedirecting(true);
-        router.replace("/");
-      } else {
+        if (result.data) {
+          setIsRedirecting(true);
+          router.replace("/");
+        } else {
+          setError(true);
+          setValidating(false);
+        }
+      } catch {
         setError(true);
         setValidating(false);
       }
@@ -56,31 +49,30 @@ export function EnrollMFA() {
 
   useEffect(() => {
     async function enroll() {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: "totp",
-        issuer: "app.zekehq.com",
-      });
+      try {
+        const result = await authClient.twoFactor.enable({
+          issuer: "app.zekehq.com",
+        });
 
-      if (error || !data) {
+        if (!result.data) {
+          setError(true);
+          return;
+        }
+
+        setQR(result.data.totpURI);
+        setSecret(result.data.secret);
+      } catch {
         setError(true);
-        return;
       }
-
-      setFactorId(data.id);
-
-      setQR(data.totp.qr_code);
-      setSecret(data.totp.secret);
     }
 
     enroll();
   }, []);
 
   const handleOnCancel = () => {
-    if (factorId) {
-      supabase.auth.mfa.unenroll({
-        factorId,
-      });
-    }
+    authClient.twoFactor.disable().catch(() => {
+      // Ignore errors when canceling
+    });
     router.push("/");
   };
 

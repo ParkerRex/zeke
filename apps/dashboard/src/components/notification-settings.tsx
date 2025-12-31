@@ -1,4 +1,4 @@
-import { getUser } from "@zeke/supabase/cached-queries";
+import { getUser } from "@zeke/auth/server";
 import { Skeleton } from "@zeke/ui/skeleton";
 import { NotificationSetting } from "./notification-setting";
 
@@ -9,7 +9,10 @@ export function NotificationSettingsSkeleton() {
 }
 
 export async function NotificationSettings() {
-  const { data: userData } = await getUser();
+  const userData = await getUser();
+  if (!userData) {
+    return null;
+  }
   const subscriberPreferences = [
     {
       id: "insights-digest",
@@ -40,7 +43,7 @@ export async function NotificationSettings() {
       name={setting.name}
       enabled={setting.preference.channels.in_app}
       subscriberId={userData.id}
-      teamId={userData.team_id}
+      teamId={userData.teamId}
       type="in_app"
     />
   ));
@@ -52,7 +55,7 @@ export async function NotificationSettings() {
       name={setting.name}
       enabled={setting.preference.channels.email}
       subscriberId={userData.id}
-      teamId={userData.team_id}
+      teamId={userData.teamId}
       type="email"
     />
   ));

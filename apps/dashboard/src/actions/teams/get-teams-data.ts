@@ -2,23 +2,23 @@
 
 import "server-only";
 
+import { getSession } from "@zeke/auth/server";
 import { connectDb } from "@zeke/db/client";
 import {
   getTeamInvitesByEmail,
   getTeamsForUser,
   getUserById,
 } from "@zeke/db/queries";
-import { getSession, getUser } from "@zeke/supabase/cached-queries";
 
 export const getTeamsViewData = async () => {
-  const user = await getUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
-  const session = await getSession();
-  const email = session.data.session?.user?.email ?? user.email ?? undefined;
+  const user = session.user;
+  const email = user.email ?? undefined;
 
   const db = await connectDb();
 
@@ -31,7 +31,7 @@ export const getTeamsViewData = async () => {
   return {
     user: {
       id: user.id,
-      fullName: profile?.fullName ?? user.full_name ?? null,
+      fullName: profile?.fullName ?? user.name ?? null,
       email: email ?? null,
     },
     teams,

@@ -1,5 +1,5 @@
 import { getI18n } from "@/locales/server";
-import { createClient } from "@zeke/supabase/server";
+import { getSession } from "@zeke/auth/server";
 import { Skeleton } from "@zeke/ui/skeleton";
 import { format } from "date-fns";
 import { RemoveMFAButton } from "./remove-mfa-button";
@@ -12,33 +12,31 @@ export function MFAListSkeleton() {
   );
 }
 
-// TODO: enable MFA on supabase.
 export async function MFAList() {
-  const supabase = await createClient();
-
-  const { data } = await supabase.auth.mfa.listFactors();
+  const session = await getSession();
   const t = await getI18n();
 
-  return data?.all
-    ?.sort((a) => (a.status === "verified" ? -1 : 1))
-    .map((factor) => {
-      return (
-        <div
-          key={factor.id}
-          className="flex justify-between items-center space-y-4"
-        >
-          <div>
-            <p className="text-sm">
-              Added on {format(new Date(factor.created_at), "pppp")}
-            </p>
+  // Check if user has 2FA enabled via session
+  const hasTwoFactor = session?.user?.twoFactorEnabled ?? false;
 
-            <p className="text-xs text-[#606060] mt-0.5">
-              {t(`mfa_status.${factor.status}`)}
-            </p>
-          </div>
+  if (!hasTwoFactor) {
+    return null;
+  }
 
-          <RemoveMFAButton factorId={factor.id} />
-        </div>
-      );
-    });
+  // Show single entry for TOTP 2FA since Better Auth uses single TOTP
+  return (
+    <div className="flex justify-between items-center space-y-4">
+      <div>
+        <p className="text-sm">
+          Two-factor authentication enabled
+        </p>
+
+        <p className="text-xs text-[#606060] mt-0.5">
+          {t("mfa_status.verified")}
+        </p>
+      </div>
+
+      <RemoveMFAButton factorId="totp" />
+    </div>
+  );
 }

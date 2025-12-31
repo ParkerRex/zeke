@@ -1,8 +1,8 @@
 "use server";
 
+import { getSession } from "@zeke/auth/server";
 import { acceptTeamInvite } from "@zeke/db/queries";
 import { connectDb } from "@zeke/db/client";
-import { getSession } from "@zeke/supabase/cached-queries";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { authActionClient } from "../safe-action";
 import { respondTeamInviteSchema } from "../schema";
@@ -14,7 +14,7 @@ export const acceptTeamInviteAction = authActionClient
   })
   .action(async ({ parsedInput: { inviteId }, ctx: { user } }) => {
     const session = await getSession();
-    const email = session.data.session?.user?.email;
+    const email = session?.user?.email;
 
     if (!email) {
       throw new Error("No email associated with current session");

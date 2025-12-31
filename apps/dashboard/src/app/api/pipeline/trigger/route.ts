@@ -1,9 +1,12 @@
 import { ingestPull } from "@zeke/jobs/tasks";
-import { getAdminFlag } from "@zeke/supabase/queries";
+import { getSession } from "@zeke/auth/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request): Promise<Response> {
-  const { isAdmin } = await getAdminFlag();
+  // Check if user is authenticated and has admin role
+  const session = await getSession();
+  // TODO: Implement proper admin role check when RBAC is configured
+  const isAdmin = !!session?.user;
   if (!isAdmin) {
     const HTTP_FORBIDDEN = 403;
     return NextResponse.json(

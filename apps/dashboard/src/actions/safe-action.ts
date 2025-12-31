@@ -1,7 +1,7 @@
 import { getQueryClient, trpc } from "@/trpc/server";
 import { logger } from "@/utils/logger";
 import { setupAnalytics } from "@zeke/events/server";
-import { createClient } from "@zeke/supabase/server";
+import { db } from "@zeke/db/client";
 import {
   DEFAULT_SERVER_ERROR_MESSAGE,
   createSafeActionClient,
@@ -57,8 +57,6 @@ export const authActionClient = actionClientWithMeta
     const queryClient = getQueryClient();
     const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
 
-    const supabase = await createClient();
-
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -74,7 +72,7 @@ export const authActionClient = actionClientWithMeta
 
     return next({
       ctx: {
-        supabase,
+        db,
         analytics,
         user,
         teamId: user.teamId,

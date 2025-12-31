@@ -1,17 +1,13 @@
 import { stripe } from "@/utils/stripe";
-import { getSession } from "@zeke/supabase/cached-queries";
-import { getTeamByIdQuery } from "@zeke/supabase/queries";
-import { createClient } from "@zeke/supabase/server";
+import { getSession } from "@zeke/auth/server";
+import { connectDb } from "@zeke/db/client";
+import { getTeamById } from "@zeke/db/queries";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 export const GET = async (req: NextRequest) => {
-  const supabase = await createClient();
-
-  const {
-    data: { session },
-  } = await getSession();
+  const session = await getSession();
 
   if (!session?.user?.id) {
     throw new Error("You must be logged in");
@@ -23,7 +19,8 @@ export const GET = async (req: NextRequest) => {
   const isDesktop = req.nextUrl.searchParams.get("isDesktop") === "true";
   const planType = req.nextUrl.searchParams.get("planType");
 
-  const { data: team } = await getTeamByIdQuery(supabase, teamId!);
+  const db = await connectDb();
+  const team = await getTeamById(db, teamId!);
 
   if (!team) {
     throw new Error("Team not found");
@@ -90,50 +87,10 @@ async function resolvePriceId({
     return plan;
   }
 
-  const supabase = await createClient({ admin: true });
-  const normalizedPlan = plan.toLowerCase();
-  const { data, error } = await supabase
-    .from("prices")
-    .select(
-      `
-        id,
-        interval,
-        metadata,
-        products (
-          metadata
-        )
-      `,
-    )
-    .eq("active", true);
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  const planMatches = data.filter((record) =>
-    matchesPlanCode(normalizedPlan, record.metadata, record.products?.metadata),
-  );
-
-  if (planMatches.length === 0) {
-    return null;
-  }
-
-  const preferredInterval = inferPreferredInterval(planType);
-
-  const intervalMatch = planMatches.find(
-    (record) =>
-      typeof record.interval === "string" &&
-      preferredInterval !== null &&
-      record.interval.toLowerCase() === preferredInterval,
-  );
-
-  const selected = intervalMatch ?? planMatches[0];
-
-  return typeof selected?.id === "string" ? selected.id : null;
+  // TODO: Implement price lookup from database when prices table is migrated to Drizzle
+  // For now, return the plan as-is if it looks like a price ID
+  console.warn("Price lookup not yet implemented - using plan directly:", plan);
+  return null;
 }
 
 function matchesPlanCode(

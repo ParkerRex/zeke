@@ -1,45 +1,25 @@
-import { getSession } from "@zeke/supabase/cached-queries";
+import { getSession } from "@zeke/auth/server";
+import { getSignedDownloadUrl } from "@zeke/storage";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
   const filePath = requestUrl.searchParams.get("filePath");
 
-  const {
-    data: { session },
-  } = await getSession();
+  const session = await getSession();
 
   if (!session || !filePath) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  // Ensure filePath starts with 'vault/'
-  const finalFilePath = filePath.startsWith("vault/")
-    ? filePath
-    : `vault/${filePath}`;
+  try {
+    // Get signed URL from MinIO storage
+    const signedUrl = await getSignedDownloadUrl("vault", filePath);
 
-  // Fetch the object from Supabase Storage
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/${finalFilePath}`,
-    {
-      headers: {
-        authorization: `Bearer ${session.access_token}`,
-      },
-    },
-  );
-
-  // Check if the fetch was successful
-  if (!response.ok) {
-    return new NextResponse(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    });
+    // Redirect to the signed URL
+    return NextResponse.redirect(signedUrl);
+  } catch (error) {
+    console.error("Failed to get signed URL:", error);
+    return new NextResponse("File not found", { status: 404 });
   }
-
-  return new NextResponse(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
-  });
 }

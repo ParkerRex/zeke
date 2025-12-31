@@ -412,13 +412,11 @@ Drizzle Flow
   Supabase Types
 
   - The generated client types live in packages/supabase/src/types/db.ts, and the
-  package exposes them via packages/supabase/src/types/index.ts.
-  - Install and log in with the Supabase CLI (supabase login), set PROJECT_ID (and
-  SUPABASE_ACCESS_TOKEN if you’re using service tokens), then run cd packages/
-  supabase && bun run db:generate; this pipes supabase gen types --lang=typescript
-  into src/types/db.ts.
-  - Commit the regenerated types together with the migration so downstream apps
-  (@zeke/supabase) stay in sync.
+  package exposes them via packages/db/src/schema.ts using Drizzle ORM.
+  - Run `cd packages/db && bun run db:generate` to generate migrations from schema
+  changes, then `bun run db:push` to apply them.
+  - Commit the schema changes together with the migration so downstream apps
+  (@zeke/db) stay in sync.
   - If you need to verify everything end-to-end, rerun the relevant service (`bun run
   dev:api`, etc.) and/or whatever tests exercise the new tables
   before opening a PR.

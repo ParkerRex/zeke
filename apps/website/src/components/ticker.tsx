@@ -1,36 +1,17 @@
-import { createServerClient } from "@supabase/ssr";
-import type { Database } from "@zeke/supabase/types";
+import { connectDb } from "@zeke/db/client";
+import { sql } from "drizzle-orm";
 
 export async function Ticker() {
-  const client = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get() {
-          return null;
-        },
-        set() {
-          return null;
-        },
-        remove() {
-          return null;
-        },
-      },
-    },
-  );
+  const db = await connectDb();
 
-  // Query for sources processed and teams
-  const [
-    { count: sourcesProcessed },
-    { count: teamsCount },
-  ] = await Promise.all([
-    client
-      .from("transactions")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
-    client.from("teams").select("id", { count: "exact", head: true }).limit(1),
+  // Query for sources processed and teams using Drizzle
+  const [transactionsResult, teamsResult] = await Promise.all([
+    db.execute(sql`SELECT COUNT(*) as count FROM transactions`),
+    db.execute(sql`SELECT COUNT(*) as count FROM teams`),
   ]);
+
+  const sourcesProcessed = Number(transactionsResult[0]?.count ?? 0);
+  const teamsCount = Number(teamsResult[0]?.count ?? 0);
 
   // Calculate hours saved: assume each source saves ~2 hours of manual research
   const hoursSaved = (sourcesProcessed ?? 0) * 2;

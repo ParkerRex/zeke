@@ -6,7 +6,6 @@ import { useUserQuery } from "@/hooks/use-user";
 import { useTRPC } from "@/trpc/client";
 import { resumableUpload } from "@/utils/upload";
 import { useMutation } from "@tanstack/react-query";
-import { createClient } from "@zeke/supabase/client";
 import { cn } from "@zeke/ui/cn";
 import { useToast } from "@zeke/ui/use-toast";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -31,7 +30,6 @@ type Props = {
 export function VaultUploadZone({ onUpload, children }: Props) {
   const trpc = useTRPC();
   const { data: user } = useUserQuery();
-  const supabase = createClient();
   const [progress, setProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [toastId, setToastId] = useState<string | null>(null);
@@ -80,7 +78,7 @@ export function VaultUploadZone({ onUpload, children }: Props) {
     try {
       const results = (await Promise.all(
         files.map(async (file: File, idx: number) =>
-          resumableUpload(supabase, {
+          resumableUpload({
             bucket: "vault",
             path,
             file,

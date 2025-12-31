@@ -1,4 +1,4 @@
-import { getSession } from "@zeke/supabase/queries";
+import { getSession } from "@zeke/auth/server";
 import { Button } from "@zeke/ui/button";
 import Link from "next/link";
 import { IoLockClosed, IoSettingsSharp } from "react-icons/io5";

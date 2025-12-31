@@ -5,7 +5,7 @@ import { revalidateTag } from "next/cache";
 import { authActionClient } from "@/actions/safe-action";
 import { updateUserSchema } from "@/actions/schema";
 import { logger } from "@/utils/logger";
-import { updateUser } from "@zeke/supabase/mutations";
+import { updateUser } from "@zeke/db/queries";
 
 export const updateUserAction = authActionClient
   .schema(updateUserSchema)
@@ -23,7 +23,7 @@ export const updateUserAction = authActionClient
 
     const payload = Object.fromEntries(payloadEntries);
 
-    await updateUser(ctx.supabase, payload);
+    await updateUser(ctx.db, { id: ctx.user.id, ...payload });
 
     try {
       revalidateTag("user-profile");

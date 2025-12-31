@@ -1,7 +1,7 @@
 "use server";
 
 import { Cookies } from "@/utils/constants";
-import { createClient } from "@zeke/supabase/server";
+import { auth } from "@zeke/auth";
 import { addYears } from "date-fns";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -17,21 +17,13 @@ export const verifyOtpAction = actionClient
     }),
   )
   .action(async ({ parsedInput: { email, token, redirectTo } }) => {
-    const supabase = await createClient();
-
-    await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
+    // Verify the magic link token with Better Auth
+    const result = await auth.api.verifyMagicLink({
+      body: { token },
     });
 
-    // Validate that the session was actually established (similar to OAuth callback)
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error("Failed to establish session after OTP verification");
+    if (!result) {
+      throw new Error("Failed to verify OTP");
     }
 
     (await cookies()).set(Cookies.PreferredSignInProvider, "otp", {

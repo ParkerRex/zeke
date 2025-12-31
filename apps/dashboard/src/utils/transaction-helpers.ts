@@ -2,12 +2,9 @@ import {
   logDatabaseError,
   measurePerformance,
 } from "@/src/utils/sentry-config";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createSupabaseServerClient } from "@zeke/auth";
-import { supabaseAdminClient } from "@zeke/supabase/client/admin";
-import type { Database } from "@zeke/supabase/types";
+import { connectDb, type Database } from "@zeke/db/client";
 
-export type TransactionClient = SupabaseClient<Database>;
+export type TransactionClient = Database;
 
 export interface TransactionResult<T> {
   success: boolean;
@@ -16,9 +13,8 @@ export interface TransactionResult<T> {
 }
 
 /**
- * Execute a function within a Supabase transaction
- * Note: Supabase doesn't have native transaction support, so we simulate it
- * with careful error handling and rollback strategies
+ * Execute a function within a database transaction
+ * Uses Drizzle's transaction support
  */
 export async function withTransaction<T>(
   operation: string,
@@ -28,17 +24,14 @@ export async function withTransaction<T>(
     userId?: string;
   } = {},
 ): Promise<TransactionResult<T>> {
-  const { useAdminClient = false, userId } = options;
+  const { userId } = options;
 
   return measurePerformance(
     `transaction:${operation}`,
     async () => {
       try {
-        const client = useAdminClient
-          ? supabaseAdminClient
-          : await createSupabaseServerClient();
-
-        const result = await fn(client);
+        const db = await connectDb();
+        const result = await fn(db);
 
         return {
           success: true,

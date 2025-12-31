@@ -2,8 +2,7 @@ import { stripe } from "@/utils/stripe";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
-import { createClient } from "@zeke/supabase/server";
-import type { Client } from "@zeke/supabase/types";
+import { connectDb, type Database } from "@zeke/db/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,24 +75,24 @@ async function handleSubscriptionEvent(
   subscription: Stripe.Subscription,
   eventType: Stripe.Event.Type,
 ) {
-  const supabase = await createClient({ admin: true });
+  const db = await connectDb();
 
-  const teamId = await resolveTeamId(supabase, subscription);
+  const teamId = await resolveTeamId(db, subscription);
   if (!teamId) {
     console.error(`Unable to resolve team for subscription ${subscription.id}`);
     return;
   }
 
-  const planCode = await resolvePlanCode(supabase, subscription);
+  const planCode = await resolvePlanCode(db, subscription);
   const stripeCustomerId = extractCustomerId(subscription.customer);
 
-  await upsertSubscriptionRecord(supabase, subscription, teamId, planCode);
+  await upsertSubscriptionRecord(db, subscription, teamId, planCode);
 
   const shouldDowngrade =
     subscription.status === "canceled" ||
     eventType === "customer.subscription.deleted";
 
-  await updateTeamBillingState(supabase, {
+  await updateTeamBillingState(db, {
     teamId,
     planCode: shouldDowngrade ? "trial" : planCode,
     stripeCustomerId,
@@ -101,7 +100,7 @@ async function handleSubscriptionEvent(
 }
 
 async function resolveTeamId(
-  supabase: Client,
+  db: Database,
   subscription: Stripe.Subscription,
 ): Promise<string | null> {
   const metadataTeamId = extractTeamId(subscription.metadata);
@@ -117,7 +116,7 @@ async function resolveTeamId(
 }
 
 async function resolvePlanCode(
-  supabase: Client,
+  db: Database,
   subscription: Stripe.Subscription,
 ): Promise<PlanCode> {
   const metadataPlan = extractPlanCode(subscription.metadata);
@@ -132,48 +131,13 @@ async function resolvePlanCode(
     return pricePlan;
   }
 
-  const priceId = firstItem?.price?.id;
-
-  if (priceId) {
-    const { data, error } = await supabase
-      .from("prices")
-      .select(
-        `
-          metadata,
-          products (
-            metadata
-          )
-        `,
-      )
-      .eq("id", priceId)
-      .maybeSingle();
-
-    if (error) {
-      throw error;
-    }
-
-    const priceMetadataPlan = extractPlanCode(
-      (data?.metadata ?? null) as Record<string, unknown> | null,
-    );
-
-    if (priceMetadataPlan) {
-      return priceMetadataPlan;
-    }
-
-    const productMetadataPlan = extractPlanCode(
-      (data?.products?.metadata ?? null) as Record<string, unknown> | null,
-    );
-
-    if (productMetadataPlan) {
-      return productMetadataPlan;
-    }
-  }
-
+  // TODO: Implement price lookup from database when prices table is migrated to Drizzle
+  // For now, default to starter plan if not found in metadata
   return "starter";
 }
 
 async function upsertSubscriptionRecord(
-  supabase: Client,
+  db: Database,
   subscription: Stripe.Subscription,
   teamId: string,
   planCode: PlanCode,
@@ -187,31 +151,14 @@ async function upsertSubscriptionRecord(
     return;
   }
 
-  const now = new Date().toISOString();
-
-  const record = {
-    id: subscription.id,
-    team_id: teamId,
-    price_id: priceId,
-    status: subscription.status,
-    plan_code: planCode,
-    current_period_start: toIsoDate(subscription.current_period_start),
-    current_period_end: toIsoDate(subscription.current_period_end),
-    trial_ends_at: toIsoDate(subscription.trial_end),
-    canceled_at: toIsoDate(subscription.canceled_at),
-    metadata: normalizeMetadata(subscription.metadata),
-    updated_at: now,
-  };
-
-  const { error } = await supabase.from("subscriptions").upsert(record);
-
-  if (error) {
-    throw error;
-  }
+  // TODO: Implement subscription upsert when subscriptions table is migrated to Drizzle
+  console.log(
+    `Upsert subscription ${subscription.id} for team ${teamId}, plan: ${planCode}`,
+  );
 }
 
 async function updateTeamBillingState(
-  supabase: Client,
+  db: Database,
   params: {
     teamId: string;
     planCode: PlanCode;

@@ -8,8 +8,8 @@ import {
   createTRPCOptionsProxy,
 } from "@trpc/tanstack-react-query";
 import type { AppRouter } from "@zeke/api/trpc/routers/_app";
+import { getSession } from "@zeke/auth/server";
 import { getCountryCode, getLocale, getTimezone } from "@zeke/location";
-import { createClient } from "@zeke/supabase/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { makeQueryClient } from "./query-client";
@@ -26,14 +26,10 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
         url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
         transformer: superjson,
         async headers() {
-          const supabase = await createClient();
-
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
+          const session = await getSession();
 
           return {
-            Authorization: `Bearer ${session?.access_token}`,
+            Authorization: session ? `Bearer ${session.session.token}` : "",
             "x-user-timezone": await getTimezone(),
             "x-user-locale": await getLocale(),
             "x-user-country": await getCountryCode(),

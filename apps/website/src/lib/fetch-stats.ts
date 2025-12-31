@@ -1,75 +1,31 @@
 "use server";
 
-import { createServerClient } from "@supabase/ssr";
-import type { Database } from "@zeke/supabase/types";
+import { connectDb } from "@zeke/db/client";
+import { sql } from "drizzle-orm";
 
 export async function fetchStats() {
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get() {
-          return null;
-        },
-        set() {
-          return null;
-        },
-        remove() {
-          return null;
-        },
-      },
-    },
-  );
+  const db = await connectDb();
 
-  const supabaseStorage = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get() {
-          return null;
-        },
-        set() {
-          return null;
-        },
-        remove() {
-          return null;
-        },
-      },
-      db: { schema: "storage" },
-    },
-  );
-
-  // Query only existing tables - removed trackerProjects, invoices, and other finance tables
+  // Query only existing tables using Drizzle
   const [
-    { count: users },
-    { count: stories },
-    { count: insights },
-    { count: sources },
-    { count: customers },
+    teamsResult,
+    storiesResult,
+    highlightsResult,
+    sourcesResult,
+    customersResult,
   ] = await Promise.all([
-    supabase
-      .from("teams")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
-    supabase
-      .from("stories")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
-    supabase
-      .from("highlights")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
-    supabase
-      .from("sources")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
-    supabase
-      .from("customers")
-      .select("id", { count: "exact", head: true })
-      .limit(1),
+    db.execute(sql`SELECT COUNT(*) as count FROM teams`),
+    db.execute(sql`SELECT COUNT(*) as count FROM stories`),
+    db.execute(sql`SELECT COUNT(*) as count FROM highlights`),
+    db.execute(sql`SELECT COUNT(*) as count FROM sources`),
+    db.execute(sql`SELECT COUNT(*) as count FROM customers`),
   ]);
+
+  const users = Number(teamsResult[0]?.count ?? 0);
+  const stories = Number(storiesResult[0]?.count ?? 0);
+  const insights = Number(highlightsResult[0]?.count ?? 0);
+  const sources = Number(sourcesResult[0]?.count ?? 0);
+  const customers = Number(customersResult[0]?.count ?? 0);
 
   return {
     users,

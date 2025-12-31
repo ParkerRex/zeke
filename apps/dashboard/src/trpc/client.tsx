@@ -5,7 +5,7 @@ import { QueryClientProvider, isServer } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import type { AppRouter } from "@zeke/api/trpc/routers/_app";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { useState } from "react";
 import superjson from "superjson";
 import { makeQueryClient } from "./query-client";
@@ -48,14 +48,12 @@ export function TRPCReactProvider(
           url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
           transformer: superjson,
           async headers() {
-            const supabase = createClient();
-
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
+            const session = await authClient.getSession();
 
             return {
-              Authorization: `Bearer ${session?.access_token}`,
+              Authorization: session?.data?.session
+                ? `Bearer ${session.data.session.token}`
+                : "",
             };
           },
         }),

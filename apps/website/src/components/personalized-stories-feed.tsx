@@ -1,4 +1,4 @@
-import { getSession } from "@zeke/supabase/cached-queries";
+import { getSession } from "@zeke/auth/server";
 import { Button } from "@zeke/ui/button";
 import {
   Card,
