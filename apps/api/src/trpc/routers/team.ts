@@ -10,8 +10,8 @@ import {
   updateTeamByIdSchema,
   updateTeamMemberSchema,
 } from "@api/schemas/team";
+import { sendJob } from "@api/services/jobs";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
-import { tasks } from "@trigger.dev/sdk";
 import { TRPCError } from "@trpc/server";
 import {
   acceptTeamInvite,
@@ -205,7 +205,7 @@ export const teamRouter = createTRPCRouter({
 
       // Only trigger email sending if there are valid invites
       if (invites.length > 0) {
-        await tasks.trigger("invite-team-members", {
+        await sendJob("invite-team-members", {
           teamId: teamId!,
           invites,
           ip,

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -a
-source "$(dirname "$0")/../.env"
+source "$(dirname "$0")/../../../.env" 2>/dev/null || true
+source "$(dirname "$0")/../.env" 2>/dev/null || true
 set +a
-exec npx trigger.dev@latest dev "$@"
+exec pnpm worker:dev "$@"

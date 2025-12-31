@@ -1,64 +1,61 @@
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+"use client";
 
-import { useRealtimeRun } from "@trigger.dev/react-hooks";
 import { useEffect, useState } from "react";
+import { useJobStatus } from "./use-job-status";
 
 type UseExportStatusProps = {
   runId?: string;
-  accessToken?: string;
+  accessToken?: string; // Kept for API compatibility but not used (uses session auth)
 };
 
 export function useExportStatus({
   runId: initialRunId,
-  accessToken: initialAccessToken,
 }: UseExportStatusProps = {}) {
-  const [accessToken, setAccessToken] = useState<string | undefined>(
-    initialAccessToken,
-  );
   const [runId, setRunId] = useState<string | undefined>(initialRunId);
   const [status, setStatus] = useState<
     "FAILED" | "IN_PROGRESS" | "COMPLETED" | null
   >(null);
+  const [progress, setProgress] = useState<number>(0);
+  const [result, setResult] = useState<unknown>(null);
 
-  const [_, setProgress] = useState<number>(0);
-
-  const [result, setResult] = useState<any>(null);
-
-  const { run, error } = useRealtimeRun(runId, {
-    enabled: !!runId && !!accessToken,
-    accessToken,
+  const {
+    status: jobStatus,
+    output,
+    error,
+  } = useJobStatus({
+    runId,
+    enabled: !!runId,
   });
 
   useEffect(() => {
-    if (initialRunId && initialAccessToken) {
-      setAccessToken(initialAccessToken);
+    if (initialRunId) {
       setRunId(initialRunId);
       setStatus("IN_PROGRESS");
     }
-  }, [initialRunId, initialAccessToken]);
+  }, [initialRunId]);
 
   useEffect(() => {
-    if (error || run?.status === "FAILED") {
+    if (error || jobStatus === "FAILED") {
       setStatus("FAILED");
       setProgress(0);
-    }
-
-    if (run?.status === "COMPLETED") {
+    } else if (jobStatus === "COMPLETED") {
       setStatus("COMPLETED");
       setProgress(100);
+    } else if (jobStatus === "EXECUTING" || jobStatus === "QUEUED") {
+      setStatus("IN_PROGRESS");
     }
-  }, [error, run]);
+  }, [error, jobStatus]);
 
   useEffect(() => {
-    if (run?.output) {
-      setResult(run.output);
+    if (output) {
+      setResult(output);
     }
-  }, [run]);
+  }, [output]);
 
   return {
     status,
     setStatus,
-    progress: run?.metadata?.progress ?? 0,
+    progress,
     result,
   };
 }

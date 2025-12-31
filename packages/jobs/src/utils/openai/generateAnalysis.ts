@@ -1,4 +1,4 @@
-import { logger } from "@trigger.dev/sdk";
+import { logger } from "@jobs/schema-task";
 import { withRetry } from "../async/withRetry";
 import {
   CHILI_MAX,

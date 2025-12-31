@@ -1,4 +1,4 @@
-import { tasks } from "@trigger.dev/sdk";
+import { sendJob } from "@api/services/jobs";
 import { createClient } from "@zeke/db/client";
 import {
   highlightTags,
@@ -101,7 +101,7 @@ export async function getHighlights(
 
     if (refresh && storyId) {
       try {
-        await tasks.trigger("extract-highlights", {
+        await sendJob("extract-highlights", {
           storyId,
           userId: context.userId,
           teamId: context.teamId,

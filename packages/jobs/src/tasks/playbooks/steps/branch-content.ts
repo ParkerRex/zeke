@@ -1,4 +1,4 @@
-import { logger } from "@trigger.dev/sdk";
+import { logger } from "@jobs/schema-task";
 
 import type { Database } from "@zeke/db/client";
 import type { PlaybookDetail, PlaybookRunRecord } from "@zeke/db/queries";

@@ -75,15 +75,8 @@ const baseEnvSchema = z.object({
     .string()
     .min(20, "OPENAI_API_KEY is required for AI features"),
 
-  // Trigger.dev - CRITICAL for background jobs
-  TRIGGER_PROJECT_ID: z.string().min(1, "TRIGGER_PROJECT_ID is required"),
-  TRIGGER_SECRET_KEY: z.string().min(1, "TRIGGER_SECRET_KEY is required"),
-  TRIGGER_API_KEY: optionalString,
-  TRIGGER_SECRET: optionalString,
-  TRIGGER_DEV_API_KEY: optionalString,
-  TRIGGER_API_URL: optionalString,
-  TRIGGER_ENDPOINT: optionalString,
-  TRIGGER_WEBHOOK_SECRET: optionalString,
+  // Background Jobs (pg-boss)
+  JOBS_CRON_TZ: z.string().default("UTC"),
 
   // Redis - Required for caching
   REDIS_URL: z
@@ -133,9 +126,7 @@ const baseEnvSchema = z.object({
 const engineEnvSchema = baseEnvSchema.pick({
   NODE_ENV: true,
   API_SECRET_KEY: true,
-  TRIGGER_PROJECT_ID: true,
-  TRIGGER_SECRET_KEY: true,
-  TRIGGER_WEBHOOK_SECRET: true,
+  JOBS_CRON_TZ: true,
   YOUTUBE_API_KEY: true,
   YOUTUBE_QUOTA_LIMIT: true,
   YOUTUBE_QUOTA_RESET_HOUR: true,
@@ -151,13 +142,7 @@ const apiEnvSchema = baseEnvSchema.pick({
   PGSSLMODE: true,
   AUTH_SECRET: true,
   OPENAI_API_KEY: true,
-  TRIGGER_PROJECT_ID: true,
-  TRIGGER_SECRET_KEY: true,
-  TRIGGER_API_KEY: true,
-  TRIGGER_SECRET: true,
-  TRIGGER_DEV_API_KEY: true,
-  TRIGGER_API_URL: true,
-  TRIGGER_ENDPOINT: true,
+  JOBS_CRON_TZ: true,
   REDIS_URL: true,
   ALLOWED_API_ORIGINS: true,
   FLY_REGION: true,

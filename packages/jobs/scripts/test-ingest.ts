@@ -4,7 +4,7 @@
  * Usage: bun run scripts/test-ingest.ts <url>
  */
 
-import { tasks } from "@trigger.dev/sdk/v3";
+import { getBoss } from "../src/boss";
 
 const url = process.argv[2];
 
@@ -13,19 +13,21 @@ if (!url) {
   process.exit(1);
 }
 
-console.log(`🚀 Triggering ingestion for: ${url}`);
+console.log(`Triggering ingestion for: ${url}`);
 
 try {
-  const handle = await tasks.trigger("ingest-oneoff", {
+  const boss = await getBoss();
+  const jobId = await boss.send("ingest-oneoff", {
     url,
     requestedBy: undefined, // Optional: system-triggered
   });
 
-  console.log(`✅ Task triggered successfully!`);
-  console.log(`   Task ID: ${handle.id}`);
-  console.log(`\n📊 View logs at: https://cloud.trigger.dev`);
-  console.log(`   Or check your local Trigger.dev dev server`);
+  console.log(`Task triggered successfully!`);
+  console.log(`   Job ID: ${jobId}`);
+  console.log(`\nMonitor job status in the database or via API`);
+
+  await boss.stop();
 } catch (error) {
-  console.error("❌ Failed to trigger task:", error);
+  console.error("Failed to trigger task:", error);
   process.exit(1);
 }

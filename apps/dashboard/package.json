@@ -30,8 +30,6 @@
 		"@tanstack/react-query": "^5.90.2",
 		"@tanstack/react-table": "^8.21.3",
 		"@team-plain/typescript-sdk": "^5.9.0",
-		"@trigger.dev/react-hooks": "4.0.4",
-		"@trigger.dev/sdk": "4.0.4",
 		"@trpc/client": "^11.6.0",
 		"@trpc/tanstack-react-query": "^11.6.0",
 		"@vercel/functions": "^3.1.4",
