@@ -32,11 +32,11 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
 
   const db = c.get("db");
 
-  // Handle Supabase JWT tokens (try to verify as JWT first)
-  const supabaseSession = await verifyAccessToken(token);
-  if (supabaseSession) {
+  // Handle JWT tokens (try to verify as JWT first)
+  const jwtSession = await verifyAccessToken(token);
+  if (jwtSession) {
     // Get user from database to get team info
-    const user = await getUserById(db, supabaseSession.user.id);
+    const user = await getUserById(db, jwtSession.user.id);
 
     if (!user) {
       throw new HTTPException(401, { message: "User not found" });
@@ -53,7 +53,7 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
 
     c.set("session", session);
     c.set("teamId", session.teamId);
-    // Grant all scopes for authenticated users via Supabase
+    // Grant all scopes for authenticated users
     c.set("scopes", expandScopes(["apis.all"]));
 
     await next();

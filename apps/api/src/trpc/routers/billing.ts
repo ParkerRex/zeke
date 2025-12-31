@@ -5,8 +5,10 @@ import {
 } from "@api/schemas/billing";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { stripe } from "@api/utils/stripe";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import { teams } from "@zeke/db/schema";
+import type { Database } from "@zeke/db/client";
 import type Stripe from "stripe";
 import { z } from "zod";
 
@@ -56,7 +58,12 @@ const getInvoiceProductName = (invoice: Stripe.Invoice) => {
   }
 
   const product = line.price?.product;
-  if (product && typeof product !== "string" && "name" in product && product.name) {
+  if (
+    product &&
+    typeof product !== "string" &&
+    "name" in product &&
+    product.name
+  ) {
     return product.name;
   }
 
@@ -67,33 +74,30 @@ const getInvoiceProductName = (invoice: Stripe.Invoice) => {
   return invoice.description ?? undefined;
 };
 
-const getStripeCustomerId = async (
-  supabase: SupabaseClient,
-  teamId: string,
-) => {
-  const { data, error } = await supabase
-    .from("teams")
-    .select("stripe_customer_id")
-    .eq("id", teamId)
-    .maybeSingle();
+const getStripeCustomerId = async (db: Database, teamId: string) => {
+  try {
+    const result = await db
+      .select({ stripeCustomerId: teams.stripeCustomerId })
+      .from(teams)
+      .where(eq(teams.id, teamId))
+      .limit(1);
 
-  if (error) {
+    return result[0]?.stripeCustomerId ?? null;
+  } catch (error) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Unable to load billing details for this team",
       cause: error,
     });
   }
-
-  return data?.stripe_customer_id ?? null;
 };
 
 const fetchInvoiceForTeam = async (
   invoiceId: string,
   teamId: string,
-  supabase: SupabaseClient,
+  db: Database,
 ) => {
-  const stripeCustomerId = await getStripeCustomerId(supabase, teamId);
+  const stripeCustomerId = await getStripeCustomerId(db, teamId);
 
   if (!stripeCustomerId) {
     throw new TRPCError({
@@ -136,7 +140,7 @@ export const billingRouter = createTRPCRouter({
   orders: protectedProcedure
     .input(getBillingOrdersSchema)
     .output(billingInvoicePageSchema)
-    .query(async ({ input, ctx: { teamId, supabase } }) => {
+    .query(async ({ input, ctx: { teamId, db } }) => {
       if (!teamId) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -144,7 +148,7 @@ export const billingRouter = createTRPCRouter({
         });
       }
 
-      const stripeCustomerId = await getStripeCustomerId(supabase, teamId);
+      const stripeCustomerId = await getStripeCustomerId(db, teamId);
 
       if (!stripeCustomerId) {
         return {
@@ -189,7 +193,8 @@ export const billingRouter = createTRPCRouter({
           data: mappedInvoices,
           meta: {
             hasNextPage: invoices.has_more,
-            cursor: invoices.has_more && lastInvoice ? lastInvoice.id : undefined,
+            cursor:
+              invoices.has_more && lastInvoice ? lastInvoice.id : undefined,
           },
         };
       } catch (error) {
@@ -204,7 +209,7 @@ export const billingRouter = createTRPCRouter({
   getInvoice: protectedProcedure
     .input(z.string())
     .output(billingInvoiceDownloadSchema)
-    .mutation(async ({ input: invoiceId, ctx: { teamId, supabase } }) => {
+    .mutation(async ({ input: invoiceId, ctx: { teamId, db } }) => {
       if (!teamId) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -212,7 +217,7 @@ export const billingRouter = createTRPCRouter({
         });
       }
 
-      const invoice = await fetchInvoiceForTeam(invoiceId, teamId, supabase);
+      const invoice = await fetchInvoiceForTeam(invoiceId, teamId, db);
 
       if (invoice.status === "draft") {
         await stripe.invoices
@@ -236,7 +241,7 @@ export const billingRouter = createTRPCRouter({
   checkInvoiceStatus: protectedProcedure
     .input(z.string())
     .output(billingInvoiceDownloadSchema)
-    .query(async ({ input: invoiceId, ctx: { teamId, supabase } }) => {
+    .query(async ({ input: invoiceId, ctx: { teamId, db } }) => {
       if (!teamId) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -245,7 +250,7 @@ export const billingRouter = createTRPCRouter({
       }
 
       try {
-        const invoice = await fetchInvoiceForTeam(invoiceId, teamId, supabase);
+        const invoice = await fetchInvoiceForTeam(invoiceId, teamId, db);
 
         const downloadUrl = resolveInvoiceDownloadUrl(invoice);
 

@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { twoFactor, oAuthProxy } from "better-auth/plugins";
+import { twoFactor } from "better-auth/plugins";
 import { db } from "@zeke/db/client";
 
 const getEnvVar = (key: string, required = true): string => {
@@ -55,7 +55,6 @@ export const auth = betterAuth({
         period: 30,
       },
     }),
-    oAuthProxy(),
   ],
 
   session: {

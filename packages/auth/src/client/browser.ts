@@ -1,9 +1,9 @@
 import { createAuthClient } from "better-auth/react";
-import { twoFactorClient, oAuthProxyClient } from "better-auth/client/plugins";
+import { twoFactorClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001",
-  plugins: [twoFactorClient(), oAuthProxyClient()],
+  plugins: [twoFactorClient()],
 });
 
 export const { signIn, signUp, signOut, useSession, getSession, twoFactor } =

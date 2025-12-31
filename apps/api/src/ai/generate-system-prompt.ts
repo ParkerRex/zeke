@@ -74,7 +74,7 @@ import type { ChatUserContext } from "@zeke/cache/chat-cache";
  * - Stage 1 (LLM extraction): ask for JSON adhering to ContentAnalysis, enforce citations (`citations` array per bullet) once we move to structured outputs.
  * - Stage 2 (validation): run a lightweight verifier (TypeScript zod schema) ensuring arrays not empty, `contentType === 'paper'`, etc.
  * - Stage 3 (render): convert into Claude canvas sections (metadata block, Bloomberg-style fact table, Canva-friendly summaries).
- * - Future: upgrade to Vercel AI SDK 5.0 structured outputs to guarantee schema fidelity, then auto-orchestrate follow-up tool calls (e.g., fetch author LinkedIn, cross-reference with Supabase types).
+ * - Future: upgrade to Vercel AI SDK 5.0 structured outputs to guarantee schema fidelity, then auto-orchestrate follow-up tool calls (e.g., fetch author LinkedIn, cross-reference with database types).
  *
  * Delivery notes:
  * - Cite every claim with page anchors/snippets so we uphold the "receipts" promise.

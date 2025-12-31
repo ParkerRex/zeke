@@ -3,17 +3,32 @@ import Stripe from "stripe";
 const STRIPE_API_VERSION = "2025-02-24.acacia";
 
 const secretKey = process.env.STRIPE_SECRET_KEY;
-if (!secretKey) {
-  throw new Error(
-    "Missing STRIPE_SECRET_KEY environment variable for Stripe configuration",
-  );
+
+// Stripe is optional in development - will throw when actually used if not configured
+let stripeInstance: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    if (!secretKey) {
+      throw new Error(
+        "Missing STRIPE_SECRET_KEY environment variable for Stripe configuration",
+      );
+    }
+    stripeInstance = new Stripe(secretKey, {
+      apiVersion: STRIPE_API_VERSION,
+      typescript: true,
+      appInfo: {
+        name: "Zeke API",
+      },
+    });
+  }
+  return stripeInstance;
 }
 
-export const stripe = new Stripe(secretKey, {
-  apiVersion: STRIPE_API_VERSION,
-  typescript: true,
-  appInfo: {
-    name: "Zeke API",
+// Export a proxy that lazily initializes Stripe
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return getStripe()[prop as keyof Stripe];
   },
 });
 

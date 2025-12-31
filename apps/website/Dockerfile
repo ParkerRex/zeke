@@ -10,16 +10,12 @@ COPY . .
 RUN bun install --frozen-lockfile
 
 WORKDIR /app/apps/website
-ENV NEXT_PUBLIC_SUPABASE_URL=https://hblelrtwdpukaymtpchv.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibGVscnR3ZHB1a2F5bXRwY2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4Njg1MDMsImV4cCI6MjA3MjQ0NDUwM30.PooTgnM30B30on2FBbdri2_eKqIZoR3YZb8i-jtKdjo
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN bun run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-ENV NEXT_PUBLIC_SUPABASE_URL=https://hblelrtwdpukaymtpchv.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibGVscnR3ZHB1a2F5bXRwY2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4Njg1MDMsImV4cCI6MjA3MjQ0NDUwM30.PooTgnM30B30on2FBbdri2_eKqIZoR3YZb8i-jtKdjo
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV PORT=3000

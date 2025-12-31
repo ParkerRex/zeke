@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@zeke/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { authActionClient } from "./safe-action";
@@ -13,16 +14,17 @@ export const unenrollMfaAction = authActionClient
   .metadata({
     name: "unenroll-mfa",
   })
-  .action(async ({ parsedInput: { factorId }, ctx: { supabase } }) => {
-    const { data, error } = await supabase.auth.mfa.unenroll({
-      factorId,
+  .action(async ({ ctx: { user } }) => {
+    // Disable two-factor authentication using Better Auth
+    const result = await auth.api.disableTwoFactor({
+      body: {},
+      headers: {
+        // Use the user's session for authentication
+        "x-user-id": user.id,
+      },
     });
-
-    if (error) {
-      throw Error(error.message);
-    }
 
     revalidatePath("/account/security");
 
-    return data;
+    return result;
   });
