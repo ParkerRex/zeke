@@ -586,7 +586,10 @@ export const apiKeys = pgTable(
     userId: uuid("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     keyHash: text("key_hash"),
-    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
+    scopes: text("scopes")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     lastUsedAt: timestamp("last_used_at", {
       withTimezone: true,
       mode: "string",
@@ -730,11 +733,16 @@ export const oauthApplications = pgTable(
     logoUrl: text("logo_url"),
     website: text("website"),
     installUrl: text("install_url"),
-    screenshots: text("screenshots").array().default(sql`'{}'::text[]`),
+    screenshots: text("screenshots")
+      .array()
+      .default(sql`'{}'::text[]`),
     redirectUris: text("redirect_uris").array().notNull(),
     clientId: text("client_id").notNull().unique(),
     clientSecret: text("client_secret").notNull(),
-    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
+    scopes: text("scopes")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     teamId: uuid("team_id").notNull(),
     createdBy: uuid("created_by").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
@@ -2037,5 +2045,176 @@ export const chatFeedbackRelations = relations(chatFeedback, ({ one }) => ({
   user: one(users, {
     fields: [chatFeedback.userId],
     references: [users.id],
+  }),
+}));
+
+// ============================================================================
+// BETTER AUTH TABLES
+// ============================================================================
+// These tables are required by Better Auth for authentication
+
+export const authUser = pgTable(
+  "auth_user",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    name: text("name"),
+    image: text("image"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    // Custom fields for Zeke
+    teamId: uuid("team_id").references(() => teams.id, {
+      onDelete: "set null",
+    }),
+    fullName: text("full_name"),
+    avatarUrl: text("avatar_url"),
+    locale: text("locale").default("en"),
+    timezone: text("timezone"),
+    twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  },
+  (table) => [
+    index("auth_user_email_idx").using("btree", table.email),
+    index("auth_user_team_id_idx").using("btree", table.teamId),
+  ],
+);
+
+export const authSession = pgTable(
+  "auth_session",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => authUser.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [
+    index("auth_session_user_id_idx").using("btree", table.userId),
+    index("auth_session_token_idx").using("btree", table.token),
+    index("auth_session_expires_at_idx").using("btree", table.expiresAt),
+  ],
+);
+
+export const authAccount = pgTable(
+  "auth_account",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => authUser.id, { onDelete: "cascade" }),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(), // google, github, apple, credential
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+    }),
+    scope: text("scope"),
+    idToken: text("id_token"),
+    password: text("password"), // For credential provider (hashed)
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("auth_account_user_id_idx").using("btree", table.userId),
+    index("auth_account_provider_idx").using("btree", table.providerId),
+    unique("auth_account_provider_account_unique").on(
+      table.providerId,
+      table.accountId,
+    ),
+  ],
+);
+
+export const authVerification = pgTable(
+  "auth_verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(), // email or phone
+    value: text("value").notNull(), // verification token
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("auth_verification_identifier_idx").using("btree", table.identifier),
+    index("auth_verification_value_idx").using("btree", table.value),
+  ],
+);
+
+export const authTwoFactor = pgTable(
+  "auth_two_factor",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => authUser.id, { onDelete: "cascade" })
+      .unique(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes"), // JSON array of backup codes
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("auth_two_factor_user_id_idx").using("btree", table.userId),
+  ],
+);
+
+// Auth Relations
+export const authUserRelations = relations(authUser, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [authUser.teamId],
+    references: [teams.id],
+  }),
+  sessions: many(authSession),
+  accounts: many(authAccount),
+  twoFactor: one(authTwoFactor),
+}));
+
+export const authSessionRelations = relations(authSession, ({ one }) => ({
+  user: one(authUser, {
+    fields: [authSession.userId],
+    references: [authUser.id],
+  }),
+}));
+
+export const authAccountRelations = relations(authAccount, ({ one }) => ({
+  user: one(authUser, {
+    fields: [authAccount.userId],
+    references: [authUser.id],
+  }),
+}));
+
+export const authTwoFactorRelations = relations(authTwoFactor, ({ one }) => ({
+  user: one(authUser, {
+    fields: [authTwoFactor.userId],
+    references: [authUser.id],
   }),
 }));

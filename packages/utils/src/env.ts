@@ -11,12 +11,18 @@ import { z } from "zod";
  */
 
 // Helper to create optional string with empty string as undefined
-const optionalString = z.string().optional().or(z.literal("")).transform(val => val || undefined);
+const optionalString = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .transform((val) => val || undefined);
 
 // Base environment schema - required for all apps
 const baseEnvSchema = z.object({
   // Node environment
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
 
   // Database - CRITICAL
   DATABASE_PRIMARY_URL: z.string().min(1, "DATABASE_PRIMARY_URL is required"),
@@ -26,15 +32,38 @@ const baseEnvSchema = z.object({
   // PostgreSQL SSL mode
   PGSSLMODE: z.enum(["disable", "no-verify", "require"]).optional(),
 
-  // Supabase - CRITICAL
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url("NEXT_PUBLIC_SUPABASE_URL must be a valid URL"),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20, "NEXT_PUBLIC_SUPABASE_ANON_KEY is required and must be at least 20 characters"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20, "SUPABASE_SERVICE_ROLE_KEY is required and must be at least 20 characters"),
-  SUPABASE_JWT_SECRET: z.string().min(32, "SUPABASE_JWT_SECRET is required and must be at least 32 characters"),
+  // Authentication (Better Auth) - CRITICAL
+  AUTH_SECRET: z
+    .string()
+    .min(32, "AUTH_SECRET is required and must be at least 32 characters"),
+  AUTH_TRUSTED_ORIGINS: optionalString,
 
-  // Legacy Supabase keys (for backwards compatibility)
-  SUPABASE_URL: optionalString,
-  SUPABASE_SERVICE_KEY: optionalString,
+  // OAuth Providers (optional - enable as needed)
+  GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_SECRET: optionalString,
+  GITHUB_CLIENT_ID: optionalString,
+  GITHUB_CLIENT_SECRET: optionalString,
+  APPLE_CLIENT_ID: optionalString,
+  APPLE_CLIENT_SECRET: optionalString,
+  APPLE_TEAM_ID: optionalString,
+  APPLE_KEY_ID: optionalString,
+
+  // Storage (MinIO) - CRITICAL for file uploads
+  MINIO_ENDPOINT: z
+    .string()
+    .url("MINIO_ENDPOINT must be a valid URL")
+    .optional(),
+  MINIO_ACCESS_KEY: optionalString,
+  MINIO_SECRET_KEY: optionalString,
+  MINIO_ROOT_USER: optionalString,
+  MINIO_ROOT_PASSWORD: optionalString,
+  MINIO_BUCKET_VAULT: z.string().default("vault"),
+  MINIO_BUCKET_INBOX: z.string().default("inbox"),
+  MINIO_BUCKET_ASSETS: z.string().default("assets"),
+  NEXT_PUBLIC_STORAGE_URL: optionalString,
+
+  // Realtime WebSocket
+  NEXT_PUBLIC_REALTIME_WS_URL: optionalString,
 
   // Application URLs
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -42,7 +71,9 @@ const baseEnvSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url().optional(),
 
   // OpenAI - CRITICAL for AI features
-  OPENAI_API_KEY: z.string().min(20, "OPENAI_API_KEY is required for AI features"),
+  OPENAI_API_KEY: z
+    .string()
+    .min(20, "OPENAI_API_KEY is required for AI features"),
 
   // Trigger.dev - CRITICAL for background jobs
   TRIGGER_PROJECT_ID: z.string().min(1, "TRIGGER_PROJECT_ID is required"),
@@ -55,10 +86,15 @@ const baseEnvSchema = z.object({
   TRIGGER_WEBHOOK_SECRET: optionalString,
 
   // Redis - Required for caching
-  REDIS_URL: z.string().url("REDIS_URL must be a valid URL").default("redis://localhost:6379"),
+  REDIS_URL: z
+    .string()
+    .url("REDIS_URL must be a valid URL")
+    .default("redis://localhost:6379"),
 
   // API Security
-  API_SECRET_KEY: z.string().min(32, "API_SECRET_KEY must be at least 32 characters for security"),
+  API_SECRET_KEY: z
+    .string()
+    .min(32, "API_SECRET_KEY must be at least 32 characters for security"),
   ALLOWED_API_ORIGINS: optionalString,
 
   // Vercel (optional, for deployments)
@@ -113,12 +149,7 @@ const apiEnvSchema = baseEnvSchema.pick({
   DATABASE_PRIMARY_URL: true,
   DATABASE_PRIMARY_POOLER_URL: true,
   PGSSLMODE: true,
-  NEXT_PUBLIC_SUPABASE_URL: true,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
-  SUPABASE_SERVICE_ROLE_KEY: true,
-  SUPABASE_JWT_SECRET: true,
-  SUPABASE_URL: true,
-  SUPABASE_SERVICE_KEY: true,
+  AUTH_SECRET: true,
   OPENAI_API_KEY: true,
   TRIGGER_PROJECT_ID: true,
   TRIGGER_SECRET_KEY: true,
@@ -138,12 +169,19 @@ const apiEnvSchema = baseEnvSchema.pick({
 // Dashboard-specific environment schema
 const dashboardEnvSchema = baseEnvSchema.pick({
   NODE_ENV: true,
-  NEXT_PUBLIC_SUPABASE_URL: true,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
-  SUPABASE_SERVICE_ROLE_KEY: true,
+  AUTH_SECRET: true,
+  AUTH_TRUSTED_ORIGINS: true,
+  GOOGLE_CLIENT_ID: true,
+  GOOGLE_CLIENT_SECRET: true,
+  GITHUB_CLIENT_ID: true,
+  GITHUB_CLIENT_SECRET: true,
+  APPLE_CLIENT_ID: true,
+  APPLE_CLIENT_SECRET: true,
   NEXT_PUBLIC_SITE_URL: true,
   NEXT_PUBLIC_APP_URL: true,
   NEXT_PUBLIC_API_URL: true,
+  NEXT_PUBLIC_STORAGE_URL: true,
+  NEXT_PUBLIC_REALTIME_WS_URL: true,
   STRIPE_SECRET_KEY: true,
   STRIPE_WEBHOOK_SECRET: true,
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: true,
@@ -165,18 +203,18 @@ export type DashboardEnv = z.infer<typeof dashboardEnvSchema>;
  */
 function validateEnv<T extends z.ZodType>(
   schema: T,
-  source: NodeJS.ProcessEnv = process.env
+  source: NodeJS.ProcessEnv = process.env,
 ): z.infer<T> {
   try {
     return schema.parse(source);
   } catch (error: any) {
     // Handle Zod validation errors
-    if (error && error.name === 'ZodError') {
+    if (error && error.name === "ZodError") {
       // In Zod v4, the error message contains the stringified errors array
       // Try to parse it, or use the error object directly if it has errors property
       let errorList: any[] = [];
 
-      if ('errors' in error && Array.isArray(error.errors)) {
+      if ("errors" in error && Array.isArray(error.errors)) {
         // Zod v3 format
         errorList = error.errors;
       } else if (error.message) {
@@ -187,7 +225,9 @@ function validateEnv<T extends z.ZodType>(
           // If parsing fails, show the raw message
           console.error("\n❌ Environment variable validation failed:");
           console.error(error.message);
-          console.error("\nPlease check your .env file and ensure all required variables are set.\n");
+          console.error(
+            "\nPlease check your .env file and ensure all required variables are set.\n",
+          );
           throw new Error("Invalid environment configuration");
         }
       }
@@ -198,7 +238,9 @@ function validateEnv<T extends z.ZodType>(
 
       console.error("\n❌ Environment variable validation failed:\n");
       console.error(missingVars);
-      console.error("\nPlease check your .env file and ensure all required variables are set.\n");
+      console.error(
+        "\nPlease check your .env file and ensure all required variables are set.\n",
+      );
 
       throw new Error("Invalid environment configuration");
     }

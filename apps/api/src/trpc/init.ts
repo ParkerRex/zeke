@@ -1,9 +1,6 @@
-import { createClient } from "@api/services/supabase";
 import { verifyAccessToken } from "@api/utils/auth";
 import type { Session } from "@api/utils/auth";
 import { getGeoContext } from "@api/utils/geo";
-import type { Database } from "@db/client";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { db } from "@zeke/db/client";
 import type { Context } from "hono";
@@ -11,9 +8,10 @@ import superjson from "superjson";
 import { withPrimaryReadAfterWrite } from "./middleware/primary-read-after-write";
 import { withTeamPermission } from "./middleware/team-permission";
 
+type Database = typeof db;
+
 type TRPCContext = {
   session: Session | null;
-  supabase: SupabaseClient;
   db: Database;
   geo: ReturnType<typeof getGeoContext>;
   teamId?: string;
@@ -25,14 +23,12 @@ export const createTRPCContext = async (
 ): Promise<TRPCContext> => {
   const accessToken = c.req.header("Authorization")?.split(" ")[1];
   const session = await verifyAccessToken(accessToken);
-  const supabase = await createClient(accessToken);
 
-  // Use the singleton database instance - no need for caching
+  // Use the singleton database instance
   const geo = getGeoContext(c.req);
 
   return {
     session,
-    supabase,
     db,
     geo,
   };

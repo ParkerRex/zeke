@@ -1,0 +1,30 @@
+{
+  "name": "@zeke/auth",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zeke/db": "workspace:*",
+    "@zeke/utils": "workspace:*",
+    "better-auth": "^1.2.3",
+    "server-only": "^0.0.1",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "typescript": "^5.9.2"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/client/server.ts",
+    "./client": "./src/client/browser.ts",
+    "./middleware": "./src/client/middleware.ts",
+    "./admin": "./src/client/admin.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

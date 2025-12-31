@@ -2,7 +2,7 @@
 
 import { verifyOtpAction } from "@/actions/verify-otp-action";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { cn } from "@zeke/ui/cn";
 import { Form, FormControl, FormField, FormItem } from "@zeke/ui/form";
 import { Input } from "@zeke/ui/input";
@@ -29,7 +29,6 @@ export function OTPSignIn({ className }: Props) {
   const [isSent, setSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [email, setEmail] = useState<string>();
-  const supabase = createClient();
   const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,7 +43,11 @@ export function OTPSignIn({ className }: Props) {
 
     setEmail(email);
 
-    await supabase.auth.signInWithOtp({ email });
+    // Send magic link email via Better Auth
+    await authClient.signIn.magicLink({
+      email,
+      callbackURL: `${window.location.origin}/${searchParams.get("return_to") || ""}`,
+    });
 
     setSent(true);
     setLoading(false);

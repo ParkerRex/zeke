@@ -18,7 +18,7 @@
     "@team-plain/typescript-sdk": "5.9.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@zeke/events": "workspace:*",
-    "@zeke/supabase": "workspace:*",
+    "@zeke/db": "workspace:*",
     "@zeke/ui": "workspace:*",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.22",

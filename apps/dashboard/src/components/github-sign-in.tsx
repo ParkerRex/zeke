@@ -2,7 +2,7 @@
 
 import { getUrl } from "@/utils/environment";
 import { isDesktopApp } from "@zeke/desktop-client/platform";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { Icons } from "@zeke/ui/icons";
 import { SubmitButton } from "@zeke/ui/submit-button";
 import { useSearchParams } from "next/navigation";
@@ -10,44 +10,28 @@ import { useState } from "react";
 
 export function GithubSignIn() {
   const [isLoading, setLoading] = useState(false);
-  const supabase = createClient();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("return_to");
 
   const handleSignIn = async () => {
     setLoading(true);
 
+    const callbackUrl = new URL("/api/auth/callback", getUrl());
+
     if (isDesktopApp()) {
-      const redirectTo = new URL("/api/auth/callback", getUrl());
-
-      redirectTo.searchParams.append("provider", "github");
-      redirectTo.searchParams.append("client", "desktop");
-
-      await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: {
-          redirectTo: redirectTo.toString(),
-          queryParams: {
-            client: "desktop",
-          },
-        },
-      });
+      callbackUrl.searchParams.append("provider", "github");
+      callbackUrl.searchParams.append("client", "desktop");
     } else {
-      const redirectTo = new URL("/api/auth/callback", getUrl());
-
       if (returnTo) {
-        redirectTo.searchParams.append("return_to", returnTo);
+        callbackUrl.searchParams.append("return_to", returnTo);
       }
-
-      redirectTo.searchParams.append("provider", "github");
-
-      await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: {
-          redirectTo: redirectTo.toString(),
-        },
-      });
+      callbackUrl.searchParams.append("provider", "github");
     }
+
+    await authClient.signIn.social({
+      provider: "github",
+      callbackURL: callbackUrl.toString(),
+    });
 
     setTimeout(() => {
       setLoading(false);

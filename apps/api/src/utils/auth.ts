@@ -1,5 +1,4 @@
 import { type JWTPayload, jwtVerify } from "jose";
-import { getApiEnv } from "@zeke/utils/env";
 
 export type Session = {
   user: {
@@ -10,12 +9,10 @@ export type Session = {
   teamId?: string;
 };
 
-type SupabaseJWTPayload = JWTPayload & {
-  user_metadata?: {
-    email?: string;
-    full_name?: string;
-    [key: string]: string | undefined;
-  };
+type BetterAuthJWTPayload = JWTPayload & {
+  email?: string;
+  name?: string;
+  [key: string]: unknown;
 };
 
 export async function verifyAccessToken(
@@ -24,21 +21,23 @@ export async function verifyAccessToken(
   if (!accessToken) return null;
 
   try {
-    // Get validated environment - will fail fast if SUPABASE_JWT_SECRET is missing
-    const env = getApiEnv();
+    const authSecret = process.env.AUTH_SECRET;
+    if (!authSecret) {
+      throw new Error("AUTH_SECRET environment variable is required");
+    }
 
     const { payload } = await jwtVerify(
       accessToken,
-      new TextEncoder().encode(env.SUPABASE_JWT_SECRET),
+      new TextEncoder().encode(authSecret),
     );
 
-    const supabasePayload = payload as SupabaseJWTPayload;
+    const authPayload = payload as BetterAuthJWTPayload;
 
     return {
       user: {
-        id: supabasePayload.sub!,
-        email: supabasePayload.user_metadata?.email,
-        full_name: supabasePayload.user_metadata?.full_name,
+        id: authPayload.sub!,
+        email: authPayload.email,
+        full_name: authPayload.name,
       },
     };
   } catch (error) {

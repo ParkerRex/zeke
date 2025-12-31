@@ -2,41 +2,30 @@
 
 import { getUrl } from "@/utils/environment";
 import { isDesktopApp } from "@zeke/desktop-client/platform";
-import { createClient } from "@zeke/supabase/client";
+import { authClient } from "@zeke/auth/client";
 import { Icons } from "@zeke/ui/icons";
 import { SubmitButton } from "@zeke/ui/submit-button";
 import { useState } from "react";
 
 export function AppleSignIn() {
   const [isLoading, setLoading] = useState(false);
-  const supabase = createClient();
 
   const handleSignIn = async () => {
     setLoading(true);
 
+    const callbackUrl = new URL("/api/auth/callback", getUrl());
+
     if (isDesktopApp()) {
-      const redirectTo = new URL("/api/auth/callback", getUrl());
-
-      redirectTo.searchParams.append("provider", "apple");
-      redirectTo.searchParams.append("client", "desktop");
-
-      await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: redirectTo.toString(),
-          queryParams: {
-            client: "desktop",
-          },
-        },
-      });
+      callbackUrl.searchParams.append("provider", "apple");
+      callbackUrl.searchParams.append("client", "desktop");
     } else {
-      await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: `${getUrl()}/api/auth/callback?provider=apple`,
-        },
-      });
+      callbackUrl.searchParams.append("provider", "apple");
     }
+
+    await authClient.signIn.social({
+      provider: "apple",
+      callbackURL: callbackUrl.toString(),
+    });
 
     setTimeout(() => {
       setLoading(false);

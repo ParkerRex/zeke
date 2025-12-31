@@ -4,18 +4,13 @@ import { useEffect, useRef, useCallback, useState } from "react";
 
 type RealtimeOperation = "INSERT" | "UPDATE" | "DELETE" | "*";
 
-interface RealtimePayload<T> {
-  eventType: RealtimeOperation;
-  new: T;
-  old?: T;
-}
-
 interface UseRealtimeProps<T> {
   channelName: string;
-  event?: RealtimeOperation;
   table: string;
   filter?: string;
-  onEvent: (payload: RealtimePayload<T>) => void;
+  event?: RealtimeOperation;
+  onEvent: (payload: { event: string; payload: T }) => void;
+  enabled?: boolean;
 }
 
 interface WebSocketMessage {
@@ -28,10 +23,11 @@ interface WebSocketMessage {
 
 export function useRealtime<T>({
   channelName,
-  event = "*",
   table,
   filter,
+  event = "*",
   onEvent,
+  enabled = true,
 }: UseRealtimeProps<T>) {
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -44,18 +40,19 @@ export function useRealtime<T>({
   }, [onEvent]);
 
   const connect = useCallback(async () => {
+    if (!enabled) return;
+
     const wsUrl = process.env.NEXT_PUBLIC_REALTIME_WS_URL;
     if (!wsUrl) {
-      console.warn(
-        "NEXT_PUBLIC_REALTIME_WS_URL not configured, realtime disabled",
-      );
+      console.warn("NEXT_PUBLIC_REALTIME_WS_URL not configured");
       return;
     }
 
-    try {
-      // Get auth token - implement based on your session storage
-      const token = ""; // TODO: Get from session
+    // Get access token from session (implement based on your auth)
+    // For now, use a placeholder
+    const token = ""; // await getAccessToken();
 
+    try {
       const ws = new WebSocket(`${wsUrl}?token=${token}`);
 
       ws.onopen = () => {
@@ -80,9 +77,8 @@ export function useRealtime<T>({
           if (data.type === "postgres_changes" && data.table === table) {
             if (event === "*" || data.event === event) {
               onEventRef.current({
-                eventType: data.event as RealtimeOperation,
-                new: data.payload,
-                old: undefined,
+                event: data.event || "",
+                payload: data.payload,
               });
             }
           }
@@ -96,9 +92,11 @@ export function useRealtime<T>({
         setIsConnected(false);
 
         // Attempt to reconnect after 3 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, 3000);
+        if (enabled) {
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connect();
+          }, 3000);
+        }
       };
 
       ws.onerror = (error) => {
@@ -109,7 +107,7 @@ export function useRealtime<T>({
     } catch (error) {
       console.error("Failed to connect to realtime:", error);
     }
-  }, [channelName, table, filter, event]);
+  }, [enabled, channelName, table, filter, event]);
 
   useEffect(() => {
     connect();

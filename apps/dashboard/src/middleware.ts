@@ -1,4 +1,4 @@
-import { createMiddlewareClient, updateSession } from "@zeke/supabase/middleware";
+import { validateSession } from "@zeke/auth/middleware";
 import { createI18nMiddleware } from "next-international/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -10,8 +10,7 @@ const I18nMiddleware = createI18nMiddleware({
 
 export async function middleware(request: NextRequest) {
   const i18nResponse = I18nMiddleware(request);
-  const response = await updateSession(request, i18nResponse);
-  const supabase = createMiddlewareClient(request, response);
+  const session = await validateSession(request);
   const url = new URL("/", request.url);
   const nextUrl = request.nextUrl;
 
@@ -29,12 +28,8 @@ export async function middleware(request: NextRequest) {
     newUrl.search
   }`;
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[MIDDLEWARE DEBUG]', {
+  if (process.env.NODE_ENV === "development") {
+    console.log("[MIDDLEWARE DEBUG]", {
       pathname: newUrl.pathname,
       pathnameWithoutLocale,
       hasSession: !!session,
@@ -55,13 +50,13 @@ export async function middleware(request: NextRequest) {
     !newUrl.pathname.includes("/desktop/search") &&
     !newUrl.pathname.includes("/mfa/setup")
   ) {
-    const url = new URL("/login", request.url);
+    const redirectUrl = new URL("/login", request.url);
 
     if (encodedSearchParams) {
-      url.searchParams.append("return_to", encodedSearchParams);
+      redirectUrl.searchParams.append("return_to", encodedSearchParams);
     }
 
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(redirectUrl);
   }
 
   // If authenticated, proceed with other checks
@@ -72,7 +67,6 @@ export async function middleware(request: NextRequest) {
 
       if (inviteCodeMatch) {
         // Allow proceeding to invite page even without setup
-        // Redirecting with the original path including locale if present
         return NextResponse.redirect(
           `${url.origin}${request.nextUrl.pathname}`,
         );
@@ -80,27 +74,25 @@ export async function middleware(request: NextRequest) {
     }
 
     // 3. Check MFA Verification
-    const { data: mfaData } =
-      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (
-      mfaData &&
-      mfaData.nextLevel === "aal2" &&
-      mfaData.nextLevel !== mfaData.currentLevel &&
-      newUrl.pathname !== "/mfa/verify"
-    ) {
-      const url = new URL("/mfa/verify", request.url);
+    // Better Auth stores two-factor status on the user object
+    if (session.user.twoFactorEnabled && newUrl.pathname !== "/mfa/verify") {
+      // Check if MFA is verified for this session via cookie
+      const mfaVerified = request.cookies.get("mfa_verified")?.value === "true";
 
-      if (encodedSearchParams) {
-        url.searchParams.append("return_to", encodedSearchParams);
+      if (!mfaVerified) {
+        const mfaUrl = new URL("/mfa/verify", request.url);
+
+        if (encodedSearchParams) {
+          mfaUrl.searchParams.append("return_to", encodedSearchParams);
+        }
+
+        return NextResponse.redirect(mfaUrl);
       }
-
-      // Redirect to MFA verification if needed and not already there
-      return NextResponse.redirect(url);
     }
   }
 
   // If all checks pass, return the original or updated response
-  return response;
+  return i18nResponse;
 }
 
 export const config = {

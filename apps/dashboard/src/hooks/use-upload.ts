@@ -1,9 +1,4 @@
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
-
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@zeke/supabase/client";
-import { upload } from "@zeke/supabase/storage";
+import { upload, getSignedUploadUrl } from "@zeke/storage";
 import { useState } from "react";
 
 interface UploadParams {
@@ -18,7 +13,6 @@ interface UploadResult {
 }
 
 export function useUpload() {
-  const supabase: SupabaseClient = createClient();
   const [isLoading, setLoading] = useState<boolean>(false);
 
   const uploadFile = async ({
@@ -29,10 +23,19 @@ export function useUpload() {
     setLoading(true);
 
     try {
-      const url = await upload(supabase, {
-        path,
-        file,
+      // Convert File to Buffer
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      // Full path including filename
+      const fullPath = [...path, file.name].join("/");
+
+      // Upload to MinIO
+      const url = await upload({
+        file: buffer,
+        path: fullPath,
         bucket,
+        contentType: file.type,
       });
 
       return {
@@ -44,8 +47,18 @@ export function useUpload() {
     }
   };
 
+  // Get a signed URL for direct upload (useful for large files)
+  const getUploadUrl = async (
+    bucket: string,
+    path: string,
+    contentType?: string,
+  ): Promise<string> => {
+    return getSignedUploadUrl(bucket, path, { contentType });
+  };
+
   return {
     uploadFile,
+    getUploadUrl,
     isLoading,
   };
 }
