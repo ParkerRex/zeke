@@ -118,6 +118,47 @@ export async function middleware(request: NextRequest) {
 }
 ```
 
+## Two-Factor Authentication
+
+Better Auth includes TOTP-based 2FA:
+
+```typescript
+// packages/auth/src/config.ts
+import { twoFactor } from "better-auth/plugins";
+
+export const auth = betterAuth({
+  plugins: [
+    twoFactor({
+      issuer: "zekehq.com",
+      otpOptions: {
+        digits: 6,
+        period: 30,
+      },
+    }),
+  ],
+});
+```
+
+### Client Usage
+
+```typescript
+import { authClient } from "@zeke/auth/client";
+
+// Enable 2FA
+const { data } = await authClient.twoFactor.enable();
+// Returns QR code URL for authenticator app
+
+// Verify 2FA code
+await authClient.twoFactor.verifyTotp({
+  code: "123456",
+});
+
+// Disable 2FA
+await authClient.twoFactor.disable({
+  password: "user-password",
+});
+```
+
 ## Session Management
 
 Sessions are stored in the database:

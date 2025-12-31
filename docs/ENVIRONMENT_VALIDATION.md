@@ -69,6 +69,7 @@ These variables have strict validation to prevent security issues:
 
 - **API_SECRET_KEY**: Must be at least 32 characters
 - **BETTER_AUTH_SECRET**: Must be at least 32 characters
+- **ZEKE_ENCRYPTION_KEY**: Must be a 64-character hex string (32 bytes) for data encryption
 - **DATABASE_PRIMARY_URL**: Required, validated as non-empty string
 
 ### Required Variables

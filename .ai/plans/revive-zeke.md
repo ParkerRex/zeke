@@ -24,11 +24,12 @@
 | Apple Podcasts | Complete | None | iTunes API + RSS |
 | Semantic Scholar | Complete | None | Rate-limited free tier |
 
-### Pending Bugs
-| ID | Issue | Priority |
-|----|-------|----------|
-| 007 | RBAC returns `isAdmin: true` for all users | P1 |
-| 009 | Stripe customer ID not stored in DB | P2 |
+### Resolved Bugs
+| ID | Issue | Status |
+|----|-------|--------|
+| 007 | RBAC returns `isAdmin: true` for all users | FIXED - Added `systemRole` enum and `getAdminStatus()` in `packages/db/src/queries/auth.ts` |
+| 008 | MFA not configured | FIXED - Better Auth twoFactor plugin configured in `packages/auth/src/config.ts` |
+| 009 | Stripe customer ID not stored in DB | FIXED - Added `stripeCustomerId` field to teams table and query functions |
 
 ---
 
