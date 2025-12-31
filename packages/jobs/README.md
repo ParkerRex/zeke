@@ -1,50 +1,38 @@
-# Zeke Jobs - The Intelligence Layer
+# Zeke Jobs - Background Processing
 
-## Executive Summary
+Background job processing for Zeke, powered by [pg-boss](https://github.com/timgit/pg-boss).
 
-Jobs is Zeke's orchestration and intelligence layer, powered by Trigger.dev. While the Engine fetches and normalizes content from research sources, Jobs applies AI to transform that content into structured insights, playbooks, and actionable intelligence. Think of it as the "brain" that turns raw research into `ContentAnalysis` JSON.
+## Overview
 
-**Key Insight**: Engine is to Jobs what Plaid is to Mint - Engine provides normalized data access, Jobs provides intelligent analysis.
+Jobs is Zeke's orchestration and intelligence layer. While the Engine fetches and normalizes content from research sources, Jobs applies AI to transform that content into structured insights, playbooks, and actionable intelligence.
 
-## Architecture Overview
-
-### The Pipeline
+## Architecture
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
 │   Engine    │────▶│     Jobs     │────▶│  AI Prompts   │────▶│   Database   │
 │  (Fetch)    │     │ (Orchestrate)│     │  (Transform)  │     │   (Store)    │
 └─────────────┘     └──────────────┘     └───────────────┘     └──────────────┘
-     │                     │                      │                     │
-  Stateless            Stateful              Intelligence          Persistence
-  - OAuth             - Workflows            - extract-pdf       - Stories
-  - Fetch             - Scheduling           - extract-blog      - Highlights
-  - Normalize         - Retries              - extract-video     - Playbooks
 ```
 
-### Division of Labor
+## Running the Worker
 
-**What Jobs DOES:**
-- Orchestrates multi-step workflows (fetch → enrich → analyze → notify)
-- Applies AI extraction prompts to normalized content
-- Manages deduplication and story clustering
-- Handles scheduling and retries
-- Stores processed results in database
-- Generates playbooks aligned to business goals
+```bash
+# Development (with hot reload)
+pnpm worker:dev
 
-**What Jobs DOES NOT DO:**
-- Connect directly to external APIs (that's Engine's job)
-- Handle OAuth flows (Engine manages auth)
-- Store raw API responses (uses Engine's normalized format)
+# Production
+pnpm worker
+```
 
 ## Task Organization
 
 ```
-packages/jobs/src/tasks/
+src/tasks/
 ├── sources/                    # Content ingestion pipeline
 │   ├── pull/                   # Scheduled fetching from Engine
-│   │   ├── rss.ts             # Pull RSS feeds via Engine
-│   │   ├── youtube.ts         # Pull YouTube videos via Engine
+│   │   ├── rss.ts             # Pull RSS feeds
+│   │   ├── youtube.ts         # Pull YouTube videos
 │   │   └── manual.ts          # On-demand URL ingestion
 │   ├── ingest/                 # Process and store
 │   │   ├── from-feed.ts       # Process RSS items
@@ -65,195 +53,91 @@ packages/jobs/src/tasks/
 │
 └── playbooks/                   # Actionable automation
     ├── run.ts                  # Execute playbook workflow
-    └── steps/
-        ├── gather-context.ts   # Collect business context
-        ├── branch-content.ts   # Route by content type
-        └── finalize.ts         # Generate final playbook
+    └── steps/                  # Playbook step handlers
 ```
 
-## Integration with Engine
+## Defining Tasks
 
-### Example Flow: YouTube Video Processing
+Tasks are defined using the `schemaTask` wrapper:
 
 ```typescript
-// 1. Jobs schedules a pull (sources/pull/youtube.ts)
-export const pullYouTube = schemaTask({
-  id: "pull-youtube",
-  schedule: "every 30 minutes",
-  run: async () => {
-    // Call Engine to get normalized content
-    const videos = await engine.youtube.getContent({
-      channelIds: user.subscriptions,
-      since: lastPull
-    });
+import { z } from "zod";
+import { schemaTask, tasks, logger } from "@jobs/schema-task";
 
-    // Trigger processing for each video
-    for (const video of videos) {
-      await generateInsights.trigger({ content: video });
-    }
-  }
+export const myTask = schemaTask({
+  id: "my-task",
+  schema: z.object({
+    itemId: z.string().uuid(),
+  }),
+  queue: {
+    concurrencyLimit: 5,
+  },
+  run: async (payload, { logger, run }) => {
+    logger.info("Processing", { itemId: payload.itemId });
+
+    // Trigger another task
+    await tasks.trigger("another-task", { data: "value" });
+
+    return { success: true };
+  },
 });
-
-// 2. Jobs applies AI extraction (insights/generate.ts)
-export const generateInsights = schemaTask({
-  id: "generate-insights",
-  run: async ({ content }) => {
-    // Apply the appropriate extraction prompt
-    const analysis = await extractVideo({
-      transcript: content.transcript,
-      businessContext: {
-        companyName: user.company,
-        strategicGoals: user.goals,
-        kpis: user.metrics
-      }
-    });
-
-    // Store ContentAnalysis with citations, playbooks
-    await storeAnalysis(analysis);
-  }
-});
-
-// 3. Result: Structured ContentAnalysis
-{
-  title: "How Cursor built their AI editor",
-  highlights: [
-    "Used GPT-4 for code completion (t 5:23)",
-    "100ms latency target for suggestions (t 12:45)"
-  ],
-  whyItMatters: "Directly supports Goal: improve developer velocity",
-  keyTakeaways: [...],
-  playbook: {
-    objective: "Implement AI code completion",
-    steps: [
-      {
-        label: "Audit current IDE latency",
-        owner: "Engineering Lead",
-        timeline: "Week 1"
-      }
-    ]
-  }
-}
 ```
 
-## AI Extraction Prompts
+## Scheduled Jobs
 
-Jobs applies three main extraction prompts (found in `docs/system-prompts/`):
-
-### extract-pdf.prompt.md
-- Processes academic papers and technical documents
-- Extracts: novelty, prerequisites, citations, reproducibility
-- Output: `ContentAnalysis` with page-level citations
-
-### extract-blog.prompt.md
-- Processes blog posts and articles
-- Extracts: key points, quotes, frameworks
-- Output: `ContentAnalysis` with section citations
-
-### extract-video.prompt.md
-- Processes video transcripts (YouTube, podcasts)
-- Extracts: key moments, speaker positions, timestamps
-- Output: `ContentAnalysis` with time-based citations
-
-## Scheduling & Orchestration
-
-Jobs uses Trigger.dev v3 for orchestration:
+Schedules are defined in `src/scheduler.ts`:
 
 ```typescript
-// Recurring schedules
-schedules.create({
-  id: "pull-all-sources",
-  cron: "0 */6 * * *",  // Every 6 hours
-  task: pullAllSources.id
-});
-
-// Event-driven triggers
-await ingestUrl.trigger({
-  url: "https://arxiv.org/abs/2401.12345",
-  requestedBy: userId
-});
-
-// Batch processing
-await generateInsights.batchTrigger(
-  contents.map(c => ({ payload: { contentId: c.id }}))
-);
+const schedules = [
+  {
+    taskId: "ingest-pull",
+    cron: "*/5 * * * *", // Every 5 minutes
+    description: "RSS feed ingestion",
+  },
+  {
+    taskId: "ingest-pull-youtube",
+    cron: "0 */6 * * *", // Every 6 hours
+    description: "YouTube channel ingestion",
+  },
+];
 ```
 
-## Why This Architecture Works
-
-### Separation of Concerns
-- **Engine**: Handles the messy reality of external APIs
-- **Jobs**: Handles the complex reality of AI processing
-- **Result**: Each layer can evolve independently
-
-### Scalability
-- Engine scales horizontally (more workers)
-- Jobs scales through concurrency limits
-- AI processing can be parallelized
-
-### Reliability
-- Failed AI processing doesn't require re-fetching
-- Engine responses can be cached aggressively
-- Jobs handles retries with exponential backoff
-
-### Cost Optimization
-- Cache expensive API calls at Engine layer
-- Batch AI processing to reduce API costs
-- Skip processing for duplicate content
-
-## Environment Configuration
+## Environment Variables
 
 ```bash
-# Trigger.dev
-TRIGGER_PROJECT_ID=xxx
-TRIGGER_SECRET_KEY=xxx
+# Database (required)
+DATABASE_PRIMARY_URL=postgresql://...
 
-# OpenAI (for extraction prompts)
-OPENAI_API_KEY=xxx
+# OpenAI (required for AI tasks)
+OPENAI_API_KEY=sk-...
 
-# Database
-DATABASE_URL=postgresql://...
-
-# Engine API
-ENGINE_API_URL=https://engine.zekehq.com
-ENGINE_API_KEY=xxx
+# Timezone for cron schedules
+JOBS_CRON_TZ=UTC
 ```
 
-## Running Locally
+## Key Files
 
-```bash
-# Install dependencies
-bun install
-
-# Run Trigger.dev dev server
-bun trigger:dev
-
-# In another terminal, run the worker
-bun dev:jobs
-
-# Trigger a test job
-bun trigger:test
-```
-
-## Deployment
-
-Jobs are automatically deployed when pushing to main:
-
-```bash
-# Deploy to staging
-bun run deploy:staging
-
-# Deploy to production
-bun run deploy:production
-```
+| File | Purpose |
+|------|---------|
+| `src/boss.ts` | pg-boss singleton |
+| `src/schema-task.ts` | Task wrapper with Zod validation |
+| `src/worker.ts` | Worker entry point |
+| `src/scheduler.ts` | Cron schedules |
+| `src/client.ts` | Client API for triggering jobs |
 
 ## Monitoring
 
-Access the Trigger.dev dashboard to:
-- View running jobs and schedules
-- Monitor success/failure rates
-- Inspect job payloads and errors
-- Manage concurrency limits
+pg-boss stores job data in the `pgboss` schema:
 
----
+```sql
+-- View recent jobs
+SELECT * FROM pgboss.job ORDER BY createdon DESC LIMIT 20;
 
-Jobs is the intelligence layer that transforms Zeke from a content aggregator into an insight generator. By cleanly separating ingestion (Engine) from intelligence (Jobs), we can scale each layer independently while maintaining a simple, reliable pipeline from source to insight.
+-- View failed jobs
+SELECT * FROM pgboss.job WHERE state = 'failed';
+
+-- View schedules
+SELECT * FROM pgboss.schedule;
+```
+
+See [docs/background-jobs.md](../../docs/background-jobs.md) for full documentation.

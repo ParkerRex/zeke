@@ -15,7 +15,7 @@
 - **DB Studio**: `cd packages/db && bun run migrate:studio`
 
 ## Architecture
-Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (Trigger.dev), **ui** (React components), **auth** (Better Auth), **storage** (MinIO), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
+Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (pg-boss background jobs), **ui** (React components), **auth** (Better Auth), **storage** (MinIO), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
 
 ## Database
 - **Schema**: `packages/db/src/schema.ts` (Drizzle ORM, snake_case DB → camelCase app via `casing: "snake_case"`)

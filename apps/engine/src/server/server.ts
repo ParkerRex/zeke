@@ -10,9 +10,6 @@ function buildEnv(): ProviderFacade {
 
   const provider = createProvider({
     API_SECRET_KEY: env.API_SECRET_KEY,
-    TRIGGER_PROJECT_ID: env.TRIGGER_PROJECT_ID,
-    TRIGGER_SECRET_KEY: env.TRIGGER_SECRET_KEY,
-    TRIGGER_WEBHOOK_SECRET: env.TRIGGER_WEBHOOK_SECRET,
     YOUTUBE_API_KEY: env.YOUTUBE_API_KEY ?? "",
     YOUTUBE_QUOTA_LIMIT: env.YOUTUBE_QUOTA_LIMIT ?? "0",
     YOUTUBE_QUOTA_RESET_HOUR: env.YOUTUBE_QUOTA_RESET_HOUR ?? "0",
@@ -28,7 +25,10 @@ export async function createServer() {
   const server = http.createServer(async (req, res) => {
     try {
       const env = getEngineEnv();
-      const requestUrl = new URL(req.url ?? "", `http://localhost:${env.PORT ?? 3010}`);
+      const requestUrl = new URL(
+        req.url ?? "",
+        `http://localhost:${env.PORT ?? 3010}`,
+      );
 
       if (req.method === "GET" && requestUrl.pathname === "/health") {
         const health = await provider.getHealthCheck();

@@ -26,7 +26,7 @@ export async function getBoss(): Promise<PgBoss> {
       retentionDays: 7,
     });
 
-    boss.on("error", (error) => {
+    boss.on("error", (error: Error) => {
       console.error("[pg-boss] Error:", error);
     });
 

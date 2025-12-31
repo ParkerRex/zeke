@@ -86,48 +86,51 @@ export function schemaTask<T extends z.ZodType>(
 
     async register(): Promise<void> {
       const boss = await getBoss();
-      const teamSize = queue?.concurrencyLimit ?? 1;
+      const batchSize = queue?.concurrencyLimit ?? 1;
 
       await boss.work<z.infer<T>>(
         id,
-        { teamSize },
-        async (job: PgBoss.Job<z.infer<T>>) => {
-          const logger = createLogger(id, job.id);
+        { batchSize },
+        async (jobs: PgBoss.Job<z.infer<T>>[]) => {
+          // Process each job in the batch
+          for (const job of jobs) {
+            const logger = createLogger(id, job.id);
 
-          logger.info("job_started", {
-            payload: job.data,
-          });
+            logger.info("job_started", {
+              payload: job.data,
+            });
 
-          const ctx: TaskContext = {
-            jobId: job.id,
-            logger,
-            run: { id: job.id },
-          };
+            const ctx: TaskContext = {
+              jobId: job.id,
+              logger,
+              run: { id: job.id },
+            };
 
-          // Wrap job execution with database context
-          return withJobDb(async () => {
-            try {
-              const validated = schema.parse(job.data);
-              const result = await run(validated, ctx);
+            // Wrap job execution with database context
+            await withJobDb(async () => {
+              try {
+                const validated = schema.parse(job.data);
+                const result = await run(validated, ctx);
 
-              logger.info("job_completed", {
-                result: result !== undefined ? "has_result" : "no_result",
-              });
+                logger.info("job_completed", {
+                  result: result !== undefined ? "has_result" : "no_result",
+                });
 
-              return result;
-            } catch (error) {
-              logger.error("job_failed", {
-                error: error instanceof Error ? error.message : String(error),
-                stack: error instanceof Error ? error.stack : undefined,
-              });
-              throw error;
-            }
-          });
+                return result;
+              } catch (error) {
+                logger.error("job_failed", {
+                  error: error instanceof Error ? error.message : String(error),
+                  stack: error instanceof Error ? error.stack : undefined,
+                });
+                throw error;
+              }
+            });
+          }
         },
       );
 
       console.log(
-        `[pg-boss] Registered handler for task: ${id} (concurrency: ${teamSize})`,
+        `[pg-boss] Registered handler for task: ${id} (batchSize: ${batchSize})`,
       );
     },
   };

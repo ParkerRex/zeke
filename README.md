@@ -10,7 +10,7 @@ AI-powered research assistant that transforms content into actionable insights.
 - **Database**: PostgreSQL + Drizzle ORM (with pgvector)
 - **Auth**: Better Auth
 - **Storage**: MinIO (S3-compatible)
-- **Background Jobs**: Trigger.dev
+- **Background Jobs**: pg-boss (PostgreSQL-backed)
 - **AI**: OpenAI via Vercel AI SDK
 - **Payments**: Stripe
 
@@ -27,7 +27,7 @@ apps/
 packages/
   db/            Drizzle schema and queries
   auth/          Better Auth config
-  jobs/          Trigger.dev tasks
+  jobs/          pg-boss background tasks
   storage/       MinIO client
   ui/            Shared React components
   cache/         Redis client
