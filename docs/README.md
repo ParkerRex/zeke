@@ -2,6 +2,13 @@
 
 AI-powered research intelligence platform that transforms content into actionable insights.
 
+## Quick Start
+
+```bash
+bun install && cp .env.example .env
+bun dev  # Starts Docker + all apps
+```
+
 ## Quick Links
 
 | Document | Description |
@@ -27,24 +34,34 @@ AI-powered research intelligence platform that transforms content into actionabl
 |---------|-------------|
 | [Database](./packages/database.md) | Drizzle ORM schema and queries |
 | [Jobs](./packages/jobs.md) | pg-boss background tasks |
-| [Auth](./packages/auth.md) | Better Auth configuration |
+| [Auth](./packages/auth.md) | Better Auth configuration (with 2FA) |
 | [Storage](./packages/storage.md) | MinIO S3-compatible client |
 | [Cache](./packages/cache.md) | Redis caching layer |
 | [UI](./packages/ui.md) | Shared React components |
 | [Utilities](./packages/utilities.md) | Utils, logger, encryption |
 
+## Infrastructure
+
+| Service | Port | Description |
+|---------|------|-------------|
+| PostgreSQL | 5435 | Primary database (pgvector) |
+| Redis | 6379 | Cache and sessions |
+| MinIO | 9000/9001 | Object storage (S3-compatible) |
+
 ## Tech Stack
 
-- **Runtime**: Bun
-- **API**: Hono + TRPC
-- **Frontend**: Next.js 15, React 19
-- **Database**: PostgreSQL 16 + Drizzle ORM (with pgvector)
-- **Auth**: Better Auth
-- **Storage**: MinIO (S3-compatible)
-- **Background Jobs**: pg-boss (PostgreSQL-backed)
-- **Cache**: Redis
-- **AI**: OpenAI via Vercel AI SDK
-- **Payments**: Stripe
+| Category | Technology |
+|----------|------------|
+| Runtime | Bun |
+| API | Hono + TRPC |
+| Frontend | Next.js 15, React 19 |
+| Database | PostgreSQL 16 + Drizzle ORM (pgvector) |
+| Auth | Better Auth (with 2FA) |
+| Storage | MinIO (S3-compatible) |
+| Jobs | pg-boss (PostgreSQL-backed) |
+| Cache | Redis |
+| AI | OpenAI via Vercel AI SDK |
+| Payments | Stripe |
 
 ## Project Structure
 
@@ -67,3 +84,16 @@ zeke/
 ├── docs/             # This documentation
 └── deploy/           # Docker configs
 ```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `bun dev` | Start full stack (Docker + apps) |
+| `bun run stop` | Stop apps |
+| `bun run stop -- --docker` | Stop everything |
+| `bun run build` | Build all apps |
+| `bun run lint` | Lint code |
+| `bun run format` | Format code |
+| `bun run db:migrate` | Run migrations |
+| `bun run db:studio` | Open Drizzle Studio |

@@ -2,17 +2,31 @@
 
 Workflows, commands, and best practices for Zeke development.
 
+## Quick Start
+
+```bash
+bun dev  # Starts Docker services + all apps
+```
+
+This starts:
+- **Docker**: PostgreSQL (5435), Redis (6379), MinIO (9000)
+- **API**: http://localhost:3003
+- **Dashboard**: http://localhost:3001
+- **Engine**: http://localhost:3010
+
 ## Commands
 
 ### Development
 
-```bash
-bun dev                 # Start all apps
-bun run dev:api         # API only (port 3003)
-bun run dev:dashboard   # Dashboard only (port 3001)
-bun run dev:website     # Website only (port 3000)
-bun run dev:desktop     # Desktop app
-```
+| Command | Description |
+|---------|-------------|
+| `bun dev` | Start full stack (Docker + all apps) |
+| `bun run stop` | Stop apps (Docker keeps running) |
+| `bun run stop -- --docker` | Stop everything including Docker |
+| `bun run dev:api` | API only (port 3003) |
+| `bun run dev:dashboard` | Dashboard only (port 3001) |
+| `bun run dev:website` | Website only (port 3000) |
+| `bun run dev:desktop` | Desktop app |
 
 ### Build & Test
 
@@ -37,9 +51,11 @@ bun run migrate:studio  # Open Drizzle Studio
 ### Docker
 
 ```bash
-docker compose up -d postgres redis minio  # Start services
-docker compose down                        # Stop services
-./deploy/run-local.sh                      # Full stack locally
+docker compose up -d              # Start all services
+docker compose up -d postgres     # Start specific service
+docker compose down               # Stop services
+docker compose logs -f            # View logs
+./deploy/run-local.sh             # Full stack in Docker
 ```
 
 ## Code Style
@@ -154,7 +170,7 @@ app.openapi(
 
 ```typescript
 // packages/jobs/src/tasks/example.ts
-import { schemaTask } from "@jobs/schema-task";
+import { schemaTask } from "@zeke/jobs/schema-task";
 import { z } from "zod";
 
 export const exampleTask = schemaTask({
@@ -176,6 +192,12 @@ export const exampleTask = schemaTask({
 import { sendJob } from "@zeke/jobs/client";
 
 await sendJob("example-task", { itemId: "123" });
+```
+
+### Run Worker
+
+```bash
+cd packages/jobs && bun run worker:dev
 ```
 
 ## Testing
@@ -221,6 +243,16 @@ SELECT * FROM pgboss.job ORDER BY createdon DESC LIMIT 20;
 
 -- View failed jobs
 SELECT * FROM pgboss.job WHERE state = 'failed';
+
+-- View schedules
+SELECT * FROM pgboss.schedule;
+```
+
+### Docker Logs
+```bash
+docker compose logs -f postgres  # PostgreSQL logs
+docker compose logs -f redis     # Redis logs
+docker compose logs -f minio     # MinIO logs
 ```
 
 ## Git Workflow
@@ -242,10 +274,13 @@ bun run format && bun run lint && bun run typecheck
 See [.env.example](../.env.example) for all variables.
 
 Critical ones:
-- `DATABASE_PRIMARY_URL` - PostgreSQL connection
-- `AUTH_SECRET` - Session signing (32+ chars)
-- `OPENAI_API_KEY` - AI features
-- `REDIS_URL` - Cache connection
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_PRIMARY_URL` | PostgreSQL connection |
+| `AUTH_SECRET` | Session signing (32+ chars) |
+| `ZEKE_ENCRYPTION_KEY` | Data encryption (64 hex chars) |
+| `OPENAI_API_KEY` | AI features |
+| `REDIS_URL` | Cache connection |
 
 ## Troubleshooting
 
@@ -260,12 +295,25 @@ kill -9 <PID>  # Kill it
 # Check PostgreSQL is running
 docker compose ps
 docker compose logs postgres
+
+# Test connection
+psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke -c "SELECT 1"
 ```
 
 ### Cache Issues
 ```bash
 # Clear Redis
 docker compose exec redis redis-cli FLUSHALL
+```
+
+### Storage Issues
+```bash
+# Check MinIO
+curl http://localhost:9000/minio/health/live
+
+# Open MinIO console
+open http://localhost:9001
+# Login: zeke_minio / zeke_minio_password
 ```
 
 ### Type Errors

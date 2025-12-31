@@ -2,6 +2,28 @@
 
 AI-powered research intelligence platform that transforms content into actionable insights.
 
+## Quick Start
+
+```bash
+# Install dependencies
+bun install
+cp .env.example .env
+
+# First time only - run migrations
+docker compose up -d postgres
+psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke -c "CREATE EXTENSION IF NOT EXISTS vector;"
+cd packages/db && bun run migrate:dev && cd ../..
+
+# Start everything (Docker + Apps)
+bun dev
+```
+
+This starts:
+- **Docker**: PostgreSQL (5435), Redis (6379), MinIO (9000)
+- **API**: http://localhost:3003
+- **Dashboard**: http://localhost:3001
+- **Engine**: http://localhost:3010
+
 ## Documentation
 
 | Document | Description |
@@ -10,7 +32,6 @@ AI-powered research intelligence platform that transforms content into actionabl
 | [Architecture](./docs/architecture.md) | System design |
 | [Development](./docs/development.md) | Dev workflows |
 | [Deployment](./docs/deployment.md) | Docker & production |
-| [CLAUDE.md](./CLAUDE.md) | AI assistant context |
 
 ### Apps & Packages
 
@@ -19,15 +40,17 @@ AI-powered research intelligence platform that transforms content into actionabl
 
 ## Tech Stack
 
-- **Runtime**: Bun
-- **API**: Hono + TRPC
-- **Frontend**: Next.js 15, React 19
-- **Database**: PostgreSQL + Drizzle ORM (with pgvector)
-- **Auth**: Better Auth
-- **Storage**: MinIO (S3-compatible)
-- **Background Jobs**: pg-boss (PostgreSQL-backed)
-- **AI**: OpenAI via Vercel AI SDK
-- **Payments**: Stripe
+| Category | Technology |
+|----------|------------|
+| Runtime | Bun |
+| API | Hono + TRPC |
+| Frontend | Next.js 15, React 19 |
+| Database | PostgreSQL + Drizzle ORM (pgvector) |
+| Auth | Better Auth (with 2FA) |
+| Storage | MinIO (S3-compatible) |
+| Jobs | pg-boss (PostgreSQL-backed) |
+| AI | OpenAI via Vercel AI SDK |
+| Payments | Stripe |
 
 ## Project Structure
 
@@ -35,8 +58,8 @@ AI-powered research intelligence platform that transforms content into actionabl
 apps/
   api/           Hono + TRPC API (port 3003)
   dashboard/     Next.js frontend (port 3001)
-  engine/        Content fetching service
-  website/       Marketing site
+  engine/        Content fetching service (port 3010)
+  website/       Marketing site (port 3000)
   desktop/       Tauri native app
 
 packages/
@@ -46,72 +69,52 @@ packages/
   storage/       MinIO client
   ui/            Shared React components
   cache/         Redis client
-  ...
-```
-
-## Setup
-
-### Prerequisites
-
-- Bun
-- Docker
-
-### Install
-
-```bash
-bun install
-cp .env.example .env
-```
-
-### Start Services
-
-```bash
-docker compose up -d postgres minio redis
-
-# First time only - enable vector extension
-psql postgresql://postgres:postgres@127.0.0.1:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"
-
-# Run migrations
-cd packages/db && bun run migrate:dev && cd ../..
-```
-
-### Development
-
-```bash
-bun dev              # Start all apps
-bun run dev:api      # API only
-bun run dev:dashboard # Dashboard only
 ```
 
 ## Commands
 
+### Development
+
 | Command | Description |
 |---------|-------------|
-| `bun dev` | Start all apps |
+| `bun dev` | Start full stack (Docker + all apps) |
+| `bun run stop` | Stop apps (Docker keeps running) |
+| `bun run stop -- --docker` | Stop everything including Docker |
+| `bun run dev:api` | API only |
+| `bun run dev:dashboard` | Dashboard only |
+
+### Build & Quality
+
+| Command | Description |
+|---------|-------------|
 | `bun run build` | Build all apps |
 | `bun run lint` | Run Biome linter |
 | `bun run format` | Format code |
-| `bun run typecheck` | Type check all apps |
+| `bun run typecheck` | TypeScript check |
+
+### Database
+
+| Command | Description |
+|---------|-------------|
 | `bun run db:migrate` | Run local migrations |
 | `bun run db:studio` | Open Drizzle Studio |
 
-## Database
+## Service Ports
 
-Schema is defined in `packages/db/src/schema.ts`. Run all migration commands from `packages/db`.
+| Service | Port | URL |
+|---------|------|-----|
+| Dashboard | 3001 | http://localhost:3001 |
+| API | 3003 | http://localhost:3003 |
+| Engine | 3010 | http://localhost:3010 |
+| PostgreSQL | 5435 | localhost:5435 |
+| Redis | 6379 | localhost:6379 |
+| MinIO API | 9000 | http://localhost:9000 |
+| MinIO Console | 9001 | http://localhost:9001 |
+
+## Docker Production
 
 ```bash
-cd packages/db
-bun run db:generate    # Generate migration from schema changes
-bun run migrate:dev    # Apply to local database
-bun run migrate        # Apply to production (set DATABASE_SESSION_POOLER_URL)
-```
-
-## Docker
-
-Full stack deployment:
-
-```bash
-./deploy/run-local.sh                              # Build and run
+./deploy/run-local.sh                              # Build and run full stack
 cd deploy && docker compose --profile staging logs -f  # View logs
 docker compose --profile staging down              # Stop
 ```
