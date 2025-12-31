@@ -6,7 +6,7 @@ import {
   triggerTaskInputSchema,
   triggerTaskResponseSchema,
 } from "@api/schemas/trigger";
-import { getTriggerRun, triggerTaskRun } from "@api/services/trigger";
+import { getJobRun, sendJob } from "@api/services/jobs";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { TRPCError } from "@trpc/server";
 
@@ -15,14 +15,21 @@ export const triggerRouter = createTRPCRouter({
     .input(triggerTaskInputSchema)
     .output(triggerTaskResponseSchema)
     .mutation(async ({ input }) => {
-      return triggerTaskRun(input.taskId, input.payload ?? {});
+      return sendJob(input.taskId, input.payload ?? {});
     }),
 
   run: protectedProcedure
     .input(triggerRunStatusInputSchema)
     .output(triggerRunStatusResponseSchema)
     .query(async ({ input }) => {
-      return getTriggerRun(input.runId);
+      const job = await getJobRun(input.runId);
+      if (!job) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Job run ${input.runId} not found`,
+        });
+      }
+      return job;
     }),
 
   ingestUrl: protectedProcedure
@@ -31,7 +38,7 @@ export const triggerRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { session } = ctx;
 
-      return triggerTaskRun("ingest-oneoff", {
+      return sendJob("ingest-oneoff", {
         url: input.url,
         requestedBy: session?.user.id,
         priority: input.priority,
@@ -51,7 +58,7 @@ export const triggerRouter = createTRPCRouter({
         });
       }
 
-      return triggerTaskRun("playbook-run", {
+      return sendJob("playbook-run", {
         playbookId: input.playbookId,
         teamId,
         triggeredBy: session.user.id,

@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { runPlaybookSchema } from "@jobs/schema";
 import {
   createPlaybookRun,
@@ -28,7 +28,7 @@ export const runPlaybook = schemaTask({
       triggerSource,
       metadata,
     }: z.infer<typeof runPlaybookSchema>,
-    { ctx },
+    { logger, run: jobRun },
   ) => {
     const db = getDb();
 
@@ -37,7 +37,7 @@ export const runPlaybook = schemaTask({
     logger.info("playbook_run_start", {
       playbookId,
       teamId,
-      runId: ctx.run.id,
+      runId: jobRun.id,
       triggerSource,
     });
 
@@ -106,7 +106,7 @@ export const runPlaybook = schemaTask({
       logger.error("playbook_run_failed", {
         playbookId,
         teamId,
-        runId: ctx.run.id,
+        runId: jobRun.id,
         message,
       });
       throw error;

@@ -1,7 +1,7 @@
-import { logger, schemaTask, tasks } from "@trigger.dev/sdk";
-import type { z} from "zod";
+import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask, tasks } from "@jobs/schema-task";
 import { analyzeStorySchema } from "@jobs/schema";
 import { createStoryQueries } from "@zeke/db/queries";
 
@@ -24,7 +24,7 @@ export const analyzeStory = schemaTask({
   },
   run: async (
     { storyId, trigger }: z.infer<typeof analyzeStorySchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
@@ -34,7 +34,7 @@ export const analyzeStory = schemaTask({
       logger.warn("analyze_story_missing", {
         storyId,
         trigger,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -49,7 +49,7 @@ export const analyzeStory = schemaTask({
       storyId,
       trigger,
       textLength: input.text.length,
-      runId: ctx.run.id,
+      runId: run.id,
     });
 
     try {
@@ -107,7 +107,8 @@ export const analyzeStory = schemaTask({
       // Trigger downstream pipeline jobs using task IDs to avoid circular imports
       // Get system user ID for auto-generated highlights
       // In production, this should be a dedicated system user
-      const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
+      const SYSTEM_USER_ID =
+        process.env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
 
       // Trigger all downstream jobs in parallel using tasks.trigger with task IDs
       await Promise.all([
@@ -123,7 +124,6 @@ export const analyzeStory = schemaTask({
       // Note: This triggers immediately; if highlights need to complete first,
       // use tasks.triggerAndWait on extract-highlights instead
       await tasks.trigger("score-relevance", { storyId });
-
     } catch (error) {
       logger.error("analyze_story_error", { storyId, trigger, error });
       throw error;

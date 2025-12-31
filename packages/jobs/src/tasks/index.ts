@@ -1,6 +1,6 @@
 // Source ingestion
-export { ingestPull, ensureIngestPullSchedule } from "./sources/pull/rss";
-export { ingestPullYouTube, ensureYouTubePullSchedule } from "./sources/pull/youtube";
+export { ingestPull } from "./sources/pull/rss";
+export { ingestPullYouTube } from "./sources/pull/youtube";
 export { ingestSource } from "./sources/ingest/from-feed";
 export { ingestYouTubeChannel } from "./sources/ingest/from-youtube";
 export { ingestFromUpload } from "./sources/ingest/from-upload";
@@ -22,5 +22,5 @@ export { scoreRelevance } from "./insights/score-relevance";
 // Brief generation
 export { generateBrief } from "./briefs/generate";
 
-// Playbooks (disabled until playbook pipeline ready)
-// export { runPlaybook } from "./playbooks/run";
+// Playbooks
+export { runPlaybook } from "./playbooks/run";

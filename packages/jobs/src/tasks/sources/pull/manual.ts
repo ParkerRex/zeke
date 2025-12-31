@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { oneOffIngestSchema } from "@jobs/schema";
 import { createRawItemQueries, createSourceQueries } from "@zeke/db/queries";
 
@@ -16,7 +16,7 @@ export const ingestOneOff = schemaTask({
   },
   run: async (
     { url, requestedBy }: z.infer<typeof oneOffIngestSchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const sourceQueries = createSourceQueries(db);
@@ -45,7 +45,7 @@ export const ingestOneOff = schemaTask({
       logger.info("ingest_oneoff_duplicate", {
         url: normalizedUrl,
         requestedBy,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -56,7 +56,7 @@ export const ingestOneOff = schemaTask({
       url: normalizedUrl,
       requestedBy,
       rawItemId,
-      runId: ctx.run.id,
+      runId: run.id,
     });
   },
 });

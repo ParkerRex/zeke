@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { stories, storyOverlays } from "@zeke/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -30,7 +30,7 @@ export const generateBrief = schemaTask({
   queue: {
     concurrencyLimit: 10,
   },
-  run: async ({ storyId, reason }: GenerateBriefPayload, { ctx }) => {
+  run: async ({ storyId, reason }: GenerateBriefPayload, { logger, run }) => {
     const db = getDb();
 
     // Get story with overlay
@@ -48,7 +48,11 @@ export const generateBrief = schemaTask({
       .limit(1);
 
     if (!story) {
-      logger.warn("generate_brief_story_missing", { storyId, reason, runId: ctx.run.id });
+      logger.warn("generate_brief_story_missing", {
+        storyId,
+        reason,
+        runId: run.id,
+      });
       return;
     }
 
@@ -57,7 +61,7 @@ export const generateBrief = schemaTask({
         storyId,
         reason,
         message: "Story has no why_it_matters yet",
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -103,8 +107,12 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
       }
 
       // Parse response
-      const oneLinerMatch = briefText.match(/ONE_LINER:\s*(.+?)(?=\n|TWO_LINER|$)/s);
-      const twoLinerMatch = briefText.match(/TWO_LINER:\s*(.+?)(?=\n|ELEVATOR|$)/s);
+      const oneLinerMatch = briefText.match(
+        /ONE_LINER:\s*(.+?)(?=\n|TWO_LINER|$)/s,
+      );
+      const twoLinerMatch = briefText.match(
+        /TWO_LINER:\s*(.+?)(?=\n|ELEVATOR|$)/s,
+      );
       const elevatorMatch = briefText.match(/ELEVATOR:\s*(.+?)$/s);
 
       const briefOneLiner = oneLinerMatch?.[1]?.trim() || null;
@@ -116,7 +124,7 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
           storyId,
           reason,
           response: briefText,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         return;
       }
@@ -155,7 +163,7 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
       logger.info("generate_brief_success", {
         storyId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
         timeSavedSeconds,
         briefLength: {
           oneLiner: briefOneLiner.length,
@@ -175,7 +183,7 @@ Focus on what developers/researchers need to know RIGHT NOW. Include specifics: 
       logger.error("generate_brief_error", {
         storyId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
         error: error instanceof Error ? error.message : String(error),
       });
       throw error;

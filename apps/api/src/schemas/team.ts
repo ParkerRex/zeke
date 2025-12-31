@@ -11,7 +11,7 @@ export const teamResponseSchema = z.object({
   }),
   logoUrl: z.string().url().nullable().openapi({
     description: "URL to the team's logo image",
-    example: "https://cdn.midday.ai/logos/acme-corp.png",
+    example: "https://cdn.zeke.ai/logos/acme-corp.png",
   }),
   plan: z.enum(["trial", "starter", "pro"]).openapi({
     description: "Current subscription plan of the team",
@@ -72,14 +72,14 @@ export const updateTeamByIdSchema = z.object({
   logoUrl: z
     .string()
     .url()
-    .refine((url) => url.includes("midday.ai"), {
-      message: "logoUrl must be a midday.ai domain URL",
+    .refine((url) => url.includes("zeke.ai"), {
+      message: "logoUrl must be a zeke.ai domain URL",
     })
     .optional()
     .openapi({
       description:
-        "URL to the team's logo image. Must be hosted on midday.ai domain",
-      example: "https://cdn.midday.ai/logos/acme-corp.png",
+        "URL to the team's logo image. Must be hosted on zeke.ai domain",
+      example: "https://cdn.zeke.ai/logos/acme-corp.png",
     }),
   countryCode: z.string().optional().openapi({
     description: "Country code for the team",
@@ -98,7 +98,7 @@ export const createTeamSchema = z.object({
   }),
   logoUrl: z.string().url().optional().openapi({
     description: "URL to the team's logo image",
-    example: "https://cdn.midday.ai/logos/acme-corp.png",
+    example: "https://cdn.zeke.ai/logos/acme-corp.png",
   }),
   switchTeam: z.boolean().optional().default(false).openapi({
     description:
@@ -207,7 +207,7 @@ export const teamMemberResponseSchema = z.object({
   }),
   avatarUrl: z.string().url().nullable().openapi({
     description: "URL to the team member's avatar image",
-    example: "https://cdn.midday.ai/avatars/john-doe.png",
+    example: "https://cdn.zeke.ai/avatars/john-doe.png",
   }),
 });
 

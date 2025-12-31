@@ -30,7 +30,7 @@ _Phase 2: Core Implementation_
   - Details: Architecture (Applications – dashboard), Technical Constraints
   - Acceptance: `docker build` produces image running `next start` with `PORT=3001`
   - Dependencies: TASK-002
-  - Note: Added production Dockerfile, pruned build context, stubs for Stripe/Trigger, and removed legacy Midday imports so `docker build` succeeds.
+  - Note: Added production Dockerfile, pruned build context, stubs for Stripe/Trigger, and removed legacy imports so `docker build` succeeds.
 - [x] TASK-005: Add dashboard service to Compose with healthcheck, volumes, and Caddy upstream wiring [COMPLETED: 2025-10-05 16:00:34 EDT]
   - Details: Functional Requirements #1–2, Architecture (Applications)
   - Acceptance: Compose service defines internal hostname `dashboard`, healthcheck command, and Caddy upstream reference `http://dashboard:3001`; `docker compose config --validate` passes

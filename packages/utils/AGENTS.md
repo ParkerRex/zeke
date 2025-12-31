@@ -11,7 +11,7 @@
 
 ## Layout Guide
 ```
-packages/utils/                      # Shared utility functions for the Midday ecosystem
+packages/utils/                      # Shared utility functions for the Zeke ecosystem
 ├── package.json                     # Package metadata plus build targets used by dependents
 ├── tsconfig.json                    # TypeScript settings tuned for isolated utility builds
 └── src/                             # Source code for utility functions

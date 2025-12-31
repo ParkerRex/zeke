@@ -20,13 +20,13 @@ The assistant lives in the dashboard shell as a global modal plus a home-screen 
 
 - When the store's message field changes, a side effect injects that text as a user turn and immediately submits it (`apps/dashboard/src/components/chat/index.tsx:30`).
 
-- Messages are rendered with automatic scroll management and a "thinking" placeholder while the model is processing (`apps/dashboard/src/components/chat/messages.tsx:14`). Markdown responses are supported (`apps/dashboard/src/components/chat/message.tsx:66`), and avatars switch between the user and the Midday logo (`apps/dashboard/src/components/chat/chat-avatar.tsx:15`).
+- Messages are rendered with automatic scroll management and a "thinking" placeholder while the model is processing (`apps/dashboard/src/components/chat/messages.tsx:14`). Markdown responses are supported (`apps/dashboard/src/components/chat/message.tsx:66`), and avatars switch between the user and the Zeke logo (`apps/dashboard/src/components/chat/chat-avatar.tsx:15`).
 
 ## Server Execution & Tooling
 
 - The `/api/chat` route streams responses from `streamText` with the OpenAI `gpt-4.1-mini` model (`apps/dashboard/src/app/api/chat/route.ts:19`). The system prompt guides financial reasoning, while `maxSteps` limits tool-call loops and `smoothStream` turns the output into word-sized SSE chunks (`apps/dashboard/src/app/api/chat/route.ts:33` and `apps/dashboard/src/app/api/chat/route.ts:37`).
 
-- **Tools** are declared with the AI SDK's `tool` helper and imported into the route (`apps/dashboard/src/app/api/chat/route.ts:38`). Each tool uses the server-side TRPC client (`getQueryClient`) to hit Midday APIs with the current user session baked into headers (`apps/dashboard/src/lib/tools/get-transactions.ts:93`, `apps/dashboard/src/trpc/server.tsx:9`).
+- **Tools** are declared with the AI SDK's `tool` helper and imported into the route (`apps/dashboard/src/app/api/chat/route.ts:38`). Each tool uses the server-side TRPC client (`getQueryClient`) to hit Zeke APIs with the current user session baked into headers (`apps/dashboard/src/lib/tools/get-transactions.ts:93`, `apps/dashboard/src/trpc/server.tsx:9`).
 
 - **Parameter schemas** live alongside the tool implementation via Zod, giving the model structured affordances (e.g. rich filtering on transactions in `apps/dashboard/src/lib/tools/get-transactions.ts:13`, finance metrics in `apps/dashboard/src/lib/tools/get-burn-rate.ts:9` and `apps/dashboard/src/lib/tools/get-tax-summary.ts:10`).
 

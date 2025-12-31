@@ -16,8 +16,7 @@ export default function PlaybooksPage() {
           Playbooks will let you string together Trigger.dev tasks—collecting
           sources, generating insights, and publishing briefs on a schedule. The
           UI will land once the new job orchestration is stable; for now
-          we&apos;re keeping a placeholder so routing and navigation stay
-          aligned with the Midday structure.
+          we&apos;re keeping a placeholder while the workflow takes shape.
         </p>
       </div>
     </section>

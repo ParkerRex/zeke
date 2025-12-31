@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { highlights } from "@zeke/db/schema";
 import { createStoryQueries } from "@zeke/db/queries";
 
@@ -25,14 +25,20 @@ export const extractHighlights = schemaTask({
   queue: {
     concurrencyLimit: 10,
   },
-  run: async ({ storyId, userId, teamId }: ExtractHighlightsPayload, { ctx }) => {
+  run: async (
+    { storyId, userId, teamId }: ExtractHighlightsPayload,
+    { logger, run },
+  ) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
 
     // Get story with content
     const story = await storyQueries.getStoryWithContent(storyId);
     if (!story) {
-      logger.warn("extract_highlights_story_missing", { storyId, runId: ctx.run.id });
+      logger.warn("extract_highlights_story_missing", {
+        storyId,
+        runId: run.id,
+      });
       return;
     }
 
@@ -41,7 +47,7 @@ export const extractHighlights = schemaTask({
       logger.info("extract_highlights_content_too_short", {
         storyId,
         textLength: textBody.length,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -49,7 +55,7 @@ export const extractHighlights = schemaTask({
     logger.info("extract_highlights_start", {
       storyId,
       textLength: textBody.length,
-      runId: ctx.run.id,
+      runId: run.id,
     });
 
     try {
@@ -57,7 +63,10 @@ export const extractHighlights = schemaTask({
       const structuredHighlights = extractStructuredHighlights(textBody);
 
       if (structuredHighlights.length === 0) {
-        logger.info("extract_highlights_none_found", { storyId, runId: ctx.run.id });
+        logger.info("extract_highlights_none_found", {
+          storyId,
+          runId: run.id,
+        });
         return;
       }
 
@@ -88,14 +97,21 @@ export const extractHighlights = schemaTask({
 
       logger.info("extract_highlights_success", {
         storyId,
-        runId: ctx.run.id,
+        runId: run.id,
         extracted: structuredHighlights.length,
         inserted: inserted.length,
         breakdown: {
-          code_example: structuredHighlights.filter(h => h.kind === 'code_example').length,
-          code_change: structuredHighlights.filter(h => h.kind === 'code_change').length,
-          api_change: structuredHighlights.filter(h => h.kind === 'api_change').length,
-          metric: structuredHighlights.filter(h => h.kind === 'metric').length,
+          code_example: structuredHighlights.filter(
+            (h) => h.kind === "code_example",
+          ).length,
+          code_change: structuredHighlights.filter(
+            (h) => h.kind === "code_change",
+          ).length,
+          api_change: structuredHighlights.filter(
+            (h) => h.kind === "api_change",
+          ).length,
+          metric: structuredHighlights.filter((h) => h.kind === "metric")
+            .length,
         },
       });
 
@@ -107,7 +123,7 @@ export const extractHighlights = schemaTask({
     } catch (error) {
       logger.error("extract_highlights_error", {
         storyId,
-        runId: ctx.run.id,
+        runId: run.id,
         error: error instanceof Error ? error.message : String(error),
       });
       throw error;

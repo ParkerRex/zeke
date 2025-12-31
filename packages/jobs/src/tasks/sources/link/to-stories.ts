@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { linkSourceToStorySchema } from "@jobs/schema";
 import { createStoryQueries } from "@zeke/db/queries";
 
@@ -13,7 +13,7 @@ export const linkSourceToStory = schemaTask({
   },
   run: async (
     { sourceId, storyId }: z.infer<typeof linkSourceToStorySchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
@@ -23,7 +23,7 @@ export const linkSourceToStory = schemaTask({
     logger.info("link_source_to_story", {
       sourceId,
       storyId,
-      runId: ctx.run.id,
+      runId: run.id,
     });
   },
 });

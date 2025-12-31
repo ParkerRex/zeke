@@ -1,7 +1,7 @@
-import { logger, schedules, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import type { ingestSourceSchema } from "@jobs/schema";
 import { createSourceQueries } from "@zeke/db/queries";
 
@@ -20,7 +20,7 @@ export const ingestPull = schemaTask({
   queue: {
     concurrencyLimit: 1,
   },
-  run: async ({ reason }: IngestPullInternalPayload, { ctx }) => {
+  run: async ({ reason }: IngestPullInternalPayload, { logger, run }) => {
     const db = getDb();
     const sourcesQueries = createSourceQueries(db);
 
@@ -28,13 +28,13 @@ export const ingestPull = schemaTask({
     type RssSource = (typeof sources)[number];
 
     if (!sources.length) {
-      logger.info("ingest_pull_no_sources", { reason, runId: ctx.run.id });
+      logger.info("ingest_pull_no_sources", { reason, runId: run.id });
       return;
     }
 
     logger.info("ingest_pull_start", {
       reason,
-      runId: ctx.run.id,
+      runId: run.id,
       sourceCount: sources.length,
     });
 
@@ -51,20 +51,8 @@ export const ingestPull = schemaTask({
 
     logger.info("ingest_pull_enqueued", {
       reason,
-      runId: ctx.run.id,
+      runId: run.id,
       sourceCount: sources.length,
     });
   },
 });
-
-export async function ensureIngestPullSchedule() {
-  const scheduleKey = "ingest-pull-5m";
-  await schedules.create({
-    task: ingestPull.id,
-    cron: "*/5 * * * *",
-    timezone: process.env.JOBS_CRON_TZ || "UTC",
-    deduplicationKey: scheduleKey,
-    externalId: scheduleKey,
-  });
-  logger.info("ingest_pull_schedule_ensured", { scheduleKey });
-}

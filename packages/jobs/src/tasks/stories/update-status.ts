@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { updateStoryStatusSchema } from "@jobs/schema";
 import { createStoryQueries } from "@zeke/db/queries";
 
@@ -13,7 +13,7 @@ export const updateStoryStatus = schemaTask({
   },
   run: async (
     { storyId, teamId, state }: z.infer<typeof updateStoryStatusSchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
@@ -26,7 +26,7 @@ export const updateStoryStatus = schemaTask({
       logger.info("story_status_no_teams", {
         storyId,
         state,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -44,7 +44,7 @@ export const updateStoryStatus = schemaTask({
     logger.info("story_status_updated", {
       storyId,
       state,
-      runId: ctx.run.id,
+      runId: run.id,
       teamCount: targetTeams.length,
     });
   },

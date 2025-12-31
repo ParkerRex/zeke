@@ -1,66 +1,54 @@
-import { configure, locals, tasks } from "@trigger.dev/sdk";
+import { AsyncLocalStorage } from "node:async_hooks";
 import type { Database } from "@zeke/db/client";
 import { createJobDb } from "@zeke/db/job-client";
 
-const triggerAccessToken =
-  process.env.TRIGGER_SECRET_KEY ??
-  process.env.TRIGGER_API_KEY ??
-  process.env.TRIGGER_SECRET ??
-  process.env.TRIGGER_DEV_API_KEY;
-
-const triggerApiUrl =
-  process.env.TRIGGER_API_URL ?? process.env.TRIGGER_ENDPOINT;
-
-const configuration: { accessToken: string; baseURL?: string } = {
-  accessToken: triggerAccessToken ?? "api_local_dev_placeholder",
-};
-
-if (triggerApiUrl) {
-  configuration.baseURL = triggerApiUrl;
-}
-
-configure(configuration);
-
-// Store the database instance
-const DbLocal = locals.create<{
+// AsyncLocalStorage for per-job database instances
+const dbStorage = new AsyncLocalStorage<{
   db: Database;
   disconnect: () => Promise<void>;
-}>("db");
+}>();
 
-// Helper function to get the database instance from locals
+// Helper function to get the database instance
 export const getDb = (): Database => {
-  const dbObj = locals.get(DbLocal);
-  if (!dbObj) throw new Error("Database not initialized in middleware");
+  const dbObj = dbStorage.getStore();
+  if (!dbObj) {
+    throw new Error(
+      "Database not initialized. Are you running outside of a job context?",
+    );
+  }
   return dbObj.db;
 };
 
-// Helper function to get the disconnect function from locals
-const getDisconnect = () => {
-  const dbObj = locals.get(DbLocal);
-  if (!dbObj) throw new Error("Database not initialized in middleware");
-  return dbObj.disconnect();
+// Run a function with a fresh database instance
+export async function withJobDb<T>(fn: () => Promise<T>): Promise<T> {
+  const dbObj = createJobDb();
+
+  try {
+    return await dbStorage.run(dbObj, fn);
+  } finally {
+    await dbObj.disconnect();
+  }
+}
+
+// For backwards compatibility - create db on demand if not in job context
+let sharedDb: { db: Database; disconnect: () => Promise<void> } | null = null;
+
+export const getDbOrCreate = (): Database => {
+  const jobDb = dbStorage.getStore();
+  if (jobDb) {
+    return jobDb.db;
+  }
+
+  // Fallback to shared instance for non-job contexts
+  if (!sharedDb) {
+    sharedDb = createJobDb();
+  }
+  return sharedDb.db;
 };
 
-// Middleware is run around every run
-tasks.middleware("db", async ({ next }) => {
-  // Create a fresh database instance for each job run
-  // This ensures consistent connection pooling with optimized settings
-  const dbObj = createJobDb();
-  locals.set(DbLocal, dbObj);
-
-  await next();
-});
-
-// This lifecycle hook is called when a `wait` is hit
-// In cloud this can result in the machine being suspended until later
-tasks.onWait("db", async () => {
-  // Close the connection pool to free database connections
-  await getDisconnect();
-});
-
-// This lifecycle hook is called when a run is resumed after a `wait`
-tasks.onResume("db", async () => {
-  // Create a new database instance since the old pool was closed
-  const db = createJobDb();
-  locals.set(DbLocal, db);
-});
+export async function cleanupSharedDb(): Promise<void> {
+  if (sharedDb) {
+    await sharedDb.disconnect();
+    sharedDb = null;
+  }
+}

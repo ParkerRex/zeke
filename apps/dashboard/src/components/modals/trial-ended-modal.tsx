@@ -1,5 +1,4 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { useUserQuery } from "@/hooks/use-user";
@@ -61,8 +60,8 @@ export function TrialEndedModal() {
             <DialogTitle>Trial expired</DialogTitle>
           </DialogHeader>
           <DialogDescription className="mb-8">
-            Hope you've enjoyed using Midday so far! Your trial has now ended,
-            and it's time to choose a plan to continue using Midday.
+            Hope you've enjoyed using Zeke so far! Your trial has now ended,
+            and it's time to choose a plan to continue using Zeke.
           </DialogDescription>
 
           <Plans />

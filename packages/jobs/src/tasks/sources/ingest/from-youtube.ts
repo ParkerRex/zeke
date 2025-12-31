@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { ingestSourceSchema } from "@jobs/schema";
 import { createRawItemQueries, createSourceQueries } from "@zeke/db/queries";
 import { createEngineClient } from "@zeke/engine-client";
@@ -21,7 +21,7 @@ export const ingestYouTubeChannel = schemaTask({
   },
   run: async (
     { sourceId, reason }: z.infer<typeof ingestSourceSchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const sourcesQueries = createSourceQueries(db);
@@ -33,7 +33,7 @@ export const ingestYouTubeChannel = schemaTask({
       logger.warn("ingest_youtube_source_missing", {
         sourceId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -44,7 +44,7 @@ export const ingestYouTubeChannel = schemaTask({
         reason,
         type: source.type,
         message: "Only YouTube channel sources are supported",
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -53,7 +53,7 @@ export const ingestYouTubeChannel = schemaTask({
       logger.warn("ingest_youtube_source_no_url", {
         sourceId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -74,7 +74,7 @@ export const ingestYouTubeChannel = schemaTask({
         logger.info("ingest_youtube_no_videos", {
           sourceId,
           channelName: channelInfo.name,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         return;
       }
@@ -113,8 +113,11 @@ export const ingestYouTubeChannel = schemaTask({
           logger.warn("ingest_youtube_video_failed", {
             sourceId,
             videoUrl,
-            error: videoError instanceof Error ? videoError.message : String(videoError),
-            runId: ctx.run.id,
+            error:
+              videoError instanceof Error
+                ? videoError.message
+                : String(videoError),
+            runId: run.id,
           });
           // Continue with next video
         }
@@ -134,18 +137,19 @@ export const ingestYouTubeChannel = schemaTask({
         sourceId,
         channelName: channelInfo.name,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
         seen,
         inserted,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       await sourcesQueries.upsertSourceHealth(sourceId, "error", errorMessage);
 
       logger.error("ingest_youtube_error", {
         sourceId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
         error: errorMessage,
       });
 

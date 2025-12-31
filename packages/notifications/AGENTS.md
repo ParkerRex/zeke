@@ -11,7 +11,7 @@
 
 ## Navigation Guide
 ```
-packages/notifications/                 # Event-driven notification system for the Midday platform
+packages/notifications/                 # Event-driven notification system for the Zeke platform
 ├── package.json                        # Package metadata, build scripts, dependency manifest for the notifications module
 ├── tsconfig.json                       # TypeScript compiler settings tailored to the package's runtime and type exports
 └── src/                                # Notification runtime, schemas, and handler registry

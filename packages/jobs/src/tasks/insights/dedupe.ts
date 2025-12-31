@@ -1,6 +1,5 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
-
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { dedupeInsightsSchema } from "@jobs/schema";
 import { createStoryQueries, getStoryHighlights } from "@zeke/db/queries";
 
@@ -13,7 +12,7 @@ export const dedupeInsights = schemaTask({
   queue: {
     concurrencyLimit: 5,
   },
-  run: async ({ storyId, teamId, createdBy, insights }, { ctx }) => {
+  run: async ({ storyId, teamId, createdBy, insights }, { logger, run }) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
 
@@ -24,7 +23,7 @@ export const dedupeInsights = schemaTask({
       if (!resolvedTeamId) {
         logger.warn("insights_dedupe_missing_team", {
           storyId,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         return;
       }
@@ -57,7 +56,7 @@ export const dedupeInsights = schemaTask({
         logger.warn("insights_dedupe_missing_summary", {
           storyId,
           title: insight.title,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         continue;
       }
@@ -66,7 +65,7 @@ export const dedupeInsights = schemaTask({
           storyId,
           teamId: resolvedTeamId,
           dedupeKey: key,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         continue;
       }
@@ -84,7 +83,7 @@ export const dedupeInsights = schemaTask({
       logger.info("insights_dedupe_noop", {
         storyId,
         teamId: resolvedTeamId,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -103,7 +102,7 @@ export const dedupeInsights = schemaTask({
       teamId: resolvedTeamId,
       createdCount: uniqueInsights.length,
       skippedCount: insights.length - uniqueInsights.length,
-      runId: ctx.run.id,
+      runId: run.id,
     });
   },
 });

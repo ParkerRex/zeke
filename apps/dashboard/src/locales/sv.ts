@@ -75,7 +75,7 @@ export default {
     intro1:
       "Granskning av insikter hamnar här – vi lyfter fram höjdpunkter, länkar tillbaka till underliggande källor och lägger upp uppföljningar i kö. Datakontrakten är på plats och instrumentpanelen tänds när de nya Trigger.dev-jobben för insikter landar.",
     intro2:
-      "Tills dess påminner ytan om att stories mynnar ut i insikter, och gränssnittet speglar Midday-flödet fast med Zekes vokabulär.",
+      "Tills dess påminner ytan om att stories mynnar ut i insikter, och gränssnittet speglar Zekes forskningsinriktade vokabulär.",
   },
   sources: {
     header: "Källor",
@@ -92,7 +92,7 @@ export default {
   playbooks: {
     header: "Handlingsplaner",
     intro1:
-      "Handlingsplaner låter dig kedja Trigger.dev-jobb – samla källor, skapa insikter och publicera sammandrag på schema. UI:t landar när orkestreringen är stabil; tills dess behåller vi en platshållare så navigationen fortsätter följa Midday-strukturen.",
+      "Handlingsplaner låter dig kedja Trigger.dev-jobb – samla källor, skapa insikter och publicera sammandrag på schema. UI:t landar när orkestreringen är stabil; tills dess behåller vi en platshållare medan arbetsflödet tar form.",
   },
   overlay: {
     whyItMatters: "Varför det är viktigt",

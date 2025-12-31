@@ -20,7 +20,7 @@
 ``` markdown
 apps/dashboard/
 ├── README.md                     # Minimal package readme; expand with onboarding notes if needed
-├── image-loader.ts               # Custom Next image loader that maps to Midday’s CDN rules
+├── image-loader.ts               # Custom Next image loader that maps to Zeke's CDN rules
 ├── next.config.mjs               # Next.js 15 configuration and experimental feature toggles
 ├── package.json                  # Application scripts, dependencies, and tooling definitions
 ├── postcss.config.cjs            # PostCSS plugins used by Tailwind during build

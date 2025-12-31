@@ -11,7 +11,7 @@ alwaysApply: true
 ### Overview
 
 - The website is a Next.js 15 app directory project focused on marketing pages and a product updates blog.
-- Styling uses Tailwind with `@midday/ui` as a preset; global CSS is in `src/styles/globals.css`.
+- Styling uses Tailwind with `@zeke/ui` as a preset; global CSS is in `src/styles/globals.css`.
 - MDX content (product updates) lives under `src/app/updates/posts/*.mdx` and is rendered server-side via `next-mdx-remote/rsc` with custom components.
 - Images use a custom Next.js image loader that proxies via Cloudflare Images (`image-loader.ts`).
 - Server Actions use `"use server"` and `next-safe-action` for validated actions.
@@ -41,7 +41,7 @@ alwaysApply: true
 
 ### Styling
 
-- Tailwind preset comes from `@midday/ui/tailwind.config`. Local `tailwind.config.ts` targets `./src/**/*.{ts,tsx}` and `../../packages/ui/src/**/*.{ts,tsx}`.
+- Tailwind preset comes from `@zeke/ui/tailwind.config`. Local `tailwind.config.ts` targets `./src/**/*.{ts,tsx}` and `../../packages/ui/src/**/*.{ts,tsx}`.
 - Global styles `src/styles/globals.css` include typography for the `.updates` article wrapper and code block styles compatible with `sugar-high` output.
 - Use utility classes consistently; avoid component-local CSS unless updating MDX typography rules.
 

@@ -3,6 +3,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { protectedMiddleware } from "../middleware";
 import { chatRouter } from "./chat";
 import { highlightsRouter } from "./highlights";
+import { jobsStreamRouter } from "./jobs-stream";
 import { notificationsRouter } from "./notifications";
 import oauthRouter from "./oauth";
 import { searchRouter } from "./search";
@@ -30,5 +31,6 @@ routers.route("/search", searchRouter);
 routers.route("/chat", chatRouter);
 routers.route("/transcription", transcriptionRouter);
 routers.route("/trigger", triggerRouter);
+routers.route("/jobs/stream", jobsStreamRouter);
 
 export { routers };

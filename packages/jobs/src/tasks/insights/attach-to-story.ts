@@ -1,6 +1,5 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
-
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { attachInsightSchema } from "@jobs/schema";
 import { createHighlight, getStoryHighlights } from "@zeke/db/queries";
 
@@ -12,7 +11,7 @@ export const attachInsightToStory = schemaTask({
   queue: {
     concurrencyLimit: 3,
   },
-  run: async ({ storyId, teamId, createdBy, insight }, { ctx }) => {
+  run: async ({ storyId, teamId, createdBy, insight }, { logger, run }) => {
     const db = getDb();
 
     const existingHighlights = await getStoryHighlights(db, {
@@ -41,7 +40,7 @@ export const attachInsightToStory = schemaTask({
           teamId,
           highlightId: duplicate.id,
           dedupeKey: incomingKey,
-          runId: ctx.run.id,
+          runId: run.id,
         });
         return;
       }
@@ -60,7 +59,7 @@ export const attachInsightToStory = schemaTask({
         ...(insight.metadata ?? {}),
         generated: true,
         dedupeKey: incomingKey ?? undefined,
-        producer: "trigger.dev",
+        producer: "pg-boss",
       },
     });
 
@@ -68,7 +67,7 @@ export const attachInsightToStory = schemaTask({
       storyId,
       teamId,
       dedupeKey: incomingKey,
-      runId: ctx.run.id,
+      runId: run.id,
     });
   },
 });

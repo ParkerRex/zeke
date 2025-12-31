@@ -1,5 +1,4 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { useOAuthParams } from "@/hooks/use-oauth-params";
@@ -180,7 +179,7 @@ export function OAuthConsentScreen() {
 
           <CardTitle className="text-lg mb-2 font-serif">
             {applicationInfo.name} is requesting API access <br /> to a team in
-            Midday.
+            Zeke.
           </CardTitle>
 
           <CardDescription className="text-sm text-muted-foreground text-center">
@@ -210,7 +209,7 @@ export function OAuthConsentScreen() {
             <div className="flex items-center gap-2">
               <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
               <span className="text-sm text-amber-700 dark:text-amber-300">
-                This app hasn't been verified by Midday yet
+                This app hasn't been verified by Zeke yet
               </span>
             </div>
           </div>

@@ -14,7 +14,7 @@ describe("Encryption/Decryption", () => {
 
   beforeEach(() => {
     // Set the environment variable before each test
-    process.env.MIDDAY_ENCRYPTION_KEY = validKey;
+    process.env.ZEKE_ENCRYPTION_KEY = validKey;
   });
 
   it("should encrypt and decrypt a string successfully", () => {

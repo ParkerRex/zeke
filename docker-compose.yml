@@ -80,6 +80,26 @@ services:
     networks:
       - zeke-network
 
+  # Jobs Worker (pg-boss)
+  # Note: For development, run: pnpm --filter @zeke/jobs worker:dev
+  # This service is for production/docker deployments
+  # jobs-worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: zeke-jobs-worker
+  #   command: pnpm --filter @zeke/jobs worker
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_PRIMARY_URL: postgresql://zeke:${POSTGRES_PASSWORD:-zeke_dev_password}@postgres:5432/zeke
+  #     OPENAI_API_KEY: ${OPENAI_API_KEY}
+  #     JOBS_CRON_TZ: ${JOBS_CRON_TZ:-UTC}
+  #   restart: unless-stopped
+  #   networks:
+  #     - zeke-network
+
 volumes:
   postgres-data:
     driver: local

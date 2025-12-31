@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { summarizeStorySchema } from "@jobs/schema";
 import { createStoryQueries } from "@zeke/db/queries";
 
@@ -28,7 +28,7 @@ export const summarizeStory = schemaTask({
   },
   run: async (
     { storyId, mode }: z.infer<typeof summarizeStorySchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const storyQueries = createStoryQueries(db);
@@ -36,14 +36,14 @@ export const summarizeStory = schemaTask({
     const story = await storyQueries.getStoryWithContent(storyId);
 
     if (!story) {
-      logger.warn("story_summary_missing", { storyId, runId: ctx.run.id });
+      logger.warn("story_summary_missing", { storyId, runId: run.id });
       return;
     }
 
     if (mode === "auto" && story.summary) {
       logger.info("story_summary_skip_existing", {
         storyId,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -58,7 +58,7 @@ export const summarizeStory = schemaTask({
     logger.info("story_summary_updated", {
       storyId,
       mode,
-      runId: ctx.run.id,
+      runId: run.id,
       usedOverlay: Boolean(overlay?.why_it_matters),
       summaryLength: summary.length,
     });

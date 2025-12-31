@@ -31,7 +31,7 @@ packages/ui/
     │   ├── use-enter-submit.ts           # Form helper enabling Enter-to-submit while respecting textarea inputs
     │   └── index.ts                      # Barrel export for available hooks
     └── components/
-        ├── accordion.tsx                 # Radix accordion wrapper with Midday styling
+        ├── accordion.tsx                 # Radix accordion wrapper with Zeke styling
         ├── alert-dialog.tsx              # Alert dialog primitives (trigger/content/actions) styled with Tailwind tokens
         ├── alert.tsx                     # Inline alert component variants (info/warning/etc.)
         ├── animated-size-container.tsx   # Auto-animating container that transitions height changes
@@ -46,7 +46,7 @@ packages/ui/
         ├── collapsible.tsx               # Radix collapsible shell for hide/show sections
         ├── combobox-dropdown.tsx         # Dropdown list UI used by combobox trigger
         ├── combobox.tsx                  # Headless command palette-powered combobox component
-        ├── command.tsx                   # CMDK command palette wrapper with Midday styling
+        ├── command.tsx                   # CMDK command palette wrapper with Zeke styling
         ├── context-menu.tsx              # Radix context menu primitives with themed styles
         ├── currency-input.tsx            # Controlled currency input masking built on react-number-format
         ├── date-range-picker.tsx         # Prebuilt range picker composed from calendar + popover

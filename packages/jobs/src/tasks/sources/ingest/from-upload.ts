@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { ingestUploadSchema } from "@jobs/schema";
 import {
   createContentQueries,
@@ -27,7 +27,7 @@ export const ingestFromUpload = schemaTask({
   },
   run: async (
     { sourceId, items, uploadedBy }: z.infer<typeof ingestUploadSchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const sourceQueries = createSourceQueries(db);
@@ -108,7 +108,7 @@ export const ingestFromUpload = schemaTask({
       processed,
       pendingFetch: pendingFetch.length,
       createdStories,
-      runId: ctx.run.id,
+      runId: run.id,
     });
   },
 });

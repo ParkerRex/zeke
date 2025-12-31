@@ -1,51 +1,48 @@
-// TODO: This is for example purposes only from the Midday project
-// We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
+"use client";
 
-import { useRealtimeRun } from "@trigger.dev/react-hooks";
 import { useEffect, useState } from "react";
+import { useJobStatus } from "./use-job-status";
 
 type UseSyncStatusProps = {
   runId?: string;
-  accessToken?: string;
+  accessToken?: string; // Kept for API compatibility but not used (uses session auth)
 };
 
-export function useSyncStatus({
-  runId: initialRunId,
-  accessToken: initialAccessToken,
-}: UseSyncStatusProps) {
-  const [accessToken, setAccessToken] = useState<string | undefined>(
-    initialAccessToken,
-  );
+export function useSyncStatus({ runId: initialRunId }: UseSyncStatusProps) {
   const [runId, setRunId] = useState<string | undefined>(initialRunId);
   const [status, setStatus] = useState<
     "FAILED" | "SYNCING" | "COMPLETED" | null
   >(null);
-  const { run, error } = useRealtimeRun(runId, {
-    enabled: !!runId && !!accessToken,
-    accessToken,
+
+  const {
+    status: jobStatus,
+    output,
+    error,
+  } = useJobStatus({
+    runId,
+    enabled: !!runId,
   });
 
   useEffect(() => {
-    if (initialRunId && initialAccessToken) {
-      setAccessToken(initialAccessToken);
+    if (initialRunId) {
       setRunId(initialRunId);
       setStatus("SYNCING");
     }
-  }, [initialRunId, initialAccessToken]);
+  }, [initialRunId]);
 
   useEffect(() => {
-    if (error || run?.status === "FAILED") {
+    if (error || jobStatus === "FAILED") {
       setStatus("FAILED");
-    }
-
-    if (run?.status === "COMPLETED") {
+    } else if (jobStatus === "COMPLETED") {
       setStatus("COMPLETED");
+    } else if (jobStatus === "EXECUTING" || jobStatus === "QUEUED") {
+      setStatus("SYNCING");
     }
-  }, [error, run]);
+  }, [error, jobStatus]);
 
   return {
     status,
     setStatus,
-    result: run?.output,
+    result: output,
   };
 }

@@ -1,9 +1,9 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { highlights, sources, stories } from "@zeke/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ICP_KEYWORDS } from "../../config/icp-sources";
 
 const scoreRelevanceSchema = z.object({
@@ -22,7 +22,7 @@ export const scoreRelevance = schemaTask({
   queue: {
     concurrencyLimit: 20,
   },
-  run: async ({ storyId }: ScoreRelevancePayload, { ctx }) => {
+  run: async ({ storyId }: ScoreRelevancePayload, { logger, run }) => {
     const db = getDb();
 
     // Get story with source and highlights
@@ -46,30 +46,42 @@ export const scoreRelevance = schemaTask({
       .where(eq(stories.id, storyId));
 
     if (storyData.length === 0) {
-      logger.warn("score_relevance_story_missing", { storyId, runId: ctx.run.id });
+      logger.warn("score_relevance_story_missing", {
+        storyId,
+        runId: run.id,
+      });
       return;
     }
 
     const storyInfo = storyData[0];
-    const storyHighlights = storyData.filter(row => row.highlight_id !== null);
+    const storyHighlights = storyData.filter(
+      (row) => row.highlight_id !== null,
+    );
 
     if (storyHighlights.length === 0) {
-      logger.info("score_relevance_no_highlights", { storyId, runId: ctx.run.id });
+      logger.info("score_relevance_no_highlights", {
+        storyId,
+        runId: run.id,
+      });
       return;
     }
 
     logger.info("score_relevance_start", {
       storyId,
       highlightCount: storyHighlights.length,
-      runId: ctx.run.id,
+      runId: run.id,
     });
 
     // Calculate freshness score (0.0-1.0)
     // Content < 7 days = 1.0, content > 30 days = 0.5
     const daysSincePublished = storyInfo.story_published_at
-      ? (Date.now() - new Date(storyInfo.story_published_at).getTime()) / (1000 * 60 * 60 * 24)
+      ? (Date.now() - new Date(storyInfo.story_published_at).getTime()) /
+        (1000 * 60 * 60 * 24)
       : 30;
-    const freshnessScore = Math.max(0.5, Math.min(1.0, 1.0 - (daysSincePublished / 60)));
+    const freshnessScore = Math.max(
+      0.5,
+      Math.min(1.0, 1.0 - daysSincePublished / 60),
+    );
 
     // Source authority (already 0.0-1.0)
     const authorityScore = storyInfo.source_authority
@@ -87,10 +99,12 @@ export const scoreRelevance = schemaTask({
         highlight.highlight_summary || "",
         highlight.highlight_quote?.slice(0, 500) || "", // First 500 chars
         storyInfo.story_title || "",
-      ].join(" ").toLowerCase();
+      ]
+        .join(" ")
+        .toLowerCase();
 
-      const keywordMatches = ICP_KEYWORDS.filter(keyword =>
-        textToScore.includes(keyword.toLowerCase())
+      const keywordMatches = ICP_KEYWORDS.filter((keyword) =>
+        textToScore.includes(keyword.toLowerCase()),
       );
 
       // Keyword score: 0.0 (no matches) to 1.0 (5+ matches)
@@ -98,17 +112,19 @@ export const scoreRelevance = schemaTask({
 
       // Highlight kind weights
       const kindWeights = {
-        code_change: 1.0,   // Breaking changes = highest priority
-        api_change: 0.95,   // API updates = very high
-        metric: 0.9,        // Performance data = high
+        code_change: 1.0, // Breaking changes = highest priority
+        api_change: 0.95, // API updates = very high
+        metric: 0.9, // Performance data = high
         code_example: 0.85, // Code examples = good
-        insight: 0.8,       // General insights = medium-high
-        action: 0.75,       // Actionable items = medium
-        quote: 0.6,         // Quotes = lower
-        question: 0.5,      // Questions = lowest
+        insight: 0.8, // General insights = medium-high
+        action: 0.75, // Actionable items = medium
+        quote: 0.6, // Quotes = lower
+        question: 0.5, // Questions = lowest
       };
 
-      const kindWeight = kindWeights[highlight.highlight_kind as keyof typeof kindWeights] || 0.7;
+      const kindWeight =
+        kindWeights[highlight.highlight_kind as keyof typeof kindWeights] ||
+        0.7;
 
       // Final relevance score = weighted average
       // 40% keyword match, 30% kind, 20% authority, 10% freshness
@@ -122,7 +138,10 @@ export const scoreRelevance = schemaTask({
       const finalScore = Math.round(relevanceScore * 100) / 100;
 
       // Update highlight metadata with score
-      const existingMetadata = (highlight.highlight_metadata || {}) as Record<string, any>;
+      const existingMetadata = (highlight.highlight_metadata || {}) as Record<
+        string,
+        any
+      >;
       await db
         .update(highlights)
         .set({
@@ -148,13 +167,13 @@ export const scoreRelevance = schemaTask({
         kind: highlight.highlight_kind,
         relevanceScore: finalScore,
         keywordMatches: keywordMatches.length,
-        runId: ctx.run.id,
+        runId: run.id,
       });
     }
 
     logger.info("score_relevance_success", {
       storyId,
-      runId: ctx.run.id,
+      runId: run.id,
       highlightsScored: scored,
       avgDaysSincePublished: Math.round(daysSincePublished),
     });

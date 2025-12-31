@@ -1,6 +1,6 @@
 # User Flows
 
-_This document enumerates the core Midday dashboard user flows. Each flow lists the user-facing steps alongside the key files, components, data inputs/outputs, and state transitions that enable them._
+_This document enumerates the core Zeke dashboard user flows. Each flow lists the user-facing steps alongside the key files, components, data inputs/outputs, and state transitions that enable them._
 
 ## 1. First-Time User Onboarding
 1. **Locale-aware request gatekeeping** – `apps/dashboard/src/middleware.ts` removes the locale prefix, caches the intended deep link as `return_to`, and redirects unauthenticated visitors to `/login` unless the path matches public resources (`/i/`, `/s/`, `/verify`, `/all-done`, `/desktop/search`); Better Auth session reads and cookie writes happen here.
@@ -57,7 +57,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 ## 7. App Store & Integrations Hub
 1. **Load the Apps workspace** – `/apps` (`apps/dashboard/src/app/[locale]/(app)/(sidebar)/apps/page.tsx`) prefetches three TRPC queries before hydration: `trpc.apps.get` (installed official integrations), `trpc.oauthApplications.list` (all approved external apps), and `trpc.oauthApplications.authorized` (connections the current team has already approved). The page renders `AppsHeader` above a Suspense-wrapped `Apps` grid.
 2. **Tabbing & search state** – `AppsHeader` combines `AppsTabs` (controlled by `useQueryState('tab')`) with the shared `SearchField`. Switching tabs rewrites the `tab` query parameter (default `all`, alternative `installed`), while updating the search box mutates `q`. Both params are consumed downstream without a full reload.
-3. **Unifying official & external apps** – `Apps` fetches data through React Query’s `useSuspenseQuery` (mirroring the server prefetch) and normalizes each source into a single `UnifiedApp` shape: Midday-maintained apps enrich metadata from `@zeke/app-store`, while approved OAuth apps map properties such as scope lists, contact info, and install URLs. The combined array is filtered based on the active tab and search query.
+3. **Unifying official & external apps** – `Apps` fetches data through React Query’s `useSuspenseQuery` (mirroring the server prefetch) and normalizes each source into a single `UnifiedApp` shape: Zeke-maintained apps enrich metadata from `@zeke/app-store`, while approved OAuth apps map properties such as scope lists, contact info, and install URLs. The combined array is filtered based on the active tab and search query.
 4. **Grid rendering & empty states** – The component lays apps out in a responsive grid of `UnifiedAppComponent` cards. If no installed apps exist (installed tab, no results) it shows a “No apps installed” message; if a search yields nothing the UI offers a “Clear search” button that resets to `/apps` via `router.push`.
 5. **Card-level actions** – Each `UnifiedAppComponent` card shows logo, description, and primary CTAs. Clicking “Details” sets `useQueryStates({ app: id })`, opening a sheet; “Install” triggers either `app.onInitialize()` for official apps or `window.open/installUrl` for external apps (using desktop deep-link helpers when needed). An installed app shows “Disconnect”, which calls either `trpc.apps.disconnect` or `trpc.oauthApplications.revokeAccess` and invalidates the relevant TRPC caches.
 6. **Detail sheet experience** – The sheet (still in `UnifiedAppComponent`) previews screenshots via `Carousel`/`Image` components, repeats install/disconnect controls, and presents sections through `Accordion`: “How it works” (long description/overview), “Settings” (for official apps with configurable options), “Website” and “Permissions” (external app metadata rendered via badges using `getScopeDescription`). Copy at the bottom clarifies certification and support expectations.
@@ -256,7 +256,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 ## 12. Desktop Shell & Integration
 
-1. **Bootstraps Midday shell & main window**
+1. **Bootstraps Zeke shell & main window**
    Tauri exposes `show_window` and `check_for_updates` commands, resolves the hosted URL per `ZEKE_ENV`, and builds the primary webview with custom chrome plus external-link guarding
    *(apps/desktop/src-tauri/src/lib.rs:20, :312, :384, :465, :486)*
 
@@ -300,7 +300,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 ### Desktop Lifecycle Actions
 
-1. Launch or refocus the Midday window via the tray icon, Dock, or deep-link
+1. Launch or refocus the Zeke window via the tray icon, Dock, or deep-link
    *(apps/desktop/src-tauri/src/lib.rs:20, :621)*
 
 2. Toggle the floating search palette with `Shift+Alt+K` or the tray icon

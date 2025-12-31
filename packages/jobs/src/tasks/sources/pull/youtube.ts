@@ -1,10 +1,9 @@
-import { logger, schedules, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import type { ingestSourceSchema } from "@jobs/schema";
 import { createSourceQueries } from "@zeke/db/queries";
-import { createEngineClient } from "@zeke/engine-client";
 
 import { chunk } from "../../../utils/array/chunk";
 import { ingestYouTubeChannel } from "../ingest/from-youtube";
@@ -25,7 +24,7 @@ export const ingestPullYouTube = schemaTask({
   queue: {
     concurrencyLimit: 1,
   },
-  run: async ({ reason }: IngestPullYouTubePayload, { ctx }) => {
+  run: async ({ reason }: IngestPullYouTubePayload, { logger, run }) => {
     const db = getDb();
     const sourcesQueries = createSourceQueries(db);
 
@@ -34,13 +33,13 @@ export const ingestPullYouTube = schemaTask({
     type YouTubeSource = (typeof sources)[number];
 
     if (!sources.length) {
-      logger.info("ingest_pull_youtube_no_sources", { reason, runId: ctx.run.id });
+      logger.info("ingest_pull_youtube_no_sources", { reason, runId: run.id });
       return;
     }
 
     logger.info("ingest_pull_youtube_start", {
       reason,
-      runId: ctx.run.id,
+      runId: run.id,
       sourceCount: sources.length,
     });
 
@@ -58,24 +57,8 @@ export const ingestPullYouTube = schemaTask({
 
     logger.info("ingest_pull_youtube_enqueued", {
       reason,
-      runId: ctx.run.id,
+      runId: run.id,
       sourceCount: sources.length,
     });
   },
 });
-
-/**
- * Ensure the YouTube pull schedule is registered
- * Runs every 6 hours (4x/day) for high-priority channels
- */
-export async function ensureYouTubePullSchedule() {
-  const scheduleKey = "ingest-pull-youtube-6h";
-  await schedules.create({
-    task: ingestPullYouTube.id,
-    cron: "0 */6 * * *", // Every 6 hours
-    timezone: process.env.JOBS_CRON_TZ || "UTC",
-    deduplicationKey: scheduleKey,
-    externalId: scheduleKey,
-  });
-  logger.info("ingest_pull_youtube_schedule_ensured", { scheduleKey });
-}

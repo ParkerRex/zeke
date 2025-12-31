@@ -74,7 +74,7 @@ export default {
     intro1:
       "Insight review will live here—surfacing highlights, linking them back to supporting sources, and queuing any follow-up tasks. The data contracts are in place, and the dashboard will light up once the new Trigger.dev insight tasks finish landing.",
     intro2:
-      "Until then, this space reminds us that stories flow into insights, and the UI will mirror Midday's matching cadence with a Zeke-specific vocabulary.",
+      "Until then, this space reminds us that stories flow into insights, and the UI will reflect Zeke's research-focused vocabulary.",
   },
   sources: {
     header: "Sources",
@@ -91,7 +91,7 @@ export default {
   playbooks: {
     header: "Playbooks",
     intro1:
-      "Playbooks will let you string together Trigger.dev tasks—collecting sources, generating insights, and publishing briefs on a schedule. The UI will land once the new job orchestration is stable; for now we're keeping a placeholder so routing and navigation stay aligned with the Midday structure.",
+      "Playbooks will let you string together Trigger.dev tasks—collecting sources, generating insights, and publishing briefs on a schedule. The UI will land once the new job orchestration is stable; for now we're keeping a placeholder while the workflow takes shape.",
   },
   overlay: {
     whyItMatters: "Why it matters",

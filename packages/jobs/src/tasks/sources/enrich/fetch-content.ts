@@ -1,9 +1,9 @@
 import { Readability } from "@mozilla/readability";
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import { JSDOM } from "jsdom";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { fetchContentSchema } from "@jobs/schema";
 import {
   createContentQueries,
@@ -24,7 +24,10 @@ export const fetchContent = schemaTask({
   queue: {
     concurrencyLimit: 3,
   },
-  run: async ({ rawItemIds }: z.infer<typeof fetchContentSchema>, { ctx }) => {
+  run: async (
+    { rawItemIds }: z.infer<typeof fetchContentSchema>,
+    { logger, run },
+  ) => {
     const db = getDb();
     const rawItemQueries = createRawItemQueries(db);
     const contentQueries = createContentQueries(db);
@@ -32,7 +35,7 @@ export const fetchContent = schemaTask({
 
     const rows = await rawItemQueries.findRawItemsByIds(rawItemIds);
     if (!rows.length) {
-      logger.info("fetch_content_no_rows", { rawItemIds, runId: ctx.run.id });
+      logger.info("fetch_content_no_rows", { rawItemIds, runId: run.id });
       return;
     }
 

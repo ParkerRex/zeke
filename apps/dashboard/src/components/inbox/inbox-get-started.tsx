@@ -1,5 +1,4 @@
 "use client";
-// TODO: This is for example purposes only from the Midday project
 // We want to mimic the pattern and structure of this, but with the new tRPC and tool pattern.
 
 import { ConnectGmail } from "@/components/inbox/connect-gmail";
@@ -62,7 +61,7 @@ export function InboxGetStarted() {
 
             <div className="text-center mt-8">
               <p className="text-xs text-[#878787]">
-                You can also forward receipts to your unique Midday email or
+                You can also forward receipts to your unique Zeke email or
                 drag and drop files here
               </p>
             </div>

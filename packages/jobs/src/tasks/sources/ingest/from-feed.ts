@@ -1,7 +1,7 @@
-import { logger, schemaTask } from "@trigger.dev/sdk";
 import type { z } from "zod";
 
 import { getDb } from "@jobs/init";
+import { logger, schemaTask } from "@jobs/schema-task";
 import { ingestSourceSchema } from "@jobs/schema";
 import { createRawItemQueries, createSourceQueries } from "@zeke/db/queries";
 
@@ -22,7 +22,7 @@ export const ingestSource = schemaTask({
   },
   run: async (
     { sourceId, reason }: z.infer<typeof ingestSourceSchema>,
-    { ctx },
+    { logger, run },
   ) => {
     const db = getDb();
     const sourcesQueries = createSourceQueries(db);
@@ -33,7 +33,7 @@ export const ingestSource = schemaTask({
       logger.warn("ingest_source_missing", {
         sourceId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -44,7 +44,7 @@ export const ingestSource = schemaTask({
         reason,
         type: source.type,
         message: "Only RSS sources are supported",
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -53,7 +53,7 @@ export const ingestSource = schemaTask({
       logger.warn("ingest_source_no_url", {
         sourceId,
         reason,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       return;
     }
@@ -103,7 +103,7 @@ export const ingestSource = schemaTask({
         reason,
         itemsSeen: seen,
         itemsInserted: inserted,
-        runId: ctx.run.id,
+        runId: run.id,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -116,7 +116,7 @@ export const ingestSource = schemaTask({
         sourceId,
         reason,
         error,
-        runId: ctx.run.id,
+        runId: run.id,
       });
       throw error;
     }
