@@ -2,14 +2,14 @@
 
 ## Coding Preferences
 - Build REST endpoints with `OpenAPIHono` and Zod schemas; register routes through `rest/routers/index.ts` with proper middleware stacks for authenticated traffic.
-- Use Supabase for authentication; validate bearer tokens in `auth` middleware and hydrate user/team context before protected routes execute.
+- Use Better Auth for authentication; validate session tokens in `auth` middleware and hydrate user/team context before protected routes execute.
 - Add TRPC features by extending domain routers under `trpc/routers` and exposing them through `protectedProcedure`/`publicProcedure` for consistent permission checks.
 - Share data contracts between REST and TRPC by reusing Zod schemas in `src/schemas`; avoid duplicating inline definitions.
 - AI tools live in `src/ai/tools/` and implement the tool interface; register new tools in `src/ai/tools/index.ts`.
 - AI artifacts (chat titles, follow-up questions, etc.) go in `src/ai/artifacts/` and are called during chat flows.
 - Use Drizzle ORM for database operations; connect via middleware/context helpers and rely on `withPrimaryReadAfterWrite` to handle replica lag.
 - Redis caching is configured for API keys, users, teams, and permissions (30 min TTL) with replication cache for read-after-write consistency (10 sec TTL).
-- Create lightweight wrappers in `src/services` for external systems (Supabase, Resend, Stripe) so credentials live in one place and can be mocked in tests.
+- Create lightweight wrappers in `src/services` for external systems (Resend, Stripe) so credentials live in one place and can be mocked in tests.
 - Surface actionable errors: throw `HTTPException` for REST handlers, `TRPCError` for TRPC procedures, and prefer precise messages over generic failures.
 - Keep rate limiting, team permissions, and scope checks in middleware to maintain clear separation between transport and business logic.
 
@@ -34,7 +34,7 @@
 - Artifacts: `chat-title`, `followup-questions`, `burn-rate`, `get-goals`
 
 ### Authentication & Authorization
-- Supabase JWT bearer tokens validated in `auth.ts` middleware
+- Better Auth session tokens validated in `auth.ts` middleware
 - User/team context hydrated from Redis cache (30 min TTL)
 - Team permissions checked via `team-permission.ts` middleware for protected routes
 - RBAC system enforces role-based access control

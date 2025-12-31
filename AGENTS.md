@@ -15,14 +15,14 @@
 - **DB Studio**: `cd packages/db && bun run migrate:studio`
 
 ## Architecture
-Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (Trigger.dev), **ui** (React components), **supabase** (auth client), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
+Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js), **engine** (Cloudflare Worker), **website** (marketing), **desktop** (Electron). Packages: **db** (Drizzle schema/queries), **jobs** (Trigger.dev), **ui** (React components), **auth** (Better Auth), **storage** (MinIO), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `.agents.md` with detailed context—read those first.
 
 ## Database
 - **Schema**: `packages/db/src/schema.ts` (Drizzle ORM, snake_case DB → camelCase app via `casing: "snake_case"`)
 - **Queries**: `packages/db/src/queries/` (shared query functions)
 - **Migrations**: From `packages/db`: `bun run migrate:dev` (local), `migrate` (prod). Set `DATABASE_SESSION_POOLER_URL` for prod.
-- **Type Gen**: From `packages/supabase`: `bun run db:generate` (pulls types from Supabase → `src/types/db.ts`)
-- **Local Setup**: `cd apps/api && supabase start` (runs Postgres on :54322); enable vector extension: `psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"`
+- **Type Gen**: Schema types are generated via Drizzle ORM from `packages/db/src/schema.ts`
+- **Local Setup**: `docker compose up -d postgres minio redis` (runs PostgreSQL, MinIO, Redis); enable vector extension: `psql postgresql://postgres:postgres@127.0.0.1:5432/postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"`
 
 ## Code Style
 - **Formatter**: Biome (2 spaces, auto organizeImports). Run `bun run format` before committing.
@@ -37,4 +37,4 @@ Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **da
 Uses **Bun test runner** (`bun:test` imports). Run single test: `cd apps/api && bun test src/path/to/file.test.ts`. Tests use `describe`, `it`, `expect`, `beforeAll`, `beforeEach` from `bun:test`.
 
 ## Context Notes
-Forked from Midday (finance app); still contains some legacy naming (invoices→articles, transactions→content items). Check `.agents/features/in-progress/mapping-plan.md` for migration plan. Each module has detailed `.agents.md`—e.g., `apps/api/AGENTS.md` covers REST/TRPC patterns, AI tools, auth middleware.
+Research content platform with legacy naming (invoices→articles, transactions→content items). Check `.agents/features/in-progress/mapping-plan.md` for migration plan. Each module has detailed `.agents.md`—e.g., `apps/api/AGENTS.md` covers REST/TRPC patterns, AI tools, auth middleware.

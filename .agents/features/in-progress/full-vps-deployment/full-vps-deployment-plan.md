@@ -1,11 +1,11 @@
 - Map all services behind a reverse proxy on the VPS with Docker Compose
 - Build lean container images and Compose profiles for staging and production
 - Port the Cloudflare Worker engine to a Bun/Hono service compatible with the VPS
-- Integrate external providers (Supabase, Google OAuth, Stripe, Resend) via environment-driven config
+- Integrate external providers (Google OAuth, Stripe, Resend) via environment-driven config
 - Establish deployment, smoke-test, and monitoring procedures for long-term operations
 
 **Executive Summary**
-We will migrate the dashboard, website, API, and ingestion engine onto the Netcup VPS using Docker Compose and a Caddy reverse proxy. The effort covers containerizing each app, replacing the Worker-specific engine with a Bun service, wiring TLS-enabled routing for staging and production domains, and documenting deployment plus operational workflows. Deliverables include reproducible Dockerfiles, Compose stacks, environment templates, OAuth/Supabase configuration updates, and smoke tests that confirm login durability.
+We will migrate the dashboard, website, API, and ingestion engine onto the Netcup VPS using Docker Compose and a Caddy reverse proxy. The effort covers containerizing each app, replacing the Worker-specific engine with a Bun service, wiring TLS-enabled routing for staging and production domains, and documenting deployment plus operational workflows. Deliverables include reproducible Dockerfiles, Compose stacks, environment templates, OAuth configuration updates, and smoke tests that confirm login durability.
 
 **Implementation Tasks**
 
@@ -52,7 +52,7 @@ _Phase 2: Core Implementation_
   - Dependencies: TASK-002
   - Note: Pruned workspace for API image, removed engine dist copy, and built `zeke-api:test`.
 - [x] TASK-009: Define API service in Compose with env mounts, Caddy upstream mapping, and readiness probe [COMPLETED: 2025-10-05 23:22:24 EDT]
-  - Details: Functional Requirements #5, Integrations (Supabase/Resend/Stripe)
+  - Details: Functional Requirements #5, Integrations (Resend/Stripe)
   - Acceptance: Compose config exposes internal hostname `api`, includes secrets references, and `curl http://api:3003/health` succeeds once running; Caddyfile upstream updated
   - Dependencies: TASK-003, TASK-008
   - Note: Added API service with healthcheck/env files, copied configs to VPS, and validated via `docker compose config`.
@@ -88,16 +88,16 @@ _Phase 3: Integration_
   - Acceptance: Caddyfile includes `app.zekehq.com`, `zekehq.com`, `www.zekehq.com`, and `engine.zekehq.com` with global HTTPS redirect and HSTS headers; `caddy validate` passes
   - Dependencies: TASK-014
   - Note: Validation confirms production site blocks and headers.
-- [x] TASK-016: Prepare staging & production environment variable files with Supabase (shared project), OAuth, Stripe, Resend secrets [COMPLETED: 2025-10-05 18:48:10 EDT]
+- [x] TASK-016: Prepare staging & production environment variable files with OAuth, Stripe, Resend secrets [COMPLETED: 2025-10-05 18:48:10 EDT]
   - Details: Integrations, Functional Requirements #5
-  - Acceptance: Encrypted/ignored env files created under `deploy/env/{staging,production}` with placeholder values documented and noting Supabase project reuse
+  - Acceptance: Encrypted/ignored env files created under `deploy/env/{staging,production}` with placeholder values documented
   - Dependencies: TASK-009
-  - Note: Populated dashboard/api/website/engine env templates with Supabase, Stripe, Resend, and OAuth placeholders and synced to VPS.
-- [x] TASK-017: Update Google OAuth and Supabase redirect whitelists for new staging/prod domains [COMPLETED: 2025-10-05 19:37:34 EDT]
-  - Details: Functional Requirements #1, #2, Integrations (Google, Supabase)
-  - Acceptance: OAuth client lists VPS domains; Supabase Auth callback URLs include `/api/auth/callback` for each host
+  - Note: Populated dashboard/api/website/engine env templates with Stripe, Resend, and OAuth placeholders and synced to VPS.
+- [x] TASK-017: Update Google OAuth redirect whitelists for new staging/prod domains [COMPLETED: 2025-10-05 19:37:34 EDT]
+  - Details: Functional Requirements #1, #2, Integrations (Google)
+  - Acceptance: OAuth client lists VPS domains; Auth callback URLs include `/api/auth/callback` for each host
   - Dependencies: TASK-016
-  - Note: Documented redirect URIs in `docs/oauth-supabase-redirects.md` and populated env templates with OAuth client ID for staging/production.
+  - Note: Populated env templates with OAuth client ID for staging/production.
 - [ ] TASK-018: Point DNS records for `zekehq.com` subdomains to VPS and validate propagation
   - Details: Architecture (Networking), Functional Requirements #2–4
   - Acceptance: `dig` queries resolve to VPS IP; Caddy automatically issues valid certificates after propagation
@@ -144,7 +144,7 @@ _Phase 5: Deployment Preparation_
 
 **Dependencies and Blockers**
 - Access to DNS provider for `zekehq.com` required to update records (Functional Requirements #2).
-- OAuth and Supabase admin access needed to adjust redirect URLs (Integrations).
+- OAuth admin access needed to adjust redirect URLs (Integrations).
 - Confirm Caddy Docker image/modules (standard vs caddy-docker-proxy) to support chosen configuration approach (Architecture – Reverse Proxy).
 
 **Success Metrics**

@@ -20,7 +20,7 @@ export const newTable = pgTable("new_table", {
 
 ### 2. **Generate Migration**
 ```bash
-# From project root - uses local Supabase
+# From project root - uses local PostgreSQL
 bun run db:migrate
 
 # Or from packages/db directory
@@ -39,7 +39,7 @@ git commit -m "feat: add new_table migration"
 
 ## 🚀 **Available Commands**
 
-### Development (Local Supabase)
+### Development (Local PostgreSQL)
 ```bash
 bun run db:migrate        # Generate + apply migration to local DB
 bun run db:studio        # Open Drizzle Studio to inspect DB
@@ -66,9 +66,9 @@ bun run migrate:studio
 
 ## ⚠️ **NEVER DO THESE**
 
-❌ **Don't write raw SQL migrations in Supabase dashboard**
+❌ **Don't write raw SQL migrations in database admin tools**
 ❌ **Don't modify migration files after they're generated**
-❌ **Don't run SQL directly in Supabase Studio for schema changes**
+❌ **Don't run SQL directly in database admin tools for schema changes**
 ❌ **Don't bypass Drizzle for schema modifications**
 
 ## ✅ **ALWAYS DO THESE**
@@ -76,7 +76,7 @@ bun run migrate:studio
 ✅ **Modify `src/schema.ts` first**
 ✅ **Use `bun run db:migrate` for development**
 ✅ **Review generated SQL before committing**
-✅ **Test migrations on local Supabase first**
+✅ **Test migrations on local PostgreSQL first**
 ✅ **Commit both schema.ts AND migration files**
 
 ## 🔧 **Common Migration Patterns**
@@ -139,7 +139,7 @@ DATABASE_SESSION_POOLER_URL="postgresql://postgres.PROJECT:PASSWORD@HOST:5432/po
 - Ensure workspace dependencies are properly linked
 
 ### "Database connection failed"
-- Check if Supabase is running: `supabase status`
+- Check if PostgreSQL is running: `docker compose ps`
 - Verify DATABASE_SESSION_POOLER_URL is set correctly
 
 ### "Migration conflicts"

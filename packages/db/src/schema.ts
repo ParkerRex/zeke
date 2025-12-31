@@ -207,7 +207,8 @@ export const teams = pgTable(
       mode: "string",
     }),
     plan: plansEnum().default("trial").notNull(),
-    // subscriptionStatus: subscriptionStatusEnum("subscription_status"),
+    // Stripe integration
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).unique(),
   },
   (table) => [
     pgPolicy("Invited users can select team if they are invited.", {
@@ -1825,6 +1826,46 @@ export const sourceHealth = pgTable("source_health", {
   }).defaultNow(),
 });
 
+// ============================================================================
+// JOB RUNS (pg-boss job tracking)
+// ============================================================================
+
+export const jobStatusEnum = pgEnum("job_status", [
+  "pending",
+  "active",
+  "completed",
+  "failed",
+  "cancelled",
+]);
+
+export const jobRuns = pgTable(
+  "job_runs",
+  {
+    id: text("id").primaryKey().notNull(),
+    taskId: text("task_id").notNull(),
+    status: jobStatusEnum("status").notNull().default("pending"),
+    payload: jsonb("payload"),
+    result: jsonb("result"),
+    error: text("error"),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("job_runs_task_id_idx").on(table.taskId),
+    index("job_runs_status_idx").on(table.status),
+    index("job_runs_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export type JobRun = typeof jobRuns.$inferSelect;
+export type NewJobRun = typeof jobRuns.$inferInsert;
+
 // Relations
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -2053,6 +2094,13 @@ export const chatFeedbackRelations = relations(chatFeedback, ({ one }) => ({
 // ============================================================================
 // These tables are required by Better Auth for authentication
 
+// System-wide role for admin access (separate from team roles)
+export const systemRole = pgEnum("system_role", [
+  "user",
+  "admin",
+  "super_admin",
+]);
+
 export const authUser = pgTable(
   "auth_user",
   {
@@ -2076,6 +2124,8 @@ export const authUser = pgTable(
     locale: text("locale").default("en"),
     timezone: text("timezone"),
     twoFactorEnabled: boolean("two_factor_enabled").default(false),
+    // System-wide admin role
+    systemRole: systemRole("system_role").default("user").notNull(),
   },
   (table) => [
     index("auth_user_email_idx").using("btree", table.email),

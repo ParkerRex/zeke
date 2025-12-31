@@ -350,3 +350,62 @@ export async function getAvailablePlans(
     pro: true,
   };
 }
+
+// Stripe integration queries
+
+/**
+ * Set the Stripe customer ID for a team
+ */
+export async function setStripeCustomerId(
+  db: Database,
+  teamId: string,
+  customerId: string,
+) {
+  const [updated] = await db
+    .update(teams)
+    .set({ stripeCustomerId: customerId })
+    .where(eq(teams.id, teamId))
+    .returning({
+      id: teams.id,
+      stripeCustomerId: teams.stripeCustomerId,
+    });
+
+  return updated;
+}
+
+/**
+ * Get a team by its Stripe customer ID
+ */
+export async function getTeamByStripeCustomerId(
+  db: Database,
+  customerId: string,
+) {
+  const [team] = await db
+    .select({
+      id: teams.id,
+      name: teams.name,
+      email: teams.email,
+      plan: teams.plan,
+      stripeCustomerId: teams.stripeCustomerId,
+    })
+    .from(teams)
+    .where(eq(teams.stripeCustomerId, customerId))
+    .limit(1);
+
+  return team ?? null;
+}
+
+/**
+ * Get the Stripe customer ID for a team
+ */
+export async function getStripeCustomerId(db: Database, teamId: string) {
+  const [team] = await db
+    .select({
+      stripeCustomerId: teams.stripeCustomerId,
+    })
+    .from(teams)
+    .where(eq(teams.id, teamId))
+    .limit(1);
+
+  return team?.stripeCustomerId ?? null;
+}

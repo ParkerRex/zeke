@@ -1,16 +1,19 @@
 # Zeke Local Docker + Postgres Bootstrap Plan
 
 > **Goal**: Get Zeke running locally with Docker and a self-hosted Postgres database, validate each engine provider, then resolve outstanding bugs.
+>
+> **Status**: COMPLETED - Migrated from Supabase to self-hosted PostgreSQL, MinIO, and Better Auth.
 
 ---
 
 ## Current State Summary
 
 ### Database
-- **Current**: Supabase cloud PostgreSQL with PgBouncer connection pooling
+- **Current**: Self-hosted PostgreSQL via Docker
 - **ORM**: Drizzle with migrations in `packages/db/migrations/`
 - **Connection**: Singleton client in `packages/db/src/client.ts`
-- **Target**: Local Docker Postgres with same Drizzle setup
+- **Storage**: MinIO (S3-compatible) via `@zeke/storage`
+- **Auth**: Better Auth via `@zeke/auth`
 
 ### Engine Providers (ALL IMPLEMENTED)
 | Provider | Status | Auth | Notes |
@@ -25,7 +28,6 @@
 | ID | Issue | Priority |
 |----|-------|----------|
 | 007 | RBAC returns `isAdmin: true` for all users | P1 |
-| 008 | MFA UI exists but Supabase MFA not enabled | P1 |
 | 009 | Stripe customer ID not stored in DB | P2 |
 
 ---
@@ -92,14 +94,11 @@ Create `.env.local` template:
 ```bash
 # Database (local Docker Postgres)
 DATABASE_PRIMARY_URL=postgresql://postgres:postgres@localhost:5432/zeke
-DATABASE_SESSION_POOLER=postgresql://postgres:postgres@localhost:5432/zeke
+DATABASE_SESSION_POOLER_URL=postgresql://postgres:postgres@localhost:5432/zeke
 PGSSLMODE=disable
 
-# Supabase (local or skip for now)
-SUPABASE_URL=http://localhost:54321
-SUPABASE_ANON_KEY=your-local-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
-SUPABASE_JWT_SECRET=your-super-secret-jwt-token-at-least-32-chars
+# Better Auth
+BETTER_AUTH_SECRET=your-auth-secret-at-least-32-chars
 
 # API
 API_SECRET_KEY=your-api-secret-key-at-least-32-characters

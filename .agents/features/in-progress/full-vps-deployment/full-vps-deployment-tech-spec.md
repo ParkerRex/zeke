@@ -7,20 +7,19 @@ We will migrate all Zeke services (dashboard, website, public API, ingestion eng
 - Containerize dashboard (Next.js), marketing website (Next.js), API (Bun + Hono), ingestion engine (currently Cloudflare Worker) for VPS hosting.
 - Provide separate staging and production deployments on the VPS with isolated configuration.
 - Centralize SSL termination, routing, and certificate automation via reverse proxy.
-- Ensure OAuth (Google) + Supabase redirects work for both staging and production domains.
+- Ensure OAuth (Google) redirects work for both staging and production domains.
 - Provide operational scripts/process for deploys, log collection, restarts, and updates.
 
 ## Non-Goals
 - Rewriting application business logic beyond deployment necessities.
 - Autoscaling across multiple VPS instances.
-- Refactoring Supabase or database stacks.
-- Replacing third-party services like Supabase, Resend, Stripe.
+- Refactoring database stacks.
+- Replacing third-party services like Resend, Stripe.
 
 ## Assumptions
 - Netcup VPS has root SSH access with Docker and Docker Compose support.
 - DNS for `zekehq.com` and subdomains can be pointed at the VPS.
-- Supabase project stays unchanged; environment secrets available.
-- Supabase staging will share the primary hosted project (no separate Supabase instance).
+- Self-hosted PostgreSQL, MinIO, and Better Auth are used; environment secrets available.
 - VPS has sufficient CPU/RAM for all services (8 GB+ recommended).
 
 ## Architecture
@@ -32,7 +31,7 @@ We will migrate all Zeke services (dashboard, website, public API, ingestion eng
   - `engine`: Convert Worker to Bun/Hono service running behind proxy (port 3010). Domain: `engine.zekehq.com` (prod), `engine-staging.zekehq.com` (staging).
 - **Data Stores:**
   - Redis container (existing compose file) for caching/queues if required.
-  - Bind to Supabase via environment vars.
+  - Bind to PostgreSQL via environment vars.
 - **Networking:** All containers on a shared Docker network; reverse proxy attaches to public network and internal network.
 - **Configuration:** Environment files per service/per environment (stored under `deploy/env/*`). Secrets injected via Docker Compose `.env` or Docker secrets; never committed.
 
@@ -41,7 +40,7 @@ We will migrate all Zeke services (dashboard, website, public API, ingestion eng
 2. Production deployment reachable via real domains with valid TLS certificates.
 3. Compose file(s) support `staging` and `production` profiles.
 4. Caddy automatically provisions/renews TLS certificates from Let’s Encrypt.
-5. Applications can access Supabase, Redis, and other services with minimal downtime.
+5. Applications can access PostgreSQL, Redis, MinIO and other services with minimal downtime.
 6. Engine service must expose `/health`, `/ingest`, `/source`, `/` endpoints identical to Worker behavior.
 7. Deploy process documented: build images, push/pull, rolling restart commands.
 8. Monitoring/logging guidelines with instructions for verifying container health.
@@ -54,7 +53,9 @@ We will migrate all Zeke services (dashboard, website, public API, ingestion eng
 - Provide healthchecks for each service container.
 
 ## Integrations
-- Supabase (env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`) shared between staging and production.
+- PostgreSQL (env: `DATABASE_PRIMARY_URL`, `DATABASE_REPLICA_URL`) for database.
+- MinIO (env: `S3_*`) for file storage.
+- Better Auth (env: `BETTER_AUTH_SECRET`) for authentication.
 - Google OAuth client (env: `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, etc.) with redirect URIs updated for new domains.
 - Resend (email) keys for API/website.
 - Stripe (billing) env vars for dashboard/API.

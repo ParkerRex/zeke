@@ -3,6 +3,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 import { connectDb, type Database } from "@zeke/db/client";
+import {
+  setStripeCustomerId,
+  getTeamByStripeCustomerId,
+  updateTeamById,
+} from "@zeke/db/queries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,11 +69,16 @@ async function handleCheckoutSessionCompleted(
   const customerId = extractCustomerId(session.customer);
 
   if (!teamId || !customerId) {
+    console.warn(
+      `Checkout session missing teamId (${teamId}) or customerId (${customerId})`,
+    );
     return;
   }
 
-  // TODO: Store stripe customer ID when database schema is updated
-  console.log(`Checkout completed for team ${teamId}, customer ${customerId}`);
+  // Store the Stripe customer ID for the team
+  const db = await connectDb();
+  await setStripeCustomerId(db, teamId, customerId);
+  console.log(`Stored Stripe customer ${customerId} for team ${teamId}`);
 }
 
 async function handleSubscriptionEvent(
@@ -103,14 +113,23 @@ async function resolveTeamId(
   db: Database,
   subscription: Stripe.Subscription,
 ): Promise<string | null> {
+  // First, try to get team ID from subscription metadata
   const metadataTeamId = extractTeamId(subscription.metadata);
   if (metadataTeamId) {
     return metadataTeamId;
   }
 
-  // TODO: Implement customer ID lookup when database schema is updated
+  // Fall back to looking up by customer ID
+  const customerId = extractCustomerId(subscription.customer);
+  if (customerId) {
+    const team = await getTeamByStripeCustomerId(db, customerId);
+    if (team) {
+      return team.id;
+    }
+  }
+
   console.warn(
-    `Cannot resolve team ID from customer for subscription ${subscription.id}`,
+    `Cannot resolve team ID for subscription ${subscription.id} - no metadata or customer mapping`,
   );
   return null;
 }
@@ -165,9 +184,23 @@ async function updateTeamBillingState(
     stripeCustomerId: string | null;
   },
 ) {
-  // TODO: Update to use plan_code when schema is updated (currently uses 'plan' enum)
+  // Update team's plan and optionally store customer ID
+  const updateData: Record<string, unknown> = {
+    plan: params.planCode,
+  };
+
+  // Also update the customer ID if provided (ensures it's always stored)
+  if (params.stripeCustomerId) {
+    updateData.stripeCustomerId = params.stripeCustomerId;
+  }
+
+  await updateTeamById(db, {
+    id: params.teamId,
+    data: updateData,
+  });
+
   console.log(
-    `Team ${params.teamId} billing state: ${params.planCode}, customer: ${params.stripeCustomerId}`,
+    `Updated team ${params.teamId} billing: plan=${params.planCode}, customer=${params.stripeCustomerId}`,
   );
 }
 

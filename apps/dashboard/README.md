@@ -175,7 +175,7 @@ apps/app/
 - **TypeScript**: Type-safe JavaScript
 - **Tailwind CSS**: Utility-first CSS framework
 - **nuqs**: Type-safe URL state management
-- **Supabase**: Backend-as-a-Service
+- **Better Auth**: Authentication
 - **React Hook Form**: Form state management
 - **Sonner**: Toast notifications
 

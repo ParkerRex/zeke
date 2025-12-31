@@ -3,11 +3,11 @@
 _This document enumerates the core Midday dashboard user flows. Each flow lists the user-facing steps alongside the key files, components, data inputs/outputs, and state transitions that enable them._
 
 ## 1. First-Time User Onboarding
-1. **Locale-aware request gatekeeping** – `apps/dashboard/src/middleware.ts` removes the locale prefix, caches the intended deep link as `return_to`, and redirects unauthenticated visitors to `/login` unless the path matches public resources (`/i/`, `/s/`, `/verify`, `/all-done`, `/desktop/search`); Supabase session reads and cookie writes happen here.
+1. **Locale-aware request gatekeeping** – `apps/dashboard/src/middleware.ts` removes the locale prefix, caches the intended deep link as `return_to`, and redirects unauthenticated visitors to `/login` unless the path matches public resources (`/i/`, `/s/`, `/verify`, `/all-done`, `/desktop/search`); Better Auth session reads and cookie writes happen here.
 2. **Sign-in surface renders providers** – `apps/dashboard/src/app/[locale]/(public)/login/page.tsx` chooses the primary button (Google, Apple, GitHub, OTP) using `Cookies.PreferredSignInProvider`, device vendor, and EU geo checks via `isEU()`; supporting components include `GoogleSignIn`, `AppleSignIn`, `GithubSignIn`, `OTPSignIn`, and the optional `ConsentBanner`.
-3. **OAuth/OTP completion exchanges a session** – `apps/dashboard/src/app/api/auth/callback/route.ts` calls `supabase.**auth**.exchangeCodeForSession(code)` and stores the chosen provider cookie; desktop clients are bounced to `/verify?code=…`, while invite-based `return_to` targets get normalized to `/teams`.
+3. **OAuth/OTP completion exchanges a session** – `apps/dashboard/src/app/api/auth/callback/route.ts` handles the OAuth callback and stores the chosen provider cookie; desktop clients are bounced to `/verify?code=…`, while invite-based `return_to` targets get normalized to `/teams`.
 4. **Desktop deep link bridge** – `/verify` (`apps/dashboard/src/app/[locale]/(public)/verify/page.tsx`) mounts `DesktopSignInVerifyCode`, which replaces `window.location` with `zeke://api/auth/callback` and exposes a manual retry link; state guarded by `hasRunned` ref to prevent loops.
-5. **Mandatory MFA enrollment** – lacking the `Cookies.MfaSetupVisited` flag from the callback route pushes first-time devices to `/mfa/setup`, where `SetupMfa` + `EnrollMFA` guide the QR scan, TOTP verification, Supabase MFA enrollment (`auth.mfa.enroll`, `challenge`, `verify`), and optional unenroll-on-cancel.
+5. **Mandatory MFA enrollment** – lacking the `Cookies.MfaSetupVisited` flag from the callback route pushes first-time devices to `/mfa/setup`, where `SetupMfa` + `EnrollMFA` guide the QR scan, TOTP verification, Better Auth MFA enrollment, and optional unenroll-on-cancel.
 6. **Authenticated route guard** – `apps/dashboard/src/app/[locale]/(app)/(sidebar)/layout.tsx` fetches `trpc.user.me`; missing `fullName` triggers `redirect("/setup")`, missing `teamId` triggers `redirect("/teams")`, ensuring downstream layout always has identity & context.
 7. **Profile completion form** – `/setup` (`apps/dashboard/src/app/[locale]/(app)/setup/page.tsx`) wraps `SetupForm`, which updates `user.fullName` through `useUserMutation`, invalidates the React Query cache, and pushes the router to `/teams` on success; avatar uploads are optional via `AvatarUpload`.
 8. **Team selection & invite triage** – `/teams` (`apps/dashboard/src/app/[locale]/(app)/teams/page.tsx`) prefetches `trpc.team.list`, `trpc.team.invitesByEmail`, and `trpc.user.me`; `SelectTeamTable` rows invoke `trpc.user.update` to swap `teamId`, while `TeamInvites` offers accept/decline mutations. Lack of data triggers `redirect("/teams/create")`.
@@ -41,7 +41,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 ## 5. Magic Inbox Triage
 1. **Connect an email source** – `ConnectGmail` (`apps/dashboard/src/components/inbox/connect-gmail.tsx`) issues `trpc.inboxAccounts.connect` and routes the user to Google OAuth; upon return, inbox accounts surface through `trpc.inboxAccounts.list` (used in `InboxHeader`).
 2. **Ingest documents and emails** – The inbox page (`apps/dashboard/src/app/[locale]/(app)/(sidebar)/inbox/page.tsx`) resolves filter params via `loadInboxFilterParams`, fetches inbox entries with `trpc.inbox.get.infiniteQueryOptions`, and, if empty/unconfigured, shows `InboxGetStarted` with pointers to connect providers or upload PDFs.
-3. **Real-time queue updates** – `InboxView` subscribes to `realtime_inbox` via `useRealtime`, batching Supabase payloads, refetching inbox data, and auto-selecting the first item by mutating URL/query params with `useInboxParams`.
+3. **Real-time queue updates** – `InboxView` subscribes to `realtime_inbox` via `useRealtime`, batching realtime payloads, refetching inbox data, and auto-selecting the first item by mutating URL/query params with `useInboxParams`.
 4. **Review details & attachments** – `InboxDetails` loads the selected item through `trpc.inbox.getById`, displays parsed metadata, embedded `FileViewer`, and exposes actions (download via `downloadFile`, copy link, open original email). Toolbar buttons call mutations (`trpc.inbox.update`, `trpc.inbox.retryMatching`, `trpc.inbox.delete`) with optimistic cache updates so the list responds instantly.
 5. **Match to transactions or mark done** – `InboxActions`, `MatchTransaction`, and `SuggestedMatch` components trigger TRPC mutations to confirm matches (`trpc.inbox.matchTransaction`), create new transactions, or mark the item as resolved; query invalidations keep `trpc.transactions.get` and `trpc.inbox.get` in sync so both Inbox and Transactions widgets reflect the status change.
 
@@ -85,7 +85,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 9. **Detail edits** happen inside the transaction sheet, which hydrates from cached list data, optimistically updates TRPC caches, cascades invalidations, and exposes category, assignment, tagging, internal/recurring toggles, notes, suggested inbox matches, and quick toasts to bulk-apply similar classifications (`apps/dashboard/src/components/sheets/transaction-sheet.tsx:1`, `apps/dashboard/src/components/transaction-details.tsx:1`, `apps/dashboard/src/components/suggested-match.tsx:1`).
 
-10. **Attachment ingestion** streams uploads to Supabase, calls the attachment processor, polls for extracted tax data, and announces when the tax engine synchronizes amounts back onto the transaction (`apps/dashboard/src/components/transaction-attachments.tsx:1`).
+10. **Attachment ingestion** streams uploads to MinIO storage, calls the attachment processor, polls for extracted tax data, and announces when the tax engine synchronizes amounts back onto the transaction (`apps/dashboard/src/components/transaction-attachments.tsx:1`).
 
 11. **All UI paths backstop** onto the TRPC router that wraps CRUD, bulk updates, similarity search, inbox matching, analytics ranges, and manual creation (which also triggers embedding jobs) under team-aware protected procedures (`apps/api/src/trpc/routers/transactions.ts:1`).
 
@@ -349,14 +349,14 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 5. **Upload surface & hidden input**
    `VaultUploadZone` (`vault-upload-zone.tsx:1`) wraps the entire view with a `react-dropzone` drop target, exposes the hidden `<input id="upload-files">`, and tracks up to 25 files (≤5 MB each).
-   It leverages Supabase resumable uploads (`apps/dashboard/src/utils/upload.ts:1`, tus 6 MB chunks) and live progress toasts (`useToast`) before queueing `trpc.documents.processDocument` mutations for each file batch.
+   It leverages resumable uploads (`apps/dashboard/src/utils/upload.ts:1`, tus 6 MB chunks) and live progress toasts (`useToast`) before queueing `trpc.documents.processDocument` mutations for each file batch.
 
 6. **Processing pipeline & job fan-out**
    The documents router (`apps/api/src/trpc/routers/documents.ts:1`) partitions uploads into supported/unsupported mimetypes, marks unsupported rows `processingStatus: "completed"`, and batch triggers the `process-document` Trigger.dev task (`tasks.batchTrigger`) for OCR, summarisation, and embedding.
-   Supabase storage deletions and short-link generation share the same router, keeping all lifecycle mutations in sync.
+   Storage deletions and short-link generation share the same router, keeping all lifecycle mutations in sync.
 
 7. **Grid rendering & realtime hydration**
-   `VaultGrid` (`vault-grid.tsx:1`) streams documents via `useSuspenseInfiniteQuery`, debounces Supabase realtime INSERT/UPDATE events (`useRealtime`, `apps/dashboard/src/hooks/use-realtime.ts:1`), flattens pages with `useMemo`, and auto-fetches the next page when `LoadMore` hits the viewport (`useInView`).
+   `VaultGrid` (`vault-grid.tsx:1`) streams documents via `useSuspenseInfiniteQuery`, debounces realtime INSERT/UPDATE events (`useRealtime`, `apps/dashboard/src/hooks/use-realtime.ts:1`), flattens pages with `useMemo`, and auto-fetches the next page when `LoadMore` hits the viewport (`useInView`).
    Empty results branch to `NoResults` or the FTUX hero (`VaultGetStarted`).
 
 8. **Card UI, previews, and quick actions**
@@ -409,7 +409,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 12. **Browse AI-suggested “Related Files”** inside the document sheet and open adjacent documents without leaving context (`vault-related-files.tsx:1`).
 
-13. **Trigger deletes** from grid/list/detail views to remove both the database row and Supabase storage object (`vault-item-actions.tsx:1`, `document-actions.tsx:1`, `documents.ts:1`).
+13. **Trigger deletes** from grid/list/detail views to remove both the database row and storage object (`vault-item-actions.tsx:1`, `document-actions.tsx:1`, `documents.ts:1`).
 
 14. **Launch the vault sheet from other surfaces** (transactions, inbox, widgets) to inspect or attach files without manually navigating to `/vault` (`global-sheets.tsx:1`, `select-attachment.tsx:1`, `widgets/vault/vault.tsx:1`).
 
@@ -438,7 +438,7 @@ _This document enumerates the core Midday dashboard user flows. Each flow lists 
 
 # Instrumented Actions
 
-1. **Sign-in & onboarding** – OAuth callback records *User Signed In*, while the Supabase registration webhook logs *User Registered* before kicking off team onboarding
+1. **Sign-in & onboarding** – OAuth callback records *User Signed In*, while the registration webhook logs *User Registered* before kicking off team onboarding
    `apps/dashboard/src/app/api/auth/callback/route.ts:41`
    `apps/dashboard/src/app/api/webhook/registered/route.ts:41`.
 

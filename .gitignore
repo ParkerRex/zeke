@@ -50,7 +50,7 @@ packages/email/public
 storybook-static
 tailwind.css
 
-# Supabase
+# Local development
 .branches
 .temp
 

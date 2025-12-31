@@ -1,6 +1,7 @@
 export * from "./activities";
 export * from "./api-keys";
 export * from "./apps";
+export * from "./auth";
 export * from "./chats";
 export * from "./contents";
 export * from "./feedback";
