@@ -13,6 +13,7 @@ const config = {
   experimental: {
     inlineCss: true,
   },
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
   images: {
     loader: "custom",
     loaderFile: "./image-loader.ts",

@@ -4,7 +4,11 @@
       "Bash(cat:*)",
       "Bash(find:*)",
       "Bash(docker compose:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker push:*)",
+      "Bash(gh auth:*)",
+      "Bash(ssh -i ~/.ssh/netcup-vps root@152.53.88.183:*)",
+      "Bash(docker buildx build:*)"
     ]
   }
 }
