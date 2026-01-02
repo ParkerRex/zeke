@@ -7,6 +7,13 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 echo "🚀 Starting Zeke development environment..."
 echo ""
 
+# Load root env vars if present so child apps get required config
+if [ -f "$ROOT_DIR/.env" ]; then
+    set -a
+    source "$ROOT_DIR/.env"
+    set +a
+fi
+
 # Start all Docker services (Postgres, Redis, MinIO)
 echo "📦 Starting Docker services..."
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d postgres redis minio 2>/dev/null || {
@@ -49,7 +56,7 @@ API_PID=$!
 cd "$ROOT_DIR/apps/dashboard" && bun run dev &
 DASH_PID=$!
 
-cd "$ROOT_DIR/apps/engine" && bun run dev &
+cd "$ROOT_DIR/apps/engine" && bun run start &
 ENGINE_PID=$!
 
 echo ""
