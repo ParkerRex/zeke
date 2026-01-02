@@ -19,8 +19,8 @@
     "./timezones": "./src/timezones.ts"
   },
   "devDependencies": {
-    "next": "15.5.4",
-    "typescript": "^5.9.2"
+    "next": "16.1.1",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "next": ">=13"

@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 
-const STRIPE_API_VERSION = "2025-02-24.acacia";
+const STRIPE_API_VERSION = "2025-12-15.clover";
 
 const secretKey = process.env.STRIPE_SECRET_KEY;
 

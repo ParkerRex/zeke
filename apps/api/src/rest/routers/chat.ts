@@ -240,9 +240,11 @@ app.post("/", withRequiredScope("chat.write"), async (c) => {
 
           // Generate chat title artifact if we have a title
           if (generatedTitle) {
-            const titleStream = chatTitleArtifact.stream({
-              title: generatedTitle,
-            });
+            const titleStream = chatTitleArtifact.stream(
+              { title: generatedTitle },
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              writer as any,
+            );
 
             titleStream.complete();
           }

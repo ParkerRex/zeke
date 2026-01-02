@@ -11,13 +11,13 @@
   "dependencies": {
     "@zeke/db": "workspace:*",
     "@zeke/utils": "workspace:*",
-    "better-auth": "^1.2.3",
+    "better-auth": "^1.4.10",
     "server-only": "^0.0.1",
-    "zod": "^3.25.64"
+    "zod": "^4.3.4"
   },
   "devDependencies": {
-    "@types/node": "^22.10.10",
-    "typescript": "^5.9.2"
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
   },
   "exports": {
     ".": "./src/index.ts",

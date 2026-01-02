@@ -1,4 +1,4 @@
-import PgBoss from "pg-boss";
+import { PgBoss } from "pg-boss";
 
 let boss: PgBoss | null = null;
 
@@ -23,8 +23,7 @@ export async function getBoss(): Promise<PgBoss> {
       retryDelay: 1,
       retryBackoff: true,
       expireInSeconds: 60 * 60, // 1 hour default job expiry
-      retentionDays: 7,
-    });
+    } as ConstructorParameters<typeof PgBoss>[0]);
 
     boss.on("error", (error: Error) => {
       console.error("[pg-boss] Error:", error);

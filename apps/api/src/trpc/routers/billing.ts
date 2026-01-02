@@ -43,32 +43,37 @@ const resolveInvoiceStatus = (
 };
 
 const getInvoiceProductName = (invoice: Stripe.Invoice) => {
-  const line = invoice.lines?.data?.[0];
+  const line = invoice.lines?.data?.[0] as Record<string, unknown> | undefined;
 
   if (!line) {
     return invoice.description ?? undefined;
   }
 
-  if (line.description) {
+  if (line.description && typeof line.description === "string") {
     return line.description;
   }
 
-  if (line.price?.nickname) {
-    return line.price.nickname;
+  const price = line.price as
+    | { nickname?: string; product?: unknown }
+    | undefined;
+  if (price?.nickname) {
+    return price.nickname;
   }
 
-  const product = line.price?.product;
+  const product = price?.product;
   if (
     product &&
     typeof product !== "string" &&
-    "name" in product &&
-    product.name
+    typeof product === "object" &&
+    product !== null &&
+    "name" in product
   ) {
-    return product.name;
+    return (product as { name: string }).name;
   }
 
-  if (line.plan?.nickname) {
-    return line.plan.nickname ?? undefined;
+  const plan = line.plan as { nickname?: string } | undefined;
+  if (plan?.nickname) {
+    return plan.nickname;
   }
 
   return invoice.description ?? undefined;
