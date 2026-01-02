@@ -2,6 +2,15 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor } from "better-auth/plugins";
 import { db } from "@zeke/db/client";
+import * as schema from "@zeke/db/schema";
+
+const authSchema = {
+  user: schema.authUser,
+  session: schema.authSession,
+  account: schema.authAccount,
+  verification: schema.authVerification,
+  twoFactor: schema.authTwoFactor,
+};
 
 const getEnvVar = (key: string, required = true): string => {
   const value = process.env[key];
@@ -14,6 +23,7 @@ const getEnvVar = (key: string, required = true): string => {
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: authSchema,
   }),
   secret: getEnvVar("AUTH_SECRET"),
   baseURL: process.env.NEXT_PUBLIC_APP_URL,

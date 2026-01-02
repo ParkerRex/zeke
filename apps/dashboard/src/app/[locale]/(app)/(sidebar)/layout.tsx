@@ -16,17 +16,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const queryClient = getQueryClient();
-
-
-  // NOTE: These are used in the global sheets
-batchPrefetch([
-    trpc.team.current.queryOptions(),
-    trpc.user.me.queryOptions(),
-    trpc.search.global.queryOptions({ searchTerm: "" }),
-  ]);
-
-
-  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions())
+  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
 
   if (!user) {
     redirect("/login");
@@ -41,6 +31,13 @@ batchPrefetch([
   if (!user.teamId) {
     redirect("/teams");
   }
+
+  // NOTE: These are used in the global sheets
+  batchPrefetch([
+    trpc.team.current.queryOptions(),
+    trpc.user.me.queryOptions(),
+    trpc.search.global.queryOptions({ searchTerm: "" }),
+  ]);
   return (
     <HydrateClient>
       <div className="relative">

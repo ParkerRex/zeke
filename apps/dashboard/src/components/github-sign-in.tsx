@@ -15,22 +15,29 @@ export function GithubSignIn() {
 
   const handleSignIn = async () => {
     setLoading(true);
+    const safeReturnTo =
+      returnTo && !returnTo.startsWith("api/") && !returnTo.startsWith("/api/")
+        ? returnTo
+        : null;
 
-    const callbackUrl = new URL("/api/auth/callback", getUrl());
-
-    if (isDesktopApp()) {
-      callbackUrl.searchParams.append("provider", "github");
-      callbackUrl.searchParams.append("client", "desktop");
-    } else {
-      if (returnTo) {
-        callbackUrl.searchParams.append("return_to", returnTo);
-      }
-      callbackUrl.searchParams.append("provider", "github");
+    if (!isDesktopApp()) {
+      const callbackUrl = new URL(safeReturnTo ?? "/", getUrl());
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: callbackUrl.toString(),
+      });
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      return;
     }
 
+    const desktopCallbackUrl = new URL("/api/auth/callback", getUrl());
+    desktopCallbackUrl.searchParams.append("provider", "github");
+    desktopCallbackUrl.searchParams.append("client", "desktop");
     await authClient.signIn.social({
       provider: "github",
-      callbackURL: callbackUrl.toString(),
+      callbackURL: desktopCallbackUrl.toString(),
     });
 
     setTimeout(() => {

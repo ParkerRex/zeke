@@ -30,6 +30,11 @@ export function OTPSignIn({ className }: Props) {
   const [isVerifying, setIsVerifying] = useState(false);
   const [email, setEmail] = useState<string>();
   const searchParams = useSearchParams();
+  const returnTo = searchParams.get("return_to");
+  const safeReturnTo =
+    returnTo && !returnTo.startsWith("api/") && !returnTo.startsWith("/api/")
+      ? returnTo
+      : "";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +51,7 @@ export function OTPSignIn({ className }: Props) {
     // Send magic link email via Better Auth
     await authClient.signIn.magicLink({
       email,
-      callbackURL: `${window.location.origin}/${searchParams.get("return_to") || ""}`,
+      callbackURL: `${window.location.origin}/${safeReturnTo}`,
     });
 
     setSent(true);
@@ -61,7 +66,7 @@ export function OTPSignIn({ className }: Props) {
     verifyOtp.execute({
       token,
       email,
-      redirectTo: `${window.location.origin}/${searchParams.get("return_to") || ""}`,
+      redirectTo: `${window.location.origin}/${safeReturnTo}`,
     });
   }
 
