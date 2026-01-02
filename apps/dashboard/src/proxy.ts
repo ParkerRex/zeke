@@ -8,7 +8,7 @@ const I18nMiddleware = createI18nMiddleware({
   urlMappingStrategy: "rewrite",
 });
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const i18nResponse = I18nMiddleware(request);
   const session = await validateSession(request);
   const url = new URL("/", request.url);
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
   }`;
 
   if (process.env.NODE_ENV === "development") {
-    console.log("[MIDDLEWARE DEBUG]", {
+    console.log("[PROXY DEBUG]", {
       pathname: newUrl.pathname,
       pathnameWithoutLocale,
       hasSession: !!session,
@@ -98,6 +98,3 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
-
-// Use Node.js runtime for pg/drizzle compatibility
-export const runtime = "nodejs";
