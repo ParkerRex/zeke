@@ -31,6 +31,8 @@
   "dependencies": {
     "@biomejs/biome": "1.9.4",
     "@manypkg/cli": "^0.24.0",
+    "baseline-browser-mapping": "^2.9.11",
+    "caniuse-lite": "^1.0.30001762",
     "typescript": "^5.9.3"
   },
   "packageManager": "bun@1.2.22",
