@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import { db } from "@zeke/db/client";
 import * as schema from "@zeke/db/schema";
+import { users, teams, usersOnTeam, authUser } from "@zeke/db/schema";
 
 const authSchema = {
   user: schema.authUser,
@@ -105,6 +107,49 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
       trustedProviders: ["google", "github", "apple"],
+    },
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // Sync user to application users table and create default team
+          const teamName = user.name || user.email?.split("@")[0] || "My Team";
+
+          // Create default team for user
+          const [team] = await db
+            .insert(teams)
+            .values({
+              name: teamName,
+              email: user.email,
+            })
+            .returning();
+
+          // Create user in application users table with team
+          await db.insert(users).values({
+            id: user.id,
+            email: user.email,
+            fullName: user.name,
+            avatarUrl: user.image,
+            teamId: team.id,
+            locale: "en",
+          });
+
+          // Add user to team membership
+          await db.insert(usersOnTeam).values({
+            userId: user.id,
+            teamId: team.id,
+            role: "owner",
+          });
+
+          // Update auth_user with team_id
+          await db
+            .update(authUser)
+            .set({ teamId: team.id })
+            .where(eq(authUser.id, user.id));
+        },
+      },
     },
   },
 });
