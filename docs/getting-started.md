@@ -20,6 +20,11 @@ bun install
 cp .env.example .env
 ```
 
+If you use the included Docker services, update `DATABASE_PRIMARY_URL` in `.env` to:
+```
+postgresql://zeke:zeke_dev_password@localhost:5435/zeke
+```
+
 ## First-Time Setup
 
 ```bash
@@ -31,7 +36,7 @@ psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke \
   -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Run database migrations
-cd packages/db && bun run migrate:dev && cd ../..
+cd packages/db && DATABASE_SESSION_POOLER=postgresql://zeke:zeke_dev_password@localhost:5435/zeke bunx drizzle-kit migrate && cd ../..
 ```
 
 ## Development
@@ -52,6 +57,7 @@ This single command:
 bun run dev:api       # API only (port 3003)
 bun run dev:dashboard # Dashboard only (port 3001)
 bun run dev:website   # Website only (port 3000)
+cd apps/engine && bun run start  # Engine only (port 3010)
 ```
 
 ### Stopping Services
@@ -78,6 +84,7 @@ DATABASE_PRIMARY_URL=postgresql://zeke:zeke_dev_password@localhost:5435/zeke
 
 # Auth (generate with: openssl rand -base64 32)
 AUTH_SECRET=your-32-char-secret-key-here
+API_SECRET_KEY=your-32-char-api-secret-here
 
 # Encryption (generate with: openssl rand -hex 32)
 ZEKE_ENCRYPTION_KEY=your-64-char-hex-key-here
@@ -105,8 +112,9 @@ MINIO_ENDPOINT=http://localhost:9000
 | `bun run lint` | Run Biome linter |
 | `bun run format` | Format code |
 | `bun run typecheck` | TypeScript check |
-| `bun run db:migrate` | Run migrations |
-| `bun run db:studio` | Open Drizzle Studio |
+| `cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate` | Apply migrations |
+| `cd packages/db && bunx drizzle-kit generate` | Generate new migration |
+| `cd packages/db && bunx drizzle-kit studio` | Open Drizzle Studio |
 
 ## Port Reference
 

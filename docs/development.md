@@ -13,6 +13,7 @@ This starts:
 - **API**: http://localhost:3003
 - **Dashboard**: http://localhost:3001
 - **Engine**: http://localhost:3010
+Website and Desktop are not started by default; use `bun run dev:website` or `bun run dev:desktop`.
 
 ## Commands
 
@@ -27,6 +28,7 @@ This starts:
 | `bun run dev:dashboard` | Dashboard only (port 3001) |
 | `bun run dev:website` | Website only (port 3000) |
 | `bun run dev:desktop` | Desktop app |
+| `cd apps/engine && bun run start` | Engine only (port 3010) |
 
 ### Build & Test
 
@@ -35,17 +37,22 @@ bun run build           # Build all apps
 bun run typecheck       # TypeScript check
 bun run lint            # Biome linter
 bun run format          # Format code
-bun test                # Run tests
+```
+
+Tests are run per app/package:
+```bash
+cd apps/api && bun test
+cd apps/dashboard && bun test
+cd apps/website && bun test
 ```
 
 ### Database
 
 ```bash
 cd packages/db
-bun run db:generate     # Generate migration from schema
-bun run migrate:dev     # Apply to local database
-bun run migrate         # Apply to production
-bun run migrate:studio  # Open Drizzle Studio
+DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit generate   # Generate migration
+DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate    # Apply migrations
+bunx drizzle-kit studio                                              # Open Drizzle Studio
 ```
 
 ### Docker
@@ -97,12 +104,12 @@ import { eq, and } from "drizzle-orm";
 1. Edit `packages/db/src/schema.ts`
 2. Generate migration:
    ```bash
-   cd packages/db && bun run db:generate
+   cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit generate
    ```
-3. Review generated SQL in `drizzle/`
+3. Review generated SQL in `migrations/`
 4. Apply migration:
    ```bash
-   bun run migrate:dev
+   DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate
    ```
 
 ### Query Functions
@@ -278,6 +285,7 @@ Critical ones:
 |----------|-------------|
 | `DATABASE_PRIMARY_URL` | PostgreSQL connection |
 | `AUTH_SECRET` | Session signing (32+ chars) |
+| `API_SECRET_KEY` | API authentication (32+ chars) |
 | `ZEKE_ENCRYPTION_KEY` | Data encryption (64 hex chars) |
 | `OPENAI_API_KEY` | AI features |
 | `REDIS_URL` | Cache connection |

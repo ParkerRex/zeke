@@ -154,23 +154,23 @@ const result = await db.execute(sql`SELECT * FROM stories WHERE id = ${id}`);
 cd packages/db
 
 # Generate migration from schema changes
-bun run db:generate
+DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit generate
 
 # Apply to local database
-bun run migrate:dev
+DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate
 
 # Apply to production
-bun run migrate
+DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate
 
 # Open Drizzle Studio
-bun run migrate:studio
+bunx drizzle-kit studio
 ```
 
 ### Migration Files
 
-Generated in `drizzle/` directory:
+Generated in `migrations/` directory:
 ```
-drizzle/
+packages/db/migrations/
 ├── 0000_initial.sql
 ├── 0001_add_stories.sql
 └── meta/
@@ -225,6 +225,9 @@ DATABASE_PRIMARY_URL=postgresql://zeke:password@localhost:5435/zeke
 # Optional pooler for production
 DATABASE_PRIMARY_POOLER_URL=postgresql://pooler.neon.tech/...
 
+# Drizzle migrations (used by drizzle.config.ts)
+DATABASE_SESSION_POOLER=postgresql://zeke:password@localhost:5435/zeke
+
 # SSL mode
 PGSSLMODE=require  # or 'disable' for local
 ```
@@ -240,7 +243,7 @@ psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke \
   -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Run migrations
-cd packages/db && bun run migrate:dev
+cd packages/db && DATABASE_SESSION_POOLER=postgresql://zeke:zeke_dev_password@localhost:5435/zeke bunx drizzle-kit migrate
 ```
 
 ## Related

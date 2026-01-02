@@ -9,10 +9,13 @@ AI-powered research intelligence platform that transforms content into actionabl
 bun install
 cp .env.example .env
 
+# If using Docker services, set DATABASE_PRIMARY_URL to:
+# postgresql://zeke:zeke_dev_password@localhost:5435/zeke
+
 # First time only - run migrations
 docker compose up -d postgres
 psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke -c "CREATE EXTENSION IF NOT EXISTS vector;"
-cd packages/db && bun run migrate:dev && cd ../..
+cd packages/db && DATABASE_SESSION_POOLER=postgresql://zeke:zeke_dev_password@localhost:5435/zeke bunx drizzle-kit migrate && cd ../..
 
 # Start everything (Docker + Apps)
 bun dev
@@ -23,6 +26,7 @@ This starts:
 - **API**: http://localhost:3003
 - **Dashboard**: http://localhost:3001
 - **Engine**: http://localhost:3010
+- **Website**: not started by `bun dev` (use `bun run dev:website`)
 
 ## Documentation
 
@@ -96,8 +100,9 @@ packages/
 
 | Command | Description |
 |---------|-------------|
-| `bun run db:migrate` | Run local migrations |
-| `bun run db:studio` | Open Drizzle Studio |
+| `cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate` | Apply migrations |
+| `cd packages/db && bunx drizzle-kit generate` | Generate new migration |
+| `cd packages/db && bunx drizzle-kit studio` | Open Drizzle Studio |
 
 ## Service Ports
 
@@ -118,14 +123,8 @@ Images are hosted on Docker Hub (`parkerrex/zeke-*`), deployed to VPS at `152.53
 ### Deploy
 
 ```bash
-# Build images for production
+# Build + push images for production
 ./scripts/containers.sh build prod
-
-# Push to Docker Hub
-docker push parkerrex/zeke-api:prod
-docker push parkerrex/zeke-dashboard:prod
-docker push parkerrex/zeke-website:prod
-docker push parkerrex/zeke-engine:prod
 
 # Deploy to VPS
 rsync -avz -e "ssh -i ~/.ssh/netcup-vps" deploy/ root@152.53.88.183:/opt/zeke/

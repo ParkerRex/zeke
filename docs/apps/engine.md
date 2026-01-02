@@ -13,7 +13,7 @@ Content ingestion service with pluggable providers.
 ## Quick Start
 
 ```bash
-bun run dev:engine  # Start on port 3010
+cd apps/engine && bun run start  # Start on port 3010
 ```
 
 ## Purpose

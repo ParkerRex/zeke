@@ -47,7 +47,7 @@ const env = getApiEnv();
 
 // All critical variables are validated
 const dbUrl = env.DATABASE_PRIMARY_URL; // Guaranteed to exist
-const authSecret = env.BETTER_AUTH_SECRET; // Guaranteed to be at least 32 chars
+const authSecret = env.AUTH_SECRET; // Guaranteed to be at least 32 chars
 ```
 
 #### Database Client
@@ -68,7 +68,7 @@ const pool = new Pool({
 These variables have strict validation to prevent security issues:
 
 - **API_SECRET_KEY**: Must be at least 32 characters
-- **BETTER_AUTH_SECRET**: Must be at least 32 characters
+- **AUTH_SECRET**: Must be at least 32 characters
 - **ZEKE_ENCRYPTION_KEY**: Must be a 64-character hex string (32 bytes) for data encryption
 - **DATABASE_PRIMARY_URL**: Required, validated as non-empty string
 

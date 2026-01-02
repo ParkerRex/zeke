@@ -9,8 +9,7 @@ Self-hosted Docker deployment on VPS.
 | `bun dev` | Start local dev (Docker + apps) |
 | `bun run stop` | Stop local apps |
 | `bun run stop -- --docker` | Stop local apps + Docker |
-| `./scripts/containers.sh build prod` | Build production images |
-| `./scripts/containers.sh push prod` | Push to Docker Hub |
+| `./scripts/containers.sh build prod` | Build + push production images |
 
 ## VPS Management
 
@@ -68,20 +67,7 @@ docker buildx build --platform linux/amd64 \
   --push .
 ```
 
-### 2. Push to Docker Hub
-
-```bash
-# Login (if needed)
-docker login
-
-# Push all images
-docker push parkerrex/zeke-api:prod
-docker push parkerrex/zeke-dashboard:prod
-docker push parkerrex/zeke-website:prod
-docker push parkerrex/zeke-engine:prod
-```
-
-### 3. Deploy to VPS
+### 2. Deploy to VPS
 
 ```bash
 # Sync deploy configs

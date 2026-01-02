@@ -9,6 +9,8 @@ bun install && cp .env.example .env
 bun dev  # Starts Docker + all apps
 ```
 
+If you use the included Docker services, set `DATABASE_PRIMARY_URL` to `postgresql://zeke:zeke_dev_password@localhost:5435/zeke`.
+
 ## Quick Links
 
 | Document | Description |
@@ -95,5 +97,6 @@ zeke/
 | `bun run build` | Build all apps |
 | `bun run lint` | Lint code |
 | `bun run format` | Format code |
-| `bun run db:migrate` | Run migrations |
-| `bun run db:studio` | Open Drizzle Studio |
+| `cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate` | Apply migrations |
+| `cd packages/db && bunx drizzle-kit generate` | Generate new migration |
+| `cd packages/db && bunx drizzle-kit studio` | Open Drizzle Studio |
