@@ -111,10 +111,47 @@ packages/
 | MinIO API | 9000 | http://localhost:9000 |
 | MinIO Console | 9001 | http://localhost:9001 |
 
-## Docker Production
+## Production Deployment
+
+Images are hosted on Docker Hub (`parkerrex/zeke-*`), deployed to VPS at `152.53.88.183`.
+
+### Deploy
 
 ```bash
-./deploy/run-local.sh                              # Build and run full stack
-cd deploy && docker compose --profile staging logs -f  # View logs
-docker compose --profile staging down              # Stop
+# Build images for production
+./scripts/containers.sh build prod
+
+# Push to Docker Hub
+docker push parkerrex/zeke-api:prod
+docker push parkerrex/zeke-dashboard:prod
+docker push parkerrex/zeke-website:prod
+docker push parkerrex/zeke-engine:prod
+
+# Deploy to VPS
+rsync -avz -e "ssh -i ~/.ssh/netcup-vps" deploy/ root@152.53.88.183:/opt/zeke/
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production pull && \
+   docker compose --profile production up -d"
 ```
+
+### VPS Commands
+
+```bash
+# Start production
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production up -d"
+
+# Stop production
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production down"
+
+# View logs
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose logs -f"
+
+# Check status
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose ps"
+```
+
+See [Deployment Guide](./docs/deployment.md) for full details.

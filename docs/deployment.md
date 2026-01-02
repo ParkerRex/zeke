@@ -1,232 +1,215 @@
 # Deployment Guide
 
-Docker deployment and production configuration.
+Self-hosted Docker deployment on VPS.
 
-## Local Docker
+## Quick Reference
 
-### Full Stack
+| Command | Description |
+|---------|-------------|
+| `bun dev` | Start local dev (Docker + apps) |
+| `bun run stop` | Stop local apps |
+| `bun run stop -- --docker` | Stop local apps + Docker |
+| `./scripts/containers.sh build prod` | Build production images |
+| `./scripts/containers.sh push prod` | Push to Docker Hub |
+
+## VPS Management
+
+### SSH Access
 
 ```bash
-# Build and run everything
-./deploy/run-local.sh
-
-# View logs
-cd deploy && docker compose --profile staging logs -f
-
-# Stop
-cd deploy && docker compose --profile staging down
+# Connect to VPS
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183
 ```
 
-### Individual Services
+### Start Production
 
 ```bash
-# Start infrastructure only
-docker compose up -d postgres redis minio
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production up -d"
+```
 
-# Build specific app
-docker build -f apps/api/Dockerfile -t zeke-api .
+### Stop Production
+
+```bash
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production down"
+```
+
+### View Logs
+
+```bash
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose logs -f"
+
+# Specific service
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose logs api --tail=50"
+```
+
+### Check Status
+
+```bash
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose ps"
+```
+
+## Full Deployment Flow
+
+### 1. Build Images
+
+```bash
+# Build all images for linux/amd64
+./scripts/containers.sh build prod
+
+# Or build individually
+docker buildx build --platform linux/amd64 \
+  -t parkerrex/zeke-api:prod \
+  -f apps/api/Dockerfile \
+  --push .
+```
+
+### 2. Push to Docker Hub
+
+```bash
+# Login (if needed)
+docker login
+
+# Push all images
+docker push parkerrex/zeke-api:prod
+docker push parkerrex/zeke-dashboard:prod
+docker push parkerrex/zeke-website:prod
+docker push parkerrex/zeke-engine:prod
+```
+
+### 3. Deploy to VPS
+
+```bash
+# Sync deploy configs
+rsync -avz -e "ssh -i ~/.ssh/netcup-vps" \
+  deploy/ root@152.53.88.183:/opt/zeke/
+
+# Pull new images and restart
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production pull && \
+   docker compose --profile production up -d --force-recreate"
 ```
 
 ## Production Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Load Balancer                           │
-│                    (Fly.io Proxy)                            │
+│                    Caddy (Reverse Proxy)                     │
+│                    Ports 80/443 + Auto SSL                   │
 └─────────────────────────┬───────────────────────────────────┘
                           │
-        ┌─────────────────┼─────────────────┐
-        │                 │                 │
-┌───────┴───────┐ ┌───────┴───────┐ ┌───────┴───────┐
-│   API (x3)    │ │ Dashboard (x2)│ │  Website (x2) │
-│   Fly.io      │ │   Vercel      │ │   Vercel      │
-└───────────────┘ └───────────────┘ └───────────────┘
-        │
-┌───────┴─────────────────────────────────────────────────────┐
-│                    Data Layer                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │  PostgreSQL  │  │    Redis     │  │    MinIO     │       │
-│  │  (Neon/RDS)  │  │  (Upstash)   │  │ (Cloudflare) │       │
-│  └──────────────┘  └──────────────┘  └──────────────┘       │
-└─────────────────────────────────────────────────────────────┘
+    ┌─────────────────────┼─────────────────────┐
+    │                     │                     │
+┌───┴───┐  ┌──────────┐  ┌┴─────────┐  ┌───────┴───┐
+│  API  │  │ Dashboard │  │ Website  │  │  Engine   │
+│ :3003 │  │   :3001   │  │  :3000   │  │   :3010   │
+└───────┘  └──────────┘  └──────────┘  └───────────┘
+    │           │              │              │
+┌───┴───────────┴──────────────┴──────────────┴───┐
+│                   Data Layer                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │ Postgres │  │  Redis   │  │  MinIO   │       │
+│  │  :5432   │  │  :6379   │  │:9000/9001│       │
+│  └──────────┘  └──────────┘  └──────────┘       │
+└─────────────────────────────────────────────────┘
 ```
 
-## Environment Configuration
+## Environment Files
 
-### Staging
+Environment files are stored in `deploy/env/{environment}/`:
+
+```
+deploy/env/production/
+├── api.env
+├── dashboard.env
+├── engine.env
+└── website.env
+```
+
+### Required Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_PRIMARY_URL` | PostgreSQL connection string |
+| `AUTH_SECRET` | Session signing key (32+ chars) |
+| `API_SECRET_KEY` | API authentication key (32+ chars) |
+| `OPENAI_API_KEY` | OpenAI API key |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `RESEND_API_KEY` | Email service key |
+
+## DNS Configuration
+
+Add A records pointing to VPS IP (`152.53.88.183`):
+
+| Domain | Type | Value |
+|--------|------|-------|
+| `app.zekehq.com` | A | 152.53.88.183 |
+| `api.zekehq.com` | A | 152.53.88.183 |
+| `www.zekehq.com` | A | 152.53.88.183 |
+| `zekehq.com` | A | 152.53.88.183 |
+| `engine.zekehq.com` | A | 152.53.88.183 |
+
+## Health Checks
 
 ```bash
-# deploy/env/staging/.env
-NODE_ENV=staging
-DATABASE_PRIMARY_URL=postgresql://...
-REDIS_URL=redis://...
-```
+# API
+curl http://152.53.88.183:3003/health
 
-### Production
+# Dashboard
+curl http://152.53.88.183:3001/api/health
 
-```bash
-# deploy/env/production/.env
-NODE_ENV=production
-DATABASE_PRIMARY_URL=postgresql://...
-REDIS_URL=redis://...
-```
-
-## Docker Images
-
-### API
-
-```dockerfile
-# apps/api/Dockerfile
-FROM oven/bun:1 AS builder
-WORKDIR /app
-COPY . .
-RUN bun install --frozen-lockfile
-RUN bun run build:api
-
-FROM oven/bun:1-slim
-WORKDIR /app
-COPY --from=builder /app/apps/api/dist ./dist
-EXPOSE 3003
-CMD ["bun", "run", "dist/index.js"]
-```
-
-### Build Commands
-
-```bash
-# Build staging images
-bun run docker:build:staging
-
-# Deploy to staging
-bun run docker:deploy:staging
-
-# Build production
-bun run docker:build:production
+# Engine
+curl http://152.53.88.183:3010/health
 ```
 
 ## Database Migrations
 
-### Production Migration
-
 ```bash
 # Set production database URL
-export DATABASE_SESSION_POOLER_URL=postgresql://...
+export DATABASE_PRIMARY_URL=postgresql://postgres:password@152.53.88.183:5432/zeke
 
 # Run migrations
 cd packages/db && bun run migrate
 ```
 
-### Rollback
+## Troubleshooting
+
+### Container Won't Start
 
 ```bash
-# Drizzle doesn't have built-in rollback
-# Create a reverse migration manually
+# Check logs
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose logs api --tail=50"
+
+# Check env file
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cat /opt/zeke/env/production/api.env"
 ```
 
-## Health Checks
+### SSL Certificate Issues
 
-### API Health
+Caddy auto-provisions SSL. If failing, check:
+1. DNS records are pointing to VPS
+2. Ports 80/443 are open
+3. Caddy logs: `docker compose logs caddy`
+
+### Database Connection
 
 ```bash
-curl https://api.zekehq.com/health
-# Returns: { "status": "ok", "region": "iad", ... }
-
-curl https://api.zekehq.com/health/db
-# Returns: { "database": "connected", ... }
-
-curl https://api.zekehq.com/health/pools
-# Returns: { "pools": { "primary": { ... } } }
+# Test from VPS
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "docker exec zeke-postgres psql -U postgres -c 'SELECT 1'"
 ```
 
-## Secrets Management
-
-### Required Secrets
-
-| Secret | Description |
-|--------|-------------|
-| `DATABASE_PRIMARY_URL` | PostgreSQL connection string |
-| `AUTH_SECRET` | Session signing key (32+ chars) |
-| `API_SECRET_KEY` | API authentication key |
-| `OPENAI_API_KEY` | OpenAI API key |
-| `STRIPE_SECRET_KEY` | Stripe secret key |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing |
-| `RESEND_API_KEY` | Email service key |
-| `MINIO_*` | Storage credentials |
-
-### Fly.io Secrets
+### Restart Individual Service
 
 ```bash
-fly secrets set DATABASE_PRIMARY_URL=postgresql://...
-fly secrets set AUTH_SECRET=...
-fly secrets list
-```
-
-## Scaling
-
-### Horizontal Scaling
-
-```bash
-# Scale API instances
-fly scale count 3 --app zeke-api
-
-# Scale by region
-fly scale count 2 --region iad --app zeke-api
-fly scale count 1 --region lhr --app zeke-api
-```
-
-### Database Connection Pooling
-
-Use connection pooler URL for production:
-```bash
-DATABASE_PRIMARY_POOLER_URL=postgresql://pooler.neon.tech/...
-```
-
-## Monitoring
-
-### Logs
-
-```bash
-# Fly.io logs
-fly logs --app zeke-api
-
-# Docker logs
-docker compose logs -f api
-```
-
-### Metrics
-
-- Sentry for error tracking
-- OpenPanel for analytics
-- Fly.io dashboard for infrastructure
-
-## Rollback
-
-### Fly.io
-
-```bash
-# List releases
-fly releases --app zeke-api
-
-# Rollback to previous
-fly deploy --image registry.fly.io/zeke-api:v123
-```
-
-### Vercel
-
-Rollback via Vercel dashboard or:
-```bash
-vercel rollback
-```
-
-## SSL/TLS
-
-### Custom Domains
-
-```bash
-# Add domain to Fly.io
-fly certs create api.zekehq.com
-
-# Check certificate status
-fly certs show api.zekehq.com
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "cd /opt/zeke && docker compose --profile production up -d api --force-recreate"
 ```
 
 ## Backup
@@ -234,44 +217,18 @@ fly certs show api.zekehq.com
 ### Database
 
 ```bash
-# Dump database
-pg_dump $DATABASE_PRIMARY_URL > backup.sql
+# Dump
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "docker exec zeke-postgres pg_dump -U postgres zeke > /opt/zeke/backup.sql"
 
-# Restore
-psql $DATABASE_PRIMARY_URL < backup.sql
+# Copy locally
+scp -i ~/.ssh/netcup-vps root@152.53.88.183:/opt/zeke/backup.sql ./backup.sql
 ```
 
-### MinIO
+### Restore
 
 ```bash
-# Sync buckets
-mc mirror minio/vault backup/vault
-```
-
-## Troubleshooting
-
-### Connection Issues
-
-```bash
-# Test database connection
-psql $DATABASE_PRIMARY_URL -c "SELECT 1"
-
-# Test Redis
-redis-cli -u $REDIS_URL PING
-```
-
-### Memory Issues
-
-```bash
-# Check memory usage
-fly ssh console --app zeke-api
-cat /proc/meminfo
-```
-
-### Slow Queries
-
-```sql
--- Enable query logging
-ALTER SYSTEM SET log_min_duration_statement = 1000;
-SELECT pg_reload_conf();
+scp -i ~/.ssh/netcup-vps ./backup.sql root@152.53.88.183:/opt/zeke/backup.sql
+ssh -i ~/.ssh/netcup-vps root@152.53.88.183 \
+  "docker exec -i zeke-postgres psql -U postgres zeke < /opt/zeke/backup.sql"
 ```
