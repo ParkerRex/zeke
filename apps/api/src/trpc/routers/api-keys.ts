@@ -1,10 +1,7 @@
 import { deleteApiKeySchema, upsertApiKeySchema } from "@api/schemas/api-key";
-import { resend } from "@api/services/resend";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { apiKeyCache } from "@zeke/cache/api-key-cache";
 import { deleteApiKey, getApiKeysByTeam, upsertApiKey } from "@zeke/db/queries";
-import { ApiKeyCreatedEmail } from "@zeke/email/emails/api-key-created";
-import { logger } from "@zeke/logger";
 
 export const apiKeysRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx: { db, teamId } }) => {
@@ -13,7 +10,7 @@ export const apiKeysRouter = createTRPCRouter({
 
   upsert: protectedProcedure
     .input(upsertApiKeySchema)
-    .mutation(async ({ ctx: { db, teamId, session, geo }, input }) => {
+    .mutation(async ({ ctx: { db, teamId, session }, input }) => {
       const { data, key, keyHash } = await upsertApiKey(db, {
         teamId: teamId!,
         userId: session.user.id,
@@ -23,26 +20,6 @@ export const apiKeysRouter = createTRPCRouter({
       // Invalidate cache if this was an update (has keyHash)
       if (keyHash) {
         await apiKeyCache.delete(keyHash);
-      }
-
-      if (data) {
-        try {
-          // We don't need to await this, it will be sent in the background
-          resend?.emails.send({
-            from: "Zeke <noreply@zeke.ai>",
-            to: session.user.email!,
-            subject: "New API Key Created",
-            react: ApiKeyCreatedEmail({
-              fullName: session.user.full_name!,
-              keyName: input.name,
-              createdAt: data.createdAt,
-              email: session.user.email!,
-              ip: geo.ip!,
-            }),
-          });
-        } catch (error) {
-          logger.error(error);
-        }
       }
 
       return {

@@ -1,8 +1,5 @@
 import type { Database } from "@zeke/db/client";
 import { shouldSendNotification } from "@zeke/db/queries";
-// Invoice email imports removed during migration to Zeke
-import TransactionsEmail from "@zeke/email/emails/transactions";
-import { render } from "@zeke/email/render";
 import { nanoid } from "nanoid";
 import { type CreateEmailOptions, Resend } from "resend";
 import type { EmailInput } from "../base";
@@ -117,16 +114,12 @@ export class EmailService {
   }
 
   #buildEmailPayload(email: EmailInput): CreateEmailOptions {
-    let html: string;
-    if (email.template) {
-      const template = this.#getTemplate(email.template as string);
-      html = render(template(email.data as any));
-    } else {
-      throw new Error(`No template found for email: ${email.template}`);
+    if (!email.subject) {
+      throw new Error("Email subject is required");
     }
 
-    if (!email.subject) {
-      throw new Error(`No subject found for email: ${email.template}`);
+    if (!email.html && !email.text) {
+      throw new Error("Email must have either html or text content");
     }
 
     // Use explicit 'to' field if provided, otherwise default to user email
@@ -136,7 +129,7 @@ export class EmailService {
       from: email.from || "zeke <zekebot@zeke.ai>",
       to: recipients,
       subject: email.subject,
-      html,
+      ...(email.html ? { html: email.html } : { text: email.text! }),
       headers: {
         "X-Entity-Ref-ID": nanoid(),
         ...email.headers,
@@ -149,23 +142,8 @@ export class EmailService {
     if (email.bcc) payload.bcc = email.bcc;
     if (email.attachments) payload.attachments = email.attachments;
     if (email.tags) payload.tags = email.tags;
-    if (email.text) payload.text = email.text;
+    if (email.html && email.text) payload.text = email.text;
 
     return payload;
-  }
-
-  #getTemplate(templateName: string) {
-    const templates = {
-      // Invoice templates removed during migration to Zeke
-      transactions: TransactionsEmail,
-    };
-
-    const template = templates[templateName as keyof typeof templates];
-
-    if (!template) {
-      throw new Error(`Unknown email template: ${templateName}`);
-    }
-
-    return template;
   }
 }

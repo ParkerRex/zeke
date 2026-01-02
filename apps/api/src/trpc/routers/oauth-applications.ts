@@ -9,7 +9,6 @@ import {
   updateOAuthApplicationSchema,
 } from "@api/schemas/oauth-applications";
 import { revokeUserApplicationAccessSchema } from "@api/schemas/oauth-flow";
-import { resend } from "@api/services/resend";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import {
   createAuthorizationCode,
@@ -20,15 +19,11 @@ import {
   getOAuthApplicationsByTeam,
   getTeamsByUserId,
   getUserAuthorizedApplications,
-  hasUserEverAuthorizedApp,
   regenerateClientSecret,
   revokeUserApplicationTokens,
   updateOAuthApplication,
   updateOAuthApplicationstatus,
 } from "@zeke/db/queries";
-import { AppInstalledEmail } from "@zeke/email/emails/app-installed";
-import { AppReviewRequestEmail } from "@zeke/email/emails/app-review-request";
-import { render } from "@zeke/email/render";
 
 export const oauthApplicationsRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -160,42 +155,6 @@ export const oauthApplicationsRouter = createTRPCRouter({
         throw new Error("Failed to create authorization code");
       }
 
-      // Send app installation email only if this is the first time authorizing this app
-      try {
-        // Check if user has ever authorized this application for this team (including expired tokens)
-        const hasAuthorizedBefore = await hasUserEverAuthorizedApp(
-          db,
-          session.user.id,
-          teamId,
-          application.id,
-        );
-
-        if (!hasAuthorizedBefore) {
-          // Get team information
-          const userTeam = userTeams.find((team) => team.id === teamId);
-
-          if (userTeam && session.user.email && resend) {
-            const html = await render(
-              AppInstalledEmail({
-                email: session.user.email,
-                teamName: userTeam.name!,
-                appName: application.name,
-              }),
-            );
-
-            await resend.emails.send({
-              from: "Zeke <noreply@zeke.ai>",
-              to: session.user.email,
-              subject: "An app has been added to your team",
-              html,
-            });
-          }
-        }
-      } catch (error) {
-        // Log error but don't fail the OAuth flow
-        console.error("Failed to send app installation email:", error);
-      }
-
       // Build success redirect URL
       redirectUrl.searchParams.set("code", authCode.code);
       if (state) {
@@ -314,14 +273,7 @@ export const oauthApplicationsRouter = createTRPCRouter({
   updateApprovalStatus: protectedProcedure
     .input(updateApprovalStatusSchema)
     .mutation(async ({ ctx, input }) => {
-      const { db, teamId, session } = ctx;
-
-      // Get full application details before updating
-      const application = await getOAuthApplicationById(db, input.id, teamId!);
-
-      if (!application) {
-        throw new Error("OAuth application not found");
-      }
+      const { db, teamId } = ctx;
 
       const result = await updateOAuthApplicationstatus(db, {
         id: input.id,
@@ -331,36 +283,6 @@ export const oauthApplicationsRouter = createTRPCRouter({
 
       if (!result) {
         throw new Error("OAuth application not found");
-      }
-
-      // Send email notification when status changes to "pending"
-      if (input.status === "pending") {
-        try {
-          // Get team information
-          const userTeams = await getTeamsByUserId(db, session.user.id);
-          const currentTeam = userTeams?.find((team) => team.id === teamId);
-
-          if (currentTeam && session.user.email && resend) {
-            const html = await render(
-              AppReviewRequestEmail({
-                applicationName: application.name,
-                developerName: application.developerName || undefined,
-                teamName: currentTeam.name!,
-                userEmail: session.user.email,
-              }),
-            );
-
-            await resend.emails.send({
-              from: "Zeke <noreply@zeke.ai>",
-              to: "admin@zeke.ai",
-              subject: `Application Review Request - ${application.name}`,
-              html,
-            });
-          }
-        } catch (error) {
-          // Log error but don't fail the mutation
-          console.error("Failed to send application review request:", error);
-        }
       }
 
       return result;

@@ -114,36 +114,6 @@ getCurrencySymbol("EUR");  // "€"
 
 ---
 
-## Email Package
-
-**Package:** `@zeke/email`
-
-### Send Email
-
-```typescript
-import { sendEmail } from "@zeke/email";
-
-await sendEmail({
-  to: "user@example.com",
-  subject: "Welcome",
-  template: "welcome",
-  data: { name: "User" },
-});
-```
-
-### Templates
-
-Located in `packages/email/src/templates/`:
-
-| Template | Purpose |
-|----------|---------|
-| `welcome.tsx` | New user welcome |
-| `invite.tsx` | Team invitation |
-| `invoice.tsx` | Invoice notification |
-| `api-key-created.tsx` | API key created |
-
----
-
 ## Notifications Package
 
 **Package:** `@zeke/notifications`

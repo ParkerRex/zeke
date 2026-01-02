@@ -10,7 +10,6 @@ import {
   oauthTokenRequestSchema,
   oauthTokenResponseSchema,
 } from "@api/schemas/oauth-flow";
-import { resend } from "@api/services/resend";
 import { verifyAccessToken } from "@api/utils/auth";
 import { validateClientCredentials } from "@api/utils/oauth";
 import { validateResponse } from "@api/utils/validate-response";
@@ -21,12 +20,9 @@ import {
   exchangeAuthorizationCode,
   getOAuthApplicationByClientId,
   getTeamsByUserId,
-  hasUserEverAuthorizedApp,
   refreshAccessToken,
   revokeAccessToken,
 } from "@zeke/db/queries";
-import { AppInstalledEmail } from "@zeke/email/emails/app-installed";
-import { render } from "@zeke/email/render";
 import { rateLimiter } from "hono-rate-limiter";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -264,42 +260,6 @@ app.openapi(
       throw new HTTPException(500, {
         message: "Failed to create authorization code",
       });
-    }
-
-    // Send app installation email only if this is the first time authorizing this app
-    try {
-      // Check if user has ever authorized this application for this team (including expired tokens)
-      const hasAuthorizedBefore = await hasUserEverAuthorizedApp(
-        db,
-        session.user.id,
-        teamId,
-        application.id,
-      );
-
-      if (!hasAuthorizedBefore) {
-        // Get team information
-        const userTeam = userTeams.find((team) => team.id === teamId);
-
-        if (userTeam && session.user.email) {
-          const html = await render(
-            AppInstalledEmail({
-              email: session.user.email,
-              teamName: userTeam.name!,
-              appName: application.name,
-            }),
-          );
-
-          await resend?.emails.send({
-            from: "Zeke <noreply@zeke.ai>",
-            to: session.user.email,
-            subject: "An app has been added to your team",
-            html,
-          });
-        }
-      }
-    } catch (error) {
-      // Log error but don't fail the OAuth flow
-      console.error("Failed to send app installation email:", error);
     }
 
     // Build success redirect URL
