@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "sideEffects": false,
-  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
+  "files": ["postcss.config.cjs"],
   "scripts": {
     "clean": "rm -rf node_modules",
     "lint": "biome check .",
@@ -45,7 +45,7 @@
     "./label": "./src/components/label.tsx",
     "./navigation-menu": "./src/components/navigation-menu.tsx",
     "./popover": "./src/components/popover.tsx",
-    "./postcss": "./postcss.config.js",
+    "./postcss": "./postcss.config.cjs",
     "./progress": "./src/components/progress.tsx",
     "./radio-group": "./src/components/radio-group.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
@@ -59,7 +59,6 @@
     "./multiple-selector": "./src/components/multiple-selector.tsx",
     "./table": "./src/components/table.tsx",
     "./tabs": "./src/components/tabs.tsx",
-    "./tailwind.config": "./tailwind.config.ts",
     "./textarea": "./src/components/textarea.tsx",
     "./toast": "./src/components/toast.tsx",
     "./toaster": "./src/components/toaster.tsx",
@@ -118,14 +117,13 @@
     "react-number-format": "^5.4.4",
     "recharts": "^2.15.3",
     "tailwind-merge": "2.5.3",
-    "tailwindcss": "^3.4.13",
-    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss": "4",
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "autoprefixer": "^10.4.21",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "typescript": "^5.9.2"

@@ -1,66 +1,233 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 0, 0%, 100%;
-    --foreground: 0, 0%, 7%;
-    --card: 45 18% 96%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 45 18% 96%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 40, 11%, 89%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 40, 11%, 89%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 40, 10%, 94%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --muted-foreground: 0, 0%, 38%;
-    --border: 45, 5%, 85%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
+/* Custom theme configuration */
+@theme {
+  /* Font families */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+
+  /* Border radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Custom screen */
+  --breakpoint-3xl: 1800px;
+
+  /* Colors - using CSS variables for light/dark mode */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-slide-effect: slide-effect 1.3s ease-in-out infinite;
+  --animate-first: moveVertical 30s ease infinite;
+  --animate-second: moveInCircle 20s reverse infinite;
+  --animate-third: moveInCircle 40s linear infinite;
+  --animate-fourth: moveHorizontal 40s ease infinite;
+  --animate-fifth: moveInCircle 20s ease infinite;
+  --animate-scroll: scroll var(--animation-duration, 40s)
+    var(--animation-direction, forwards) linear infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
-  .dark {
-    --background: 0, 0%, 7%;
-    --foreground: 0 0% 98%;
-    --card: 0, 0%, 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0, 0%, 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 0, 0%, 11%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0, 0%, 11%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 0, 0%, 11%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 359, 100%, 61%;
-    --destructive-foreground: 0, 0%, 100%;
-    --muted-foreground: 0, 0%, 38%;
-    --border: 0, 0%, 17%;
-    --input: 0, 0%, 11%;
-    --ring: 240 4.9% 83.9%;
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes jiggle {
+    0% {
+      transform: rotate(-4deg);
+    }
+    50% {
+      transform: rotate(4deg);
+    }
+  }
+
+  @keyframes caret-blink {
+    0%,
+    70%,
+    100% {
+      opacity: 1;
+    }
+    20%,
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 0.5rem));
+    }
+  }
+
+  @keyframes moveHorizontal {
+    0% {
+      transform: translateX(-50%) translateY(-10%);
+    }
+    50% {
+      transform: translateX(50%) translateY(10%);
+    }
+    100% {
+      transform: translateX(-50%) translateY(-10%);
+    }
+  }
+
+  @keyframes moveInCircle {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes moveVertical {
+    0% {
+      transform: translateY(-50%);
+    }
+    50% {
+      transform: translateY(50%);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes webgl-scale-in-fade {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slide-effect {
+    0% {
+      left: 0%;
+    }
+    50% {
+      left: calc(100% - 80px);
+    }
+    100% {
+      left: 0%;
+    }
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    font-family: var(--font-sans), system-ui, sans-serif;
-    @apply bg-background text-foreground;
-  }
+/* CSS variables for light/dark mode */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 7%;
+  --card: 45 18% 96%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 45 18% 96%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 40 11% 89%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 40 11% 89%;
+  --muted-foreground: 0 0% 38%;
+  --accent: 40 10% 94%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 45 5% 85%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+  --radius: 0.5rem;
 }
 
+.dark {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 0 0% 11%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 11%;
+  --muted-foreground: 0 0% 38%;
+  --accent: 0 0% 11%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 359 100% 61%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 17%;
+  --input: 0 0% 11%;
+  --ring: 240 4.9% 83.9%;
+}
+
+/* Base styles */
+* {
+  @apply border-border;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  @apply bg-background text-foreground;
+}
+
+/* Utility classes */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -76,6 +243,7 @@
   appearance: none;
 }
 
+/* Dialog animations */
 @keyframes dialog-overlay-show {
   from {
     opacity: 0;
@@ -116,23 +284,17 @@
   }
 }
 
+/* Loading ellipsis */
 .loading-ellipsis:after {
   overflow: hidden;
   display: inline-block;
   vertical-align: bottom;
-  -webkit-animation: ellipsis steps(4, end) 900ms infinite;
   animation: ellipsis steps(4, end) 900ms infinite;
-  content: "\2026"; /* ascii code for the ellipsis character */
+  content: "\2026";
   width: 0px;
 }
 
 @keyframes ellipsis {
-  to {
-    width: 1.25em;
-  }
-}
-
-@-webkit-keyframes ellipsis {
   to {
     width: 1.25em;
   }
