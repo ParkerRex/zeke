@@ -114,7 +114,9 @@ export function useTabs() {
           embedKind: meta?.embedKind || "article",
           embedUrl: meta?.embedUrl || "about:blank",
           clusterId: meta?.clusterId,
-          shareId: id.startsWith("share:") ? id.replace("share:", "") : undefined,
+          shareId: id.startsWith("share:")
+            ? id.replace("share:", "")
+            : undefined,
           preview: meta?.preview || false,
           pinned: meta?.pinned || false,
           overlays: DEFAULT_OVERLAYS,
@@ -128,32 +130,29 @@ export function useTabs() {
   const active = tabs.find((t) => t.id === activeId);
 
   // Tab operations
-  const openTab = useCallback(
-    (tab: Tab) => {
-      setState((prev) => {
-        const exists = prev.tabs.includes(tab.id);
-        const updatedTabs = exists ? prev.tabs : [...prev.tabs, tab.id];
+  const openTab = useCallback((tab: Tab) => {
+    setState((prev) => {
+      const exists = prev.tabs.includes(tab.id);
+      const updatedTabs = exists ? prev.tabs : [...prev.tabs, tab.id];
 
-        return {
-          ...prev,
-          tabs: updatedTabs,
-          activeId: tab.id,
-          metadata: {
-            ...prev.metadata,
-            [tab.id]: {
-              title: tab.title,
-              clusterId: tab.clusterId,
-              embedKind: tab.embedKind,
-              embedUrl: tab.embedUrl,
-              preview: tab.preview,
-              pinned: tab.pinned,
-            },
+      return {
+        ...prev,
+        tabs: updatedTabs,
+        activeId: tab.id,
+        metadata: {
+          ...prev.metadata,
+          [tab.id]: {
+            title: tab.title,
+            clusterId: tab.clusterId,
+            embedKind: tab.embedKind,
+            embedUrl: tab.embedUrl,
+            preview: tab.preview,
+            pinned: tab.pinned,
           },
-        };
-      });
-    },
-    [],
-  );
+        },
+      };
+    });
+  }, []);
 
   const closeTab = useCallback((id: string) => {
     setState((prev) => {
@@ -207,69 +206,65 @@ export function useTabs() {
 
   // Panel management
   const sidePanelOpen = activeId
-    ? state.panelStates[activeId] ?? state.globalPanel
+    ? (state.panelStates[activeId] ?? state.globalPanel)
     : state.globalPanel;
 
-  const setSidePanelOpen = useCallback(
-    (open: boolean) => {
-      setState((prev) => {
-        if (prev.activeId) {
-          return {
-            ...prev,
-            panelStates: { ...prev.panelStates, [prev.activeId]: open },
-          };
-        }
-
-        return { ...prev, globalPanel: open };
-      });
-    },
-    [],
-  );
-
-  // Batch operations
-  const batch = useCallback(
-    (fn: (tabs: Tab[]) => Tab[]) => {
-      setState((prev) => {
-        const tabObjects = prev.tabs.map((id) => {
-          const meta = prev.metadata[id];
-          return {
-            id,
-            title: meta?.title || `Tab ${id}`,
-            embedKind: meta?.embedKind || "article",
-            embedUrl: meta?.embedUrl || "about:blank",
-            clusterId: meta?.clusterId,
-            shareId: id.startsWith("share:") ? id.replace("share:", "") : undefined,
-            preview: meta?.preview || false,
-            pinned: meta?.pinned || false,
-            overlays: DEFAULT_OVERLAYS,
-            context: {},
-          } satisfies Tab;
-        });
-
-        const nextTabs = fn(tabObjects);
-        const nextIds = nextTabs.map((tab) => tab.id);
-        const nextMetadata: Record<string, TabMetadata> = {};
-
-        for (const tab of nextTabs) {
-          nextMetadata[tab.id] = {
-            title: tab.title,
-            clusterId: tab.clusterId,
-            embedKind: tab.embedKind,
-            embedUrl: tab.embedUrl,
-            preview: tab.preview,
-            pinned: tab.pinned,
-          };
-        }
-
+  const setSidePanelOpen = useCallback((open: boolean) => {
+    setState((prev) => {
+      if (prev.activeId) {
         return {
           ...prev,
-          tabs: nextIds,
-          metadata: nextMetadata,
+          panelStates: { ...prev.panelStates, [prev.activeId]: open },
         };
+      }
+
+      return { ...prev, globalPanel: open };
+    });
+  }, []);
+
+  // Batch operations
+  const batch = useCallback((fn: (tabs: Tab[]) => Tab[]) => {
+    setState((prev) => {
+      const tabObjects = prev.tabs.map((id) => {
+        const meta = prev.metadata[id];
+        return {
+          id,
+          title: meta?.title || `Tab ${id}`,
+          embedKind: meta?.embedKind || "article",
+          embedUrl: meta?.embedUrl || "about:blank",
+          clusterId: meta?.clusterId,
+          shareId: id.startsWith("share:")
+            ? id.replace("share:", "")
+            : undefined,
+          preview: meta?.preview || false,
+          pinned: meta?.pinned || false,
+          overlays: DEFAULT_OVERLAYS,
+          context: {},
+        } satisfies Tab;
       });
-    },
-    [],
-  );
+
+      const nextTabs = fn(tabObjects);
+      const nextIds = nextTabs.map((tab) => tab.id);
+      const nextMetadata: Record<string, TabMetadata> = {};
+
+      for (const tab of nextTabs) {
+        nextMetadata[tab.id] = {
+          title: tab.title,
+          clusterId: tab.clusterId,
+          embedKind: tab.embedKind,
+          embedUrl: tab.embedUrl,
+          preview: tab.preview,
+          pinned: tab.pinned,
+        };
+      }
+
+      return {
+        ...prev,
+        tabs: nextIds,
+        metadata: nextMetadata,
+      };
+    });
+  }, []);
 
   // Update overlay/context currently no-op placeholders
   const updateOverlay = useCallback(
@@ -279,9 +274,12 @@ export function useTabs() {
     [],
   );
 
-  const updateContext = useCallback((id: string, partial: Record<string, unknown>) => {
-    console.debug("updateContext", id, partial);
-  }, []);
+  const updateContext = useCallback(
+    (id: string, partial: Record<string, unknown>) => {
+      console.debug("updateContext", id, partial);
+    },
+    [],
+  );
 
   const restoreFromUrl = useCallback(
     async (id: string, isShare = false) => {

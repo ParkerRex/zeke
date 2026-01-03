@@ -33,9 +33,7 @@ type Props = {
   defaultCountryCodePromise: Promise<string>;
 };
 
-export function CreateTeamForm({
-  defaultCountryCodePromise,
-}: Props) {
+export function CreateTeamForm({ defaultCountryCodePromise }: Props) {
   const countryCode = use(defaultCountryCodePromise);
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -92,9 +90,10 @@ export function CreateTeamForm({
         const errorId = `team_creation_error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
         // Extract TRPC error details
-        const trpcError = error && typeof error === 'object' && 'data' in error
-          ? (error as any).data
-          : null;
+        const trpcError =
+          error && typeof error === "object" && "data" in error
+            ? (error as any).data
+            : null;
 
         console.error({
           errorId,

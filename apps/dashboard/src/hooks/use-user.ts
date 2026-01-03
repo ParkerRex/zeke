@@ -34,8 +34,9 @@ export function useUserMutation() {
       );
 
       // Optimistically update
-      queryClient.setQueryData<User>(trpc.user.me.queryKey(), (old: User | undefined) =>
-        old ? { ...old, ...newData } : old,
+      queryClient.setQueryData<User>(
+        trpc.user.me.queryKey(),
+        (old: User | undefined) => (old ? { ...old, ...newData } : old),
       );
 
       return { previousData };
@@ -47,10 +48,7 @@ export function useUserMutation() {
     ) => {
       // Rollback on error
       if (context?.previousData) {
-        queryClient.setQueryData(
-          trpc.user.me.queryKey(),
-          context.previousData,
-        );
+        queryClient.setQueryData(trpc.user.me.queryKey(), context.previousData);
       }
     },
     onSettled: () => {

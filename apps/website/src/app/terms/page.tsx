@@ -18,8 +18,8 @@ export default function Page() {
 
           <p className="leading-7 mt-8">
             These Terms and Conditions ("Terms", "Terms and Conditions") govern
-            your relationship with the ZEKE application (the "Service")
-            operated by Minton Holdings LLC ("us", "we", or "our").
+            your relationship with the ZEKE application (the "Service") operated
+            by Minton Holdings LLC ("us", "we", or "our").
           </p>
 
           <p className="leading-7 mt-8">

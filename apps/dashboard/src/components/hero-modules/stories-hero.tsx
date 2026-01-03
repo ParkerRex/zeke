@@ -141,7 +141,9 @@ function StoryItem({
   onTrack: (event: string, props: any) => void;
 }) {
   const rawChili = typeof story.chiliScore === "number" ? story.chiliScore : 0;
-  const chiliLevel = Number.isFinite(rawChili) ? Math.max(0, Math.round(rawChili * 5)) : 0;
+  const chiliLevel = Number.isFinite(rawChili)
+    ? Math.max(0, Math.round(rawChili * 5))
+    : 0;
 
   const handleClick = () => {
     onTrack("StoryClicked", {

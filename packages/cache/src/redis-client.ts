@@ -19,9 +19,12 @@ export class RedisCache {
     const redisUrl = process.env.REDIS_URL;
 
     if (!redisUrl) {
-      const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+      const isDev =
+        process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
       if (isDev) {
-        console.warn("⚠️  REDIS_URL not configured - start Redis with 'bun run redis:start' or 'bun dev'");
+        console.warn(
+          "⚠️  REDIS_URL not configured - start Redis with 'bun run redis:start' or 'bun dev'",
+        );
         console.warn("📖 See packages/cache/README.md for setup instructions");
         // Gracefully degrade - cache operations will no-op
         throw new Error("REDIS_UNAVAILABLE_DEV");

@@ -21,4 +21,3 @@ export interface ProviderInterface {
    */
   supportsUrl(url: string): boolean;
 }
-

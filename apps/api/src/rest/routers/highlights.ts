@@ -44,7 +44,8 @@ app.openapi(
     const db = c.get("db");
     const teamId = c.get("teamId");
     const query = c.req.valid("query");
-    const requestedScope = query.scope ?? (query.includeGlobal ? "all" : "team");
+    const requestedScope =
+      query.scope ?? (query.includeGlobal ? "all" : "team");
     const effectiveScope = teamId
       ? requestedScope
       : requestedScope === "team"

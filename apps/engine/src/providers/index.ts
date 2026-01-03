@@ -44,10 +44,7 @@ export class ProviderFacade {
     }
 
     try {
-      this.providers.set(
-        "semantic-scholar",
-        new SemanticScholarProvider(envs),
-      );
+      this.providers.set("semantic-scholar", new SemanticScholarProvider(envs));
     } catch (error) {
       console.warn("Failed to initialize Semantic Scholar provider:", error);
     }

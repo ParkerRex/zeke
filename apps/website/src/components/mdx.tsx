@@ -71,10 +71,12 @@ interface CodeProps {
 function Code({ children, ...props }: CodeProps) {
   const codeHTML = highlight(children);
   const sanitizedHTML = DOMPurify.sanitize(codeHTML, {
-    ALLOWED_TAGS: ['span'],
-    ALLOWED_ATTR: ['class', 'style'],
+    ALLOWED_TAGS: ["span"],
+    ALLOWED_ATTR: ["class", "style"],
   });
-  return <code dangerouslySetInnerHTML={{ __html: sanitizedHTML }} {...props} />;
+  return (
+    <code dangerouslySetInnerHTML={{ __html: sanitizedHTML }} {...props} />
+  );
 }
 
 function slugify(str: string): string {

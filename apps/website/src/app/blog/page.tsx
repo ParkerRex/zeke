@@ -48,11 +48,14 @@ export default function BlogIndex(): JSX.Element {
                 )}
                 <div className="flex flex-row items-center gap-4">
                   <p className="text-muted-foreground text-sm">
-                    {new Date(post.metadata.publishedAt).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {new Date(post.metadata.publishedAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
                   </p>
                   {post.metadata.tag && (
                     <span className="text-muted-foreground text-sm">

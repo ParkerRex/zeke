@@ -21,7 +21,9 @@ type Props = {
 };
 
 export function UserMenu({ onlySignOut }: Props) {
-  const { data: user } = useUserQuery() as { data: RouterOutputs["user"]["me"] };
+  const { data: user } = useUserQuery() as {
+    data: RouterOutputs["user"]["me"];
+  };
 
   return (
     <DropdownMenu>

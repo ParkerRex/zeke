@@ -22,7 +22,9 @@ export async function Ticker() {
         {Intl.NumberFormat("en-US", {
           maximumFractionDigits: 0,
         }).format(hoursSaved)}{" "}
-        <span className="text-[#878787] text-[30px] md:text-[50px] lg:text-[60px] xl:text-[70px] 2xl:text-[80px]">hours</span>
+        <span className="text-[#878787] text-[30px] md:text-[50px] lg:text-[60px] xl:text-[70px] 2xl:text-[80px]">
+          hours
+        </span>
       </span>
       <span className="text-[#878787]">
         Saved by compressing{" "}

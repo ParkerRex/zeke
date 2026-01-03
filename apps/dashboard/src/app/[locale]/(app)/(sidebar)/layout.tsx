@@ -33,7 +33,7 @@ export default async function Layout({
   }
 
   // NOTE: These are used in the global sheets
-  batchPrefetch([
+  await batchPrefetch([
     trpc.team.current.queryOptions(),
     trpc.user.me.queryOptions(),
     trpc.search.global.queryOptions({ searchTerm: "" }),

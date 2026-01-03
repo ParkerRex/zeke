@@ -18,7 +18,6 @@ import { ProfitCanvas } from "./profit-canvas";
 import { RevenueCanvas } from "./revenue-canvas";
 import { RunwayCanvas } from "./runway-canvas";
 
-
 export function Canvas() {
   const { current } = useArtifacts({
     exclude: ["chat-title", "followup-questions"],

@@ -3,18 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@api/*": [
-        "../api/src/*"
-      ],
-      "@db/*": [
-        "../../packages/db/src/*"
-      ],
-      "@jobs/*": [
-        "../../packages/jobs/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@api/*": ["../api/src/*"],
+      "@db/*": ["../../packages/db/src/*"],
+      "@jobs/*": ["../../packages/jobs/src/*"]
     },
     "strict": true
   },

@@ -131,7 +131,9 @@ export function SupportForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Content Sources">Content Sources</SelectItem>
+                    <SelectItem value="Content Sources">
+                      Content Sources
+                    </SelectItem>
                     <SelectItem value="Library">Library</SelectItem>
                     <SelectItem value="Insights">Insights</SelectItem>
                     <SelectItem value="Playbooks">Playbooks</SelectItem>

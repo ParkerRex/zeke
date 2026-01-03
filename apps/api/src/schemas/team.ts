@@ -142,7 +142,7 @@ export const deleteTeamMemberSchema = z.object({
   }),
   userId: z.string().openapi({
     description: "Unique identifier of the user to remove from the team",
-    example: "456e7890-f12a-34b5-c678-901234567890",
+    example: "user_abc123",
   }),
 });
 
@@ -153,7 +153,7 @@ export const updateTeamMemberSchema = z.object({
   }),
   userId: z.string().openapi({
     description: "Unique identifier of the user whose role to update",
-    example: "456e7890-f12a-34b5-c678-901234567890",
+    example: "user_abc123",
   }),
   role: z.enum(["owner", "member"]).openapi({
     description:
@@ -192,9 +192,9 @@ export const deleteTeamInviteSchema = z.object({
 });
 
 export const teamMemberResponseSchema = z.object({
-  id: z.string().uuid().openapi({
+  id: z.string().openapi({
     description: "Unique identifier of the user",
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "user_abc123",
   }),
   role: z.enum(["owner", "member"]).openapi({
     description:

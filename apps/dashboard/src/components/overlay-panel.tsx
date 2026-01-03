@@ -24,7 +24,9 @@ export default function OverlayPanel({ tab }: { tab: Tab }) {
       <div className="flex items-center gap-2">
         <span className="font-medium">Hype</span>
         <span>
-          {Array.from({ length: Math.max(0, Math.round(tab.overlays.chili ?? 0)) }).map(() => "🌶")}
+          {Array.from({
+            length: Math.max(0, Math.round(tab.overlays.chili ?? 0)),
+          }).map(() => "🌶")}
         </span>
         <span className="text-muted-foreground text-xs">
           confidence{" "}

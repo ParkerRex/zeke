@@ -472,9 +472,7 @@ export async function getHighlightFeed(
   const whereForIds = combineConditions(idsConditions);
 
   const idsQuery = (() => {
-    let query = db
-      .select({ id: highlights.id })
-      .from(highlights);
+    let query = db.select({ id: highlights.id }).from(highlights);
 
     if (tags?.length) {
       query = query.innerJoin(
@@ -505,9 +503,7 @@ export async function getHighlightFeed(
     return { items: [], total: 0 };
   }
 
-  const pagedIds = allIds
-    .slice(offset, offset + limit)
-    .map((row) => row.id);
+  const pagedIds = allIds.slice(offset, offset + limit).map((row) => row.id);
 
   if (pagedIds.length === 0) {
     return { items: [], total };
@@ -630,10 +626,7 @@ async function fetchHighlights(
       q = q.where(filter) as typeof q;
     }
 
-    return q.orderBy(
-      desc(highlights.created_at),
-      highlights.id,
-    );
+    return q.orderBy(desc(highlights.created_at), highlights.id);
   })();
 
   return query as unknown as Promise<HighlightBaseRow[]>;
@@ -705,8 +698,10 @@ export async function createHighlight(
       title: params.title ?? null,
       summary: params.summary ?? null,
       quote: params.quote ?? null,
-      start_seconds: params.startSeconds != null ? params.startSeconds.toString() : null,
-      end_seconds: params.endSeconds != null ? params.endSeconds.toString() : null,
+      start_seconds:
+        params.startSeconds != null ? params.startSeconds.toString() : null,
+      end_seconds:
+        params.endSeconds != null ? params.endSeconds.toString() : null,
       metadata: params.metadata ?? null,
       origin: params.origin ?? undefined,
       origin_metadata: params.originMetadata ?? null,

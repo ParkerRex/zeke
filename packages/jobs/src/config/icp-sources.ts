@@ -163,10 +163,11 @@ export const ICP_KEYWORDS = [
  */
 export function getSourcesDueForCheck(
   lastSyncedAt: Date | null,
-  checkFrequencyHours: number
+  checkFrequencyHours: number,
 ): boolean {
   if (!lastSyncedAt) return true; // Never synced, check now
 
-  const hoursSinceSync = (Date.now() - lastSyncedAt.getTime()) / (1000 * 60 * 60);
+  const hoursSinceSync =
+    (Date.now() - lastSyncedAt.getTime()) / (1000 * 60 * 60);
   return hoursSinceSync >= checkFrequencyHours;
 }

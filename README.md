@@ -9,16 +9,11 @@ AI-powered research intelligence platform that transforms content into actionabl
 bun install
 cp .env.example .env
 
-# If using Docker services, set DATABASE_PRIMARY_URL to:
-# postgresql://zeke:zeke_dev_password@localhost:5435/zeke
-
-# First time only - run migrations
-docker compose up -d postgres
-psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke -c "CREATE EXTENSION IF NOT EXISTS vector;"
-cd packages/db && DATABASE_SESSION_POOLER=postgresql://zeke:zeke_dev_password@localhost:5435/zeke bunx drizzle-kit migrate && cd ../..
-
 # Start everything (Docker + Apps)
 bun dev
+
+# First time only - run migrations (in another terminal)
+cd packages/db && bun run migrate:dev
 ```
 
 This starts:
@@ -27,6 +22,15 @@ This starts:
 - **Dashboard**: http://localhost:3001
 - **Engine**: http://localhost:3010
 - **Website**: not started by `bun dev` (use `bun run dev:website`)
+
+Run a single app if needed:
+
+```bash
+bun run dev:api
+bun run dev:dashboard
+bun run dev:website
+bun run dev:desktop
+```
 
 ## Documentation
 
@@ -86,6 +90,8 @@ packages/
 | `bun run stop -- --docker` | Stop everything including Docker |
 | `bun run dev:api` | API only |
 | `bun run dev:dashboard` | Dashboard only |
+| `bun run dev:website` | Website only |
+| `bun run dev:desktop` | Desktop only |
 
 ### Build & Quality
 
@@ -100,9 +106,9 @@ packages/
 
 | Command | Description |
 |---------|-------------|
-| `cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate` | Apply migrations |
-| `cd packages/db && bunx drizzle-kit generate` | Generate new migration |
-| `cd packages/db && bunx drizzle-kit studio` | Open Drizzle Studio |
+| `cd packages/db && bun run migrate:dev` | Apply migrations (local) |
+| `cd packages/db && bun run migrate` | Apply migrations (prod) |
+| `cd packages/db && bun run migrate:studio` | Open Drizzle Studio |
 
 ## Service Ports
 

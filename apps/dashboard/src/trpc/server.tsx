@@ -55,28 +55,36 @@ export function HydrateClient(props: { children: React.ReactNode }) {
   );
 }
 
-export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(
+export async function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(
   queryOptions: T,
 ) {
   const queryClient = getQueryClient();
 
-  if (queryOptions.queryKey[1]?.type === "infinite") {
-    void queryClient.prefetchInfiniteQuery(queryOptions as any);
-  } else {
-    void queryClient.prefetchQuery(queryOptions);
+  try {
+    if (queryOptions.queryKey[1]?.type === "infinite") {
+      await queryClient.prefetchInfiniteQuery(queryOptions as any);
+    } else {
+      await queryClient.prefetchQuery(queryOptions);
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("tRPC prefetch failed", error);
+    }
   }
 }
 
-export function batchPrefetch<T extends ReturnType<TRPCQueryOptions<any>>>(
-  queryOptionsArray: T[],
-) {
+export async function batchPrefetch<
+  T extends ReturnType<TRPCQueryOptions<any>>,
+>(queryOptionsArray: T[]) {
   const queryClient = getQueryClient();
 
-  for (const queryOptions of queryOptionsArray) {
-    if (queryOptions.queryKey[1]?.type === "infinite") {
-      void queryClient.prefetchInfiniteQuery(queryOptions as any);
-    } else {
-      void queryClient.prefetchQuery(queryOptions);
-    }
-  }
+  await Promise.allSettled(
+    queryOptionsArray.map((queryOptions) => {
+      if (queryOptions.queryKey[1]?.type === "infinite") {
+        return queryClient.prefetchInfiniteQuery(queryOptions as any);
+      }
+
+      return queryClient.prefetchQuery(queryOptions);
+    }),
+  );
 }

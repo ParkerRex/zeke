@@ -57,7 +57,7 @@ export function createContentQueries(db: Database) {
       if (!result || result.length === 0) {
         throw new Error("Failed to create content record");
       }
-      
+
       return result[0]!.id;
     },
 

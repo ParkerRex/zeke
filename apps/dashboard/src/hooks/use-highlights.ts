@@ -43,7 +43,15 @@ export function usePrioritizedHighlights(limit = 20) {
 }
 
 export function useHighlightsByKind(
-  kind: "insight" | "quote" | "action" | "question" | "code_example" | "code_change" | "api_change" | "metric",
+  kind:
+    | "insight"
+    | "quote"
+    | "action"
+    | "question"
+    | "code_example"
+    | "code_change"
+    | "api_change"
+    | "metric",
   minRelevance = 0.7,
   limit = 10,
 ) {

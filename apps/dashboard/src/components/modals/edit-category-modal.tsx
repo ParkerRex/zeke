@@ -91,11 +91,7 @@ export function EditCategoryModal({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input
-                            {...field}
-                            placeholder="Tag name"
-                            autoFocus
-                          />
+                          <Input {...field} placeholder="Tag name" autoFocus />
                           <FormMessage />
                         </div>
                       </FormControl>

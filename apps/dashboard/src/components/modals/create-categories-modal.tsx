@@ -116,11 +116,7 @@ export function CreateCategoriesModal({ onOpenChange, isOpen }: Props) {
                           Name
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            autoFocus
-                            placeholder="Tag name"
-                          />
+                          <Input {...field} autoFocus placeholder="Tag name" />
                         </FormControl>
                       </FormItem>
                     )}

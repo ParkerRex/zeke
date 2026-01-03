@@ -60,8 +60,8 @@ export function TrialEndedModal() {
             <DialogTitle>Trial expired</DialogTitle>
           </DialogHeader>
           <DialogDescription className="mb-8">
-            Hope you've enjoyed using Zeke so far! Your trial has now ended,
-            and it's time to choose a plan to continue using Zeke.
+            Hope you've enjoyed using Zeke so far! Your trial has now ended, and
+            it's time to choose a plan to continue using Zeke.
           </DialogDescription>
 
           <Plans />

@@ -41,7 +41,8 @@ export default function Page() {
                   </span>
                 </div>
                 <p className="mt-4 text-[#878787] text-left text-sm">
-                  For individuals and teams who need powerful research intelligence.
+                  For individuals and teams who need powerful research
+                  intelligence.
                 </p>
 
                 <div className="mt-8">
@@ -55,11 +56,15 @@ export default function Page() {
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
-                      <span className="text-sm">Process podcasts, videos, and papers</span>
+                      <span className="text-sm">
+                        Process podcasts, videos, and papers
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
-                      <span className="text-sm">Verified citations & timestamps</span>
+                      <span className="text-sm">
+                        Verified citations & timestamps
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
@@ -67,7 +72,9 @@ export default function Page() {
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
-                      <span className="text-sm">Advanced analysis & insights</span>
+                      <span className="text-sm">
+                        Advanced analysis & insights
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-primary flex-shrink-0 mr-2" />
@@ -109,7 +116,9 @@ export default function Page() {
             <Accordion type="single" collapsible className="w-full mt-10 mb-48">
               <AccordionItem value="item-1">
                 <AccordionTrigger>
-                  <span className="truncate">How much time will I actually save?</span>
+                  <span className="truncate">
+                    How much time will I actually save?
+                  </span>
                 </AccordionTrigger>
                 <AccordionContent>
                   Most users go from 2-10 hours of research per week to 15-30
@@ -163,8 +172,8 @@ export default function Page() {
                 </AccordionTrigger>
                 <AccordionContent>
                   ZEKE processes YouTube videos, podcasts, research papers, blog
-                  posts, and more. We support most major content platforms and are
-                  continuously adding new sources.
+                  posts, and more. We support most major content platforms and
+                  are continuously adding new sources.
                 </AccordionContent>
               </AccordionItem>
 

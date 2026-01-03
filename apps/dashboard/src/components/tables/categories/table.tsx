@@ -34,9 +34,7 @@ export function DataTable() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const { data } = useSuspenseQuery(
-    trpc.tags.list.queryOptions(),
-  );
+  const { data } = useSuspenseQuery(trpc.tags.list.queryOptions());
 
   const deleteTagMutation = useMutation(
     trpc.tags.delete.mutationOptions({

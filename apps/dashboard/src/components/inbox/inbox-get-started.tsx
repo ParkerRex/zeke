@@ -61,8 +61,8 @@ export function InboxGetStarted() {
 
             <div className="text-center mt-8">
               <p className="text-xs text-[#878787]">
-                You can also forward receipts to your unique Zeke email or
-                drag and drop files here
+                You can also forward receipts to your unique Zeke email or drag
+                and drop files here
               </p>
             </div>
           </div>

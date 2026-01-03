@@ -83,7 +83,8 @@ export function PrioritizedHighlights() {
                 <span className="font-medium">{highlight.storyTitle}</span>
                 {highlight.storyPublishedAt && (
                   <span className="ml-2">
-                    • {new Date(highlight.storyPublishedAt).toLocaleDateString()}
+                    •{" "}
+                    {new Date(highlight.storyPublishedAt).toLocaleDateString()}
                   </span>
                 )}
               </div>

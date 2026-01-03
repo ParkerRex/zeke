@@ -27,9 +27,7 @@ export async function MFAList() {
   return (
     <div className="flex justify-between items-center space-y-4">
       <div>
-        <p className="text-sm">
-          Two-factor authentication enabled
-        </p>
+        <p className="text-sm">Two-factor authentication enabled</p>
 
         <p className="text-xs text-[#606060] mt-0.5">
           {t("mfa_status.verified")}

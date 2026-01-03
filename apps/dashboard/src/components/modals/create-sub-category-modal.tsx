@@ -35,10 +35,7 @@ const formSchema = z.object({
 
 type CreateTagFormValues = z.infer<typeof formSchema>;
 
-export function CreateSubCategoryModal({
-  onOpenChange,
-  isOpen,
-}: Props) {
+export function CreateSubCategoryModal({ onOpenChange, isOpen }: Props) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -84,11 +81,7 @@ export function CreateSubCategoryModal({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input
-                            {...field}
-                            placeholder="Tag name"
-                            autoFocus
-                          />
+                          <Input {...field} placeholder="Tag name" autoFocus />
                           <FormMessage />
                         </div>
                       </FormControl>

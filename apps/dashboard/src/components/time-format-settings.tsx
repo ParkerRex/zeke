@@ -19,7 +19,9 @@ import {
 
 export function TimeFormatSettings() {
   const updateUserMutation = useUserMutation();
-  const { data: user } = useUserQuery() as { data: RouterOutputs["user"]["me"] };
+  const { data: user } = useUserQuery() as {
+    data: RouterOutputs["user"]["me"];
+  };
 
   return (
     <Card className="flex justify-between items-center">

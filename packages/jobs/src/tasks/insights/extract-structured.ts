@@ -32,24 +32,24 @@ export function extractCodeExamples(text: string): StructuredHighlight[] {
     const trimmedCode = code.trim();
 
     // Skip trivial examples (< 2 lines or < 50 chars)
-    if (trimmedCode.split('\n').length < 2 || trimmedCode.length < 50) {
+    if (trimmedCode.split("\n").length < 2 || trimmedCode.length < 50) {
       continue;
     }
 
     // Look for context before the code block (within 200 chars)
     const contextStart = Math.max(0, match.index - 200);
     const context = text.slice(contextStart, match.index);
-    const contextLines = context.split('\n').slice(-3); // Last 3 lines
+    const contextLines = context.split("\n").slice(-3); // Last 3 lines
 
     highlights.push({
       kind: "code_example",
-      title: `${language || 'Code'} Example`,
+      title: `${language || "Code"} Example`,
       quote: trimmedCode,
-      summary: contextLines.join(' ').trim() || "Code implementation example",
+      summary: contextLines.join(" ").trim() || "Code implementation example",
       confidence: 0.85,
       metadata: {
         language: language || "unknown",
-        lineCount: trimmedCode.split('\n').length,
+        lineCount: trimmedCode.split("\n").length,
         charCount: trimmedCode.length,
       },
     });
@@ -87,7 +87,9 @@ export function extractCodeChanges(text: string): StructuredHighlight[] {
         summary: context.trim() || "Breaking change or code modification",
         confidence: 0.75,
         metadata: {
-          type: fullMatch.toLowerCase().includes('breaking') ? 'breaking' : 'update',
+          type: fullMatch.toLowerCase().includes("breaking")
+            ? "breaking"
+            : "update",
           changeLength: fullMatch.length,
         },
       });
@@ -122,19 +124,26 @@ export function extractAPIChanges(text: string): StructuredHighlight[] {
 
       // Get surrounding context (100 chars before/after)
       const contextStart = Math.max(0, match.index - 100);
-      const contextEnd = Math.min(text.length, match.index + match[0].length + 100);
+      const contextEnd = Math.min(
+        text.length,
+        match.index + match[0].length + 100,
+      );
       const context = text.slice(contextStart, contextEnd);
 
       highlights.push({
         kind: "api_change",
         title: "API Update",
         quote: matchText,
-        summary: context.split('\n')[0].trim(),
-        confidence: 0.80,
+        summary: context.split("\n")[0].trim(),
+        confidence: 0.8,
         metadata: {
-          changeType: matchText.toLowerCase().includes('environment') ? 'env_var' :
-                     matchText.toLowerCase().includes('endpoint') ? 'endpoint' :
-                     matchText.toLowerCase().includes('version') ? 'version' : 'parameter',
+          changeType: matchText.toLowerCase().includes("environment")
+            ? "env_var"
+            : matchText.toLowerCase().includes("endpoint")
+              ? "endpoint"
+              : matchText.toLowerCase().includes("version")
+                ? "version"
+                : "parameter",
         },
       });
     }
@@ -168,7 +177,10 @@ export function extractMetrics(text: string): StructuredHighlight[] {
 
       // Get surrounding context for explanation
       const contextStart = Math.max(0, match.index - 150);
-      const contextEnd = Math.min(text.length, match.index + match[0].length + 150);
+      const contextEnd = Math.min(
+        text.length,
+        match.index + match[0].length + 150,
+      );
       const context = text.slice(contextStart, contextEnd);
 
       highlights.push({
@@ -178,9 +190,13 @@ export function extractMetrics(text: string): StructuredHighlight[] {
         summary: context.trim(),
         confidence: 0.85,
         metadata: {
-          metricType: metricText.toLowerCase().includes('token') ? 'tokens' :
-                     metricText.toLowerCase().includes('latency') ? 'latency' :
-                     metricText.toLowerCase().includes('cost') ? 'cost' : 'performance',
+          metricType: metricText.toLowerCase().includes("token")
+            ? "tokens"
+            : metricText.toLowerCase().includes("latency")
+              ? "latency"
+              : metricText.toLowerCase().includes("cost")
+                ? "cost"
+                : "performance",
         },
       });
     }
@@ -192,7 +208,9 @@ export function extractMetrics(text: string): StructuredHighlight[] {
 /**
  * Main extraction function - runs all extractors
  */
-export function extractStructuredHighlights(text: string): StructuredHighlight[] {
+export function extractStructuredHighlights(
+  text: string,
+): StructuredHighlight[] {
   const allHighlights: StructuredHighlight[] = [
     ...extractCodeExamples(text),
     ...extractCodeChanges(text),
@@ -202,7 +220,7 @@ export function extractStructuredHighlights(text: string): StructuredHighlight[]
 
   // Deduplicate by quote
   const seen = new Set<string>();
-  return allHighlights.filter(h => {
+  return allHighlights.filter((h) => {
     const key = h.quote.slice(0, 100); // Use first 100 chars as key
     if (seen.has(key)) return false;
     seen.add(key);

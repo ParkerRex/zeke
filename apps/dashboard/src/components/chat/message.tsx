@@ -14,7 +14,6 @@ import { Inbox } from "./tools/inbox/inbox";
 import { Profit } from "./tools/profit/profit";
 import { Revenue } from "./tools/revenue/revenue";
 
-
 type ToolResultProps = {
   part: UIMessage["parts"][number];
 };

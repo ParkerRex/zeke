@@ -2,7 +2,10 @@ import { sql } from "drizzle-orm";
 import { db } from "../client";
 
 export async function checkHealth() {
-  const candidate = db as unknown as { executeOnReplica?: (query: unknown) => Promise<unknown>; execute?: (query: unknown) => Promise<unknown> };
+  const candidate = db as unknown as {
+    executeOnReplica?: (query: unknown) => Promise<unknown>;
+    execute?: (query: unknown) => Promise<unknown>;
+  };
 
   try {
     if (typeof candidate.executeOnReplica === "function") {
@@ -20,5 +23,7 @@ export async function checkHealth() {
     throw new Error(`Database health check failed: ${message}`);
   }
 
-  throw new Error("Database client does not support execute or executeOnReplica");
+  throw new Error(
+    "Database client does not support execute or executeOnReplica",
+  );
 }

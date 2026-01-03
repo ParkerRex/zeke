@@ -4,11 +4,7 @@ import { z } from "zod";
 import { getHighlights } from "./get-highlights";
 import { getSummaries } from "./get-summaries";
 import type { GetBriefInput } from "./schema";
-import type {
-  HighlightDetail,
-  SummaryToolData,
-  ToolResult,
-} from "./types";
+import type { HighlightDetail, SummaryToolData, ToolResult } from "./types";
 
 const briefSchema = z.object({
   title: z.string(),

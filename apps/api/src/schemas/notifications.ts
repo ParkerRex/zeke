@@ -42,12 +42,11 @@ export const getNotificationsSchema = z
       }),
     userId: z
       .string()
-      .uuid()
       .nullable()
       .optional()
       .openapi({
         description: "Filter notifications by specific user ID",
-        example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        example: "user_abc123",
         param: {
           in: "query",
         },
@@ -122,9 +121,9 @@ export const notificationSchema = z
       description: "Unique identifier of the team",
       example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     }),
-    userId: z.string().uuid().nullable().openapi({
+    userId: z.string().nullable().openapi({
       description: "Unique identifier of the user (if applicable)",
-      example: "c2d3e4f5-a6b7-8901-bcde-f23456789012",
+      example: "user_abc123",
     }),
     type: z.string().openapi({
       description: "Type of notification",

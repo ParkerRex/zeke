@@ -65,9 +65,9 @@ export const updateUserSchema = z.object({
 });
 
 export const userSchema = z.object({
-  id: z.string().uuid().openapi({
+  id: z.string().openapi({
     description: "Unique identifier of the user",
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "user_abc123",
   }),
   fullName: z.string().openapi({
     description: "Full name of the user",

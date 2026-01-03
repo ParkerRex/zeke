@@ -70,4 +70,3 @@ function generateFeedId(url: string): string {
   const domain = new URL(url).hostname.replace(/^www\./, "");
   return `feed_${domain.replace(/[^a-zA-Z0-9]/g, "_")}`;
 }
-

@@ -245,7 +245,7 @@ export const userInvites = pgTable(
     email: text(),
     role: teamRolesEnum(),
     code: text().default("nanoid(24)"),
-    invitedBy: uuid("invited_by"),
+    invitedBy: text("invited_by"),
   },
   (table) => [
     index("user_invites_team_id_idx").using(
@@ -334,7 +334,7 @@ export const apps = pgTable(
       mode: "string",
     }).defaultNow(),
     appId: text("app_id").notNull(),
-    createdBy: uuid("created_by").defaultRandom(),
+    createdBy: text("created_by"),
     settings: jsonb(),
   },
   (table) => [
@@ -376,7 +376,7 @@ export const apps = pgTable(
 export const users = pgTable(
   "users",
   {
-    id: uuid().primaryKey().notNull(),
+    id: text("id").primaryKey().notNull(),
     fullName: text("full_name"),
     avatarUrl: text("avatar_url"),
     email: text(),
@@ -434,7 +434,7 @@ export const users = pgTable(
 export const usersOnTeam = pgTable(
   "users_on_team",
   {
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     id: uuid().defaultRandom().notNull(),
     role: teamRolesEnum(),
@@ -450,7 +450,7 @@ export const usersOnTeam = pgTable(
     ),
     index("users_on_team_user_id_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.teamId],
@@ -584,13 +584,10 @@ export const apiKeys = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     keyHash: text("key_hash"),
-    scopes: text("scopes")
-      .array()
-      .notNull()
-      .default(sql`'{}'::text[]`),
+    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
     lastUsedAt: timestamp("last_used_at", {
       withTimezone: true,
       mode: "string",
@@ -603,7 +600,7 @@ export const apiKeys = pgTable(
     ),
     index("api_keys_user_id_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     index("api_keys_team_id_idx").using(
       "btree",
@@ -632,7 +629,7 @@ export const chats = pgTable(
       .references(() => teams.id, {
         onDelete: "cascade",
       }),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, {
         onDelete: "cascade",
@@ -666,7 +663,7 @@ export const chatMessages = pgTable(
       .references(() => teams.id, {
         onDelete: "cascade",
       }),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, {
         onDelete: "cascade",
@@ -699,7 +696,7 @@ export const chatFeedback = pgTable(
       .references(() => teams.id, {
         onDelete: "cascade",
       }),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, {
         onDelete: "cascade",
@@ -734,18 +731,13 @@ export const oauthApplications = pgTable(
     logoUrl: text("logo_url"),
     website: text("website"),
     installUrl: text("install_url"),
-    screenshots: text("screenshots")
-      .array()
-      .default(sql`'{}'::text[]`),
+    screenshots: text("screenshots").array().default(sql`'{}'::text[]`),
     redirectUris: text("redirect_uris").array().notNull(),
     clientId: text("client_id").notNull().unique(),
     clientSecret: text("client_secret").notNull(),
-    scopes: text("scopes")
-      .array()
-      .notNull()
-      .default(sql`'{}'::text[]`),
+    scopes: text("scopes").array().notNull().default(sql`'{}'::text[]`),
     teamId: uuid("team_id").notNull(),
-    createdBy: uuid("created_by").notNull(),
+    createdBy: text("created_by").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -797,7 +789,7 @@ export const oauthAuthorizationCodes = pgTable(
     id: uuid("id").notNull().defaultRandom().primaryKey(),
     code: text("code").notNull().unique(),
     applicationId: uuid("application_id").notNull(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     scopes: text("scopes").array().notNull(),
     redirectUri: text("redirect_uri").notNull(),
@@ -823,7 +815,7 @@ export const oauthAuthorizationCodes = pgTable(
     ),
     index("oauth_authorization_codes_user_id_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.applicationId],
@@ -851,7 +843,7 @@ export const oauthAccessTokens = pgTable(
     token: text("token").notNull().unique(),
     refreshToken: text("refresh_token").unique(),
     applicationId: uuid("application_id").notNull(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     scopes: text("scopes").array().notNull(),
     expiresAt: timestamp("expires_at", {
@@ -887,7 +879,7 @@ export const oauthAccessTokens = pgTable(
     ),
     index("oauth_access_tokens_user_id_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("uuid_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.applicationId],
@@ -1158,7 +1150,7 @@ export const storyTags = pgTable(
       .notNull()
       .references(() => stories.id, { onDelete: "cascade" }),
     tag: text("tag").notNull(),
-    created_by: uuid("created_by").references(() => users.id, {
+    created_by: text("created_by").references(() => users.id, {
       onDelete: "set null",
     }),
     created_at: timestamp("created_at", {
@@ -1280,7 +1272,7 @@ export const highlights = pgTable(
     team_id: uuid("team_id").references(() => teams.id, {
       onDelete: "cascade",
     }), // null = global
-    created_by: uuid("created_by")
+    created_by: text("created_by")
       .notNull()
       .references(() => users.id),
     chapter_id: uuid("chapter_id").references(() => storyChapters.id, {
@@ -1354,7 +1346,7 @@ export const highlightCollaborators = pgTable(
     highlight_id: uuid("highlight_id")
       .notNull()
       .references(() => highlights.id, { onDelete: "cascade" }),
-    user_id: uuid("user_id")
+    user_id: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: highlightCollaboratorRole("role").notNull().default("viewer"),
@@ -1392,13 +1384,13 @@ export const teamHighlightStates = pgTable(
       .notNull()
       .references(() => highlights.id, { onDelete: "cascade" }),
     state: text("state").default("active"), // active, archived, etc.
-    pinned_by: uuid("pinned_by").references(() => users.id, {
+    pinned_by: text("pinned_by").references(() => users.id, {
       onDelete: "set null",
     }),
     shared_scope: highlightShareScope("shared_scope")
       .notNull()
       .default("private"),
-    shared_by: uuid("shared_by").references(() => users.id, {
+    shared_by: text("shared_by").references(() => users.id, {
       onDelete: "set null",
     }),
     shared_at: timestamp("shared_at", {
@@ -1458,7 +1450,7 @@ export const storyNotes = pgTable(
     team_id: uuid("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
-    user_id: uuid("user_id")
+    user_id: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     visibility: text("visibility").notNull().default("team"), // team, personal
@@ -1495,7 +1487,7 @@ export const playbookTemplates = pgTable(
     default_channel: text("default_channel"),
     is_public: boolean("is_public").default(false),
     metadata: jsonb("metadata"),
-    created_by: uuid("created_by")
+    created_by: text("created_by")
       .notNull()
       .references(() => users.id),
     created_at: timestamp("created_at", {
@@ -1549,7 +1541,7 @@ export const playbooks = pgTable(
     template_id: uuid("template_id").references(() => playbookTemplates.id, {
       onDelete: "set null",
     }),
-    created_by: uuid("created_by")
+    created_by: text("created_by")
       .notNull()
       .references(() => users.id),
     status: playbookStatus("status").notNull().default("draft"),
@@ -1580,7 +1572,7 @@ export const playbookSteps = pgTable(
       () => playbookTemplateSteps.id,
       { onDelete: "set null" },
     ),
-    assigned_to: uuid("assigned_to").references(() => users.id, {
+    assigned_to: text("assigned_to").references(() => users.id, {
       onDelete: "set null",
     }),
     status: stepStatus("status").notNull().default("pending"),
@@ -1647,7 +1639,7 @@ export const playbookRuns = pgTable(
     team_id: uuid("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
-    triggered_by: uuid("triggered_by").references(() => users.id, {
+    triggered_by: text("triggered_by").references(() => users.id, {
       onDelete: "set null",
     }),
     trigger_source: text("trigger_source"),
@@ -1700,7 +1692,7 @@ export const notifications = pgTable(
     teamId: uuid("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").notNull(), // story_published, highlight_shared, etc.
@@ -1731,7 +1723,7 @@ export const activities = pgTable(
 
     // Core fields
     teamId: uuid("team_id").notNull(),
-    userId: uuid("user_id"),
+    userId: text("user_id"),
     type: activityTypeEnum().notNull(),
     priority: smallint().default(5), // 1-3 = notifications, 4-10 = insights only
 
@@ -1995,7 +1987,7 @@ export const notificationSettings = pgTable(
   "notification_settings",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     teamId: uuid("team_id").notNull(),
     notificationType: text("notification_type").notNull(),
     channel: text("channel").notNull(), // 'in_app', 'email', 'push'

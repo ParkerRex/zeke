@@ -9,9 +9,10 @@ const env = getBaseEnv();
 const isDevelopment = env.NODE_ENV === "development";
 
 const sslMode = env.PGSSLMODE?.toLowerCase();
-const sslOptions = sslMode === "disable"
-  ? undefined
-  : { rejectUnauthorized: sslMode !== "no-verify" };
+const sslOptions =
+  sslMode === "disable"
+    ? undefined
+    : { rejectUnauthorized: sslMode !== "no-verify" };
 
 const connectionConfig = {
   max: isDevelopment ? 8 : 12,

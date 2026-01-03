@@ -26,15 +26,18 @@ export function SelectUser({ selectedId, onSelect }: Props) {
 
   // Get team members
   const { data: teamMembers, isLoading } = useQuery({
-    ...trpc.teams.getMembers.queryOptions({ teamId: currentUser?.teamId ?? "" }),
+    ...trpc.teams.getMembers.queryOptions({
+      teamId: currentUser?.teamId ?? "",
+    }),
     enabled: !!currentUser?.teamId,
   });
 
-  const users: User[] = teamMembers?.map((member) => ({
-    id: member.id,
-    avatar_url: member.avatarUrl,
-    full_name: member.fullName,
-  })) ?? [];
+  const users: User[] =
+    teamMembers?.map((member) => ({
+      id: member.id,
+      avatar_url: member.avatarUrl,
+      full_name: member.fullName,
+    })) ?? [];
 
   useEffect(() => {
     setValue(selectedId);
