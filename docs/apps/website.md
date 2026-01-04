@@ -1,6 +1,16 @@
 # Website Application
 
-Marketing and public-facing website.
+Marketing site. Public pages only. No auth, no app workflows.
+
+## Owns
+
+- Landing, pricing, legal, and support pages
+- Blog content and SEO
+
+## Does Not Own
+
+- Product UI (Dashboard owns that)
+- Business logic (API owns that)
 
 ## Overview
 

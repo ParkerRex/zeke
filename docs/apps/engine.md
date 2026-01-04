@@ -1,6 +1,18 @@
 # Engine Application
 
-Content ingestion service with pluggable providers.
+Engine fetches external content and normalizes it. That's it. It does not own product logic, auth, or storage.
+
+## Owns
+
+- Provider adapters (YouTube, RSS, arXiv, podcasts, Semantic Scholar)
+- Normalized ingest response shape
+- Source/channel metadata lookup
+
+## Does Not Own
+
+- Database writes (callers persist the result)
+- Business rules (API owns them)
+- UI or user workflows (Dashboard owns those)
 
 ## Overview
 

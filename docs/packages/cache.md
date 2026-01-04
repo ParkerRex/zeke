@@ -1,6 +1,17 @@
 # Cache Package
 
-Redis distributed caching layer.
+Redis caching helpers. This is not storage and it is not authoritative.
+
+## Owns
+
+- Redis client config
+- Cache helpers for API-level read optimizations
+- Short-lived consistency caches
+
+## Does Not Own
+
+- Persistence (Database owns that)
+- Business rules (API owns those)
 
 ## Overview
 
@@ -131,7 +142,7 @@ const redis = new Redis({
 });
 ```
 
-### Production (Fly.io)
+### Production
 
 ```typescript
 const redis = new Redis(process.env.REDIS_URL, {

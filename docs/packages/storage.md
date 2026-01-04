@@ -1,6 +1,17 @@
 # Storage Package
 
-MinIO S3-compatible object storage client.
+S3-compatible storage client. Stores files, not business data.
+
+## Owns
+
+- MinIO client configuration
+- Bucket wiring and signed URL helpers
+- File uploads/downloads
+
+## Does Not Own
+
+- Metadata or permissions (API owns those)
+- UI flows (Dashboard owns them)
 
 ## Overview
 

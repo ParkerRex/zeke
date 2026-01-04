@@ -1,10 +1,15 @@
 # Utility Packages
 
-Shared utilities and helper packages.
+Grab-bag of small packages. Keep them boring and reusable. No product logic here.
 
-## Utils Package
+## Utils Package (`@zeke/utils`)
 
-**Package:** `@zeke/utils`
+Owns:
+- Env validation helpers
+- Formatting and pure utilities
+
+Does not own:
+- Domain logic or API rules
 
 ### Environment Validation
 
@@ -36,9 +41,13 @@ const tax = calculateTax(100, "US", "CA");
 
 ---
 
-## Logger Package
+## Logger Package (`@zeke/logger`)
 
-**Package:** `@zeke/logger`
+Owns:
+- Pino logger config and helpers
+
+Does not own:
+- Log routing/infra
 
 ### Usage
 
@@ -66,9 +75,13 @@ const logger = pino({
 
 ---
 
-## Encryption Package
+## Encryption Package (`@zeke/encryption`)
 
-**Package:** `@zeke/encryption`
+Owns:
+- Encrypt/decrypt helpers
+
+Does not own:
+- Key management policies
 
 ### Encrypt/Decrypt
 
@@ -81,9 +94,13 @@ const decrypted = await decrypt(encrypted, key);
 
 ---
 
-## Location Package
+## Location Package (`@zeke/location`)
 
-**Package:** `@zeke/location`
+Owns:
+- Country/timezone/currency datasets
+
+Does not own:
+- Billing or tax logic
 
 ### Countries
 
@@ -114,9 +131,13 @@ getCurrencySymbol("EUR");  // "€"
 
 ---
 
-## Notifications Package
+## Notifications Package (`@zeke/notifications`)
 
-**Package:** `@zeke/notifications`
+Owns:
+- Notification payload schemas and send helpers
+
+Does not own:
+- UI presentation or delivery provider setup
 
 ### Send Notification
 
@@ -133,9 +154,13 @@ await sendNotification({
 
 ---
 
-## Events Package
+## Events Package (`@zeke/events`)
 
-**Package:** `@zeke/events`
+Owns:
+- Event tracking helpers
+
+Does not own:
+- Analytics backend configuration
 
 ### Track Event
 
@@ -158,9 +183,13 @@ track("button_clicked", { button: "signup" });
 
 ---
 
-## Realtime Package
+## Realtime Package (`@zeke/realtime`)
 
-**Package:** `@zeke/realtime`
+Owns:
+- Realtime broadcast helpers and client hooks
+
+Does not own:
+- WebSocket server hosting
 
 ### Server
 
@@ -188,9 +217,13 @@ useRealtime({
 
 ---
 
-## TSConfig Package
+## TSConfig Package (`@zeke/tsconfig`)
 
-**Package:** `@zeke/tsconfig`
+Owns:
+- Shared TypeScript config
+
+Does not own:
+- App-specific compiler overrides
 
 Shared TypeScript configurations:
 
@@ -199,30 +232,3 @@ Shared TypeScript configurations:
   "extends": "@zeke/tsconfig/base.json"
 }
 ```
-
-Available configs:
-- `base.json` - Base configuration
-- `react.json` - React apps
-- `nextjs.json` - Next.js apps
-
----
-
-## Engine Client Package
-
-**Package:** `@zeke/engine-client`
-
-```typescript
-import { engineClient } from "@zeke/engine-client";
-
-const content = await engineClient.ingest({
-  url: "https://youtube.com/watch?v=xxx",
-});
-```
-
----
-
-## Desktop Client Package
-
-**Package:** `@zeke/desktop-client`
-
-Desktop-specific utilities for Tauri integration.

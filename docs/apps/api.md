@@ -1,6 +1,19 @@
 # API Application
 
-Core backend server providing TRPC + REST endpoints.
+The API is the source of truth for domain data. If a client needs data, it comes through here. This is not a UI and it is not a content ingestion service.
+
+## Owns
+
+- Auth/session validation and team scoping
+- CRUD for stories, highlights, chats, tags, playbooks, notifications, API keys
+- Search, billing (Stripe), and usage enforcement
+- Public REST endpoints + internal TRPC
+
+## Does Not Own
+
+- External content fetching (Engine does that)
+- User interface (Dashboard/Website do that)
+- Background scheduling (Jobs package does that)
 
 ## Overview
 
@@ -35,7 +48,7 @@ bun run dev:api  # Start on port 3003
 
 ### TRPC
 
-All TRPC routes available at `/trpc/*`.
+All TRPC routes are under `/trpc/*`.
 
 ## TRPC Routers
 

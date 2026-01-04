@@ -1,6 +1,17 @@
 # Dashboard Application
 
-Next.js 15 frontend for the Zeke research platform.
+This is the product UI. If you are building user-facing workflows, you are here. If you need business logic, go to the API.
+
+## Owns
+
+- User workflows: discovery, reading, highlighting, chat, playbooks
+- Team settings and billing UI
+- Client-side state, routing, and UI components
+
+## Does Not Own
+
+- Data access rules (API owns them)
+- Content ingestion (Engine owns that)
 
 ## Overview
 
@@ -18,12 +29,12 @@ bun run dev:dashboard  # Start on port 3001
 
 ## Key Features
 
-- **Story Discovery**: Browse and search research content
-- **AI Chat**: Interactive AI assistant
-- **Highlights**: Create and manage notes
-- **Playbooks**: Automation workflows
-- **Team Management**: Multi-user collaboration
-- **Billing**: Stripe subscription management
+- **Story discovery**: browse and search content
+- **AI chat**: ask questions against your content
+- **Highlights**: create and organize notes
+- **Playbooks**: run automations
+- **Team management**: roles and settings
+- **Billing**: Stripe subscription UI
 
 ## Tech Stack
 
@@ -48,8 +59,8 @@ apps/dashboard/src/
 │   │   │   └── (main)/     # Full-width routes
 │   │   └── (public)/     # Public routes
 │   └── api/              # API routes
-├── components/           # React components (130+)
-├── hooks/                # Custom hooks (40+)
+├── components/           # React components
+├── hooks/                # Custom hooks
 ├── actions/              # Server actions
 ├── lib/                  # Utilities
 │   ├── trpc/             # TRPC client setup
@@ -198,5 +209,3 @@ bun run start          # Start production server
 ## Related
 
 - [API Application](./api.md)
-- [UI Package](../packages/ui.md)
-- [Auth Package](../packages/auth.md)

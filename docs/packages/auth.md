@@ -1,6 +1,18 @@
 # Auth Package
 
-Better Auth configuration for authentication.
+Authentication wiring. If you need sessions or OAuth, start here. This does not define product rules.
+
+## Owns
+
+- Better Auth configuration
+- Session creation/validation
+- OAuth and 2FA settings
+
+## Does Not Own
+
+- User profiles (API + DB own them)
+- UI flows (Dashboard owns them)
+- Billing or permissions logic (API owns it)
 
 ## Overview
 
@@ -197,62 +209,3 @@ export const auth = betterAuth({
   },
 });
 ```
-
-## Environment Variables
-
-```bash
-# Required
-AUTH_SECRET=your-32-character-minimum-secret-key
-
-# Trusted origins for CORS
-AUTH_TRUSTED_ORIGINS=http://localhost:3001,https://app.zekehq.com
-
-# OAuth providers (optional)
-GOOGLE_CLIENT_ID=xxx
-GOOGLE_CLIENT_SECRET=xxx
-GITHUB_CLIENT_ID=xxx
-GITHUB_CLIENT_SECRET=xxx
-```
-
-## Security
-
-### Secret Key
-
-Generate a secure secret:
-```bash
-openssl rand -base64 32
-```
-
-### Session Security
-
-- HTTP-only cookies
-- Secure flag in production
-- SameSite=Lax
-- CSRF protection
-
-## User Types
-
-```typescript
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-  image?: string;
-  emailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface Session {
-  id: string;
-  userId: string;
-  expiresAt: Date;
-  user: User;
-}
-```
-
-## Related
-
-- [API Application](../apps/api.md)
-- [Dashboard Application](../apps/dashboard.md)
-- [Database Package](./database.md)

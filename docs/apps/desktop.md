@@ -1,6 +1,17 @@
 # Desktop Application
 
-Native desktop app using Tauri.
+Thin desktop shell around the Dashboard. If you need product features, build them in the Dashboard + API first.
+
+## Owns
+
+- Native window chrome and sizing
+- Deep linking and auto-updates
+- Packaging for macOS/Windows/Linux
+
+## Does Not Own
+
+- Product UI (Dashboard owns that)
+- Business logic (API owns that)
 
 ## Overview
 

@@ -1,6 +1,17 @@
 # UI Package
 
-Shared React component library.
+Shared React UI primitives. Use this for consistent styling. Do not put business logic here.
+
+## Owns
+
+- Reusable UI components
+- Tailwind-based design tokens/styles
+- Icon set and globals
+
+## Does Not Own
+
+- Data fetching
+- Product workflows or domain logic
 
 ## Overview
 

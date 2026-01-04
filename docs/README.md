@@ -1,6 +1,6 @@
 # Zeke Documentation
 
-AI-powered research intelligence platform that transforms content into actionable insights.
+This repo runs the Zeke platform. These docs are for builders. No fluff.
 
 ## Quick Start
 
@@ -10,6 +10,25 @@ bun dev  # Starts Docker + all apps
 ```
 
 If you use the included Docker services, set `DATABASE_PRIMARY_URL` to `postgresql://zeke:zeke_dev_password@localhost:5435/zeke`.
+
+## Service Map (Blunt)
+
+If you need to...
+- **Ingest external content**: `apps/engine` (Engine)
+- **Read/write domain data, auth, billing**: `apps/api` (API)
+- **Build user workflows**: `apps/dashboard` (Dashboard)
+- **Ship marketing pages**: `apps/website` (Website)
+- **Ship a desktop shell**: `apps/desktop` (Desktop)
+
+## Domain Glossary
+
+- **Story**: User-facing content (article/video/podcast/etc.) built from ingested data.
+- **Content item**: Raw extracted content stored in `contents` (text, transcript, pdf, etc.).
+- **Highlight**: A user-created note on a story.
+- **Source**: The origin of content (RSS feed, YouTube channel, publisher, etc.).
+- **Playbook**: Automation workflow that runs against content.
+- **Team**: The tenant boundary for users, data, and billing.
+- **Legacy naming**: Some modules still say `invoice` or `transaction`. Read `invoice` as story/article and `transaction` as content item until the migration finishes.
 
 ## Quick Links
 
@@ -22,13 +41,13 @@ If you use the included Docker services, set `DATABASE_PRIMARY_URL` to `postgres
 
 ## Applications
 
-| App | Port | Description |
-|-----|------|-------------|
-| [API](./apps/api.md) | 3003 | Hono + TRPC backend |
-| [Dashboard](./apps/dashboard.md) | 3001 | Next.js 15 frontend |
-| [Engine](./apps/engine.md) | 3010 | Content ingestion service |
+| App | Port | What it owns |
+|-----|------|--------------|
+| [API](./apps/api.md) | 3003 | Domain data, auth, billing, search |
+| [Dashboard](./apps/dashboard.md) | 3001 | Product UI and user workflows |
+| [Engine](./apps/engine.md) | 3010 | Content ingestion + normalization |
 | [Website](./apps/website.md) | 3000 | Marketing site |
-| [Desktop](./apps/desktop.md) | - | Tauri native app |
+| [Desktop](./apps/desktop.md) | - | Desktop shell for the dashboard |
 
 ## Packages
 
@@ -70,11 +89,11 @@ If you use the included Docker services, set `DATABASE_PRIMARY_URL` to `postgres
 ```
 zeke/
 ├── apps/
-│   ├── api/          # Hono + TRPC API (port 3003)
-│   ├── dashboard/    # Next.js frontend (port 3001)
+│   ├── api/          # Domain API (port 3003)
+│   ├── dashboard/    # Product UI (port 3001)
 │   ├── engine/       # Content ingestion (port 3010)
 │   ├── website/      # Marketing site (port 3000)
-│   └── desktop/      # Tauri native app
+│   └── desktop/      # Desktop shell
 ├── packages/
 │   ├── db/           # Drizzle schema and queries
 │   ├── jobs/         # pg-boss background tasks
@@ -97,6 +116,6 @@ zeke/
 | `bun run build` | Build all apps |
 | `bun run lint` | Lint code |
 | `bun run format` | Format code |
-| `cd packages/db && DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate` | Apply migrations |
-| `cd packages/db && bunx drizzle-kit generate` | Generate new migration |
-| `cd packages/db && bunx drizzle-kit studio` | Open Drizzle Studio |
+| `bun run db:migrate` | Generate + apply migrations (local) |
+| `bun run db:migrate:prod` | Apply migrations (prod) |
+| `bun run db:studio` | Open Drizzle Studio |

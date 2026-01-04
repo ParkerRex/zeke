@@ -1,6 +1,18 @@
 # Database Package
 
-Drizzle ORM schema, queries, and migrations.
+Schema, migrations, and query helpers. This is the data source of truth. If the data model changes, it changes here.
+
+## Owns
+
+- Drizzle schema (`packages/db/src/schema.ts`)
+- Migrations and DB health checks
+- Shared query helpers
+
+## Does Not Own
+
+- Business logic (API owns it)
+- Caching (Cache package owns it)
+- Background scheduling (Jobs package owns it)
 
 ## Overview
 
@@ -55,12 +67,11 @@ console.log(story.teamId);  // camelCase
 | `users` | User accounts |
 | `teams` | Organizations |
 | `users_on_team` | Team membership |
-| `stories` | Content narratives |
+| `stories` | User-facing content |
+| `contents` | Raw extracted content |
+| `sources` | Content sources |
 | `highlights` | User notes/highlights |
 | `chats` | Chat conversations |
-| `contents` | Raw content items |
-| `sources` | Content sources |
-| `transcripts` | Video/audio transcripts |
 | `playbooks` | Automation workflows |
 | `tags` | Content tags |
 | `api_keys` | API authentication |
@@ -150,20 +161,20 @@ const result = await db.execute(sql`SELECT * FROM stories WHERE id = ${id}`);
 
 ## Migrations
 
+### From repo root
+
 ```bash
-cd packages/db
+bun run db:migrate        # Generate + apply to local DB
+bun run db:studio         # Open Drizzle Studio
+bun run db:migrate:prod   # Apply to production
+```
 
-# Generate migration from schema changes
-DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit generate
+### From `packages/db`
 
-# Apply to local database
-DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate
-
-# Apply to production
-DATABASE_SESSION_POOLER=postgresql://... bunx drizzle-kit migrate
-
-# Open Drizzle Studio
-bunx drizzle-kit studio
+```bash
+bun run migrate:dev       # Local migration
+bun run migrate           # Production migration
+bun run migrate:studio    # Drizzle Studio
 ```
 
 ### Migration Files
@@ -197,56 +208,3 @@ import { getConnectionPoolStats } from "@zeke/db/client";
 const stats = getConnectionPoolStats();
 // { primary: { total: 12, active: 3, idle: 9, waiting: 0 } }
 ```
-
-## pgvector
-
-For AI embeddings:
-
-```typescript
-import { vector } from "drizzle-orm/pg-core";
-
-export const embeddings = pgTable("embeddings", {
-  id: uuid().primaryKey(),
-  embedding: vector("embedding", { dimensions: 1536 }),
-});
-```
-
-Enable extension:
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;
-```
-
-## Environment Variables
-
-```bash
-# Primary database
-DATABASE_PRIMARY_URL=postgresql://zeke:password@localhost:5435/zeke
-
-# Optional pooler for production
-DATABASE_PRIMARY_POOLER_URL=postgresql://pooler.neon.tech/...
-
-# Drizzle migrations (used by drizzle.config.ts)
-DATABASE_SESSION_POOLER=postgresql://zeke:password@localhost:5435/zeke
-
-# SSL mode
-PGSSLMODE=require  # or 'disable' for local
-```
-
-## Docker Setup
-
-```bash
-# Start PostgreSQL
-docker compose up -d postgres
-
-# Enable pgvector
-psql postgresql://zeke:zeke_dev_password@localhost:5435/zeke \
-  -c "CREATE EXTENSION IF NOT EXISTS vector;"
-
-# Run migrations
-cd packages/db && DATABASE_SESSION_POOLER=postgresql://zeke:zeke_dev_password@localhost:5435/zeke bunx drizzle-kit migrate
-```
-
-## Related
-
-- [API Application](../apps/api.md)
-- [Jobs Package](./jobs.md)

@@ -1,6 +1,18 @@
 # Jobs Package
 
-Background job processing with pg-boss.
+Background jobs and scheduling. This is the async pipeline brain. It is not an HTTP service.
+
+## Owns
+
+- pg-boss setup and task registry
+- Scheduling for ingestion/AI pipelines
+- Job triggering helpers
+
+## Does Not Own
+
+- Business rules (API owns those)
+- External content fetching (Engine owns that)
+- UI or API endpoints
 
 ## Overview
 
@@ -38,11 +50,13 @@ import { getBoss } from "@zeke/jobs/boss";
 ## Running the Worker
 
 ```bash
+cd packages/jobs
+
 # Development (with hot reload)
-pnpm worker:dev
+bun run worker:dev
 
 # Production
-pnpm worker
+bun run worker
 ```
 
 ## Defining Tasks
@@ -198,74 +212,4 @@ packages/jobs/src/
     ├── insights/     # AI tasks
     ├── stories/      # Story tasks
     ├── briefs/       # Brief generation
-    └── playbooks/    # Automation
 ```
-
-## Configuration
-
-```typescript
-// boss.ts
-const boss = new PgBoss({
-  connectionString: process.env.DATABASE_PRIMARY_URL,
-  schema: "pgboss",
-  archiveCompletedAfterSeconds: 86400,  // 24 hours
-  deleteAfterDays: 7,
-  retryLimit: 3,
-  retryDelay: 1,
-  retryBackoff: true,
-});
-```
-
-## Environment Variables
-
-```bash
-# Database (required)
-DATABASE_PRIMARY_URL=postgresql://...
-
-# OpenAI (for AI tasks)
-OPENAI_API_KEY=sk-...
-
-# Timezone for cron
-JOBS_CRON_TZ=UTC
-```
-
-## Error Handling
-
-Tasks automatically retry on failure:
-
-```typescript
-export const myTask = schemaTask({
-  id: "my-task",
-  queue: {
-    concurrencyLimit: 1,
-    // Retries configured at pg-boss level
-  },
-  run: async (payload, { logger }) => {
-    try {
-      // Task logic
-    } catch (error) {
-      logger.error("Task failed", { error });
-      throw error;  // Will trigger retry
-    }
-  },
-});
-```
-
-## SSE Job Status
-
-Real-time job status via Server-Sent Events:
-
-```typescript
-// API endpoint: GET /api/jobs/stream/:runId
-const eventSource = new EventSource(`/api/jobs/stream/${runId}`);
-eventSource.onmessage = (event) => {
-  const status = JSON.parse(event.data);
-  console.log(status);
-};
-```
-
-## Related
-
-- [API Application](../apps/api.md)
-- [Engine Application](../apps/engine.md)
-- [Database Package](./database.md)

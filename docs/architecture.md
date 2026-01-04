@@ -1,10 +1,10 @@
 # Architecture
 
-System design and architectural patterns for Zeke.
+System design and service boundaries for Zeke. This is a monorepo, not magic. Keep responsibilities clean.
 
 ## Overview
 
-Zeke is a monorepo using Bun workspaces. It follows a microservices-inspired architecture with shared packages for common functionality.
+Zeke uses a service-ish architecture inside a Bun workspace monorepo. Shared packages handle cross-cutting concerns. Each app has a clear job. Do not blur them.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -39,6 +39,25 @@ Zeke is a monorepo using Bun workspaces. It follows a microservices-inspired arc
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+## Boundaries (Blunt)
+
+- **API** owns business logic and database writes. If a client needs data, it goes through the API.
+- **Engine** only fetches and normalizes external content. It does not enforce business rules.
+- **Jobs** run background work and orchestrate ingestion/AI pipelines. They are not HTTP services.
+- **Dashboard/Website/Desktop** are clients. They do not own domain rules.
+
+## Domain Ownership Map
+
+| Domain Area | Source of Truth | Notes |
+|-------------|------------------|-------|
+| Users/Teams/Auth | API + Auth package | Session and access control live here |
+| Stories/Highlights/Chats/Tags | API + Database | Core content domain |
+| Playbooks/Automations | API + Jobs | Jobs execute, API owns rules |
+| Content Ingestion | Engine | Normalizes external sources |
+| Billing/Usage | API + Stripe | Billing UI lives in Dashboard |
+| Marketing | Website | No auth or private data |
+| Desktop Shell | Desktop | Wraps the Dashboard |
 
 ## Core Patterns
 
