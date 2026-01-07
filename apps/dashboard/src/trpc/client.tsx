@@ -2,21 +2,20 @@
 
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider, isServer } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
-import { createTRPCContext } from "@trpc/tanstack-react-query";
+import { httpBatchLink, loggerLink } from "@trpc/client";
+import { createTRPCReact } from "@trpc/react-query";
 import type { AppRouter } from "@zeke/api/trpc/routers/_app";
 import { authClient } from "@zeke/auth/client";
 import { useState } from "react";
 import superjson from "superjson";
 import { makeQueryClient } from "./query-client";
 
-const { TRPCProvider: InternalTRPCProvider, useTRPC } =
-  createTRPCContext<AppRouter>();
+// Create the TRPC React client with hooks (v10-style direct access pattern)
+export const api = createTRPCReact<AppRouter>();
 
-// Export both api and useTRPC for compatibility
-export { useTRPC as api };
-export { useTRPC };
-export const TRPCProvider = InternalTRPCProvider;
+// Legacy exports for compatibility
+export const trpc = api;
+export const useTRPC = api;
 
 let browserQueryClient: QueryClient;
 
@@ -42,7 +41,7 @@ export function TRPCReactProvider(
 ) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
+    api.createClient({
       links: [
         httpBatchLink({
           url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
@@ -68,9 +67,9 @@ export function TRPCReactProvider(
 
   return (
     <QueryClientProvider client={queryClient}>
-      <InternalTRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+      <api.Provider client={trpcClient} queryClient={queryClient}>
         {props.children}
-      </InternalTRPCProvider>
+      </api.Provider>
     </QueryClientProvider>
   );
 }

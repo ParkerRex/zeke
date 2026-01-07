@@ -1,7 +1,7 @@
 "use client";
 
 import { useAnalytics } from "@/hooks/use-analytics";
-import { trpc } from "@/trpc/client";
+import { api } from "@/trpc/client";
 import { Badge } from "@zeke/ui/badge";
 import {
   Card,
@@ -20,7 +20,7 @@ import Link from "next/link";
  */
 export function StoriesHero() {
   const { track } = useAnalytics();
-  const { data, isLoading, error } = trpc.stories.dashboardSummaries.useQuery({
+  const { data, isLoading, error } = api.stories.dashboardSummaries.useQuery({
     limit: 12,
     includeMetrics: true,
   });

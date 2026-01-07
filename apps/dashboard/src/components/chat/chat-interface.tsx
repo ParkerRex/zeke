@@ -8,7 +8,13 @@ import { Button } from "@zeke/ui/button";
 import { ScrollArea } from "@zeke/ui/scroll-area";
 import { Textarea } from "@zeke/ui/textarea";
 import { useToast } from "@zeke/ui/use-toast";
-import { ArrowRight, Loader2, MapPin, RefreshCw, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChatEmpty } from "./chat-empty";

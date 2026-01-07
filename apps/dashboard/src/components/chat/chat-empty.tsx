@@ -1,3 +1,5 @@
+"use client";
+
 import { api } from "@/trpc/client";
 import { Icons } from "@zeke/ui/icons";
 import { Sparkles } from "lucide-react";

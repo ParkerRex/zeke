@@ -5,7 +5,6 @@ import { useModalParams } from "@/hooks/use-modal-params";
 import { api } from "@/trpc/client";
 import { Badge } from "@zeke/ui/badge";
 import { Button } from "@zeke/ui/button";
-import { cn } from "@zeke/ui/cn";
 import { Bell, Link2, PlayCircle, Search, Sparkles } from "lucide-react";
 
 /**
