@@ -6,7 +6,6 @@ echo "Stopping Zeke services..."
 pkill -f "apps/api" 2>/dev/null || true
 pkill -f "apps/dashboard" 2>/dev/null || true
 pkill -f "apps/website" 2>/dev/null || true
-pkill -f "apps/desktop" 2>/dev/null || true
 pkill -f "apps/engine" 2>/dev/null || true
 
 echo "✅ Application services stopped"

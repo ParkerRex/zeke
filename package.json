@@ -13,7 +13,6 @@
     "dev:api": "./scripts/start-api.sh",
     "dev:dashboard": "./scripts/start-dashboard.sh",
     "dev:website": "./scripts/start-website.sh",
-    "dev:desktop": "./scripts/start-desktop.sh",
     "redis:start": "./scripts/start-redis.sh",
     "redis:stop": "docker stop zeke-redis",
     "docker:build:local": "./scripts/containers.sh build local",

@@ -44,7 +44,6 @@
       "Bash(apps/api/src/trpc/routers/billing.ts )",
       "Bash(apps/api/src/utils/stripe.ts )",
       "Bash(apps/dashboard/package.json )",
-      "Bash(apps/desktop/package.json )",
       "Bash(apps/engine/package.json )",
       "Bash(apps/website/package.json )",
       "Bash(packages/db/package.json )",
