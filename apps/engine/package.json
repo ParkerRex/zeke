@@ -1,7 +1,9 @@
 {
   "name": "@zeke/engine",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf node_modules",
     "lint": "biome check .",

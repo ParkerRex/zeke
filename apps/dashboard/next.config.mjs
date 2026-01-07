@@ -17,9 +17,6 @@ const config = {
   },
   transpilePackages: ["@zeke/ui", "@zeke/tailwind", "@zeke/api"],
   serverExternalPackages: ["@react-pdf/renderer", "pdfjs-dist"],
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },

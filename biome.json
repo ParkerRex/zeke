@@ -1,20 +1,30 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "files": {
-    "ignore": [
-      "dist",
-      "dist/**",
-      "node_modules",
-      "node_modules/**",
-      ".next",
-      ".next/**"
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.json",
+      "**/*.jsonc",
+      "!**/dist/**",
+      "!**/node_modules/**",
+      "!**/.next/**",
+      "!**/.wrangler/**",
+      "!**/coverage/**",
+      "!**/.turbo/**",
+      "!**/.trigger/**"
     ]
   },
   "linter": {
-    "ignore": [".wrangler", "node_modules"],
     "enabled": true,
     "rules": {
       "recommended": true,

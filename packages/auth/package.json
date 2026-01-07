@@ -12,6 +12,7 @@
     "@zeke/db": "workspace:*",
     "@zeke/utils": "workspace:*",
     "better-auth": "^1.4.10",
+    "drizzle-orm": "0.45.1",
     "server-only": "^0.0.1",
     "zod": "^4.3.4"
   },

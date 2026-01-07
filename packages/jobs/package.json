@@ -17,6 +17,7 @@
     "@mozilla/readability": "^0.6.0",
     "@zeke/db": "workspace:*",
     "@zeke/engine": "workspace:*",
+    "@zeke/engine-client": "workspace:*",
     "@zeke/storage": "workspace:*",
     "drizzle-orm": "^0.44.6",
     "fast-xml-parser": "^5.3.3",
