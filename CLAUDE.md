@@ -45,7 +45,6 @@ apps/
   dashboard/     # Next.js 15 (port 3001)
   engine/        # Content fetching (port 3010)
   website/       # Marketing (port 3000)
-  desktop/       # Tauri app
 
 packages/
   db/            # Drizzle schema/queries
@@ -122,7 +121,6 @@ Full documentation in `/docs`:
 - [Dashboard](./docs/apps/dashboard.md) - Next.js frontend
 - [Engine](./docs/apps/engine.md) - Content ingestion
 - [Website](./docs/apps/website.md) - Marketing site
-- [Desktop](./docs/apps/desktop.md) - Tauri app
 
 ### Packages
 - [Database](./docs/packages/database.md) - Drizzle ORM

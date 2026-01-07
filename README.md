@@ -29,7 +29,6 @@ Run a single app if needed:
 bun run dev:api
 bun run dev:dashboard
 bun run dev:website
-bun run dev:desktop
 ```
 
 ## Documentation
@@ -43,7 +42,7 @@ bun run dev:desktop
 
 ### Apps & Packages
 
-- **Apps**: [API](./docs/apps/api.md) · [Dashboard](./docs/apps/dashboard.md) · [Engine](./docs/apps/engine.md) · [Website](./docs/apps/website.md) · [Desktop](./docs/apps/desktop.md)
+- **Apps**: [API](./docs/apps/api.md) · [Dashboard](./docs/apps/dashboard.md) · [Engine](./docs/apps/engine.md) · [Website](./docs/apps/website.md)
 - **Packages**: [Database](./docs/packages/database.md) · [Jobs](./docs/packages/jobs.md) · [Auth](./docs/packages/auth.md) · [Storage](./docs/packages/storage.md) · [Cache](./docs/packages/cache.md) · [UI](./docs/packages/ui.md)
 
 ## Tech Stack
@@ -68,7 +67,6 @@ apps/
   dashboard/     Next.js frontend (port 3001)
   engine/        Content fetching service (port 3010)
   website/       Marketing site (port 3000)
-  desktop/       Tauri native app
 
 packages/
   db/            Drizzle schema and queries
@@ -91,7 +89,6 @@ packages/
 | `bun run dev:api` | API only |
 | `bun run dev:dashboard` | Dashboard only |
 | `bun run dev:website` | Website only |
-| `bun run dev:desktop` | Desktop only |
 
 ### Build & Quality
 

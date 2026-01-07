@@ -4,7 +4,7 @@
 
 ## Commands
 - **Dev All**: `bun dev` (starts Docker services + all apps with health checks)
-- **Dev Single**: `bun run dev:api` / `dev:dashboard` / `dev:website` / `dev:desktop`
+- **Dev Single**: `bun run dev:api` / `dev:dashboard` / `dev:website`
 - **Stop Apps**: `bun run stop` (stops apps, Docker keeps running)
 - **Stop All**: `bun run stop -- --docker` (stops everything including Docker)
 - **Build**: `bun run build` (runs the sequential build script across packages and apps)
@@ -19,7 +19,7 @@
 - **DB Studio**: `cd packages/db && bun run migrate:studio`
 
 ## Architecture
-Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js, port 3001), **engine** (content fetching, port 3010), **website** (marketing, port 3000), **desktop** (Tauri). Packages: **db** (Drizzle schema/queries), **jobs** (pg-boss background jobs), **ui** (React components), **auth** (Better Auth with 2FA), **storage** (MinIO), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `AGENTS.md` with detailed context—read those first.
+Monorepo using Bun + pnpm workspaces. Apps: **api** (TRPC+REST, port 3003), **dashboard** (Next.js, port 3001), **engine** (content fetching, port 3010), **website** (marketing, port 3000). Packages: **db** (Drizzle schema/queries), **jobs** (pg-boss background jobs), **ui** (React components), **auth** (Better Auth with 2FA), **storage** (MinIO), **cache** (Redis), **logger**, **encryption**, etc. Each app/package has its own `AGENTS.md` with detailed context—read those first.
 
 ## Services
 | Service | Port | Description |
