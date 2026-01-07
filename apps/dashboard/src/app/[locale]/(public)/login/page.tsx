@@ -13,11 +13,8 @@ import {
 import { Icons } from "@zeke/ui/icons";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { userAgent } from "next/server";
-import backgroundDark from "public/assets/bg-login-dark.jpg";
-import backgroundLight from "public/assets/bg-login.jpg";
 
 export const metadata: Metadata = {
   title: "Login | Zeke",
@@ -84,26 +81,8 @@ export default async function Page() {
 
       {/* Main Layout */}
       <div className="flex h-full">
-        {/* Background Image Section - Hidden on mobile, visible on desktop */}
-        <div className="hidden lg:flex lg:w-1/2 relative">
-          <Image
-            src={backgroundLight}
-            alt="Background"
-            className="object-cover dark:hidden"
-            priority
-            fill
-          />
-          <Image
-            src={backgroundDark}
-            alt="Background"
-            className="object-cover hidden dark:block"
-            priority
-            fill
-          />
-        </div>
-
         {/* Login Form Section */}
-        <div className="w-full lg:w-1/2 relative">
+        <div className="w-full relative">
           {/* Form Content */}
           <div className="relative z-10 flex h-full items-center justify-center p-6">
             <div className="w-full max-w-md space-y-8">

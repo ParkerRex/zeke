@@ -21,7 +21,7 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
           </Button>
 
           <Link href="/account/support">
-            <Button>Contact us</Button>
+            <Button variant="outline">Contact us</Button>
           </Link>
         </div>
       </div>

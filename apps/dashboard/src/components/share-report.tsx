@@ -87,7 +87,7 @@ export function ShareReport({ defaultValue, type, setOpen }: Props) {
             />
 
             <Link href={data.short_link} onClick={() => dismiss(id)}>
-              <Button>View</Button>
+              <Button variant="outline">View</Button>
             </Link>
           </div>
         ),

@@ -28,7 +28,7 @@ export function MfaSettingsList() {
       <CardFooter className="flex justify-between">
         <div />
         <Link href="?add=device">
-          <Button>Add new device</Button>
+          <Button variant="outline">Add new device</Button>
         </Link>
       </CardFooter>
     </Card>

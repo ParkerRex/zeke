@@ -27,7 +27,7 @@ export function DataTableHeader({ table }: Props) {
         spellCheck="false"
       />
       <Link href="/teams/create">
-        <Button>Create team</Button>
+        <Button variant="outline">Create team</Button>
       </Link>
     </div>
   );
