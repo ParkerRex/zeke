@@ -1,3 +1,5 @@
+- READ ~/Projects/shorts-factory/agent-scripts/AGENTS.MD BEFORE ANYTHING (skip if missing).
+
 # Zeke - AI Coding Assistant Context
 
 AI-powered research intelligence platform. This document provides context for AI coding assistants.

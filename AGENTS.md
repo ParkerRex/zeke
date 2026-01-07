@@ -1,3 +1,5 @@
+- READ ~/Projects/shorts-factory/agent-scripts/AGENTS.MD BEFORE ANYTHING (skip if missing).
+
 # Zeke - Project Architecture & Agent Documentation
 
 ## Commands
