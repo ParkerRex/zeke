@@ -47,7 +47,6 @@ export async function proxy(request: NextRequest) {
     !newUrl.pathname.includes("/s/") &&
     !newUrl.pathname.includes("/verify") &&
     !newUrl.pathname.includes("/all-done") &&
-    !newUrl.pathname.includes("/desktop/search") &&
     !newUrl.pathname.includes("/mfa/setup")
   ) {
     const redirectUrl = new URL("/login", request.url);

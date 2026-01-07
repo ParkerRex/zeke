@@ -1,7 +1,6 @@
 "use client";
 
 import { getUrl } from "@/utils/environment";
-import { isDesktopApp } from "@zeke/desktop-client/platform";
 import { authClient } from "@zeke/auth/client";
 import { Icons } from "@zeke/ui/icons";
 import { SubmitButton } from "@zeke/ui/submit-button";
@@ -13,26 +12,11 @@ export function AppleSignIn() {
   const handleSignIn = async () => {
     setLoading(true);
 
-    if (!isDesktopApp()) {
-      const callbackUrl = new URL("/", getUrl());
-      await authClient.signIn.social({
-        provider: "apple",
-        callbackURL: callbackUrl.toString(),
-      });
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-      return;
-    }
-
-    const desktopCallbackUrl = new URL("/api/auth/callback", getUrl());
-    desktopCallbackUrl.searchParams.append("provider", "apple");
-    desktopCallbackUrl.searchParams.append("client", "desktop");
+    const callbackUrl = new URL("/", getUrl());
     await authClient.signIn.social({
       provider: "apple",
-      callbackURL: desktopCallbackUrl.toString(),
+      callbackURL: callbackUrl.toString(),
     });
-
     setTimeout(() => {
       setLoading(false);
     }, 2000);

@@ -3,7 +3,6 @@
 import { useUserQuery } from "@/hooks/use-user";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
-import { isDesktopApp } from "@zeke/desktop-client/platform";
 import { cn } from "@zeke/ui/cn";
 import { SubmitButton } from "@zeke/ui/submit-button";
 import {
@@ -17,7 +16,6 @@ import Link from "next/link";
 import { useState } from "react";
 // TODO: UPDATE THIS TO ZEKE LOGIC
 export function Plans() {
-  const isDesktop = isDesktopApp();
   const [isSubmitting, setIsSubmitting] = useState(0);
   const trpc = useTRPC();
 
@@ -97,7 +95,7 @@ export function Plans() {
               <TooltipTrigger asChild>
                 <Link
                   prefetch={false}
-                  href={`/api/checkout?plan=starter&teamId=${user?.team?.id}&isDesktop=${isDesktop}&planType=starter`}
+                  href={`/api/checkout?plan=starter&teamId=${user?.team?.id}&isDesktop=false&planType=starter`}
                   className={cn(!data?.starter && "opacity-50 cursor-default")}
                   onClick={(evt) => {
                     if (!data?.starter) {
@@ -214,7 +212,7 @@ export function Plans() {
           <div className="mt-8 border-t border-border pt-4">
             <Link
               prefetch={false}
-              href={`/api/checkout?plan=pro&teamId=${user?.team?.id}&isDesktop=${isDesktop}&planType=pro`}
+              href={`/api/checkout?plan=pro&teamId=${user?.team?.id}&isDesktop=false&planType=pro`}
             >
               <SubmitButton
                 className="h-9"

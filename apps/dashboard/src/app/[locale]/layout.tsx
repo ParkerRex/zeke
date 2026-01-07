@@ -1,8 +1,6 @@
 import "@/styles/globals.css";
 import { cn } from "@zeke/ui/cn";
 import "@zeke/ui/globals.css";
-import { DesktopHeader } from "@/components/desktop-header";
-import { isDesktopApp } from "@/utils/desktop";
 import { Provider as Analytics } from "@zeke/events/client";
 import { Toaster } from "@zeke/ui/toaster";
 import { GeistMono } from "geist/font/mono";
@@ -83,22 +81,15 @@ export default async function Layout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const isDesktop = await isDesktopApp();
 
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-      className={cn(isDesktop && "desktop")}
-    >
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={cn(
           `${GeistSans.variable} ${GeistMono.variable} ${lora.variable} font-sans`,
           "whitespace-pre-line overscroll-none antialiased",
         )}
       >
-        <DesktopHeader />
-
         <NuqsAdapter>
           <Providers locale={locale}>{children}</Providers>
           <Toaster />
