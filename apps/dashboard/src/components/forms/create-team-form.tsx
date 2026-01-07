@@ -107,23 +107,6 @@ export function CreateTeamForm({ defaultCountryCodePromise }: Props) {
           timestamp: new Date().toISOString(),
         });
 
-        // Capture error in Sentry for debugging
-        if (error instanceof Error && process.env.NODE_ENV === "production") {
-          import("@sentry/nextjs").then((Sentry) => {
-            Sentry.captureException(error, {
-              extra: {
-                errorId,
-                component: "CreateTeamForm",
-                action: "team_creation_mutation",
-                trpcCode: trpcError?.code,
-                trpcHttpStatus: trpcError?.httpStatus,
-                url: window.location.href,
-                timestamp: new Date().toISOString(),
-              },
-            });
-          });
-        }
-
         setIsLoading(false);
         isSubmittedRef.current = false; // Reset on error to allow retry
       },

@@ -1,7 +1,3 @@
-import {
-  logDatabaseError,
-  measurePerformance,
-} from "@/src/utils/sentry-config";
 import { connectDb, type Database } from "@zeke/db/client";
 
 export type TransactionClient = Database;
@@ -19,41 +15,28 @@ export interface TransactionResult<T> {
 export async function withTransaction<T>(
   operation: string,
   fn: (client: TransactionClient) => Promise<T>,
-  options: {
+  _options: {
     useAdminClient?: boolean;
     userId?: string;
   } = {},
 ): Promise<TransactionResult<T>> {
-  const { userId } = options;
+  try {
+    const db = await connectDb();
+    const result = await fn(db);
 
-  return measurePerformance(
-    `transaction:${operation}`,
-    async () => {
-      try {
-        const db = await connectDb();
-        const result = await fn(db);
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
 
-        return {
-          success: true,
-          data: result,
-        };
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-
-        logDatabaseError(error as Error, {
-          operation,
-          userId,
-        });
-
-        return {
-          success: false,
-          error: errorMessage,
-        };
-      }
-    },
-    { operation, userId },
-  );
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
 }
 
 /**
