@@ -1,3 +1,8 @@
+Project name: Zeke
+One liner: AI-powered research workspace to chat with, organize, and highlight insights from your private story archive.
+Stack: TypeScript, React 19, TanStack Router/Start, Vite, Convex, Better Auth, OpenAI AI SDK, Tailwind CSS, Bun.
+Problem: Useful ideas get buried across scattered stories and notes; Zeke centralizes source material and turns it into searchable, reusable highlights through guided AI conversations.
+
 # Zeke
 
 AI-powered research intelligence platform that transforms content into actionable insights.
